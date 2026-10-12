@@ -235,8 +235,8 @@ textarea.mono{font-family:var(--mono);font-size:13px;background:var(--code-bg)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
 <script>
 (function(){
-const TYPES={hw:{label:'Homework',short:'HW'},rec:{label:'Recitation',short:'Rec'},lec:{label:'Lecture',short:'Lec'},prac:{label:'Exam practice',short:'Prac'}};
-const TYPE_ORDER=['hw','rec','lec','prac'];
+const TYPES={hw:{label:'Homework',short:'HW'},rec:{label:'Recitation',short:'Rec'},lec:{label:'Lecture',short:'Lec'},prac:{label:'Exam review',short:'Rev'}};
+const TYPE_ORDER=['prac','hw','rec','lec'];
 const EXAMS=['Midterm 1','Midterm 2','Final'];
 
 let canWrite=true; const localUrls={};
@@ -256,10 +256,46 @@ const fmtSize=b=>b>1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round(b/
 const fmtDate=d=>{if(!d)return '';const x=new Date(d+'T12:00:00');return isNaN(x)?d:x.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});};
 function store(k,v){try{localStorage.setItem(k,v)}catch(e){}}
 function recall(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function mdInline(t){
+  return t.replace(/`([^`]+)`/g,'<code>$1</code>')
+          .replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+          .replace(/(^|[^*])\*([^*\s][^*]*)\*/g,'$1<em>$2</em>')
+          .replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>')
+          .replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g,'$1<a href="$2" target="_blank" rel="noopener">$2</a>');
+}
+function miniMd(text){
+  const lines=esc(text).split('\n'); let html='', i=0;
+  while(i<lines.length){
+    const l=lines[i];
+    if(!l.trim()){i++;continue;}
+    if(/^\s*\|/.test(l)){
+      const rows=[]; while(i<lines.length&&/^\s*\|/.test(lines[i])){rows.push(lines[i]);i++;}
+      const cells=r=>r.trim().replace(/^\||\|$/g,'').split('|').map(c=>mdInline(c.trim()));
+      const body=rows.filter((r,k)=>!(k===1&&/^[\s|:-]+$/.test(r)));
+      html+='<table><thead><tr>'+cells(body[0]).map(c=>'<th>'+c+'</th>').join('')+'</tr></thead><tbody>'+
+        body.slice(1).map(r=>'<tr>'+cells(r).map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
+      continue;
+    }
+    let m=l.match(/^(#{1,4})\s+(.*)/);
+    if(m){html+='<h4>'+mdInline(m[2])+'</h4>';i++;continue;}
+    if(/^\s*[-*]\s+/.test(l)||/^\s*\d+\.\s+/.test(l)){
+      const ordered=/^\s*\d+\./.test(l); const items=[];
+      while(i<lines.length&&(ordered?/^\s*\d+\.\s+/:/^\s*[-*]\s+/).test(lines[i])){
+        items.push(lines[i].replace(/^\s*([-*]|\d+\.)\s+/,'')); i++;
+        while(i<lines.length&&/^\s{2,}\S/.test(lines[i])&&!/^\s*([-*]|\d+\.)\s+/.test(lines[i])){items[items.length-1]+=' '+lines[i].trim();i++;}
+      }
+      html+=(ordered?'<ol>':'<ul>')+items.map(x=>'<li>'+mdInline(x)+'</li>').join('')+(ordered?'</ol>':'</ul>');
+      continue;
+    }
+    const para=[]; while(i<lines.length&&lines[i].trim()&&!/^\s*(\||[-*]\s|\d+\.\s|#)/.test(lines[i])){para.push(lines[i]);i++;}
+    html+='<p>'+mdInline(para.join(' '))+'</p>';
+  }
+  return html;
+}
 function md(text){
   if(!text)return '';
   try{ if(window.marked&&window.DOMPurify) return DOMPurify.sanitize(marked.parse(text)); }catch(e){}
-  return '<p>'+esc(text).replace(/\n\n+/g,'</p><p>').replace(/\n/g,'<br>')+'</p>';
+  return miniMd(text);
 }
 function highlight(root){
   if(!window.hljs)return;
@@ -349,14 +385,14 @@ function entryHTML(id,e){
     <div class="badges">${(e.exams||[]).map(x=>`<span class="badge exam">${esc(x)}</span>`).join('')}${(e.topics||[]).map(x=>`<span class="badge">${esc(x)}</span>`).join('')}</div>
   </header>
 
-  <section class="block">
+  <section class="block" ${e.type==='prac'&&!pdfs.length?'hidden':''}>
     <div class="block-h"><h3>Files<span class="count">${pdfs.length}</span></h3>
 
     </div>
     ${pdfs.length?`<div class="files">${pdfs.map(fileHTML).join('')}</div>`:`<p class="empty-line">No files yet. Use Edit to attach the assignment PDF, your solutions, or screenshots of output.</p>`}
   </section>
 
-  <section class="block">
+  <section class="block" ${e.type==='prac'&&!chunks.length?'hidden':''}>
     <div class="block-h"><h3>Code<span class="count">${chunks.length} chunk${chunks.length===1?'':'s'}</span></h3></div>
     ${chunks.length?chunks.map((c,i)=>chunkHTML(c,i)).join(''):`<p class="empty-line">No code yet. Use Edit to paste chunks or import an .R / .Rmd file.</p>`}
   </section>

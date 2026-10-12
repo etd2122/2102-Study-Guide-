@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-12T17:10:00Z";
+window.ENTRIES_SAVED = "2026-10-12T17:45:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -1745,5 +1745,544 @@ window.ENTRIES = {
   "notes": "Unfair dice, sampling until a sum passes 10, `test_scores_variation`, coin streaks, rainy days, light bulbs, an adaptive quiz, a random walk and more simulation functions.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
   "updatedAt": "2026-10-12T17:10:00Z"
+ },
+ "rev-00": {
+  "type": "prac",
+  "num": "00",
+  "title": "Review session notes and exam plan",
+  "date": "",
+  "exams": [
+   "Midterm 1"
+  ],
+  "topics": [
+   "exam format",
+   "functions",
+   "data set",
+   "visualization"
+  ],
+  "pdfs": [],
+  "chunks": [],
+  "notes": "**From the review session**\n\n- You can use solutions from homework and recitation sessions.\n- The exam has two parts: **(1) create a function** and **(2) work with a data set**, including visualization.\n\n**Topics to know**\n\n- Data structures: vectors, lists, matrices, data frames, factors. `length()` can be used as an input. Adding elements to a vector. Subsetting.\n- Lists hold mixed (heterogeneous) data. Single brackets `[ ]` give back a **list**; double brackets `[[ ]]` give back the **element itself** (a vector, a number, etc.).\n- Matrices: `matrix(data, ncol = , byrow = TRUE)`. Access with `[row, column]`. Use logical conditions to change elements, for example every 8 becomes 0.\n- Data frames: `str(df)`, `summary(df)`, `colnames(df)`, use `head()` to show a manipulation, subset with `[ ]` or `$` (e.g. `df[df$Age < 50, ]`), add columns (`df$Experience <- c(...)`), `cbind()` and `rbind()`.\n- Convert character columns into factors and define their levels.\n- Filtering with `&` and `|`.\n- `if`/`else` and nested if-else; `ifelse()` (Lecture 5).\n- For loops with `next` and `break`. **Only for loops in the questions.**\n- Functions (Lecture 6): always use `return()`. Functions with sampling, like the simpler homework problems.\n- `read.table()` is more general; `read.csv()` is for CSV files. Use `stringsAsFactors = TRUE`.\n- `quantile(data1$Age, c(0.3, 0.8))`.\n- Apply functions: `apply(data, 1 or 2, function)`, `lapply()`, `sapply()`, `mapply()`, `tapply()` for subgroup analysis (means and medians across groups).\n- Visualization: histograms and boxplots; make sure the inputs are the right type.\n- Probability: only the normal distribution (`rnorm()`) and `sample()`. Use `set.seed(1)` **inside** the function.\n\n**Fixes to my notes** (these would cause errors or wrong answers)\n\n- `matrix_8 <- matrix_8[matrix_8 == 8] <- 0` overwrites the whole matrix with `0`. Write `matrix_8[matrix_8 == 8] <- 0` on its own line.\n- The function is `quantile()`, not `quantiles()`, and it needs both closing parentheses: `quantile(data1$Age, c(0.3, 0.8))`.\n- R is case-sensitive: `stringsAsFactors = TRUE` and `length()`, not `STRINGSASFACTORS` or `Length()`.\n- Column names are case-sensitive too: `df$Experience` and `df$EXPERIENCE` are different columns.\n\nThe other review sheets (Rev 01–06) have a tested template for each topic.",
+  "takeaways": [
+   "Part 1 is writing a function; Part 2 is working with a data set plus a plot.",
+   "Homework and recitation solutions are allowed: use \"Find code for a question\" to locate the closest one.",
+   "Every function ends with return(...).",
+   "Put set.seed(1) inside the function, before sample() or rnorm().",
+   "Questions use for loops (with next and break), not while loops.",
+   "matrix_8[matrix_8 == 8] <- 0 on its own line; never assign it back to matrix_8.",
+   "quantile(), stringsAsFactors = TRUE and length() are spelled exactly like that.",
+   "[ ] on a list gives a list; [[ ]] gives the element itself."
+  ],
+  "updatedAt": "2026-10-12T17:45:00Z"
+ },
+ "rev-01": {
+  "type": "prac",
+  "num": "01",
+  "title": "Functions: templates to adapt",
+  "date": "",
+  "exams": [
+   "Midterm 1"
+  ],
+  "topics": [
+   "functions",
+   "return",
+   "if-else",
+   "for loops",
+   "next",
+   "break",
+   "sample()",
+   "rnorm()",
+   "set.seed",
+   "lists"
+  ],
+  "pdfs": [],
+  "chunks": [
+   {
+    "id": "rev-01-c01",
+    "label": "Function anatomy",
+    "question": "Write a function named ___ that takes ___ and returns ___.",
+    "code": "# name <- function(argument1, argument2 = default) {\n#   ...work with the arguments...\n#   return(result)\n# }\n\nadd_tax <- function(price, rate = 0.08) {\n  total <- price * (1 + rate)\n  return(total)\n}\n\nadd_tax(100)               # uses the default rate\n#> [1] 108\nadd_tax(100, rate = 0.10)  # overrides the default\n#> [1] 110\nadd_tax(c(10, 20, 30))     # vectors work too\n#> [1] 10.8 21.6 32.4",
+    "comment": "- Arguments are the inputs the question lists, in the same order.\n- `rate = 0.08` is a **default**: used when you don't pass a rate.\n- Objects created inside the function (like `total`) don't exist outside it.",
+    "key": true
+   },
+   {
+    "id": "rev-01-c02",
+    "label": "if / else if / else on one value",
+    "question": "Write a function that assigns a status (or category) to a single value based on rules.",
+    "code": "grade_status <- function(score, homework_rate) {\n  if (score >= 90 & homework_rate >= 0.9) {\n    status <- \"Excellent\"\n  } else if (score >= 80 & homework_rate >= 0.8) {\n    status <- \"Good\"\n  } else if (score >= 70) {\n    status <- \"Pass\"\n  } else {\n    status <- \"Fail\"\n  }\n  return(status)\n}\n\ngrade_status(84, 0.92)\n#> [1] \"Good\"\ngrade_status(65, 1)\n#> [1] \"Fail\"",
+    "comment": "- Check the strictest condition first; R stops at the first TRUE.\n- `&` means both must be TRUE, `|` means at least one.\n- `if ()` only takes **one** TRUE/FALSE. For a vector, see the next chunk.",
+    "key": true
+   },
+   {
+    "id": "rev-01-c03",
+    "label": "Classify every element of a vector (for loop + if)",
+    "question": "Write a function that takes a numeric vector and labels each element (e.g. Small / Medium / Large).",
+    "code": "categorize <- function(x) {\n  labels <- c()                        # start empty, fill in the loop\n  for (i in 1:length(x)) {\n    if (x[i] < 10) {\n      labels[i] <- \"Small\"\n    } else if (x[i] <= 20) {\n      labels[i] <- \"Medium\"\n    } else {\n      labels[i] <- \"Large\"\n    }\n  }\n  return(labels)\n}\n\ncategorize(c(4, 10, 15, 22, 8, 18, 27, 5, 12))\n#> [1] \"Small\"  \"Medium\" \"Medium\" \"Large\"  \"Small\"  \"Medium\" \"Large\"  \"Small\" \n#> [9] \"Medium\"\n\n# Same result in one line with nested ifelse()\ncategorize2 <- function(x) {\n  return(ifelse(x < 10, \"Small\", ifelse(x <= 20, \"Medium\", \"Large\")))\n}\ncategorize2(c(4, 10, 15, 22, 8, 18, 27, 5, 12))\n#> [1] \"Small\"  \"Medium\" \"Medium\" \"Large\"  \"Small\"  \"Medium\" \"Large\"  \"Small\" \n#> [9] \"Medium\"",
+    "comment": "- `for (i in 1:length(x))` loops over **positions**, so you can write `labels[i]`.\n- \"Between 10 and 20 inclusive\" means `>= 10` and `<= 20`; the `else if` order handles the `>= 10` part.\n- This is Homework 1, Problem 5 Part 1.",
+    "key": true
+   },
+   {
+    "id": "rev-01-c04",
+    "label": "Count things with a for loop (counters, next)",
+    "question": "Write a function that counts how many elements meet a condition (even/odd, positive/negative) and returns the counts.",
+    "code": "count_even_odd <- function(x) {\n  even <- 0\n  odd <- 0\n  for (value in x) {\n    if (!is.numeric(value)) {\n      next                             # skip anything that isn't a number\n    }\n    if (value %% 2 == 0) {\n      even <- even + 1\n    } else if (value %% 2 == 1) {      # decimals like 3.4 are neither\n      odd <- odd + 1\n    }\n  }\n  return(list(Even = even, Odd = odd))\n}\n\ncount_even_odd(c(1, 3.4, 2, -5, 16, 7))\n#> $Even\n#> [1] 2\n#> $Odd\n#> [1] 3",
+    "comment": "- `x %% 2 == 0` is even. In R, `-5 %% 2` is `1`, so negatives work too.\n- `for (value in x)` loops over **values**; use it when you don't need the position.\n- `next` jumps to the next element; `break` stops the loop entirely.",
+    "key": true
+   },
+   {
+    "id": "rev-01-c05",
+    "label": "Loop over a matrix (nested for loops)",
+    "question": "Write a function (or loop) that goes through every element of a matrix and replaces values according to rules.",
+    "code": "adjust_matrix <- function(m) {\n  result <- m                               # same size as the input\n  for (i in 1:nrow(m)) {                    # rows\n    for (j in 1:ncol(m)) {                  # columns\n      if (m[i, j] < 0) {\n        result[i, j] <- 0\n      } else if (m[i, j] < 5) {\n        result[i, j] <- 5\n      } else if (m[i, j] > 10 & m[i, j] < 15) {\n        result[i, j] <- 10\n      } else {\n        result[i, j] <- 100\n      }\n    }\n  }\n  return(result)\n}\n\nm <- matrix(c(10, 3, 6, 23, -5,\n              -4, 13, 17, 5, 6), ncol = 5, byrow = TRUE)\nadjust_matrix(m)\n#>      [,1] [,2] [,3] [,4] [,5]\n#> [1,]  100    5  100  100    0\n#> [2,]    0   10  100  100  100",
+    "comment": "- `i` walks the rows and `j` the columns, so the element is `m[i, j]`.\n- Copy the input first (`result <- m`) or make an empty one: `matrix(0, nrow = nrow(m), ncol = ncol(m))`.\n- Close to Homework 1, Problem 4 Part 2.",
+    "key": true
+   },
+   {
+    "id": "rev-01-c06",
+    "label": "Return several results in a list",
+    "question": "Write a function that returns a list containing several summaries (sums, means, max, min...).",
+    "code": "matrix_summary <- function(m) {\n  result <- list(\n    RowSums     = rowSums(m),\n    ColumnMeans = colMeans(m),\n    MaxValue    = max(m),\n    MinValue    = min(m)\n  )\n  return(result)\n}\n\nout <- matrix_summary(matrix(c(5, 7, 9, 6, 12, 14), nrow = 2, byrow = TRUE))\nout\n#> $RowSums\n#> [1] 21 32\n#> $ColumnMeans\n#> [1]  5.5  9.5 11.5\n#> $MaxValue\n#> [1] 14\n#> $MinValue\n#> [1] 5\nout$MaxValue       # pull out one piece\n#> [1] 14",
+    "comment": "- Name every list element (`RowSums = ...`) so the output is labeled.\n- Without `rowSums()`: `apply(m, 1, sum)` for rows, `apply(m, 2, mean)` for columns.\n- Homework 1, Problem 5 Part 2.",
+    "key": false
+   },
+   {
+    "id": "rev-01-c07",
+    "label": "Simulation with sample() and set.seed()",
+    "question": "Write a function that simulates rolling dice (fair or unfair) n times and returns the outcomes or a frequency table.",
+    "code": "roll_two_dice <- function(n) {\n  set.seed(1)                                   # same results every run\n  die1 <- sample(1:6, size = n, replace = TRUE)\n  die2 <- sample(1:6, size = n, replace = TRUE)\n  return(data.frame(Die1 = die1, Die2 = die2, Sum = die1 + die2))\n}\nroll_two_dice(5)\n#>   Die1 Die2 Sum\n#> 1    1    3   4\n#> 2    4    6  10\n#> 3    1    2   3\n#> 4    2    3   5\n#> 5    5    3   8\n\n# Unfair die: prob = goes in the same order as the faces 1:6\nunfair_die <- function(n) {\n  set.seed(1)\n  rolls <- sample(1:6, size = n, replace = TRUE,\n                  prob = c(0.1, 0.3, 0.2, 0.05, 0.3, 0.05))\n  return(table(rolls))\n}\nunfair_die(100)\n#> rolls\n#>  1  2  3  4  5  6 \n#> 11 33 26  2 24  4 ",
+    "comment": "- `replace = TRUE` is required when you take more draws than there are faces.\n- The probabilities must add up to 1.\n- `table()` turns the results into a frequency table (how many 1s, 2s, ...).\n- Close to Homework 2, Problem 1 Parts 1–2.",
+    "key": true
+   },
+   {
+    "id": "rev-01-c08",
+    "label": "Repeat until something happens (for loop + break)",
+    "question": "Write a function that keeps simulating until a condition is met and returns how many tries it took.",
+    "code": "rolls_until_sum <- function(target, max_rolls = 1000) {\n  set.seed(1)\n  for (i in 1:max_rolls) {\n    total <- sample(1:6, 1) + sample(1:6, 1)\n    if (total == target) {\n      break                        # stop as soon as we hit the target\n    }\n  }\n  return(i)                        # i is the number of rolls it took\n}\n\nrolls_until_sum(7)\n#> [1] 7\nrolls_until_sum(12)\n#> [1] 8",
+    "comment": "- Since exam questions use **for loops**, this is the for-loop way to \"keep going until\": loop up to a big number and `break`.\n- After `break`, `i` still holds the step where the loop stopped.\n- Recitation 4 solves similar problems with `while`; either works if allowed.",
+    "key": true
+   },
+   {
+    "id": "rev-01-c09",
+    "label": "Normal distribution with rnorm()",
+    "question": "Write a function that generates n observations from a normal distribution with mean mu and standard deviation sigma and returns summaries.",
+    "code": "normal_summary <- function(n, mu, sigma) {\n  set.seed(1)\n  x <- rnorm(n, mean = mu, sd = sigma)\n  result <- list(\n    SampleMean   = mean(x),\n    SampleSD     = sd(x),\n    ShareAboveMu = mean(x > mu),               # mean of TRUE/FALSE = proportion\n    Quartiles    = quantile(x, c(0.25, 0.75)),\n    AnyNegative  = any(x < 0)\n  )\n  return(result)\n}\n\nnormal_summary(n = 500, mu = 3, sigma = 2)\n#> $SampleMean\n#> [1] 3.045288\n#> $SampleSD\n#> [1] 2.023857\n#> $ShareAboveMu\n#> [1] 0.478\n#> $Quartiles\n#>      25%      75% \n#> 1.757506 4.357126 \n#> $AnyNegative\n#> [1] TRUE",
+    "comment": "- `rnorm(n, mean, sd)`: the third argument is the **standard deviation**, not the variance.\n- `mean(x > mu)` gives the proportion of values above `mu`.\n- `any()` and `all()` check a whole vector at once (Homework 2, Problem 1 Part 4 uses this).",
+    "key": true
+   },
+   {
+    "id": "rev-01-c10",
+    "label": "rnorm() into a matrix, then summarize",
+    "question": "Generate n random normal numbers, fill a matrix with them, and return column means or row medians depending on a condition.",
+    "code": "fill_and_summarize <- function(n, mu, sigma) {\n  set.seed(1)\n  x <- rnorm(n, mean = mu, sd = sigma)\n  if (n %% 2 == 0) {\n    m <- matrix(x, nrow = 2, byrow = TRUE)     # 2 rows, n/2 columns\n  } else {\n    m <- matrix(x, ncol = 1)\n  }\n  if (all(x >= 0)) {\n    return(apply(m, 2, mean))                  # column means\n  } else {\n    return(apply(m, 1, median))                # row medians\n  }\n}\n\nfill_and_summarize(n = 10, mu = 0.5, sigma = 2)\n#> [1] 0.8672866 1.4748581",
+    "comment": "- `n %% 2 == 0` checks divisibility; `n %% 3 == 0` for 3.\n- `apply(m, 1, f)` = by **row**, `apply(m, 2, f)` = by **column**.\n- Pattern from Homework 2, Problem 1 Part 4.",
+    "key": false
+   },
+   {
+    "id": "rev-01-c11",
+    "label": "Function that works on a data frame",
+    "question": "Write a function that takes a data frame, filters it, and returns a group summary.",
+    "code": "employees <- data.frame(\n  Employee   = c(\"Anna\", \"Ben\", \"Carla\", \"David\", \"Emma\", \"Frank\", \"Grace\", \"Henry\"),\n  Department = c(\"Analytics\", \"Marketing\", \"Analytics\", \"Finance\",\n                 \"Marketing\", \"Analytics\", \"Finance\", \"Analytics\"),\n  Experience = c(2, 7, 5, 9, 3, 6, 8, 4),\n  Salary     = c(68000, 85000, 79000, 105000, 72000, 92000, 99000, 76000),\n  Remote     = c(TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, TRUE)\n)\n\ndept_report <- function(df, min_salary) {\n  high <- df[df$Salary > min_salary, ]                    # rows that pass\n  avg_by_dept <- tapply(high$Salary, high$Department, mean)\n  return(list(Count = nrow(high), AverageByDept = avg_by_dept))\n}\n\ndept_report(employees, 75000)\n#> $Count\n#> [1] 6\n#> $AverageByDept\n#> Analytics   Finance Marketing \n#>  82333.33 102000.00  85000.00 ",
+    "comment": "- `df[condition, ]` keeps the rows where the condition is TRUE; the empty spot after the comma keeps all columns.\n- `tapply(values, groups, function)` is the subgroup summary from the review session.",
+    "key": true
+   },
+   {
+    "id": "rev-01-c12",
+    "label": "Use sapply instead of a loop",
+    "question": "Write a function that takes a list, computes the mean of each element, and reorders the list by those means.",
+    "code": "order_by_mean <- function(lst) {\n  means <- sapply(lst, mean)           # one mean per list element\n  return(lst[order(means)])            # smallest mean first\n}\n\norder_by_mean(list(c(20, 13, 34, 2), c(2, 3), c(45, 65, 78), c(3, 5, 10)))\n#> [[1]]\n#> [1] 2 3\n#> [[2]]\n#> [1]  3  5 10\n#> [[3]]\n#> [1] 20 13 34  2\n#> [[4]]\n#> [1] 45 65 78",
+    "comment": "- `sapply()` returns a vector; `lapply()` returns a list.\n- `order()` gives the positions in sorted order; use them as an index.\n- Homework 2, Problem 1 Part 3.",
+    "key": false
+   }
+  ],
+  "notes": "Start from the template that matches the question, rename things, and change the body.\n\n**How to read a function question**\n\n1. The **name** and **arguments** are given: `fun2 <- function(n) { }`.\n2. Underline what it must **return**. One thing goes in `return(x)`; several things go in `return(list(A = a, B = b))`.\n3. If it says \"simulate\", \"random\" or \"roll\", you need `set.seed(1)` and `sample()` or `rnorm()`.\n4. If it says \"for each element\", \"every value\" or \"repeat\", you need a `for` loop.\n5. Finish by **calling it with the test values** the question gives, so the output is printed.\n\n**Debugging checklist**\n\n- Every `(`, `{` and `\"` is closed.\n- The object you build inside the loop was created **before** the loop (`result <- c()`, `count <- 0`).\n- You return the object you built, not the input.\n- `if ()` gets one TRUE/FALSE. To test a whole vector, use `ifelse()` or a loop.\n- Run the function with a tiny input you can check by hand.",
+  "takeaways": [
+   "Template: name <- function(arg1, arg2 = default) { ...; return(result) }",
+   "Create the result object (c(), 0, matrix(0, ...)) before the loop, then fill it inside the loop.",
+   "Several outputs: return(list(Name1 = a, Name2 = b)).",
+   "Simulation: set.seed(1) first, then sample(1:6, n, replace = TRUE) or rnorm(n, mean, sd).",
+   "Use next to skip an element and break to stop the loop early."
+  ],
+  "updatedAt": "2026-10-12T17:45:00Z"
+ },
+ "rev-02": {
+  "type": "prac",
+  "num": "02",
+  "title": "Vectors, lists, matrices and factors",
+  "date": "",
+  "exams": [
+   "Midterm 1"
+  ],
+  "topics": [
+   "vectors",
+   "subsetting",
+   "append",
+   "lists",
+   "matrices",
+   "factors",
+   "cbind",
+   "rbind"
+  ],
+  "pdfs": [],
+  "chunks": [
+   {
+    "id": "rev-02-c01",
+    "label": "Vectors: create, length, append",
+    "question": "Create a vector in several ways and add elements at specific positions.",
+    "code": "v1 <- c(2.5, 4.5, 6.5, 8.5)\nv2 <- seq(2.5, 8.5, by = 2)\nv3 <- seq(2.5, 8.5, length.out = 4)\nv4 <- 1:5\nv5 <- rep(c(\"A\", \"B\"), times = 3)\nlength(v1)\n#> [1] 4\n\nv2 <- append(v2, 10, after = 1)     # 10 becomes the 2nd element\nv2 <- append(v2, 20, after = 0)     # 20 becomes the 1st element\nv2 <- c(v2, 40)                     # 40 at the end\nv2\n#> [1] 20.0  2.5 10.0  4.5  6.5  8.5 40.0",
+    "comment": "- `after = 0` puts the value first; `after = length(v)` puts it last.\n- Homework 1, Problem 1.",
+    "key": true
+   },
+   {
+    "id": "rev-02-c02",
+    "label": "Vectors: subsetting and changing values",
+    "question": "Extract elements by position or by a condition, and replace values.",
+    "code": "orders <- c(18, 24, 15, 31, 27, 22, 35, 19, 28, 40, 26, 33)\n\norders[1:4]                    # first four\n#> [1] 18 24 15 31\norders[c(3, 6, 9, 12)]         # specific positions\n#> [1] 15 22 28 33\norders[-c(1, length(orders))]  # all except first and last\n#>  [1] 24 15 31 27 22 35 19 28 40 26\norders[orders > 25]            # only values above 25\n#> [1] 31 27 35 28 40 26 33\norders[orders > 25 & orders %% 2 != 0]   # above 25 AND odd\n#> [1] 31 27 35 33\n\norders[4] <- 29                # replace one value\n27 %in% orders                 # is 27 in the vector?\n#> [1] TRUE\nwhich(orders == max(orders))   # position of the largest\n#> [1] 10\norders * 1.10                  # vectorized: every value +10%\n#>  [1] 19.8 26.4 16.5 31.9 29.7 24.2 38.5 20.9 30.8 44.0 28.6 36.3",
+    "comment": "- Negative indexes **remove**; logical conditions **filter**.\n- Recitation 1, Problem 1.",
+    "key": true
+   },
+   {
+    "id": "rev-02-c03",
+    "label": "Lists: [ ] vs [[ ]] and $",
+    "question": "Create a list with mixed elements and extract or change parts of it.",
+    "code": "course <- list(\"Applied Statistical Computing\", 35, c(\"R\", \"Python\"),\n               c(88, 92, 79, 95, 84), list(\"Fall 2026\", TRUE))\n\ncourse[3]            # single brackets: a list\n#> [[1]]\n#> [1] \"R\"      \"Python\"\nclass(course[3])\n#> [1] \"list\"\ncourse[[3]]          # double brackets: the vector itself\n#> [1] \"R\"      \"Python\"\nclass(course[[3]])\n#> [1] \"character\"\ncourse[[3]][2]       # \"Python\"\n#> [1] \"Python\"\ncourse[[4]][4]       # 95\n#> [1] 95\ncourse[[5]][[1]]     # \"Fall 2026\"\n#> [1] \"Fall 2026\"\n\ncourse[[2]] <- 40                    # change an element\ncourse[[3]][2] <- \"SQL\"\ncourse[[6]] <- \"Statistics Department\"   # add a 6th element\ncourse[[4]] <- NULL                  # remove the 4th element\nlength(course)\n#> [1] 5",
+    "comment": "- Think of `[ ]` as \"a smaller train\" and `[[ ]]` as \"the cargo in one car\".\n- Setting an element to `NULL` deletes it.\n- Recitation 1, Problem 2.",
+    "key": true
+   },
+   {
+    "id": "rev-02-c04",
+    "label": "Lists: names, combine, unlist",
+    "question": "Combine lists and flatten a list into a vector; explain the result.",
+    "code": "info <- list(Name = \"Data Science\", Value = 100, Flag = TRUE)\ninfo$Name                       # $ works when elements have names\n#> [1] \"Data Science\"\n\nextra <- list(\"Statistics\", 50, FALSE)\ncombined1 <- c(info, extra)     # one list with 6 elements\ncombined2 <- list(info, extra)  # a list holding 2 lists\nlength(combined1)\n#> [1] 6\nlength(combined2)\n#> [1] 2\n\nunlist(info)                    # everything becomes character\n#>           Name          Value           Flag \n#> \"Data Science\"          \"100\"         \"TRUE\" ",
+    "comment": "- `c()` merges lists; `list()` nests them.\n- `unlist()` coerces to the highest type: logical < integer < double < character.",
+    "key": false
+   },
+   {
+    "id": "rev-02-c05",
+    "label": "Matrices: create, access, logical replace",
+    "question": "Create a matrix by row, extract rows/columns/elements, and replace every element equal to a value.",
+    "code": "scores <- matrix(c(82, 75, 91,\n                   68, 88, 8,\n                   8, 70, 95,\n                   77, 8, 84), ncol = 3, byrow = TRUE)\nscores\n#>      [,1] [,2] [,3]\n#> [1,]   82   75   91\n#> [2,]   68   88    8\n#> [3,]    8   70   95\n#> [4,]   77    8   84\n\nscores[3, 2]         # row 3, column 2\n#> [1] 70\nscores[2, ]          # all of row 2\n#> [1] 68 88  8\nscores[, 3]          # all of column 3\n#> [1] 91  8 95 84\nscores[c(1, 4), c(1, 3)]\n#>      [,1] [,2]\n#> [1,]   82   91\n#> [2,]   77   84\n\nscores[scores == 8] <- 0      # every 8 becomes 0 (one line, no assignment in front)\nscores\n#>      [,1] [,2] [,3]\n#> [1,]   82   75   91\n#> [2,]   68   88    0\n#> [3,]    0   70   95\n#> [4,]   77    0   84\n\nscores[scores >= 90]          # elements that pass a condition\n#> [1] 91 95\ndim(scores); nrow(scores); ncol(scores)\n#> [1] 4 3\n#> [1] 4\n#> [1] 3",
+    "comment": "- Your note had `matrix_8 <- matrix_8[matrix_8 == 8] <- 0`, which replaces the whole matrix with 0. Use the single line shown here.\n- `byrow = TRUE` fills across rows first.",
+    "key": true
+   },
+   {
+    "id": "rev-02-c06",
+    "label": "Matrices: add and remove rows and columns",
+    "question": "Add a column or a row to a matrix and remove rows or columns.",
+    "code": "scores <- matrix(c(82, 75, 91, 68, 88, 79), ncol = 3, byrow = TRUE)\n\nscores <- cbind(scores, c(90, 85))          # new column (one value per row)\nscores <- rbind(scores, c(80, 77, 89, 92))  # new row (one value per column)\nscores\n#>      [,1] [,2] [,3] [,4]\n#> [1,]   82   75   91   90\n#> [2,]   68   88   79   85\n#> [3,]   80   77   89   92\n\nscores[-2, ]          # drop row 2\n#>      [,1] [,2] [,3] [,4]\n#> [1,]   82   75   91   90\n#> [2,]   80   77   89   92\nscores[, -1]          # drop column 1\n#>      [,1] [,2] [,3]\n#> [1,]   75   91   90\n#> [2,]   88   79   85\n#> [3,]   77   89   92\nscores[-2, -1]        # both\n#>      [,1] [,2] [,3]\n#> [1,]   75   91   90\n#> [2,]   77   89   92\nscores + 3            # add 3 to every element\n#>      [,1] [,2] [,3] [,4]\n#> [1,]   85   78   94   93\n#> [2,]   71   91   82   88\n#> [3,]   83   80   92   95",
+    "comment": "- A new column needs as many values as there are **rows**; a new row needs as many as there are **columns**.",
+    "key": false
+   },
+   {
+    "id": "rev-02-c07",
+    "label": "Factors: levels, counts, groups",
+    "question": "Convert a character variable into a factor with specific levels, count its values, or make groups from numbers.",
+    "code": "satisfaction <- c(\"High\", \"Low\", \"Medium\", \"High\", \"Low\", \"High\")\nsat <- factor(satisfaction, levels = c(\"Low\", \"Medium\", \"High\"))\nsat\n#> [1] High   Low    Medium High   Low    High  \n#> Levels: Low Medium High\nlevels(sat)\n#> [1] \"Low\"    \"Medium\" \"High\"  \ntable(sat)                       # counts, in level order\n#> sat\n#>    Low Medium   High \n#>      2      1      3 \n\nyears <- c(1, 4, 7, 12, 16, 22)\ntenure <- cut(years, breaks = c(-Inf, 5, 15, Inf),\n              labels = c(\"Short\", \"Medium\", \"Long\"))\ntable(tenure)\n#> tenure\n#>  Short Medium   Long \n#>      2      2      2 ",
+    "comment": "- Without `levels =`, R sorts them alphabetically.\n- `cut()` makes groups from a number; `breaks` are the boundaries (Recitation 3, Question 3).",
+    "key": true
+   }
+  ],
+  "notes": "Vectors, matrices and factors hold **one type** (homogeneous). Lists and data frames can mix types (heterogeneous).",
+  "takeaways": [
+   "seq(2.5, 14.5, by = 2) and seq(2.5, 14.5, length.out = 7) make the same vector.",
+   "append(x, value, after = k) puts the value in position k + 1.",
+   "x[-c(1, 12)] drops elements; x[x > 25] keeps the ones that pass.",
+   "list[[2]] gives the element; list[2] gives a one-element list.",
+   "unlist() turns everything into the most general type (often character).",
+   "Matrix: m[row, column]; m[2, ] is a whole row, m[, 3] a whole column.",
+   "factor(x, levels = c(...)) sets the order of the categories."
+  ],
+  "updatedAt": "2026-10-12T17:45:00Z"
+ },
+ "rev-03": {
+  "type": "prac",
+  "num": "03",
+  "title": "Data frames: the data set question",
+  "date": "",
+  "exams": [
+   "Midterm 1"
+  ],
+  "topics": [
+   "data frames",
+   "read.csv",
+   "str",
+   "summary",
+   "subsetting",
+   "tapply",
+   "quantile",
+   "factors",
+   "order"
+  ],
+  "pdfs": [],
+  "chunks": [
+   {
+    "id": "rev-03-c01",
+    "label": "Import a CSV (stringsAsFactors)",
+    "question": "Import the data set into R, making sure character variables become factors.",
+    "code": "employees <- data.frame(\n  Employee   = c(\"Anna\", \"Ben\", \"Carla\", \"David\", \"Emma\", \"Frank\", \"Grace\", \"Henry\"),\n  Department = c(\"Analytics\", \"Marketing\", \"Analytics\", \"Finance\",\n                 \"Marketing\", \"Analytics\", \"Finance\", \"Analytics\"),\n  Experience = c(2, 7, 5, 9, 3, 6, 8, 4),\n  Salary     = c(68000, 85000, 79000, 105000, 72000, 92000, 99000, 76000),\n  Remote     = c(TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, TRUE)\n)\nwrite.csv(employees, \"employees.csv\", row.names = FALSE)   # (makes a file to practice on)\n\ndf <- read.csv(\"employees.csv\", stringsAsFactors = TRUE)\nstr(df)\n#> 'data.frame':\t8 obs. of  5 variables:\n#>  $ Employee  : Factor w/ 8 levels \"Anna\",\"Ben\",\"Carla\",..: 1 2 3 4 5 6 7 8\n#>  $ Department: Factor w/ 3 levels \"Analytics\",\"Finance\",..: 1 3 1 2 3 1 2 1\n#>  $ Experience: int  2 7 5 9 3 6 8 4\n#>  $ Salary    : int  68000 85000 79000 105000 72000 92000 99000 76000\n#>  $ Remote    : logi  TRUE FALSE TRUE FALSE TRUE FALSE ...\n\n# read.table() is the general version: say there is a header and what separates values\ndf2 <- read.table(\"employees.csv\", header = TRUE, sep = \",\", stringsAsFactors = TRUE)\ndim(df2)\n#> [1] 8 5",
+    "comment": "- On the exam, put the CSV in your working directory (`getwd()` shows it) or use the full path.\n- `str()` should show `Factor` for text columns. If it says `chr`, you forgot `stringsAsFactors = TRUE`.",
+    "key": true
+   },
+   {
+    "id": "rev-03-c02",
+    "label": "Look at the data",
+    "question": "Examine the structure, a summary of variables, the first rows and the dimensions.",
+    "code": "employees <- data.frame(\n  Employee   = c(\"Anna\", \"Ben\", \"Carla\", \"David\", \"Emma\", \"Frank\", \"Grace\", \"Henry\"),\n  Department = c(\"Analytics\", \"Marketing\", \"Analytics\", \"Finance\",\n                 \"Marketing\", \"Analytics\", \"Finance\", \"Analytics\"),\n  Experience = c(2, 7, 5, 9, 3, 6, 8, 4),\n  Salary     = c(68000, 85000, 79000, 105000, 72000, 92000, 99000, 76000),\n  Remote     = c(TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, TRUE)\n)\n\nstr(employees)\n#> 'data.frame':\t8 obs. of  5 variables:\n#>  $ Employee  : chr  \"Anna\" \"Ben\" \"Carla\" \"David\" ...\n#>  $ Department: chr  \"Analytics\" \"Marketing\" \"Analytics\" \"Finance\" ...\n#>  $ Experience: num  2 7 5 9 3 6 8 4\n#>  $ Salary    : num  68000 85000 79000 105000 72000 92000 99000 76000\n#>  $ Remote    : logi  TRUE FALSE TRUE FALSE TRUE FALSE ...\nsummary(employees)\n#>    Employee          Department          Experience       Salary      \n#>  Length:8           Length:8           Min.   :2.00   Min.   : 68000  \n#>  Class :character   Class :character   1st Qu.:3.75   1st Qu.: 75000  \n#>  Mode  :character   Mode  :character   Median :5.50   Median : 82000  \n#>                                        Mean   :5.50   Mean   : 84500  \n#>                                        3rd Qu.:7.25   3rd Qu.: 93750  \n#>                                        Max.   :9.00   Max.   :105000  \n#>    Remote       \n#>  Mode :logical  \n#>  FALSE:3        \n#>  TRUE :5        \nhead(employees, 3)\n#>   Employee Department Experience Salary Remote\n#> 1     Anna  Analytics          2  68000   TRUE\n#> 2      Ben  Marketing          7  85000  FALSE\n#> 3    Carla  Analytics          5  79000   TRUE\ndim(employees)\n#> [1] 8 5\ncolnames(employees)\n#> [1] \"Employee\"   \"Department\" \"Experience\" \"Salary\"     \"Remote\"    ",
+    "comment": "- Use `head()` after each change to show the manipulation worked, as mentioned in the review session.",
+    "key": true
+   },
+   {
+    "id": "rev-03-c03",
+    "label": "Subset columns and rows",
+    "question": "Extract a column (as a data frame and as a vector), specific rows and columns, or rows meeting conditions.",
+    "code": "employees <- data.frame(\n  Employee   = c(\"Anna\", \"Ben\", \"Carla\", \"David\", \"Emma\", \"Frank\", \"Grace\", \"Henry\"),\n  Department = c(\"Analytics\", \"Marketing\", \"Analytics\", \"Finance\",\n                 \"Marketing\", \"Analytics\", \"Finance\", \"Analytics\"),\n  Experience = c(2, 7, 5, 9, 3, 6, 8, 4),\n  Salary     = c(68000, 85000, 79000, 105000, 72000, 92000, 99000, 76000),\n  Remote     = c(TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, TRUE)\n)\n\nemployees[\"Salary\"]                 # data frame\n#>   Salary\n#> 1  68000\n#> 2  85000\n#> 3  79000\n#> 4 105000\n#> 5  72000\n#> 6  92000\n#> 7  99000\n#> 8  76000\nemployees[[\"Salary\"]]               # vector\n#> [1]  68000  85000  79000 105000  72000  92000  99000  76000\nemployees$Salary                    # vector\n#> [1]  68000  85000  79000 105000  72000  92000  99000  76000\n\nemployees[, c(\"Employee\", \"Department\", \"Salary\")]\n#>   Employee Department Salary\n#> 1     Anna  Analytics  68000\n#> 2      Ben  Marketing  85000\n#> 3    Carla  Analytics  79000\n#> 4    David    Finance 105000\n#> 5     Emma  Marketing  72000\n#> 6    Frank  Analytics  92000\n#> 7    Grace    Finance  99000\n#> 8    Henry  Analytics  76000\nemployees[2:6, c(\"Employee\", \"Experience\")]\n#>   Employee Experience\n#> 2      Ben          7\n#> 3    Carla          5\n#> 4    David          9\n#> 5     Emma          3\n#> 6    Frank          6\n\nemployees[employees$Experience >= 5, ]                           # one condition\n#>   Employee Department Experience Salary Remote\n#> 2      Ben  Marketing          7  85000  FALSE\n#> 3    Carla  Analytics          5  79000   TRUE\n#> 4    David    Finance          9 105000  FALSE\n#> 6    Frank  Analytics          6  92000  FALSE\n#> 7    Grace    Finance          8  99000   TRUE\nemployees[employees$Department == \"Analytics\" & employees$Remote, ]   # AND\n#>   Employee Department Experience Salary Remote\n#> 1     Anna  Analytics          2  68000   TRUE\n#> 3    Carla  Analytics          5  79000   TRUE\n#> 8    Henry  Analytics          4  76000   TRUE\nemployees[employees$Salary > 95000 | employees$Experience < 3, ]   # OR\n#>   Employee Department Experience Salary Remote\n#> 1     Anna  Analytics          2  68000   TRUE\n#> 4    David    Finance          9 105000  FALSE\n#> 7    Grace    Finance          8  99000   TRUE\nemployees[employees$Department %in% c(\"Finance\", \"Marketing\"), ]\n#>   Employee Department Experience Salary Remote\n#> 2      Ben  Marketing          7  85000  FALSE\n#> 4    David    Finance          9 105000  FALSE\n#> 5     Emma  Marketing          3  72000   TRUE\n#> 7    Grace    Finance          8  99000   TRUE",
+    "comment": "- Inside `[rows, columns]`, the condition goes **before** the comma.\n- Text must match exactly, including capitals: `\"Analytics\"`.",
+    "key": true
+   },
+   {
+    "id": "rev-03-c04",
+    "label": "Add and change columns and rows",
+    "question": "Add new variables, change a specific value, and add a new row.",
+    "code": "employees <- data.frame(\n  Employee   = c(\"Anna\", \"Ben\", \"Carla\", \"David\", \"Emma\", \"Frank\", \"Grace\", \"Henry\"),\n  Department = c(\"Analytics\", \"Marketing\", \"Analytics\", \"Finance\",\n                 \"Marketing\", \"Analytics\", \"Finance\", \"Analytics\"),\n  Experience = c(2, 7, 5, 9, 3, 6, 8, 4),\n  Salary     = c(68000, 85000, 79000, 105000, 72000, 92000, 99000, 76000),\n  Remote     = c(TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, TRUE)\n)\n\nemployees$Salary_K <- employees$Salary / 1000\nemployees$Senior <- ifelse(employees$Experience >= 6, TRUE, FALSE)\nemployees[employees$Employee == \"Carla\", \"Salary\"] <- 82000\n\nnew_row <- data.frame(Employee = \"Irene\", Department = \"Marketing\", Experience = 10,\n                      Salary = 101000, Remote = FALSE, Salary_K = 101, Senior = TRUE)\nemployees <- rbind(employees, new_row)\ntail(employees, 3)\n#>   Employee Department Experience Salary Remote Salary_K Senior\n#> 7    Grace    Finance          8  99000   TRUE       99   TRUE\n#> 8    Henry  Analytics          4  76000   TRUE       76  FALSE\n#> 9    Irene  Marketing         10 101000  FALSE      101   TRUE\n\nbonus <- c(1, 2, 1, 3, 2, 1, 2, 1, 3)\nemployees <- cbind(employees, Bonus = bonus)    # add a column with cbind\nhead(employees, 3)\n#>   Employee Department Experience Salary Remote Salary_K Senior Bonus\n#> 1     Anna  Analytics          2  68000   TRUE       68  FALSE     1\n#> 2      Ben  Marketing          7  85000  FALSE       85   TRUE     2\n#> 3    Carla  Analytics          5  82000   TRUE       79  FALSE     1",
+    "comment": "- A new row from `rbind()` needs **every** column, with the same names.\n- Recitation 1, Problem 4.",
+    "key": true
+   },
+   {
+    "id": "rev-03-c05",
+    "label": "Convert character columns to factors with levels",
+    "question": "Convert each character variable into a factor and define its levels.",
+    "code": "df <- data.frame(Dept = c(\"HR\", \"Sales\", \"HR\", \"IT\"),\n                 Level = c(\"Low\", \"High\", \"Medium\", \"Low\"),\n                 Pay = c(50, 70, 55, 65))\n\ndf$Dept  <- factor(df$Dept)                                   # levels in alphabetical order\ndf$Level <- factor(df$Level, levels = c(\"Low\", \"Medium\", \"High\"))  # your own order\nstr(df)\n#> 'data.frame':\t4 obs. of  3 variables:\n#>  $ Dept : Factor w/ 3 levels \"HR\",\"IT\",\"Sales\": 1 3 1 2\n#>  $ Level: Factor w/ 3 levels \"Low\",\"Medium\",..: 1 3 2 1\n#>  $ Pay  : num  50 70 55 65\n\n# Every character column at once\ndf2 <- data.frame(A = c(\"x\", \"y\"), B = c(\"u\", \"v\"), C = 1:2)\nchar_cols <- sapply(df2, is.character)\ndf2[char_cols] <- lapply(df2[char_cols], factor)\nstr(df2)\n#> 'data.frame':\t2 obs. of  3 variables:\n#>  $ A: Factor w/ 2 levels \"x\",\"y\": 1 2\n#>  $ B: Factor w/ 2 levels \"u\",\"v\": 1 2\n#>  $ C: int  1 2",
+    "comment": "- Define levels when the order means something (Low < Medium < High) so tables and plots come out in that order.",
+    "key": false
+   },
+   {
+    "id": "rev-03-c06",
+    "label": "Group summaries: tapply, table, proportions",
+    "question": "Compute the mean (or median, count, proportion) of a variable for each group.",
+    "code": "employees <- data.frame(\n  Employee   = c(\"Anna\", \"Ben\", \"Carla\", \"David\", \"Emma\", \"Frank\", \"Grace\", \"Henry\"),\n  Department = c(\"Analytics\", \"Marketing\", \"Analytics\", \"Finance\",\n                 \"Marketing\", \"Analytics\", \"Finance\", \"Analytics\"),\n  Experience = c(2, 7, 5, 9, 3, 6, 8, 4),\n  Salary     = c(68000, 85000, 79000, 105000, 72000, 92000, 99000, 76000),\n  Remote     = c(TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, TRUE)\n)\n\ntapply(employees$Salary, employees$Department, mean)\n#> Analytics   Finance Marketing \n#>     78750    102000     78500 \ntapply(employees$Salary, employees$Department, median)\n#> Analytics   Finance Marketing \n#>     77500    102000     78500 \ntable(employees$Department)                  # counts per group\n#> Analytics   Finance Marketing \n#>         4         2         2 \nprop.table(table(employees$Department))      # proportions per group\n#> Analytics   Finance Marketing \n#>      0.50      0.25      0.25 \n\n# Proportion of a condition within each group\ntapply(employees$Remote, employees$Department, mean)\n#> Analytics   Finance Marketing \n#>      0.75      0.50      0.50 \n\n# Which group has the largest mean?\ndept_means <- tapply(employees$Salary, employees$Department, mean)\nnames(which.max(dept_means))\n#> [1] \"Finance\"",
+    "comment": "- `tapply(what, by, function)`: the first argument is the number you summarize, the second is the group.\n- The mean of TRUE/FALSE values is the proportion TRUE.\n- Recitation 3, Question 1.",
+    "key": true
+   },
+   {
+    "id": "rev-03-c07",
+    "label": "Sort, top n, percentiles, spread",
+    "question": "Find the top n rows, compare groups above/below a percentile, or compute variance and standard deviation.",
+    "code": "employees <- data.frame(\n  Employee   = c(\"Anna\", \"Ben\", \"Carla\", \"David\", \"Emma\", \"Frank\", \"Grace\", \"Henry\"),\n  Department = c(\"Analytics\", \"Marketing\", \"Analytics\", \"Finance\",\n                 \"Marketing\", \"Analytics\", \"Finance\", \"Analytics\"),\n  Experience = c(2, 7, 5, 9, 3, 6, 8, 4),\n  Salary     = c(68000, 85000, 79000, 105000, 72000, 92000, 99000, 76000),\n  Remote     = c(TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, TRUE)\n)\n\nsorted <- employees[order(employees$Salary, decreasing = TRUE), ]\nhead(sorted, 3)                                   # top 3 earners\n#>   Employee Department Experience Salary Remote\n#> 4    David    Finance          9 105000  FALSE\n#> 7    Grace    Finance          8  99000   TRUE\n#> 6    Frank  Analytics          6  92000  FALSE\n\nquantile(employees$Salary, c(0.3, 0.8))           # 30th and 80th percentiles\n#>   30%   80% \n#> 76300 96200 \nq75 <- quantile(employees$Salary, 0.75)\nemployees[employees$Salary > q75, \"Employee\"]\n#> [1] \"David\" \"Grace\"\n\nvar(employees$Salary)\n#> [1] 1.74e+08\nsd(employees$Salary)\n#> [1] 13190.91\nmean(employees$Experience[employees$Salary < median(employees$Salary)])\n#> [1] 3.5",
+    "comment": "- `order()` sorts the **rows**; `sort()` only sorts a single vector.\n- Recitation 3, Question 2.",
+    "key": true
+   }
+  ],
+  "notes": "For Part 2 of the exam: import, look at the data, filter, summarize by group, then plot (see Rev 06).",
+  "takeaways": [
+   "read.csv(\"file.csv\", stringsAsFactors = TRUE) turns text columns into factors.",
+   "Look first: str(df), summary(df), head(df), colnames(df), dim(df).",
+   "Rows that pass a filter: df[df$Age < 50 & df$Dept == \"HR\", ]",
+   "df[\"Salary\"] is a data frame; df$Salary and df[[\"Salary\"]] are vectors.",
+   "New column: df$New <- ...; conditional column: ifelse(test, yes, no).",
+   "Group summary: tapply(df$Salary, df$Department, mean).",
+   "Top 5 by salary: head(df[order(df$Salary, decreasing = TRUE), ], 5).",
+   "quantile(df$Age, c(0.3, 0.8)) for the 30th and 80th percentiles."
+  ],
+  "updatedAt": "2026-10-12T17:45:00Z"
+ },
+ "rev-04": {
+  "type": "prac",
+  "num": "04",
+  "title": "if-else, ifelse() and for loops",
+  "date": "",
+  "exams": [
+   "Midterm 1"
+  ],
+  "topics": [
+   "if-else",
+   "nested if-else",
+   "ifelse()",
+   "for loops",
+   "next",
+   "break",
+   "logical operators"
+  ],
+  "pdfs": [],
+  "chunks": [
+   {
+    "id": "rev-04-c01",
+    "label": "Nested if-else",
+    "question": "Write nested if-else statements that check one condition inside another.",
+    "code": "temperature <- 72\nraining <- FALSE\n\nif (raining) {\n  plan <- \"Stay in\"\n} else {\n  if (temperature > 85) {\n    plan <- \"Pool\"\n  } else if (temperature > 60) {\n    plan <- \"Practice outside\"\n  } else {\n    plan <- \"Gym\"\n  }\n}\nprint(plan)\n#> [1] \"Practice outside\"",
+    "comment": "- Every `{` needs its `}`; indenting helps you see which `else` belongs to which `if`.",
+    "key": false
+   },
+   {
+    "id": "rev-04-c02",
+    "label": "ifelse() on a vector",
+    "question": "Use ifelse() to create a vector that is TRUE/FALSE (or labels) for every element.",
+    "code": "exam_scores <- c(94, 82, 76, 68, 88, 91, 73, 59)\nhomework_rates <- c(0.95, 0.84, 0.98, 0.90, 0.72, 0.88, 0.79, 1.00)\n\neligible <- ifelse(exam_scores >= 75 & homework_rates >= 0.80, TRUE, FALSE)\neligible\n#> [1]  TRUE  TRUE  TRUE FALSE FALSE  TRUE FALSE FALSE\n\ngrade <- ifelse(exam_scores >= 90, \"A\",\n          ifelse(exam_scores >= 80, \"B\", \"C or below\"))\ngrade\n#> [1] \"A\"          \"B\"          \"C or below\" \"C or below\" \"B\"         \n#> [6] \"A\"          \"C or below\" \"C or below\"",
+    "comment": "- `ifelse()` is the vector version of `if`.\n- Recitation 2, Problem 1 Part II.",
+    "key": true
+   },
+   {
+    "id": "rev-04-c03",
+    "label": "for loop with next and break",
+    "question": "Use a for loop that skips some values (next) and stops early (break).",
+    "code": "values <- c(3, -2, 8, 0, 5, 12, 7)\nkept <- c()\n\nfor (v in values) {\n  if (v <= 0) {\n    next                 # skip zero and negatives\n  }\n  if (v > 10) {\n    break                # stop completely at the first value over 10\n  }\n  kept <- c(kept, v)\n}\nkept\n#> [1] 3 8 5",
+    "comment": "- Build the result by starting empty (`c()`) and adding with `c(kept, v)`.",
+    "key": true
+   },
+   {
+    "id": "rev-04-c04",
+    "label": "for loop that fills a vector of odd numbers",
+    "question": "Use a loop to fill a vector with numbers meeting conditions (e.g. odd numbers under 30 not divisible by 3).",
+    "code": "vector7 <- c()\nfor (n in 1:29) {\n  if (n %% 2 == 1 & n %% 3 != 0) {\n    vector7 <- c(vector7, n)\n  }\n}\nvector7\n#>  [1]  1  5  7 11 13 17 19 23 25 29",
+    "comment": "- Homework 1, Problem 4 Part 3 (asked with a while loop there; here the for-loop version).",
+    "key": false
+   }
+  ],
+  "notes": "Lecture 5 covers these. Exam questions use **for loops** only.",
+  "takeaways": [
+   "if (one TRUE/FALSE) { } else if (...) { } else { }",
+   "ifelse(vector_test, value_if_true, value_if_false) works on a whole vector.",
+   "for (i in 1:length(x)) gives positions; for (value in x) gives values.",
+   "next skips to the next iteration; break exits the loop.",
+   "Comparisons: == != < <= > >=; combine with & (and), | (or), ! (not)."
+  ],
+  "updatedAt": "2026-10-12T17:45:00Z"
+ },
+ "rev-05": {
+  "type": "prac",
+  "num": "05",
+  "title": "apply, lapply, sapply, mapply and tapply",
+  "date": "",
+  "exams": [
+   "Midterm 1"
+  ],
+  "topics": [
+   "apply",
+   "lapply",
+   "sapply",
+   "mapply",
+   "tapply",
+   "apply family"
+  ],
+  "pdfs": [],
+  "chunks": [
+   {
+    "id": "rev-05-c01",
+    "label": "apply on rows and columns",
+    "question": "Use apply() to compute a summary for each row or each column of a matrix.",
+    "code": "m <- matrix(c(5, 7, 9, 6, 12, 14, 10, 17, 3), nrow = 3, byrow = TRUE)\napply(m, 1, sum)        # row sums\n#> [1] 21 32 30\napply(m, 2, mean)       # column means\n#> [1]  7.000000 12.000000  8.666667\napply(m, 1, function(row) max(row) - min(row))   # your own function\n#> [1]  4  8 14",
+    "comment": "- The `1`/`2` is the MARGIN: 1 = rows, 2 = columns.",
+    "key": true
+   },
+   {
+    "id": "rev-05-c02",
+    "label": "lapply and sapply on a list",
+    "question": "Apply a function to every element of a list.",
+    "code": "scores <- list(c(20, 13, 34, 2), c(2, 3), c(45, 65, 78))\nlapply(scores, mean)     # list output\n#> [[1]]\n#> [1] 17.25\n#> [[2]]\n#> [1] 2.5\n#> [[3]]\n#> [1] 62.66667\nsapply(scores, mean)     # vector output\n#> [1] 17.25000  2.50000 62.66667\nsapply(scores, length)\n#> [1] 4 2 3\nsapply(scores, function(x) x[x > 10])   # can return different lengths\n#> [[1]]\n#> [1] 20 13 34\n#> [[2]]\n#> numeric(0)\n#> [[3]]\n#> [1] 45 65 78",
+    "comment": "- If each result has a different length, `sapply()` gives back a list anyway.",
+    "key": true
+   },
+   {
+    "id": "rev-05-c03",
+    "label": "mapply on pairs (dice comparison)",
+    "question": "Compare two vectors element by element with mapply and return a factor with set levels.",
+    "code": "set.seed(1)\ndie1 <- sample(1:6, 8, replace = TRUE)\ndie2 <- sample(1:6, 8, replace = TRUE)\n\ncompare <- mapply(function(a, b) {\n  if (a > b) \"Die1 > Die2\" else if (a < b) \"Die1 < Die2\" else \"Die1 = Die2\"\n}, die1, die2)\n\ncomparison <- factor(compare, levels = c(\"Die1 > Die2\", \"Die1 < Die2\", \"Die1 = Die2\"))\ndata.frame(die1, die2, comparison)\n#>   die1 die2  comparison\n#> 1    1    3 Die1 < Die2\n#> 2    4    3 Die1 > Die2\n#> 3    1    1 Die1 = Die2\n#> 4    2    5 Die1 < Die2\n#> 5    5    5 Die1 = Die2\n#> 6    3    2 Die1 > Die2\n#> 7    6    6 Die1 = Die2\n#> 8    2    6 Die1 < Die2\ntable(comparison)\n#> comparison\n#> Die1 > Die2 Die1 < Die2 Die1 = Die2 \n#>           2           3           3 ",
+    "comment": "- In `mapply()` the **function comes first**, then the vectors.\n- Homework 2, Problem 1 Part 1.",
+    "key": true
+   },
+   {
+    "id": "rev-05-c04",
+    "label": "tapply for subgroup analysis",
+    "question": "Break down means and medians of a variable across groups.",
+    "code": "employees <- data.frame(\n  Employee   = c(\"Anna\", \"Ben\", \"Carla\", \"David\", \"Emma\", \"Frank\", \"Grace\", \"Henry\"),\n  Department = c(\"Analytics\", \"Marketing\", \"Analytics\", \"Finance\",\n                 \"Marketing\", \"Analytics\", \"Finance\", \"Analytics\"),\n  Experience = c(2, 7, 5, 9, 3, 6, 8, 4),\n  Salary     = c(68000, 85000, 79000, 105000, 72000, 92000, 99000, 76000),\n  Remote     = c(TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, TRUE)\n)\n\ntapply(employees$Salary, employees$Department, mean)\n#> Analytics   Finance Marketing \n#>     78750    102000     78500 \ntapply(employees$Salary, employees$Department, median)\n#> Analytics   Finance Marketing \n#>     77500    102000     78500 \ntapply(employees$Salary, list(employees$Department, employees$Remote), mean)   # two groupings\n#>            FALSE     TRUE\n#> Analytics  92000 74333.33\n#> Finance   105000 99000.00\n#> Marketing  85000 72000.00",
+    "comment": "- Two groupings give a table (NA means that combination doesn't exist).\n- `aggregate(Salary ~ Department, data = employees, FUN = mean)` gives the same as a data frame.",
+    "key": true
+   }
+  ],
+  "notes": "| Function | Input | Does | Output |\n|---|---|---|---|\n| `apply(m, 1, f)` | matrix | f on each **row** | vector |\n| `apply(m, 2, f)` | matrix | f on each **column** | vector |\n| `lapply(lst, f)` | list/vector | f on each element | **list** |\n| `sapply(lst, f)` | list/vector | f on each element | vector |\n| `mapply(f, x, y)` | 2+ vectors | f on pairs x[1],y[1]; x[2],y[2]... | vector |\n| `tapply(x, group, f)` | vector + group | f within each group | named vector |",
+  "takeaways": [
+   "apply(m, 1, f) = rows; apply(m, 2, f) = columns.",
+   "lapply returns a list; sapply simplifies to a vector.",
+   "mapply(function(a, b) ..., x, y) works on pairs of elements.",
+   "tapply(values, groups, f) is subgroup analysis."
+  ],
+  "updatedAt": "2026-10-12T17:45:00Z"
+ },
+ "rev-06": {
+  "type": "prac",
+  "num": "06",
+  "title": "Plots, rnorm() and sample()",
+  "date": "",
+  "exams": [
+   "Midterm 1"
+  ],
+  "topics": [
+   "histograms",
+   "boxplots",
+   "barplots",
+   "scatterplots",
+   "par",
+   "rnorm",
+   "sample",
+   "set.seed"
+  ],
+  "pdfs": [],
+  "chunks": [
+   {
+    "id": "rev-06-c01",
+    "label": "Histogram",
+    "question": "Plot a histogram of a numeric variable with labels, colors and a set number of bins.",
+    "code": "set.seed(1)\nsalary <- rnorm(200, mean = 80000, sd = 12000)\nhist(salary, breaks = 10,\n     main = \"Distribution of Salary\", xlab = \"Salary (USD)\", ylab = \"Frequency\",\n     col = \"lightblue\", border = \"darkblue\")",
+    "comment": "- `breaks = 10` suggests about 10 bins; R may adjust slightly.",
+    "key": true
+   },
+   {
+    "id": "rev-06-c02",
+    "label": "Boxplot by group (with notch)",
+    "question": "Create boxplots of a numeric variable across categories, with labels, colors and notches.",
+    "code": "employees <- data.frame(\n  Employee   = c(\"Anna\", \"Ben\", \"Carla\", \"David\", \"Emma\", \"Frank\", \"Grace\", \"Henry\"),\n  Department = c(\"Analytics\", \"Marketing\", \"Analytics\", \"Finance\",\n                 \"Marketing\", \"Analytics\", \"Finance\", \"Analytics\"),\n  Experience = c(2, 7, 5, 9, 3, 6, 8, 4),\n  Salary     = c(68000, 85000, 79000, 105000, 72000, 92000, 99000, 76000),\n  Remote     = c(TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, TRUE)\n)\n\nboxplot(Salary ~ Department, data = employees,\n        main = \"Salary by Department\", xlab = \"Department\", ylab = \"Salary (USD)\",\n        col = c(\"salmon\", \"lightgreen\", \"lightblue\"), border = \"gray30\",\n        notch = TRUE)",
+    "comment": "- Formula `y ~ group`: the number on the left, the grouping factor on the right.\n- Points beyond the whiskers are outliers.\n- R warns that notches go outside the hinges when groups are small; the plot still works.",
+    "key": true
+   },
+   {
+    "id": "rev-06-c03",
+    "label": "Barplot (and side-by-side)",
+    "question": "Show counts of a categorical variable with a barplot, including side-by-side bars for two variables.",
+    "code": "employees <- data.frame(\n  Employee   = c(\"Anna\", \"Ben\", \"Carla\", \"David\", \"Emma\", \"Frank\", \"Grace\", \"Henry\"),\n  Department = c(\"Analytics\", \"Marketing\", \"Analytics\", \"Finance\",\n                 \"Marketing\", \"Analytics\", \"Finance\", \"Analytics\"),\n  Experience = c(2, 7, 5, 9, 3, 6, 8, 4),\n  Salary     = c(68000, 85000, 79000, 105000, 72000, 92000, 99000, 76000),\n  Remote     = c(TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, TRUE)\n)\n\ncounts <- table(employees$Department)\nbarplot(counts, main = \"Employees per Department\", xlab = \"Department\", ylab = \"Count\",\n        col = \"orange\", names.arg = c(\"ANALYTICS\", \"FINANCE\", \"MARKETING\"))\n\ntwo_way <- table(employees$Remote, employees$Department)\nbarplot(two_way, beside = TRUE, col = c(\"gray\", \"steelblue\"),\n        main = \"Remote by Department\", legend.text = c(\"On site\", \"Remote\"))",
+    "comment": "- `names.arg` renames the bars (Recitation 3, Question 3).\n- `horiz = TRUE` makes horizontal bars.",
+    "key": true
+   },
+   {
+    "id": "rev-06-c04",
+    "label": "Scatterplot colored by group",
+    "question": "Plot one variable against another with point shape, size and color by group, plus a legend.",
+    "code": "employees <- data.frame(\n  Employee   = c(\"Anna\", \"Ben\", \"Carla\", \"David\", \"Emma\", \"Frank\", \"Grace\", \"Henry\"),\n  Department = c(\"Analytics\", \"Marketing\", \"Analytics\", \"Finance\",\n                 \"Marketing\", \"Analytics\", \"Finance\", \"Analytics\"),\n  Experience = c(2, 7, 5, 9, 3, 6, 8, 4),\n  Salary     = c(68000, 85000, 79000, 105000, 72000, 92000, 99000, 76000),\n  Remote     = c(TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, TRUE)\n)\n\nplot(employees$Experience, employees$Salary,\n     main = \"Salary vs Experience\", xlab = \"Years of experience\", ylab = \"Salary (USD)\",\n     pch = 17, cex = 0.9,\n     col = ifelse(employees$Remote, \"orange\", \"darkgreen\"))\nlegend(\"topleft\", legend = c(\"Remote\", \"On site\"), col = c(\"orange\", \"darkgreen\"), pch = 17)",
+    "comment": "- `pch = 17` is a filled triangle; `cex` sets point size.\n- Homework 2, Problem 2 Part 7 asks for exactly this kind of plot.",
+    "key": false
+   },
+   {
+    "id": "rev-06-c05",
+    "label": "Two plots side by side",
+    "question": "Put two plots (e.g. histograms before and after filtering) next to each other in one image.",
+    "code": "set.seed(1)\nhours <- rnorm(200, mean = 45, sd = 6)\npar(mfrow = c(1, 2))\nhist(hours, main = \"All employees\", xlab = \"Hours\", col = \"lightblue\", breaks = 10)\nhist(hours[hours <= 50], main = \"50 hours or less\", xlab = \"Hours\", col = \"lightpink\", breaks = 10)\npar(mfrow = c(1, 1))     # reset",
+    "comment": "- `c(1, 2)` = 1 row, 2 columns of plots. Reset afterwards so later plots aren't squeezed.",
+    "key": false
+   },
+   {
+    "id": "rev-06-c06",
+    "label": "rnorm, sample and set.seed basics",
+    "question": "Generate random normal data or random samples reproducibly.",
+    "code": "set.seed(1)\nx <- rnorm(5, mean = 10, sd = 2)       # 5 draws from Normal(10, sd 2)\nx\n#> [1]  8.747092 10.367287  8.328743 13.190562 10.659016\n\nset.seed(1)\nsample(1:6, 3)                         # 3 rolls, no repeats\n#> [1] 1 4 3\nsample(1:6, 10, replace = TRUE)        # 10 rolls, repeats allowed\n#>  [1] 1 2 5 3 6 2 3 3 1 5\nsample(c(\"H\", \"T\"), 5, replace = TRUE, prob = c(0.7, 0.3))   # unfair coin\n#> [1] \"T\" \"H\" \"T\" \"T\" \"H\"\n\nset.seed(1)\nrnorm(5, mean = 10, sd = 2)            # same seed, same numbers as x\n#> [1]  8.747092 10.367287  8.328743 13.190562 10.659016",
+    "comment": "- Same seed and same code give the same numbers, which is why the exam asks for `set.seed(1)`.\n- Put `set.seed(1)` **inside** the function so every call matches.",
+    "key": true
+   }
+  ],
+  "notes": "**Right input for each plot**\n\n- `hist(x)`: one **numeric** vector.\n- `boxplot(y ~ group, data = df)`: numeric `y` split by a factor.\n- `barplot(table(f))`: **counts**, so wrap a factor in `table()` first.\n- `plot(x, y)`: two numeric vectors of the same length.\n\nAlways add `main =`, `xlab =`, `ylab =` and colors when the question asks you to customize.",
+  "takeaways": [
+   "hist(x, main, xlab, col, border, breaks = 10)",
+   "boxplot(Salary ~ Group, data = df, notch = TRUE, col = ...)",
+   "barplot(table(f), names.arg = ..., col = ...); beside = TRUE for side-by-side bars.",
+   "par(mfrow = c(1, 2)) puts two plots next to each other.",
+   "set.seed(1); rnorm(n, mean, sd); sample(x, size, replace = TRUE, prob = ...)"
+  ],
+  "updatedAt": "2026-10-12T17:45:00Z"
  }
 };

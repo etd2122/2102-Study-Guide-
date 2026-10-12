@@ -164,6 +164,24 @@ textarea.mono{font-family:var(--mono);font-size:13px;background:var(--code-bg)}
 .empty h3{font-family:var(--display);margin:0;font-size:20px}
 .empty p{margin:0;color:var(--muted);max-width:60ch}
 .menu-btn{display:none}
+.match-btn{width:100%;justify-content:center;border-color:var(--accent);color:var(--accent)}
+.match-btn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.match-box{display:flex;flex-direction:column;gap:8px}
+.match-box textarea{min-height:130px;font-size:15px}
+.match-box .hint code{font-family:var(--mono);font-size:12px;background:var(--code-bg);padding:0 4px;border-radius:3px}
+.results{display:flex;flex-direction:column;gap:14px}
+.result{border:1px solid var(--line);border-radius:8px;background:var(--panel);overflow:hidden}
+.result-top{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;flex-wrap:wrap}
+.result-rank{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--muted);padding-top:2px;font-variant-numeric:tabular-nums}
+.result-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.result-where{font-family:var(--mono);font-size:12px;font-weight:600}
+.result-label{font-weight:600;font-size:14px;overflow-wrap:anywhere}
+.result-why{font-size:12px;color:var(--muted);display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.result-why .term{font-family:var(--mono);background:var(--accent-soft);color:var(--accent);border-radius:3px;padding:0 5px}
+.meter{width:70px;height:6px;background:var(--code-bg);border-radius:3px;overflow:hidden;margin-top:6px}
+.meter i{display:block;height:100%;background:var(--accent)}
+.result pre{max-height:190px;overflow:auto;border-top:1px solid var(--line)}
+.chunk.flash{outline:3px solid var(--mark);outline-offset:2px}
 @media (max-width:820px){
   .app{grid-template-columns:minmax(0,1fr)}
   .side{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}
@@ -191,6 +209,7 @@ textarea.mono{font-family:var(--mono);font-size:13px;background:var(--code-bg)}
       <button class="btn" id="btnGuide" type="button" aria-pressed="false">Study guide</button>
       <button class="btn ghost menu-btn" id="btnMenu" type="button" aria-expanded="true">List</button>
     </div>
+    <button class="btn match-btn" id="btnMatch" type="button" aria-pressed="false">Find code for a question</button>
     <div class="collapsible" style="display:flex;flex-direction:column;gap:12px">
       <input class="search" id="search" type="search" placeholder="Search titles, code, notes…" aria-label="Search entries">
       <div class="chips" id="typeChips" role="group" aria-label="Filter by type"></div>
@@ -222,7 +241,7 @@ let pendingFiles=[];
 let entries={}, loaded=false, dbError='';
 let view='entry', curId=null, editing=false, isNew=false, draft=null;
 let draftUploads=[], draftRemovals=[];
-let filterType='all', filterExam='all', query='', guideExam='all';
+let filterType='all', filterExam='all', query='', guideExam='all', matchQuery='';
 let openPreviews=new Set(), confirmDelete=false, saveMsg='';
 
 const $=s=>document.querySelector(s);
@@ -285,7 +304,7 @@ function renderList(){
   }
   list.innerHTML=html;
 }
-function renderSide(){ renderChips(); renderList(); $('#btnGuide').setAttribute('aria-pressed',view==='guide'); $('#btnNew').hidden=!canWrite; }
+function renderSide(){ renderChips(); renderList(); $('#btnGuide').setAttribute('aria-pressed',view==='guide'); $('#btnMatch').setAttribute('aria-pressed',view==='match'); $('#btnNew').hidden=!canWrite; }
 
 /* ---------- Main ---------- */
 function renderMain(){
@@ -295,12 +314,14 @@ function renderMain(){
   if(!loaded&&!dbError){main.innerHTML='<div class="wrap"><div class="banner">Loading your entries…</div></div>';return;}
   if(editing) html+=editorHTML();
   else if(view==='guide') html+=guideHTML();
+  else if(view==='match') html+=matchHTML();
   else{
     const ids=sorted().map(e=>e.id);
     if(!curId||!entries[curId]) curId=ids[0]||null;
     html+= curId? entryHTML(curId,entries[curId]) : emptyHTML();
   }
   main.innerHTML=`<div class="wrap">${html}</div>`;
+  if(view==='match'&&!editing){ renderMatches(); }
   highlight(main);
   if(!editing) main.scrollIntoView && null;
 }
@@ -358,7 +379,7 @@ function fileHTML(f){
   </div>${open?`<div class="preview">${isImg?`<img src="${url}" alt="${esc(f.name)}">`:`<iframe src="${url}" title="${esc(f.name)}"></iframe>`}</div>`:''}</div>`;
 }
 function chunkHTML(c,i){
-  return `<div class="chunk ${c.key?'key':''}">
+  return `<div class="chunk ${c.key?'key':''}" id="ch-${i}">
     <div class="chunk-code">
       <div class="chunk-bar"><span class="lbl">${esc(c.label||('Chunk '+(i+1)))}</span>${c.key?'<span class="star">Exam</span>':''}<button class="btn sm ghost" type="button" data-act="copy" data-i="${i}">Copy</button></div>
       <pre><code class="language-r">${esc(c.code||'')}</code></pre>
@@ -386,6 +407,131 @@ function guideHTML(){
     </article>`;}).join('')
   :`<div class="empty"><h3>Nothing flagged yet</h3><p>Add lines under "Remember for the test" or mark code chunks as exam material, and tag entries with an exam. They collect here.</p></div>`}
   ${missing.length?`<p class="hint">Not summarized yet: ${missing.map(e=>esc(tagOf(e))).join(', ')}</p>`:''}`;
+}
+
+/* ---------- Question matcher ---------- */
+const STOP=new Set('the a an and or of to in on for with by is are be as at from that this it its into using use your you their there then than which what how does do did each per all any some these those them they using write create make find show given following print display result results value values code function functions problem part question answer data based new also only one two three between within whether should would can could will must need may way ways r'.split(' '));
+const CONCEPTS=[
+ [/\b(loop|loops|iterat|repeat|each element|every element|go through)/,['for','while']],
+ [/\bwhile\b|until|keep (going|rolling|flipping|sampling)|continues? until/,['while','break']],
+ [/\bfor\b.*\bloop|nested/,['for']],
+ [/\bif\b|otherwise|else|condition|depending on|classif|categori[sz]e/,['if','else','ifelse']],
+ [/function|takes? (an? )?(argument|input|parameter)|returns?/,['function','return']],
+ [/average|mean/,['mean']],[/median/,['median']],[/standard deviation|\bsd\b/,['sd']],[/variance/,['var']],
+ [/quantile|percentile|quartile/,['quantile']],[/\biqr\b|interquartile/,['iqr']],
+ [/sum|total/,['sum']],[/cumulative/,['cumsum']],
+ [/max|highest|largest|biggest|most/,['max','which.max']],[/min|lowest|smallest|least|fewest/,['min','which.min']],
+ [/how many|count|number of|frequenc/,['nrow','length','sum','table']],
+ [/proportion|percent|fraction|ratio|rate/,['mean','prop.table','table']],
+ [/group|each (department|category|level|group)|by (department|category|group)|per |across/,['tapply','aggregate','group_by','summarise']],
+ [/simulat|random|roll|dice|die\b|coin|flip|trial/,['sample','set.seed','rnorm','runif']],
+ [/dice|\bdie\b|\broll/,['die','die_1','die_2','die1','die2','roll']],
+ [/normal distribution|normally distributed|rnorm/,['rnorm']],[/uniform/,['runif']],
+ [/probabilit|unfair|weighted|chance/,['prob','sample']],
+ [/matrix|matrices|row-?wise|column-?wise/,['matrix','nrow','ncol','byrow']],
+ [/\brows?\b/,['nrow','rbind']],[/\bcolumns?\b/,['ncol','cbind']],
+ [/data ?frame|dataset|data set|variables?/,['data.frame','str','summary']],
+ [/import|read|load|\.csv|csv/,['read.csv','read.table']],[/export|write|save/,['write.csv','write.table']],
+ [/\blists?\b|sublist|element/,['list','lapply','unlist']],[/unlist|flatten/,['unlist']],
+ [/vector/,['c','seq','rep']],[/sequence|spaced|increments?/,['seq']],[/repeat/,['rep']],
+ [/append|insert|after the|position/,['append']],
+ [/factor|categor|levels?/,['factor','levels','cut']],[/bin|interval|tenure group|cut/,['cut']],
+ [/sort|order|rank|arrange|top \d|highest paid|ascending|descending/,['order','sort','arrange','head']],
+ [/filter|subset|extract|select|only (the )?(rows|those|employees|observations)|where/,['subset','filter','select','which']],
+ [/histogram/,['hist','breaks']],[/bar ?plot|bar ?chart|bar graph/,['barplot']],[/box ?plot/,['boxplot']],
+ [/scatter|plot .* against|versus|vs\.?/,['plot']],[/legend/,['legend']],[/colou?r/,['col']],
+ [/label|title|axis/,['main','xlab','ylab']],[/side by side|single image|combine.*plot/,['par','mfrow']],[/notch/,['notch']],
+ [/apply|without (using )?loops?|vectori[sz]ed/,['apply','sapply','lapply','mapply']],
+ [/merge|combine|join/,['c','rbind','cbind','merge']],
+ [/new (column|variable)|add (a )?(column|variable)/,['mutate','transmute']],
+ [/rename/,['rename']],[/tidyverse|dplyr|tibble|pipe/,['tidyverse','dplyr','filter','mutate','summarise']],
+ [/break|stop/,['break']],[/skip/,['next']],[/missing|\bna\b/,['is.na','na.rm']],
+ [/divisible|even|odd|remainder/,['%%']],[/membership|contains|present in|presence/,['%in%']],
+ [/round/,['round']],[/unique|distinct/,['unique']],[/string|character|paste/,['paste','character']],
+ [/logical|true|false/,['logical']],[/convert|coerce|class|type/,['as.numeric','class']],
+];
+function stem(t){ if(t.length>4&&!/[._%]/.test(t)){ t=t.replace(/ies$/,'y').replace(/([^s])s$/,'$1'); } return t; }
+function toks(text){
+  return (String(text||'').toLowerCase().match(/%[a-z]+%|%%|[a-z_][a-z0-9_.]*[a-z0-9_]|[a-z]/g)||[])
+    .filter(t=>!STOP.has(t)&&(t.length>1||t==='c')).map(stem);
+}
+let matchIndex=null, matchIndexKey='';
+function buildIndex(){
+  const key=JSON.stringify(Object.keys(entries))+Object.values(entries).reduce((n,e)=>n+(e.updatedAt||'').length+(e.chunks||[]).length,0);
+  if(matchIndex&&key===matchIndexKey&&matchIndex.size===Object.keys(entries).length)return matchIndex;
+  const docs=[];
+  for(const e of sorted()){
+    (e.chunks||[]).forEach((c,i)=>{
+      const code=(c.code||'').split('\n').filter(l=>!/^\s*#>/.test(l)).join('\n');
+      const calls=(code.match(/[A-Za-z_.][A-Za-z0-9_.]*(?=\s*\()/g)||[]).map(x=>stem(x.toLowerCase()));
+      const tf=new Map(); let len=0;
+      const add=(arr,w)=>{for(const t of arr){tf.set(t,(tf.get(t)||0)+w);len+=w;}};
+      add(toks(c.label),2); add(toks(code),1); add(calls,1.5); add(toks(c.comment),1);
+      add(toks((e.topics||[]).join(' ')),0.6); add(toks(e.title),0.6);
+      if(/\bfor\s*\(/.test(code))add(['for'],1.5); if(/\bwhile\s*\(/.test(code))add(['while'],1.5); if(/\bif\s*\(/.test(code))add(['if'],1);
+      docs.push({eid:e.id,i,e,c,tf,len});
+    });
+  }
+  const df=new Map(); for(const d of docs)for(const t of d.tf.keys())df.set(t,(df.get(t)||0)+1);
+  const avg=docs.reduce((s,d)=>s+d.len,0)/Math.max(1,docs.length);
+  matchIndex={docs,df,avg,N:docs.length,size:Object.keys(entries).length}; matchIndexKey=key;
+  return matchIndex;
+}
+function queryTerms(q){
+  const w=new Map();
+  for(const t of toks(q)) w.set(t,Math.max(w.get(t)||0,1));
+  const low=q.toLowerCase();
+  for(const [re,terms] of CONCEPTS){ if(re.test(low)) for(const t of terms){ const s=stem(t.toLowerCase()); w.set(s,Math.max(w.get(s)||0,1.3)); } }
+  // explicit R function names typed in the question count extra
+  for(const m of (q.match(/[A-Za-z_.][A-Za-z0-9_.]*(?=\s*\()/g)||[])) w.set(stem(m.toLowerCase()),2);
+  return w;
+}
+function findMatches(q){
+  const idx=buildIndex(); const qt=queryTerms(q); const k1=1.2,b=0.75;
+  const res=[];
+  for(const d of idx.docs){
+    let score=0; const hits=[];
+    for(const [t,w] of qt){
+      const f=d.tf.get(t); if(!f)continue;
+      const n=idx.df.get(t)||0, idf=Math.log(1+(idx.N-n+.5)/(n+.5));
+      score+=w*idf*(f*(k1+1))/(f+k1*(1-b+b*d.len/idx.avg)); hits.push([t,w*idf]);
+    }
+    if(score>0)res.push({d,score,hits:hits.sort((a,b)=>b[1]-a[1]).map(h=>h[0])});
+  }
+  return res.sort((a,b)=>b.score-a.score).slice(0,10);
+}
+function matchHTML(){
+  return `<header class="head"><div class="eyebrow"><span>Find code for a question</span></div>
+    <h2>Where have I done this before?</h2></header>
+    <div class="match-box">
+      <label class="label" for="matchQ">Paste or type the question</label>
+      <textarea class="inp" id="matchQ" placeholder="e.g. Write a function that simulates rolling two dice until the sum is 7 and returns the number of rolls">${esc(matchQuery)}</textarea>
+      <span class="hint">Matches on wording and on the R functions a question usually needs (<code>tapply</code> for "average by department", <code>while</code> for "keep rolling until"). Searches the code in every entry.</span>
+    </div>
+    <div class="results" id="matchResults"></div>`;
+}
+function renderMatches(){
+  const box=$('#matchResults'); if(!box)return;
+  if(matchQuery.trim().length<4){box.innerHTML='<p class="empty-line">Results show up here as you type.</p>';return;}
+  const res=findMatches(matchQuery);
+  if(!res.length){box.innerHTML='<p class="empty-line">No similar code found. Try describing what the code should do, like "mean salary by department".</p>';return;}
+  const top=res[0].score;
+  box.innerHTML=res.map((r,n)=>{
+    const {e,c,i}=r.d; const code=(c.code||'').split('\n'); const preview=code.slice(0,10).join('\n')+(code.length>10?'\n…':'');
+    return `<div class="result"><div class="result-top">
+      <span class="result-rank">${n+1}</span>
+      <div class="result-main">
+        <span class="result-where tc-${esc(e.type)}">${esc(tagOf(e))} · ${esc(e.title||'')}</span>
+        <span class="result-label">${esc(c.label||('Chunk '+(i+1)))}</span>
+        <span class="result-why">Matched: ${r.hits.slice(0,6).map(h=>`<span class="term">${esc(h)}</span>`).join('')}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <button class="btn sm" type="button" data-act="goto" data-eid="${esc(e.id)}" data-i="${i}">Open</button>
+        <div class="meter" title="Match strength"><i style="width:${Math.max(8,Math.round(r.score/top*100))}%"></i></div>
+      </div></div>
+      <pre><code class="language-r">${esc(preview)}</code></pre></div>`;
+  }).join('');
+  highlight(box);
 }
 
 /* ---------- Editor ---------- */
@@ -537,6 +683,12 @@ document.addEventListener('click',async ev=>{
     return;
   }
   const act=b.dataset.act; if(!act)return;
+  if(act==='goto'){
+    curId=b.dataset.eid; view='entry'; store('s2102.cur',curId); renderSide(); renderMain();
+    const el=document.getElementById('ch-'+b.dataset.i);
+    if(el){ el.scrollIntoView({block:'center'}); el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'),2200); }
+    return;
+  }
   if(act==='new')startEdit(null);
   else if(act==='edit')startEdit(curId);
   else if(act==='cancel')cancelEdit();
@@ -560,10 +712,12 @@ document.addEventListener('click',async ev=>{
   else if(act==='discard-yes'){try{localStorage.removeItem(LS_KEY);localStorage.removeItem(LS_PENDING)}catch(e){} entries=JSON.parse(JSON.stringify(window.ENTRIES||{}));pendingFiles=[];curId=null;renderSavebox();renderSide();renderMain();}
 });
 $('#btnNew').addEventListener('click',()=>{ if(!editing)startEdit(null); });
+$('#btnMatch').addEventListener('click',()=>{ if(editing)return; view=view==='match'?'entry':'match'; renderSide(); renderMain(); window.scrollTo(0,0); const t=$('#matchQ'); if(t)t.focus(); });
 $('#btnGuide').addEventListener('click',()=>{ if(editing)return; view=view==='guide'?'entry':'guide'; renderSide(); renderMain(); window.scrollTo(0,0); });
 $('#btnMenu').addEventListener('click',()=>{const s=$('#side');const c=s.classList.toggle('collapsed');$('#btnMenu').setAttribute('aria-expanded',String(!c));});
 let qt; $('#search').addEventListener('input',e=>{clearTimeout(qt);qt=setTimeout(()=>{query=e.target.value.trim();renderList();},150);});
 document.addEventListener('submit',e=>{ if(e.target.id==='edForm'){e.preventDefault();saveEdit();} });
+let mt; document.addEventListener('input',e=>{ if(e.target.id==='matchQ'){ matchQuery=e.target.value; clearTimeout(mt); mt=setTimeout(renderMatches,200); } });
 document.addEventListener('input',e=>{ if(e.target.id==='f-title'&&draft){ const h=document.querySelector('.head h2'); if(h)h.textContent=e.target.value||'Untitled'; } });
 document.addEventListener('change',async e=>{
   const t=e.target;

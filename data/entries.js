@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-12T17:45:00Z";
+window.ENTRIES_SAVED = "2026-10-12T21:50:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -1017,7 +1017,7 @@ window.ENTRIES = {
     "id": "c106",
     "label": "Problem 2 - Lists · Part 5 · Extract Fall 2026 directly from course_info.",
     "code": "course_info[[5]][[1]]\n#> [1] \"Fall 2026\"",
-    "comment": "",
+    "comment": "**Why two sets of double brackets:** \"Fall 2026\" is inside a list that is itself inside `course_info`.\n\n- Element 5 of `course_info` is `list(\"Fall 2026\", TRUE)`, a list inside the list.\n- `course_info[[5]]` opens the outer list and hands you that inner list.\n- The second `[[1]]` opens the inner list and hands you its first item, the text `\"Fall 2026\"`.\n\nIf the second step uses single brackets, `course_info[[5]][1]`, you get a **list** that contains \"Fall 2026\". That's why R prints an extra `[[1]]` line above it.\n\nCompare with Part 4: `course_info[[4]][4]` gives 95 directly because element 4 is a plain vector, and single brackets on a vector return the value itself.\n\nRule: use `[[ ]]` each time you go one level deeper into a list.",
     "key": false,
     "question": "Extract Fall 2026 directly from course_info."
    },
@@ -1272,7 +1272,7 @@ window.ENTRIES = {
   ],
   "notes": "Online store orders vector, the `course_info` list, the quiz `scores` matrix, and the `employees` data frame.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
-  "updatedAt": "2026-10-12T17:10:00Z"
+  "updatedAt": "2026-10-12T21:50:00Z"
  },
  "rec-02": {
   "type": "rec",

@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STAT 2102 Study Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: RStudio-like split — "Environment" sidebar of entries on the left, a source pane on the right
+   where each entry stacks Files → Code (with margin comments) → Notes → Remember for the test. */
+:root{
+  --paper:#f4f7fb; --panel:#ffffff; --ink:#152033; --muted:#5a6677; --line:#d9e0ea;
+  --accent:#1f5fae; --accent-ink:#ffffff; --accent-soft:#e2ecf8; --mark:#f6dc5c; --mark-ink:#3a2f00;
+  --code-bg:#eef2f8; --danger:#b3261e; --danger-soft:#fbe7e5;
+  --t-hw:#1f5fae; --t-rec:#257a5c; --t-lec:#55617a; --t-prac:#a5610f;
+  --hl-kw:#8a2f9e; --hl-str:#2b7a2b; --hl-num:#b3541e; --hl-com:#7a8496; --hl-fn:#1f5fae;
+  --display:"Familjen Grotesk","Helvetica Neue",Arial,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0e131a; --panel:#151c26; --ink:#e3e8ef; --muted:#93a0b2; --line:#283343;
+  --accent:#6aa3ea; --accent-ink:#0b1420; --accent-soft:#1b2c44; --mark:#d8b92c; --mark-ink:#1d1700;
+  --code-bg:#0f1720; --danger:#f08b84; --danger-soft:#3a1b19;
+  --t-hw:#6aa3ea; --t-rec:#5cc59c; --t-lec:#a3afc4; --t-prac:#e5a24f;
+  --hl-kw:#d49ae6; --hl-str:#8fd18f; --hl-num:#f0a477; --hl-com:#76839a; --hl-fn:#7fb3f0;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0e131a; --panel:#151c26; --ink:#e3e8ef; --muted:#93a0b2; --line:#283343;
+  --accent:#6aa3ea; --accent-ink:#0b1420; --accent-soft:#1b2c44; --mark:#d8b92c; --mark-ink:#1d1700;
+  --code-bg:#0f1720; --danger:#f08b84; --danger-soft:#3a1b19;
+  --t-hw:#6aa3ea; --t-rec:#5cc59c; --t-lec:#a3afc4; --t-prac:#e5a24f;
+  --hl-kw:#d49ae6; --hl-str:#8fd18f; --hl-num:#f0a477; --hl-com:#76839a; --hl-fn:#7fb3f0;
+  color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.app{display:grid;grid-template-columns:300px minmax(0,1fr);min-height:100vh}
+/* Sidebar */
+.side{background:var(--panel);border-right:1px solid var(--line);padding:20px 16px;display:flex;flex-direction:column;gap:16px;position:sticky;top:env(safe-area-inset-top,0px);height:100vh;overflow:auto}
+.brand{display:flex;flex-direction:column;gap:2px}
+.brand .code{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.04em}
+.brand h1{font-family:var(--display);font-size:22px;line-height:1.15;margin:0;font-weight:700;text-wrap:balance}
+.brand .sub{color:var(--muted);font-size:13px}
+.side-actions{display:flex;gap:8px}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:7px 12px;cursor:pointer;font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--ink);border-color:var(--line)}
+.btn.danger{color:var(--danger);border-color:var(--danger)}
+.btn.danger.solid{background:var(--danger);color:var(--panel)}
+.btn.sm{padding:4px 9px;font-size:13px}
+.btn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.side-actions .btn{flex:1;justify-content:center}
+.search{width:100%;border:1px solid var(--line);background:var(--paper);border-radius:6px;padding:8px 10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:transparent;border-radius:999px;padding:3px 10px;font-size:13px;cursor:pointer;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--panel)}
+.label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.list{display:flex;flex-direction:column;gap:2px;margin:0;padding:0;list-style:none}
+.group-h{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;padding:12px 8px 4px}
+.item{display:grid;grid-template-columns:64px minmax(0,1fr);gap:8px;align-items:baseline;width:100%;text-align:left;border:0;background:transparent;border-radius:6px;padding:7px 8px;cursor:pointer}
+.item:hover{background:var(--code-bg)}
+.item[aria-current="true"]{background:var(--accent-soft)}
+.item .tag{font-family:var(--mono);font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
+.item .t{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .meta{grid-column:2;font-size:12px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap}
+.tc-hw{color:var(--t-hw)}.tc-rec{color:var(--t-rec)}.tc-lec{color:var(--t-lec)}.tc-prac{color:var(--t-prac)}
+.side-foot{margin-top:auto;font-size:12px;color:var(--muted)}
+.savebox{border:1px solid var(--mark);background:var(--panel);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px;font-size:13px}
+.savebox b{font-family:var(--display);font-size:15px}
+.savebox ol{margin:0;padding-left:18px;color:var(--muted)}
+.savebox code{font-family:var(--mono);font-size:12px;background:var(--code-bg);padding:0 4px;border-radius:3px}
+.savebox .row{display:flex;gap:8px;flex-wrap:wrap}
+.side-foot a{color:var(--accent)}
+/* Main */
+.main{padding-block:28px 64px;padding-inline:40px;min-width:0}
+.wrap{max-width:900px;display:flex;flex-direction:column;gap:28px}
+.banner{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:12px 14px;font-size:14px;color:var(--muted)}
+.banner.err{border-color:var(--danger);color:var(--danger);background:var(--danger-soft)}
+.head{display:flex;flex-direction:column;gap:10px}
+.eyebrow{font-family:var(--mono);font-size:13px;font-weight:600;letter-spacing:.02em;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.eyebrow .date{color:var(--muted);font-weight:400}
+.head h2{font-family:var(--display);font-size:34px;line-height:1.1;margin:0;font-weight:700;text-wrap:balance}
+.head-row{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.head-btns{display:flex;gap:8px;flex-wrap:wrap}
+.badges{display:flex;gap:6px;flex-wrap:wrap}
+.badge{font-size:12px;border-radius:4px;padding:2px 8px;border:1px solid var(--line);color:var(--muted)}
+.badge.exam{background:var(--mark);border-color:var(--mark);color:var(--mark-ink);font-weight:600}
+section.block{display:flex;flex-direction:column;gap:12px}
+.block-h{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--line);padding-bottom:6px;flex-wrap:wrap}
+.block-h h3{font-family:var(--display);font-size:18px;margin:0;font-weight:600}
+.block-h .count{font-family:var(--mono);font-size:12px;color:var(--muted);margin-left:8px;font-weight:400}
+.empty-line{color:var(--muted);font-size:14px;font-style:italic}
+/* Files */
+.files{display:flex;flex-direction:column;gap:8px}
+.file{border:1px solid var(--line);border-radius:8px;background:var(--panel);overflow:hidden}
+.file-row{display:flex;align-items:center;gap:10px;padding:9px 12px;flex-wrap:wrap}
+.file-ic{font-family:var(--mono);font-size:11px;font-weight:600;border:1px solid var(--danger);color:var(--danger);border-radius:3px;padding:1px 5px}
+.file-ic.img{border-color:var(--t-rec);color:var(--t-rec)}
+.file-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.file-size{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.file a{color:var(--accent);font-size:13px}
+.preview{border-top:1px solid var(--line);background:var(--code-bg)}
+.preview iframe{display:block;width:100%;height:72vh;border:0;background:#fff}
+.preview img{display:block;margin:0 auto;max-height:72vh}
+.upload-status{font-size:13px;color:var(--muted)}
+/* Code */
+.chunk{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);border:1px solid var(--line);border-radius:8px;background:var(--panel);overflow:hidden}
+.chunk.key{border-color:var(--mark);box-shadow:inset 3px 0 0 var(--mark)}
+.chunk-code{min-width:0;display:flex;flex-direction:column}
+.chunk-bar{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--line);font-size:13px}
+.chunk-bar .lbl{font-family:var(--mono);font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.star{font-size:11px;font-weight:600;background:var(--mark);color:var(--mark-ink);border-radius:3px;padding:1px 6px}
+pre{margin:0;overflow-x:auto;background:var(--code-bg);padding:12px 14px;font-family:var(--mono);font-size:13px;line-height:1.6;flex:1}
+pre code{font-family:inherit;background:none}
+.chunk-note{border-left:1px dashed var(--line);padding:10px 14px;font-size:14px;background:var(--panel);min-width:0}
+.chunk-note .label{display:block;margin-bottom:4px}
+.chunk-note p{margin:0 0 6px}
+.chunk-note.none{color:var(--muted);font-style:italic}
+.hljs-keyword,.hljs-built_in,.hljs-literal{color:var(--hl-kw)}
+.hljs-string{color:var(--hl-str)}
+.hljs-number{color:var(--hl-num)}
+.hljs-comment{color:var(--hl-com);font-style:italic}
+.hljs-title,.hljs-title.function_,.hljs-function{color:var(--hl-fn)}
+.hljs-operator,.hljs-punctuation{color:var(--ink)}
+/* Notes */
+.prose{max-width:68ch}
+.prose p{margin:0 0 10px}
+.prose h1,.prose h2,.prose h3,.prose h4{font-family:var(--display);margin:16px 0 6px;font-size:17px}
+.prose code{font-family:var(--mono);font-size:.88em;background:var(--code-bg);padding:1px 5px;border-radius:3px}
+.prose pre{border-radius:6px;margin-bottom:10px}
+.prose pre code{padding:0}
+.prose ul,.prose ol{padding-left:22px;margin:0 0 10px}
+.prose a{color:var(--accent)}
+.prose table{border-collapse:collapse;font-size:14px;margin-bottom:10px;display:block;overflow-x:auto}
+.prose th,.prose td{border:1px solid var(--line);padding:4px 8px;text-align:left}
+/* Takeaways */
+.takeaways{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;counter-reset:tk}
+.takeaways li{display:grid;grid-template-columns:28px minmax(0,1fr);gap:8px;counter-increment:tk}
+.takeaways li::before{content:counter(tk);font-family:var(--mono);font-size:12px;font-weight:600;color:var(--mark-ink);background:var(--mark);border-radius:4px;height:22px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+/* Editor */
+.form{display:flex;flex-direction:column;gap:20px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field.span2{grid-column:span 2}.field.span4{grid-column:1/-1}
+.field label,.field .label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.inp{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:8px 10px;width:100%;min-width:0}
+textarea.inp{resize:vertical;line-height:1.5}
+textarea.mono{font-family:var(--mono);font-size:13px;background:var(--code-bg)}
+.hint{font-size:12px;color:var(--muted)}
+.checks{display:flex;gap:14px;flex-wrap:wrap}
+.checks label{display:flex;gap:6px;align-items:center;font-size:14px;text-transform:none;letter-spacing:0;color:var(--ink);font-weight:400}
+.chunk-ed{border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--panel);display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:10px}
+.chunk-ed .top{grid-column:1/-1;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chunk-ed .top .inp{flex:1;min-width:160px}
+.save-bar{position:sticky;bottom:env(safe-area-inset-bottom,0px);background:var(--paper);border-top:1px solid var(--line);padding:12px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.save-bar .msg{color:var(--muted);font-size:13px;margin-left:auto}
+.confirm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:14px;color:var(--danger)}
+/* Guide */
+.guide-stats{display:flex;gap:28px;flex-wrap:wrap}
+.stat{display:flex;flex-direction:column}
+.stat b{font-family:var(--display);font-size:28px;font-variant-numeric:tabular-nums;line-height:1}
+.stat span{font-size:12px;color:var(--muted)}
+.g-entry{display:flex;flex-direction:column;gap:10px;padding-top:18px;border-top:1px solid var(--line)}
+.g-entry h4{margin:0;font-family:var(--display);font-size:19px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.g-entry h4 button{all:unset;cursor:pointer}
+.g-entry h4 button:hover{color:var(--accent)}
+.g-entry h4 .tag{font-family:var(--mono);font-size:13px}
+.empty{border:1px dashed var(--line);border-radius:10px;padding:28px;display:flex;flex-direction:column;gap:10px;align-items:flex-start;background:var(--panel)}
+.empty h3{font-family:var(--display);margin:0;font-size:20px}
+.empty p{margin:0;color:var(--muted);max-width:60ch}
+.menu-btn{display:none}
+@media (max-width:820px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .side{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}
+  .side.collapsed .collapsible{display:none}
+  .menu-btn{display:inline-flex}
+  .main{padding-inline:16px}
+  .head h2{font-size:27px}
+  .chunk,.chunk-ed{grid-template-columns:minmax(0,1fr)}
+  .chunk-note{border-left:0;border-top:1px dashed var(--line)}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" id="side">
+    <div class="brand">
+      <span class="code">STAT 2102 · Fall 2026</span>
+      <h1>Applied Statistical Computing</h1>
+      <span class="sub">Homework, recitation and lecture study guide</span>
+    </div>
+    <div class="side-actions">
+      <button class="btn primary" id="btnNew" type="button">+ New entry</button>
+      <button class="btn" id="btnGuide" type="button" aria-pressed="false">Study guide</button>
+      <button class="btn ghost menu-btn" id="btnMenu" type="button" aria-expanded="true">List</button>
+    </div>
+    <div class="collapsible" style="display:flex;flex-direction:column;gap:12px">
+      <input class="search" id="search" type="search" placeholder="Search titles, code, notes…" aria-label="Search entries">
+      <div class="chips" id="typeChips" role="group" aria-label="Filter by type"></div>
+      <div class="chips" id="examChips" role="group" aria-label="Filter by exam"></div>
+      <ul class="list" id="list"></ul>
+    </div>
+    <div class="savebox collapsible" id="savebox" hidden></div>
+    <div class="side-foot collapsible">Course notes: <a href="https://ap4347.github.io/2102/index.html" target="_blank" rel="noopener">ap4347.github.io/2102</a></div>
+  </aside>
+  <main class="main" id="main"><div class="wrap"><div class="banner">Loading your entries…</div></div></main>
+</div>
+
+<script src="data/entries.js"></script>
+</body>
+</html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/r.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+<script>
+(function(){
+const TYPES={hw:{label:'Homework',short:'HW'},rec:{label:'Recitation',short:'Rec'},lec:{label:'Lecture',short:'Lec'},prac:{label:'Exam practice',short:'Prac'}};
+const TYPE_ORDER=['hw','rec','lec','prac'];
+const EXAMS=['Midterm 1','Midterm 2','Final'];
+
+let canWrite=true; const localUrls={};
+const LS_KEY='s2102.entries', LS_PENDING='s2102.pending';
+let pendingFiles=[];
+let entries={}, loaded=false, dbError='';
+let view='entry', curId=null, editing=false, isNew=false, draft=null;
+let draftUploads=[], draftRemovals=[];
+let filterType='all', filterExam='all', query='', guideExam='all';
+let openPreviews=new Set(), confirmDelete=false, saveMsg='';
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Math.random().toString(36).slice(2,10);
+const tagOf=e=>{const t=TYPES[e.type]||TYPES.hw;const n=e.num!==''&&e.num!=null?String(e.num).padStart(2,'0'):'';return (t.short+' '+n).trim();};
+const fmtSize=b=>b>1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round(b/1024))+' KB';
+const fmtDate=d=>{if(!d)return '';const x=new Date(d+'T12:00:00');return isNaN(x)?d:x.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});};
+function store(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function recall(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function md(text){
+  if(!text)return '';
+  try{ if(window.marked&&window.DOMPurify) return DOMPurify.sanitize(marked.parse(text)); }catch(e){}
+  return '<p>'+esc(text).replace(/\n\n+/g,'</p><p>').replace(/\n/g,'<br>')+'</p>';
+}
+function highlight(root){
+  if(!window.hljs)return;
+  root.querySelectorAll('pre code').forEach(el=>{ if(!el.className) el.className='language-r'; try{hljs.highlightElement(el)}catch(e){} });
+}
+function sorted(){
+  return Object.entries(entries).map(([id,e])=>({id,...e})).sort((a,b)=>{
+    const ta=TYPE_ORDER.indexOf(a.type), tb=TYPE_ORDER.indexOf(b.type);
+    if(ta!==tb)return ta-tb;
+    return (Number(a.num)||0)-(Number(b.num)||0) || String(a.title).localeCompare(String(b.title));
+  });
+}
+function matches(e){
+  if(filterType!=='all'&&e.type!==filterType)return false;
+  if(filterExam!=='all'&&!(e.exams||[]).includes(filterExam))return false;
+  if(query){
+    const q=query.toLowerCase();
+    const hay=[e.title,tagOf(e),(e.topics||[]).join(' '),e.notes,(e.takeaways||[]).join(' '),...(e.chunks||[]).map(c=>c.label+' '+c.code+' '+c.comment)].join(' ').toLowerCase();
+    if(!hay.includes(q))return false;
+  }
+  return true;
+}
+
+/* ---------- Sidebar ---------- */
+function renderChips(){
+  const tc=$('#typeChips');
+  tc.innerHTML=[['all','All'],...TYPE_ORDER.map(t=>[t,TYPES[t].label])].map(([v,l])=>`<button class="chip" type="button" data-type="${v}" aria-pressed="${filterType===v}">${l}</button>`).join('');
+  const ec=$('#examChips');
+  ec.innerHTML=[['all','Any exam'],...EXAMS.map(x=>[x,x])].map(([v,l])=>`<button class="chip" type="button" data-exam="${esc(v)}" aria-pressed="${filterExam===v}">${esc(l)}</button>`).join('');
+}
+function renderList(){
+  const list=$('#list');
+  if(!loaded){list.innerHTML='';return;}
+  const items=sorted().filter(matches);
+  if(!items.length){list.innerHTML=`<li class="empty-line" style="padding:8px">${Object.keys(entries).length?'No entries match.':'No entries yet.'}</li>`;return;}
+  let html='',last='';
+  for(const e of items){
+    if(e.type!==last){html+=`<li class="group-h">${TYPES[e.type]?.label||'Other'}</li>`;last=e.type;}
+    const meta=[];
+    if((e.pdfs||[]).length)meta.push(`${e.pdfs.length} file${e.pdfs.length>1?'s':''}`);
+    if((e.chunks||[]).length)meta.push(`${e.chunks.length} chunk${e.chunks.length>1?'s':''}`);
+    if((e.exams||[]).length)meta.push(e.exams.join(', '));
+    html+=`<li><button class="item" type="button" data-id="${esc(e.id)}" aria-current="${view==='entry'&&!editing&&curId===e.id || (editing&&!isNew&&curId===e.id)}">
+      <span class="tag tc-${esc(e.type)}">${esc(tagOf(e))}</span><span class="t">${esc(e.title||'Untitled')}</span>
+      ${meta.length?`<span class="meta">${esc(meta.join(' · '))}</span>`:''}</button></li>`;
+  }
+  list.innerHTML=html;
+}
+function renderSide(){ renderChips(); renderList(); $('#btnGuide').setAttribute('aria-pressed',view==='guide'); $('#btnNew').hidden=!canWrite; }
+
+/* ---------- Main ---------- */
+function renderMain(){
+  const main=$('#main');
+  let html='';
+  if(dbError) html+=`<div class="banner err">${esc(dbError)}</div>`;
+  if(!loaded&&!dbError){main.innerHTML='<div class="wrap"><div class="banner">Loading your entries…</div></div>';return;}
+  if(editing) html+=editorHTML();
+  else if(view==='guide') html+=guideHTML();
+  else{
+    const ids=sorted().map(e=>e.id);
+    if(!curId||!entries[curId]) curId=ids[0]||null;
+    html+= curId? entryHTML(curId,entries[curId]) : emptyHTML();
+  }
+  main.innerHTML=`<div class="wrap">${html}</div>`;
+  highlight(main);
+  if(!editing) main.scrollIntoView && null;
+}
+function emptyHTML(){
+  return `<div class="empty"><h3>Start your study guide</h3>
+  <p>Add an entry for each homework, recitation or lecture. Each one holds the PDF, the R code that goes with it, your comments on each chunk, and the points you want to remember for the exam.</p>
+  ${canWrite?'<button class="btn primary" type="button" data-act="new">+ New entry</button>':''}</div>`;
+}
+function entryHTML(id,e){
+  const t=TYPES[e.type]||TYPES.hw;
+  const pdfs=e.pdfs||[], chunks=e.chunks||[], tk=(e.takeaways||[]).filter(Boolean);
+  return `
+  <header class="head">
+    <div class="head-row">
+      <div class="eyebrow"><span class="tc-${esc(e.type)}">${esc(tagOf(e))} · ${t.label}</span>${e.date?`<span class="date">${esc(fmtDate(e.date))}</span>`:''}</div>
+      ${canWrite?`<div class="head-btns">${confirmDelete?
+        `<span class="confirm">Delete this entry and its files?<button class="btn sm danger solid" type="button" data-act="del-yes">Delete</button><button class="btn sm" type="button" data-act="del-no">Keep</button></span>`
+        :`<button class="btn sm" type="button" data-act="edit">Edit</button><button class="btn sm ghost" type="button" data-act="del">Delete</button>`}</div>`:''}
+    </div>
+    <h2>${esc(e.title||'Untitled')}</h2>
+    <div class="badges">${(e.exams||[]).map(x=>`<span class="badge exam">${esc(x)}</span>`).join('')}${(e.topics||[]).map(x=>`<span class="badge">${esc(x)}</span>`).join('')}</div>
+  </header>
+
+  <section class="block">
+    <div class="block-h"><h3>Files<span class="count">${pdfs.length}</span></h3>
+
+    </div>
+    ${pdfs.length?`<div class="files">${pdfs.map(fileHTML).join('')}</div>`:`<p class="empty-line">No files yet. Use Edit to attach the assignment PDF, your solutions, or screenshots of output.</p>`}
+  </section>
+
+  <section class="block">
+    <div class="block-h"><h3>Code<span class="count">${chunks.length} chunk${chunks.length===1?'':'s'}</span></h3></div>
+    ${chunks.length?chunks.map((c,i)=>chunkHTML(c,i)).join(''):`<p class="empty-line">No code yet. Use Edit to paste chunks or import an .R / .Rmd file.</p>`}
+  </section>
+
+  <section class="block">
+    <div class="block-h"><h3>Notes</h3></div>
+    ${e.notes?`<div class="prose">${md(e.notes)}</div>`:`<p class="empty-line">No notes yet.</p>`}
+  </section>
+
+  <section class="block">
+    <div class="block-h"><h3>Remember for the test<span class="count">${tk.length}</span></h3></div>
+    ${tk.length?`<ol class="takeaways">${tk.map(x=>`<li><span>${esc(x)}</span></li>`).join('')}</ol>`:`<p class="empty-line">Nothing flagged yet. These lines feed the study guide view.</p>`}
+  </section>`;
+}
+function fileHTML(f){
+  const isImg=(f.type||'').startsWith('image/');
+  const url=fileUrl(f), open=openPreviews.has(f.name);
+  return `<div class="file"><div class="file-row">
+    <span class="file-ic ${isImg?'img':''}">${isImg?'IMG':'PDF'}</span>
+    <span class="file-name" title="${esc(f.name)}">${esc(f.name)}</span>
+    <span class="file-size">${f.size?fmtSize(f.size):''}</span>
+    <button class="btn sm" type="button" data-act="preview" data-fid="${esc(f.name)}" aria-expanded="${open}">${open?'Hide':'View'}</button>
+    <a href="${url}" target="_blank" rel="noopener">Open in new tab</a>
+  </div>${open?`<div class="preview">${isImg?`<img src="${url}" alt="${esc(f.name)}">`:`<iframe src="${url}" title="${esc(f.name)}"></iframe>`}</div>`:''}</div>`;
+}
+function chunkHTML(c,i){
+  return `<div class="chunk ${c.key?'key':''}">
+    <div class="chunk-code">
+      <div class="chunk-bar"><span class="lbl">${esc(c.label||('Chunk '+(i+1)))}</span>${c.key?'<span class="star">Exam</span>':''}<button class="btn sm ghost" type="button" data-act="copy" data-i="${i}">Copy</button></div>
+      <pre><code class="language-r">${esc(c.code||'')}</code></pre>
+    </div>
+    <div class="chunk-note ${c.comment?'':'none'}"><span class="label">My comment</span>${c.comment?`<div class="prose">${md(c.comment)}</div>`:'No comment on this chunk.'}</div>
+  </div>`;
+}
+function guideHTML(){
+  const all=sorted().filter(e=>guideExam==='all'||(e.exams||[]).includes(guideExam));
+  const withContent=all.filter(e=>(e.takeaways||[]).filter(Boolean).length||(e.chunks||[]).some(c=>c.key));
+  const missing=all.filter(e=>!withContent.includes(e));
+  const nTk=all.reduce((s,e)=>s+(e.takeaways||[]).filter(Boolean).length,0);
+  const nKey=all.reduce((s,e)=>s+(e.chunks||[]).filter(c=>c.key).length,0);
+  return `<header class="head">
+    <div class="eyebrow"><span>Study guide</span></div>
+    <h2>${guideExam==='all'?'Everything flagged for exams':esc(guideExam)}</h2>
+    <div class="chips" role="group" aria-label="Exam">${[['all','All exams'],...EXAMS.map(x=>[x,x])].map(([v,l])=>`<button class="chip" type="button" data-gexam="${esc(v)}" aria-pressed="${guideExam===v}">${esc(l)}</button>`).join('')}</div>
+  </header>
+  <div class="guide-stats"><div class="stat"><b>${all.length}</b><span>entries</span></div><div class="stat"><b>${nTk}</b><span>points to remember</span></div><div class="stat"><b>${nKey}</b><span>exam code chunks</span></div></div>
+  ${withContent.length?withContent.map(e=>{
+    const tk=(e.takeaways||[]).filter(Boolean), keys=(e.chunks||[]).map((c,i)=>[c,i]).filter(([c])=>c.key);
+    return `<article class="g-entry"><h4><span class="tag tc-${esc(e.type)}">${esc(tagOf(e))}</span><button type="button" data-id="${esc(e.id)}">${esc(e.title||'Untitled')}</button></h4>
+      ${tk.length?`<ol class="takeaways">${tk.map(x=>`<li><span>${esc(x)}</span></li>`).join('')}</ol>`:''}
+      ${keys.map(([c,i])=>chunkHTML(c,i).replace('data-act="copy"','data-act="copy" data-eid="'+esc(e.id)+'"')).join('')}
+    </article>`;}).join('')
+  :`<div class="empty"><h3>Nothing flagged yet</h3><p>Add lines under "Remember for the test" or mark code chunks as exam material, and tag entries with an exam. They collect here.</p></div>`}
+  ${missing.length?`<p class="hint">Not summarized yet: ${missing.map(e=>esc(tagOf(e))).join(', ')}</p>`:''}`;
+}
+
+/* ---------- Editor ---------- */
+function blankDraft(){return {type:filterType!=='all'?filterType:'hw',num:'',title:'',date:new Date().toISOString().slice(0,10),exams:[],topics:[],pdfs:[],chunks:[{id:uid(),label:'',code:'',comment:'',key:false}],notes:'',takeaways:[]};}
+function editorHTML(){
+  const d=draft;
+  return `<header class="head"><div class="eyebrow"><span>${isNew?'New entry':'Editing '+esc(tagOf(d))}</span></div><h2>${esc(d.title||'Untitled')}</h2></header>
+  <form class="form" id="edForm" autocomplete="off">
+    <div class="grid">
+      <div class="field"><label for="f-type">Type</label><select class="inp" id="f-type">${TYPE_ORDER.map(t=>`<option value="${t}" ${d.type===t?'selected':''}>${TYPES[t].label}</option>`).join('')}</select></div>
+      <div class="field"><label for="f-num">Number</label><input class="inp" id="f-num" inputmode="numeric" value="${esc(d.num)}" placeholder="3"></div>
+      <div class="field span2"><label for="f-date">Date</label><input class="inp" id="f-date" type="date" value="${esc(d.date)}"></div>
+      <div class="field span4"><label for="f-title">Title</label><input class="inp" id="f-title" value="${esc(d.title)}" placeholder="Vectors, indexing and logical operators" required></div>
+      <div class="field span2"><span class="label">Exams it covers</span><div class="checks">${EXAMS.map((x,i)=>`<label><input type="checkbox" id="f-ex-${i}" value="${esc(x)}" ${(d.exams||[]).includes(x)?'checked':''}> ${esc(x)}</label>`).join('')}</div></div>
+      <div class="field span2"><label for="f-topics">Topics</label><input class="inp" id="f-topics" value="${esc((d.topics||[]).join(', '))}" placeholder="vectors, data frames, apply"><span class="hint">Separate with commas</span></div>
+    </div>
+
+    <section class="block">
+      <div class="block-h"><h3>Files<span class="count">${d.pdfs.length}</span></h3>
+        <span style="display:flex;gap:8px;align-items:center"><span class="upload-status" id="upStatus"></span><label class="btn sm" for="upEdit">Attach PDF or image</label><input id="upEdit" type="file" accept=".pdf,application/pdf,image/*" multiple hidden></span></div>
+      <p class="hint">Attached files show up here right away. To keep them on the website, also put each file in the site's <code>files</code> folder (the sidebar lists which ones).</p>
+      ${d.pdfs.length?`<div class="files">${d.pdfs.map(f=>`<div class="file"><div class="file-row"><span class="file-ic ${(f.type||'').startsWith('image/')?'img':''}">${(f.type||'').startsWith('image/')?'IMG':'PDF'}</span><span class="file-name">${esc(f.name)}</span><span class="file-size">${f.size?fmtSize(f.size):''}</span><button class="btn sm ghost" type="button" data-act="rm-file" data-fid="${esc(f.name)}">Remove</button></div></div>`).join('')}</div>`:'<p class="empty-line">No files attached.</p>'}
+    </section>
+
+    <section class="block">
+      <div class="block-h"><h3>Code chunks<span class="count">${d.chunks.length}</span></h3>
+        <span style="display:flex;gap:8px"><label class="btn sm" for="impR">Import .R / .Rmd</label><input id="impR" type="file" accept=".R,.r,.Rmd,.rmd,.txt,.qmd" multiple hidden><button class="btn sm" type="button" data-act="add-chunk">+ Add chunk</button></span></div>
+      ${d.chunks.map((c,i)=>`<div class="chunk-ed">
+        <div class="top"><input class="inp" id="c-lbl-${c.id}" data-ci="${i}" data-k="label" value="${esc(c.label)}" placeholder="Label, e.g. Q2(b) — filter with which()">
+          <label class="checks" style="font-size:13px"><input type="checkbox" id="c-key-${c.id}" data-ci="${i}" data-k="key" ${c.key?'checked':''}> Exam material</label>
+          <button class="btn sm ghost" type="button" data-act="up-chunk" data-i="${i}" ${i===0?'disabled':''} aria-label="Move up">↑</button>
+          <button class="btn sm ghost" type="button" data-act="rm-chunk" data-i="${i}">Remove</button></div>
+        <div class="field"><label for="c-code-${c.id}">R code</label><textarea class="inp mono" id="c-code-${c.id}" data-ci="${i}" data-k="code" rows="${Math.min(18,Math.max(5,(c.code||'').split('\n').length+1))}" spellcheck="false" placeholder="x <- c(1, 5, 9)&#10;mean(x)">${esc(c.code)}</textarea></div>
+        <div class="field"><label for="c-com-${c.id}">My comment</label><textarea class="inp" id="c-com-${c.id}" data-ci="${i}" data-k="comment" rows="5" placeholder="Why this works, what tripped me up, what the output means">${esc(c.comment)}</textarea></div>
+      </div>`).join('')}
+    </section>
+
+    <div class="field"><label for="f-notes">Notes</label><textarea class="inp" id="f-notes" rows="8" placeholder="General notes. Markdown works: **bold**, \`code\`, - lists">${esc(d.notes)}</textarea></div>
+    <div class="field"><label for="f-tk">Remember for the test</label><textarea class="inp" id="f-tk" rows="5" placeholder="One point per line">${esc((d.takeaways||[]).join('\n'))}</textarea><span class="hint">One point per line. These show up in the study guide.</span></div>
+
+    <div class="save-bar"><button class="btn primary" type="submit">Save entry</button><button class="btn" type="button" data-act="cancel">Cancel</button><span class="msg" id="saveMsg">${esc(saveMsg)}</span></div>
+  </form>`;
+}
+function readForm(){
+  if(!editing||!$('#edForm'))return;
+  const d=draft;
+  d.type=$('#f-type').value; d.num=$('#f-num').value.trim(); d.title=$('#f-title').value.trim(); d.date=$('#f-date').value;
+  d.exams=EXAMS.filter((x,i)=>$('#f-ex-'+i).checked);
+  d.topics=$('#f-topics').value.split(',').map(s=>s.trim()).filter(Boolean);
+  d.notes=$('#f-notes').value; d.takeaways=$('#f-tk').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  document.querySelectorAll('[data-ci]').forEach(el=>{const c=d.chunks[+el.dataset.ci]; if(!c)return; c[el.dataset.k]=el.type==='checkbox'?el.checked:el.value;});
+}
+function startEdit(id){
+  isNew=!id; curId=id||curId;
+  draft=id?JSON.parse(JSON.stringify({...entries[id]})):blankDraft();
+  draft.chunks=(draft.chunks||[]).map(c=>({id:c.id||uid(),label:'',code:'',comment:'',key:false,...c}));
+  draft.pdfs=draft.pdfs||[];
+  draftUploads=[]; draftRemovals=[]; saveMsg=''; editing=true; confirmDelete=false;
+  renderList(); renderMain(); window.scrollTo(0,0);
+}
+function cancelEdit(){
+  editing=false; draft=null; isNew=false; renderSide(); renderMain();
+}
+function slug(d){
+  const base=(d.type||'hw')+'-'+(String(d.num||'').padStart(2,'0')||'x');
+  let id=base.replace(/[^a-z0-9-]/gi,'')||('entry-'+Date.now()); let k=2;
+  while(entries[id]){id=base+'-'+(k++);}
+  return id;
+}
+function persist(){
+  try{localStorage.setItem(LS_KEY,JSON.stringify({savedAt:new Date().toISOString(),base:window.ENTRIES_SAVED||'',entries}))}catch(e){}
+  try{localStorage.setItem(LS_PENDING,JSON.stringify(pendingFiles))}catch(e){}
+  renderSavebox();
+}
+function hasLocalChanges(){
+  return JSON.stringify(entries)!==JSON.stringify(window.ENTRIES||{});
+}
+function renderSavebox(){
+  const box=$('#savebox'); if(!box)return;
+  const changed=hasLocalChanges();
+  const pend=pendingFiles.filter(n=>Object.values(entries).some(e=>(e.pdfs||[]).some(f=>f.name===n)));
+  if(!changed&&!pend.length){box.hidden=true;return;}
+  box.hidden=false;
+  box.innerHTML=`<b>Changes saved in this browser</b>
+    <span>To put them on your website:</span>
+    <ol><li>Download <code>entries.js</code> and replace the one in the <code>data</code> folder.</li>
+    ${pend.length?`<li>Add these to the <code>files</code> folder: ${pend.map(n=>`<code>${esc(n)}</code>`).join(', ')}</li>`:''}</ol>
+    <div class="row"><button class="btn sm primary" type="button" data-act="export">Download entries.js</button>
+    <button class="btn sm ghost" type="button" data-act="discard">Discard changes</button></div>
+    <span id="discardConfirm"></span>`;
+}
+function exportData(){
+  const stamp=new Date().toISOString();
+  const text='// STAT 2102 study guide data. Replace this file with the one you download from the site.\nwindow.ENTRIES_SAVED = '+JSON.stringify(stamp)+';\nwindow.ENTRIES = '+JSON.stringify(entries,null,1)+';\n';
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([text],{type:'text/javascript'}));
+  a.download='entries.js'; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+function saveEdit(){
+  readForm();
+  if(!draft.title){saveMsg='Add a title before saving.';$('#saveMsg').textContent=saveMsg;$('#f-title').focus();return;}
+  const body={type:draft.type,num:draft.num,title:draft.title,date:draft.date,exams:draft.exams,topics:draft.topics,
+    pdfs:draft.pdfs.map(({name,size,type})=>({name,size,type})),
+    chunks:draft.chunks.filter(c=>c.code.trim()||c.comment.trim()||c.label.trim()).map(({id,label,code,comment,key})=>({id,label,code,comment,key:!!key})),
+    notes:draft.notes,takeaways:draft.takeaways,updatedAt:new Date().toISOString()};
+  const id=isNew?slug(draft):curId;
+  entries={...entries,[id]:body};
+  curId=id; store('s2102.cur',curId);
+  editing=false; draft=null; isNew=false; view='entry';
+  persist(); renderSide(); renderMain(); window.scrollTo(0,0);
+}
+
+/* ---------- Files ---------- */
+function fileUrl(f){ return localUrls[f.name] || ('files/'+encodeURIComponent(f.name)); }
+function uploadFiles(fileList){
+  readForm();
+  for(const f of fileList){
+    const type=f.type||(/\.pdf$/i.test(f.name)?'application/pdf':'');
+    if(localUrls[f.name])URL.revokeObjectURL(localUrls[f.name]);
+    localUrls[f.name]=URL.createObjectURL(f);
+    if(!draft.pdfs.some(p=>p.name===f.name)) draft.pdfs.push({name:f.name,size:f.size,type});
+    if(!pendingFiles.includes(f.name)) pendingFiles.push(f.name);
+  }
+  try{localStorage.setItem(LS_PENDING,JSON.stringify(pendingFiles))}catch(e){}
+  renderMain();
+}
+function deleteEntry(id){
+  const next={...entries}; delete next[id]; entries=next;
+  curId=null; confirmDelete=false; persist(); renderSide(); renderMain();
+}
+function readTextFile(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result));r.onerror=rej;r.readAsText(f);});}
+function splitRmd(text){
+  const out=[]; const re=/```\{r([^}]*)\}\s*\n([\s\S]*?)```/g; let m;
+  while((m=re.exec(text))){ const lbl=(m[1]||'').split(',')[0].trim(); out.push({label:lbl,code:m[2].replace(/\s+$/,'')}); }
+  return out;
+}
+
+/* ---------- Events ---------- */
+document.addEventListener('click',async ev=>{
+  const b=ev.target.closest('button'); if(!b)return;
+  if(b.dataset.type){filterType=b.dataset.type;renderSide();return;}
+  if(b.dataset.exam){filterExam=b.dataset.exam;renderSide();return;}
+  if(b.dataset.gexam){guideExam=b.dataset.gexam;renderMain();return;}
+  if(b.dataset.id&&!b.dataset.act){
+    if(editing)return;
+    curId=b.dataset.id; view='entry'; confirmDelete=false; store('s2102.cur',curId); renderSide(); renderMain(); window.scrollTo(0,0);
+    if(window.innerWidth<820){$('#side').classList.add('collapsed');$('#btnMenu').setAttribute('aria-expanded','false');}
+    return;
+  }
+  const act=b.dataset.act; if(!act)return;
+  if(act==='new')startEdit(null);
+  else if(act==='edit')startEdit(curId);
+  else if(act==='cancel')cancelEdit();
+  else if(act==='del'){confirmDelete=true;renderMain();}
+  else if(act==='del-no'){confirmDelete=false;renderMain();}
+  else if(act==='del-yes')deleteEntry(curId);
+  else if(act==='preview'){const f=b.dataset.fid;openPreviews.has(f)?openPreviews.delete(f):openPreviews.add(f);renderMain();}
+  else if(act==='copy'){
+    const e=entries[b.dataset.eid||curId]; const code=(e?.chunks||[])[+b.dataset.i]?.code||'';
+    const pre=b.closest('.chunk').querySelector('pre');
+    try{await navigator.clipboard.writeText(code);b.textContent='Copied';}
+    catch(x){const r=document.createRange();r.selectNodeContents(pre);const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Selected';}
+    setTimeout(()=>{b.textContent='Copy'},1400);
+  }
+  else if(act==='add-chunk'){readForm();draft.chunks.push({id:uid(),label:'',code:'',comment:'',key:false});renderMain();}
+  else if(act==='rm-chunk'){readForm();draft.chunks.splice(+b.dataset.i,1);renderMain();}
+  else if(act==='up-chunk'){readForm();const i=+b.dataset.i;if(i>0){const c=draft.chunks.splice(i,1)[0];draft.chunks.splice(i-1,0,c);}renderMain();}
+  else if(act==='rm-file'){readForm();const fid=b.dataset.fid;draft.pdfs=draft.pdfs.filter(f=>f.name!==fid);renderMain();}
+  else if(act==='export')exportData();
+  else if(act==='discard'){const c=$('#discardConfirm');c.innerHTML='<span class="confirm">Undo every change made in this browser?<button class="btn sm danger solid" type="button" data-act="discard-yes">Discard</button></span>';}
+  else if(act==='discard-yes'){try{localStorage.removeItem(LS_KEY);localStorage.removeItem(LS_PENDING)}catch(e){} entries=JSON.parse(JSON.stringify(window.ENTRIES||{}));pendingFiles=[];curId=null;renderSavebox();renderSide();renderMain();}
+});
+$('#btnNew').addEventListener('click',()=>{ if(!editing)startEdit(null); });
+$('#btnGuide').addEventListener('click',()=>{ if(editing)return; view=view==='guide'?'entry':'guide'; renderSide(); renderMain(); window.scrollTo(0,0); });
+$('#btnMenu').addEventListener('click',()=>{const s=$('#side');const c=s.classList.toggle('collapsed');$('#btnMenu').setAttribute('aria-expanded',String(!c));});
+let qt; $('#search').addEventListener('input',e=>{clearTimeout(qt);qt=setTimeout(()=>{query=e.target.value.trim();renderList();},150);});
+document.addEventListener('submit',e=>{ if(e.target.id==='edForm'){e.preventDefault();saveEdit();} });
+document.addEventListener('input',e=>{ if(e.target.id==='f-title'&&draft){ const h=document.querySelector('.head h2'); if(h)h.textContent=e.target.value||'Untitled'; } });
+document.addEventListener('change',async e=>{
+  const t=e.target;
+  if(t.id==='upEdit'&&t.files.length)uploadFiles(t.files);
+  if(t.id==='impR'&&t.files.length){
+    readForm();
+    for(const f of t.files){
+      const text=await readTextFile(f);
+      const parts=/\.(rmd|qmd)$/i.test(f.name)?splitRmd(text):[];
+      const fresh=parts.length?parts.map((p,i)=>({id:uid(),label:p.label||`${f.name} · chunk ${i+1}`,code:p.code,comment:'',key:false})):[{id:uid(),label:f.name,code:text.replace(/\s+$/,''),comment:'',key:false}];
+      draft.chunks=draft.chunks.filter(c=>c.code.trim()||c.comment.trim()||c.label.trim()).concat(fresh);
+    }
+    renderMain();
+  }
+});
+
+/* ---------- Boot ---------- */
+curId=recall('s2102.cur');
+renderSide();
+(function(){
+  const base=window.ENTRIES||{};
+  let local=null;
+  try{local=JSON.parse(localStorage.getItem(LS_KEY)||'null')}catch(e){}
+  try{pendingFiles=JSON.parse(localStorage.getItem(LS_PENDING)||'[]')||[]}catch(e){}
+  if(local&&local.entries&&(!window.ENTRIES_SAVED||!local.base||local.base>=window.ENTRIES_SAVED||local.savedAt>window.ENTRIES_SAVED)){
+    entries=local.entries;
+  }else{
+    entries=JSON.parse(JSON.stringify(base));
+    try{localStorage.removeItem(LS_KEY)}catch(e){}
+  }
+  if(!window.ENTRIES) dbError='Could not find data/entries.js. Keep index.html next to the data and files folders.';
+  loaded=true; renderSide(); renderMain(); renderSavebox();
+})();
+})();
+</script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-12T22:20:00Z";
+window.ENTRIES_SAVED = "2026-10-12T22:40:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -1153,7 +1153,7 @@ window.ENTRIES = {
     "id": "c123",
     "label": "Problem 3 - Matrices · Part 9 · Remove Student 2 and Quiz 1 from bonus_scores and save the…",
     "code": "reduced_scores <- bonus_scores[-2, -1]\nprint(reduced_scores)\n#>      [,1] [,2] [,3]\n#> [1,]   78   94   93\n#> [2,]   91  100  100\n#> [3,]   84   90   85\n#> [4,]   80   92   94",
-    "comment": "",
+    "comment": "**Removing rows and columns from a matrix:** use a minus sign inside one pair of brackets, `[rows, columns]`, and save the result.\n\n| Goal | Code |\n|---|---|\n| Drop row 2 | `m[-2, ]` |\n| Drop column 1 | `m[, -1]` |\n| Drop both | `m[-2, -1]` |\n| Drop rows 1 and 3 | `m[-c(1, 3), ]` |\n\n**Why `reduced_scores <- [c(2, ), c( , 1)] <- NULL` doesn't work:**\n\n- The brackets must come right after the object: `bonus_scores[...]`.\n- A matrix takes **one** pair of brackets with a comma: `[rows, columns]`, not two separate `c()` pieces.\n- `c(2, )` has an empty slot; inside `c()` every comma needs a value. The empty spot only works directly in the matrix brackets (`m[2, ]` = all columns).\n- `<- NULL` deletes **list** elements, not matrix rows or columns.\n\n**Rule:** lists use `<- NULL` to delete; matrices and data frames use a minus sign inside `[rows, columns]`.",
     "key": false,
     "question": "Remove Student 2 and Quiz 1 from bonus_scores and save the resulting matrix as reduced_scores."
    },
@@ -1272,7 +1272,7 @@ window.ENTRIES = {
   ],
   "notes": "Online store orders vector, the `course_info` list, the quiz `scores` matrix, and the `employees` data frame.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
-  "updatedAt": "2026-10-12T22:20:00Z"
+  "updatedAt": "2026-10-12T22:40:00Z"
  },
  "rec-02": {
   "type": "rec",

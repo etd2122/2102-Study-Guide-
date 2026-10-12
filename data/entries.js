@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-12T21:50:00Z";
+window.ENTRIES_SAVED = "2026-10-12T22:20:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -1057,7 +1057,7 @@ window.ENTRIES = {
     "id": "c111",
     "label": "Problem 2 - Lists · Part 10 · Create another list called instructor_info containing “Dr.…",
     "code": "instructor_info <- list(\"Dr. Smith\", \"Columbia University\")\ncombined1 <- c(course_info, instructor_info)\nprint(combined1)\n#> [[1]]\n#> [1] \"Applied Statistical Computing\"\n#> \n#> [[2]]\n#> [1] 40\n#> \n#> [[3]]\n#> [1] \"R\"   \"SQL\"\n#> \n#> [[4]]\n#> [[4]][[1]]\n#> [1] \"Fall 2026\"\n#> \n#> [[4]][[2]]\n#> [1] TRUE\n#> \n#> \n#> [[5]]\n#> [1] \"Statistics Department\"\n#> \n#> [[6]]\n#> [1] \"Dr. Smith\"\n#> \n#> [[7]]\n#> [1] \"Columbia University\"\ncombined2 <- list(course_info, instructor_info)\nprint(combined2)\n#> [[1]]\n#> [[1]][[1]]\n#> [1] \"Applied Statistical Computing\"\n#> \n#> [[1]][[2]]\n#> [1] 40\n#> \n#> [[1]][[3]]\n#> [1] \"R\"   \"SQL\"\n#> \n#> [[1]][[4]]\n#> [[1]][[4]][[1]]\n#> [1] \"Fall 2026\"\n#> \n#> [[1]][[4]][[2]]\n#> [1] TRUE\n#> \n#> \n#> [[1]][[5]]\n#> [1] \"Statistics Department\"\n#> \n#> \n#> [[2]]\n#> [[2]][[1]]\n#> [1] \"Dr. Smith\"\n#> \n#> [[2]][[2]]\n#> [1] \"Columbia University\"",
-    "comment": "",
+    "comment": "**`c()` vs `list()`: same two lists, different shapes.**\n\n- `combined1 <- c(course_info, instructor_info)` **merges** them. The 5 elements of `course_info` and the 2 of `instructor_info` are laid end to end in one flat list, so `length(combined1)` is **7**. \"Dr. Smith\" is just element 6: `combined1[[6]]`.\n- `combined2 <- list(course_info, instructor_info)` **nests** them. It makes a new list whose two elements are the original lists, untouched, so `length(combined2)` is **2**. \"Dr. Smith\" is now one level deeper: `combined2[[2]][[1]]`.\n\n**How to tell from the printout:** `combined1` labels go `[[1]]` … `[[7]]`. `combined2` labels go `[[1]][[1]]`, `[[1]][[2]]` … `[[2]][[1]]`, `[[2]][[2]]`. The extra `[[ ]]` in front is the extra layer of nesting.\n\n**Rule:** `c()` = combine into one longer list. `list()` = put the lists inside a new list as separate items.",
     "key": false,
     "question": "Create another list called instructor_info containing “Dr. Smith” and “Columbia University”. Combine course_info and instructor_info using c() and save the result as combined1. Next, combine course_info and instructor_info using list() and save the result as combined2.Compare combined1 and combined2. How many elements does each contain?"
    },
@@ -1272,7 +1272,7 @@ window.ENTRIES = {
   ],
   "notes": "Online store orders vector, the `course_info` list, the quiz `scores` matrix, and the `employees` data frame.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
-  "updatedAt": "2026-10-12T21:50:00Z"
+  "updatedAt": "2026-10-12T22:20:00Z"
  },
  "rec-02": {
   "type": "rec",

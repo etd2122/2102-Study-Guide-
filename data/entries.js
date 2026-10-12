@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-12T15:50:00Z";
+window.ENTRIES_SAVED = "2026-10-12T17:10:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -34,131 +34,149 @@ window.ENTRIES = {
     "label": "Problem 1 [7pt] · Part 1 · Create vectors containing {2.5, 4.5, 6.5, 8.5, 10.5, 12.5,…",
     "code": "vector1 <- c(2.5, 4.5, 6.5, 8.5, 10.5, 12.5, 14.5)\nvector1\n#> [1]  2.5  4.5  6.5  8.5 10.5 12.5 14.5\nvector2 <- seq(2.5, 14.5, by = 2)\nvector2\n#> [1]  2.5  4.5  6.5  8.5 10.5 12.5 14.5\nvector3 <- seq(2.5, 14.5, length.out = 7)\nvector3\n#> [1]  2.5  4.5  6.5  8.5 10.5 12.5 14.5",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Create vectors containing {2.5, 4.5, 6.5, 8.5, 10.5, 12.5, 14.5} elements in three different ways, using the following functions: c(), seq() with the by argument, and seq() with the length.out argument. Name them vector1, vector2, and vector3, respectively."
    },
    {
     "id": "c076",
     "label": "Problem 1 [7pt] · Part 2 · Append four additional elements to vector2: 10, 20, 30, and…",
     "code": "vector2 <- append(vector2, 10, after = 1)\nvector2 <- append(vector2, 20, after = 0)\nvector2 <- append(vector2, 30, after = 6)\nvector2 <- append(vector2, 40)\nvector2\n#>  [1] 20.0  2.5 10.0  4.5  6.5  8.5 30.0 10.5 12.5 14.5 40.0",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Append four additional elements to vector2: 10, 20, 30, and 40. Ensure that 10 becomes the second element in the updated vector2, 20 is the first element considering that 10 has been already added, 30 occupies the 7th position given the presence of 10 and 20, and 40 is positioned as the last element after including all the other numbers."
    },
    {
     "id": "c077",
     "label": "Problem 1 [7pt] · Part 3 · Form a new vector encompassing {2, 3, 6, 10, 15, 18, 22, 25,…",
     "code": "vector4 <- c(2, 3, 6, 10, 15, 18, 22, 25, 27, 30, 31, 35, 42)\nvector4\n#>  [1]  2  3  6 10 15 18 22 25 27 30 31 35 42\nvector5 <- vector4[vector4 > 15 & vector4 %% 2 != 0]\nvector5\n#> [1] 25 27 31 35\n27 %in% vector5\n#> [1] TRUE",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Form a new vector encompassing {2, 3, 6, 10, 15, 18, 22, 25, 27, 30, 31, 35, 42} elements and label it vector4. Extract elements greater than 15 and not divisible by 2 through a logical statement, generating a new vector named vector5. Verify the presence of the number 27 within vector5 using a logical operator."
    },
    {
     "id": "c078",
     "label": "Problem 2 [9pt] · Part 1 · Create a list listX with the following elements:",
     "code": "listX <- list(\n  \"Data Science\",\n  100,\n  c(-3, 0, 3, 6),\n  TRUE,\n  list(c(\"A\", \"B\", \"C\"), c(2.5, 5.5, 7.5))\n)\nlistX\n#> [[1]]\n#> [1] \"Data Science\"\n#> [[2]]\n#> [1] 100\n#> [[3]]\n#> [1] -3  0  3  6\n#> [[4]]\n#> [1] TRUE\n#> [[5]]\n#> [[5]][[1]]\n#> [1] \"A\" \"B\" \"C\"\n#> [[5]][[2]]\n#> [1] 2.5 5.5 7.5",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Create a list listX with the following elements:\n• A character string “Data Science”\n• A numeric value 100\n• A vector {-3, 0, 3, 6}\n• A logical value TRUE\n• A sublist containing vectors {“A”, “B”, “C”} and {2.5, 5.5, 7.5}"
    },
    {
     "id": "c079",
     "label": "Problem 2 [9pt] · Part 2 · Extract the third element of listX and assign it to vector6.",
     "code": "vector6 <- listX[[3]]\nvector6\n#> [1] -3  0  3  6",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Extract the third element of listX and assign it to vector6."
    },
    {
     "id": "c080",
     "label": "Problem 2 [9pt] · Part 3 · Convert listX into a single vector using unlist(). Explain…",
     "code": "unlist(listX)\n#>  [1] \"Data Science\" \"100\"          \"-3\"           \"0\"            \"3\"\n#>  [6] \"6\"            \"TRUE\"         \"A\"            \"B\"            \"C\"\n#> [11] \"2.5\"          \"5.5\"          \"7.5\"\n# By applying unlist() to listX, we obtain a character vector. From the R documentation for unlist():\n# Given a list structure x, unlist() simplifies it to produce a vector which contains all the atomic\n# components which occur in x. Where possible the list elements are coerced to a common mode\n# during the unlisting, and so the result often ends up as a character vector. Vectors will be coerced\n# to the highest type of the components in the hierarchy:\n#>      NULL<  raw< logical < integer < double < complex< character < list < expression\n# Under the above hierarchy, the highest data type of an atomic element inside listX is “character”, so all\n# other elements are coerced to be of class “character” as well. The result thus becomes a character vector.",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Convert listX into a single vector using unlist(). Explain why the resulting structure appears as it does."
    },
    {
     "id": "c081",
     "label": "Problem 2 [9pt] · Part 4 · Modify listX by replacing the second element with a new…",
     "code": "listX[[2]] <- 200\nlistX\n#> [[1]]\n#> [1] \"Data Science\"\n#> [[2]]\n#> [1] 200\n#> [[3]]\n#> [1] -3  0  3  6\n#> [[4]]\n#> [1] TRUE\n#> [[5]]\n#> [[5]][[1]]\n#> [1] \"A\" \"B\" \"C\"\n#> [[5]][[2]]\n#> [1] 2.5 5.5 7.5",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Modify listX by replacing the second element with a new value: 200."
    },
    {
     "id": "c082",
     "label": "Problem 2 [9pt] · Part 5 · Create a new list listY by merging listXwith another list…",
     "code": "listY <- c(listX, list(\"Statistics\", 50, FALSE))\nlistY\n#> [[1]]\n#> [1] \"Data Science\"\n#> [[2]]\n#> [1] 200\n#> [[3]]\n#> [1] -3  0  3  6\n#> [[4]]\n#> [1] TRUE\n#> [[5]]\n#> [[5]][[1]]\n#> [1] \"A\" \"B\" \"C\"\n#> [[5]][[2]]\n#> [1] 2.5 5.5 7.5\n#> [[6]]\n#> [1] \"Statistics\"\n#> [[7]]\n#> [1] 50\n#> [[8]]\n#> [1] FALSE\n# The structure of listY differs from that of listX in that it is longer by 3 elements.",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Create a new list listY by merging listXwith another list containing “Statistics”, 50, and FALSE. Compare the structures of listX and listY."
    },
    {
     "id": "c083",
     "label": "Problem 3 [9pt] · Part 1 · Create a data frame dfA with the following variables:",
     "code": "Team <- c(\"Alpha\", \"Beta\", \"Gamma\", \"Delta\", \"Epsilon\",\n          \"Beta\", \"Alpha\", \"Gamma\", \"Delta\", \"Epsilon\")\nRole <- c(\"Analyst\", \"Manager\", \"Developer\", \"Analyst\", \"Manager\",\n          \"Developer\", \"Analyst\", \"Manager\", \"Developer\", \"Analyst\")\nScore <- c(82, 90, 75, 88, 79, 95, 80, 85, 76, 89)\nCertified <- c(\"Yes\", \"No\", \"Yes\", \"No\", \"Yes\", \"Yes\", \"No\", \"Yes\", \"No\", \"Yes\")\nExperience <- c(3, 5, 7, 2, 6, 8, 4, 3, 5, 9)\ndfA <- data.frame(Team, Role, Score, Certified, Experience)\ndfA\n#>       Team      Role Score Certified Experience\n#> 1    Alpha   Analyst    82       Yes          3\n#> 2     Beta   Manager    90        No          5\n#> 3    Gamma Developer    75       Yes          7\n#> 4    Delta   Analyst    88        No          2\n#> 5  Epsilon   Manager    79       Yes          6\n#> 6     Beta Developer    95       Yes          8\n#> 7    Alpha   Analyst    80        No          4\n#> 8    Gamma   Manager    85       Yes          3\n#> 9    Delta Developer    76        No          5\n#> 10 Epsilon   Analyst    89       Yes          9",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Create a data frame dfA with the following variables:\n• Team - {“Alpha”, “Beta”, “Gamma”, “Delta”, “Epsilon”, “Beta”, “Alpha”, “Gamma”, “Delta”, “Epsilon”}\n• Role - {“Analyst”, “Manager”, “Developer”, “Analyst”, “Manager”, “Developer”, “Analyst”, “Manager”, “Developer”, “Analyst”}\n• Score - {82, 90, 75, 88, 79, 95, 80, 85, 76, 89}\n• Certified - {“Yes”, “No”, “Yes”, “No”, “Yes”, “Yes”, “No”, “Yes”, “No”, “Yes”}\n• Experience - {3, 5, 7, 2, 6, 8, 4, 3, 5, 9}"
    },
    {
     "id": "c084",
     "label": "Problem 3 [9pt] · Part 2 · Compute summary statistics for the Score variable.",
     "code": "summary(dfA$Score)\n#>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.\n#>   75.00   79.25   83.50   83.90   88.75   95.00",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Compute summary statistics for the Score variable."
    },
    {
     "id": "c085",
     "label": "Problem 3 [9pt] · Part 3 · Convert Certified into a factor if it is not already. Display…",
     "code": "dfA$Certified <- factor(dfA$Certified)\ndfA$Certified\n#>  [1] Yes No  Yes No  Yes Yes No  Yes No  Yes\n#> Levels: No Yes\n# NOTE: The function as.factor() also works here:\ndfA$Certified <- as.factor(dfA$Certified)\ndfA$Certified\n#>  [1] Yes No  Yes No  Yes Yes No  Yes No  Yes\n#> Levels: No Yes\ntable(dfA$Certified)\n#>  No Yes\n#>   4   6",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Convert Certified into a factor if it is not already. Display the frequency table of its values."
    },
    {
     "id": "c086",
     "label": "Problem 3 [9pt] · Part 4 · Add a new column High_Performer, which is TRUE if Score is…",
     "code": "dfA$High_Performer <- dfA$Score > 85 & dfA$Experience > 4\ndfA$High_Performer\n#>  [1] FALSE  TRUE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE  TRUE\n# NOTE: Your first instinct might be to use ifelse() for this question, like so:\ndfA$High_Performer <- ifelse(dfA$Score > 85 & dfA$Experience > 4, TRUE, FALSE)\n# This is not incorrect. However, using ifelse() is redundant if you want to create a logical vector (i.e. a\n# vector containing TRUE and FALSE values) – so instead of writing x <- ifelse(condition, TRUE, FALSE)\n# you can just write x <- condition.",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Add a new column High_Performer, which is TRUE if Score is greater than 85 and Experience is more than 4, otherwise FALSE."
    },
    {
     "id": "c087",
     "label": "Problem 3 [9pt] · Part 5 · Extract all employees who belong to the “Gamma” team and are…",
     "code": "dfA[dfA$Team == \"Gamma\" & dfA$Certified == \"Yes\", ]\n#>    Team      Role Score Certified Experience High_Performer\n#> 3 Gamma Developer    75       Yes          7          FALSE\n#> 8 Gamma   Manager    85       Yes          3          FALSE\n# Solution #2 (using the subset() function)\nsubset(dfA, Team == \"Gamma\" & Certified == \"Yes\")\n#>    Team      Role Score Certified Experience High_Performer\n#> 3 Gamma Developer    75       Yes          7          FALSE\n#> 8 Gamma   Manager    85       Yes          3          FALSE",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Extract all employees who belong to the “Gamma” team and are certified."
    },
    {
     "id": "c088",
     "label": "Problem 4 [9pt] · Part 1 · Generate a matrix named matrix1 with 5 columns, filled…",
     "code": "elements <- c(10, 3, 6, 23, -5, -4, 13, 17, 5, 6, -7, -10,\n              13, 39, 20, 2, 1, 9, 11, -22, 23, -15, -3, 6, 12)\nmatrix1 <- matrix(elements, ncol = 5, byrow = TRUE)\nmatrix1\n#>      [,1] [,2] [,3] [,4] [,5]\n#> [1,]   10    3    6   23   -5\n#> [2,]   -4   13   17    5    6\n#> [3,]   -7  -10   13   39   20\n#> [4,]    2    1    9   11  -22\n#> [5,]   23  -15   -3    6   12",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Generate a matrix named matrix1 with 5 columns, filled row-wise with the elements: 10, 3, 6, 23, -5, -4, 13, 17, 5, 6, -7, -10, 13, 39, 20, 2, 1, 9, 11, -22, 23, -15, -3, 6, 12."
    },
    {
     "id": "c089",
     "label": "Problem 4 [9pt] · Part 2 · Employ a for loop to update the elements of matrix1 according…",
     "code": "for (i in 1:nrow(matrix1)) {\n  for (j in 1:ncol(matrix1)) {\n    if (matrix1[i, j] < 0) {\n      matrix1[i, j] <- 0\n    } else if (matrix1[i, j] >= 0 & matrix1[i, j] < 5) {\n      matrix1[i, j] <- 5\n    } else if (matrix1[i, j] > 10 & matrix1[i, j] < 15) {\n      matrix1[i, j] <- 10\n    } else {\n      matrix1[i, j] <- 100\n    }\n  }\n}\nmatrix1\n#>      [,1] [,2] [,3] [,4] [,5]\n#> [1,]  100    5  100  100    0\n#> [2,]    0   10  100  100  100\n#> [3,]    0    0   10  100  100\n#> [4,]    5    5  100   10    0\n#> [5,]  100    0    0  100   10",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Employ a for loop to update the elements of matrix1 according to the following criteria: replace negative values with 0; for elements greater than or equal to 0 but less than 5, replace them with 5; for elements less than 15 but greater than 10, replace them with 10; for elements that do not meet the specified conditions, substitute them with 100."
    },
    {
     "id": "c090",
     "label": "Problem 4 [9pt] · Part 3 · Initiate an empty vector vector7. Utilize a while loop to…",
     "code": "vector7 <- vector(mode = \"numeric\")\ni <- 1\nwhile (i < 30) {\n  if (i %% 2 == 1 & i %% 3 != 0) {\n    vector7 <- c(vector7, i)\n  }\n  i <- i + 1\n}\nvector7\n#>  [1]  1  5  7 11 13 17 19 23 25 29",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Initiate an empty vector vector7. Utilize a while loop to fill vector7 with odd numbers greater than 0 and less than 30, excluding those odd numbers divisible by 3."
    },
    {
     "id": "c091",
     "label": "Problem 5 [9pt] · Part 1 · Write a function categorize_numbers() that takes a numeric…",
     "code": "categorize_numbers <- function(vec) {\n  labels <- vector(mode = \"character\", length = length(vec))\n  for (i in 1:length(vec)) {\n    if (vec[i] < 10) {\n      labels[i] <- \"Small\"\n    } else if (vec[i] >= 10 & vec[i] <= 20) {\n      labels[i] <- \"Medium\"\n    } else {\n      labels[i] <- \"Large\"\n    }\n  }\n  labels\n}\ntest_vec <- c(4, 10, 15, 22, 8, 18, 27, 5, 12)\ncategorize_numbers(test_vec)\n#> [1] \"Small\"  \"Medium\" \"Medium\" \"Large\"  \"Small\"  \"Medium\" \"Large\"  \"Small\"\n#> [9] \"Medium\"\n# Solution #2 (without using a for loop)\ncategorize_numbers <- function(vec) {\n  labels <- ifelse(vec < 10, \"Small\", ifelse(vec >= 10 & vec <= 20, \"Medium\", \"Large\"))\n  labels\n}\ntest_vec <- c(4, 10, 15, 22, 8, 18, 27, 5, 12)\ncategorize_numbers(test_vec)\n#> [1] \"Small\"  \"Medium\" \"Medium\" \"Large\"  \"Small\"  \"Medium\" \"Large\"  \"Small\"\n#> [9] \"Medium\"\n# NOTE: This solution is a lot more compact because it uses the ifelse() function instead of if statements.\n# An if statement only works on one element at a time, but ifelse() can deal with a whole vector (or a\n# whole matrix) at once. This can helps us avoid for loops, making our code a lot shorter and simpler.\n# Notice the use of two ifelse() functions, one nested inside the other.\n# The first ifelse() corresponds to the if part that checks whether an element is less than 10:\n# If the element is less than 10 return “Small” as the corresponding category label.\n# If the element is NOT less than 10 we enter the second ifelse(). This corresponds to the\n# else if part that checks whether an element is between 10 and 20 (inclusive).\n# If the element is between 10 and 20 (inclusive) return “Medium” as the category\n# label.\n# If the element is NOT between 10 and 20 (inclusive), meaning that it is\n# greater than 20, return “Large” 10 as the category label. This final piece corresponds\n# to what the else part was handling.",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Write a function categorize_numbers() that takes a numeric vector as input and classifies each element into one of three categories:\n• \"Small\" if the number is less than 10\n• \"Medium\" if the number is between 10 and 20 (inclusive)\n• \"Large\" if the number is greater than 20 The function should return a character vector with the corresponding category labels. Test your function with the vector: {4, 10, 15, 22, 8, 18, 27, 5, 12}."
    },
    {
     "id": "c092",
     "label": "Problem 5 [9pt] · Part 2 · Create a function matrix_summary() that accepts a numeric…",
     "code": "matrix_summary <- function(mat) {\n  # row sums\n  row_sums <- vector(mode = \"numeric\", length = nrow(mat))\n  for (i in 1:nrow(mat)) {\n    row_sums[i] <- sum(mat[i, ])\n  }\n  # column means\n  col_means <- vector(mode = \"numeric\", length = ncol(mat))\n  for (i in 1:ncol(mat)) {\n    col_means[i] <- mean(mat[ , i])\n  }\n  # maximum value\n  max_val <- max(mat)\n  # minimum value\n  min_val <- min(mat)\n  # package everything up in a list\n  summary <- list(\n    \"Row Sums\" = row_sums,\n    \"Column Means\" = col_means,\n    \"Max Value\" = max_val,\n    \"Min Value\" = min_val\n  )\n  summary\n}\ntest_mat <- matrix(c(5, 12, 18, 7, 14, 22, 9, 10, 25, 6, 17, 30), ncol = 3, byrow = TRUE)\nmatrix_summary(test_mat)\n#> $`Row Sums`\n#> [1] 35 43 44 53\n#> $`Column Means`\n#> [1]  6.75 13.25 23.75\n#> $`Max Value`\n#> [1] 30\n#> $`Min Value`\n#> [1] 5\n# Solution #2\n# R has many in-built functions that simplify common operations, so you might have stumbled upon the\n# rowSums and colMeans functions (the corresponding functions rowMeans and colSums also exist).\nmatrix_summary <- function(mat) {\n  summary <- list(\n    \"Row Sums\" = rowSums(mat),\n    \"Column Means\" = colMeans(mat),\n    \"Max Value\" = max(mat),\n    \"Min Value\" = min(mat)\n  )\n  summary\n}\ntest_mat <- matrix(c(5, 12, 18, 7, 14, 22, 9, 10, 25, 6, 17, 30), ncol = 3, byrow = TRUE)\nmatrix_summary(test_mat)\n#> $`Row Sums`\n#> [1] 35 43 44 53\n#> $`Column Means`\n#> [1]  6.75 13.25 23.75\n#> $`Max Value`\n#> [1] 30\n#> $`Min Value`\n#> [1] 5",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Create a function matrix_summary() that accepts a numeric matrix and returns a list containing the following elements:\n• Row Sums - a vector with the sum of each row\n• Column Means - a vector with the mean of each column\n• Max Value - the maximum value in the entire matrix\n• Min Value - the minimum value in the entire matrix Hint: sum(), mean(), max(), min() functions will come in handy.\nTest your function on the matrix:\n  5 12 18 7 14 22   9 10 25 6 17 30"
    }
   ],
   "notes": "Due September 27, 11:59 PM. Five problems: building vectors with `c()` and `seq()`, `append()` and logical filtering; lists and `unlist()` coercion; the `dfA` data frame with factors and a `High_Performer` column; a for loop and a while loop over `matrix1`; and the functions `categorize_numbers()` and `matrix_summary()`.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
-  "updatedAt": "2026-10-12T15:40:00Z"
+  "updatedAt": "2026-10-12T17:10:00Z"
  },
  "hw-02": {
   "type": "hw",
@@ -896,320 +914,365 @@ window.ENTRIES = {
     "label": "Problem 1 - Vectors · Part 1 · Create a vector called orders containing these values.",
     "code": "orders <- c(18, 24, 15, 31, 27, 22, 35, 19, 28, 40, 26, 33)\nprint(orders)\n#>  [1] 18 24 15 31 27 22 35 19 28 40 26 33",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Create a vector called orders containing these values."
    },
    {
     "id": "c094",
     "label": "Problem 1 - Vectors · Part 2 · Use indexing to extract:",
     "code": "orders[1:4]\n#> [1] 18 24 15 31",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Use indexing to extract:\n• the first four observations"
    },
    {
     "id": "c095",
     "label": "Problem 1 - Vectors · Part 2 · the 3rd, 6th, 9th, and 12th observations",
     "code": "orders[c(3, 6, 9, 12)]\n#> [1] 15 22 28 33",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Use indexing to extract:\n• the 3rd, 6th, 9th, and 12th observations"
    },
    {
     "id": "c096",
     "label": "Problem 1 - Vectors · Part 2 · all observations except the first and last",
     "code": "orders[-c(1, 12)]\n#>  [1] 24 15 31 27 22 35 19 28 40 26",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Use indexing to extract:\n• all observations except the first and last"
    },
    {
     "id": "c097",
     "label": "Problem 1 - Vectors · Part 3 · Create a new vector called high_orders containing only values…",
     "code": "high_orders <- orders[orders > 25]\nprint(high_orders)\n#> [1] 31 27 35 28 40 26 33",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Create a new vector called high_orders containing only values from orders that are greater than 25."
    },
    {
     "id": "c098",
     "label": "Problem 1 - Vectors · Part 4 · The store later discovers that the 4th recorded value should…",
     "code": "orders[4] <- 29\nprint(orders)\n#>  [1] 18 24 15 29 27 22 35 19 28 40 26 33",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "The store later discovers that the 4th recorded value should have been 29 rather than 31. Modify orders accordingly."
    },
    {
     "id": "c099",
     "label": "Problem 1 - Vectors · Part 5 · Insert the value 21 immediately after the second observation…",
     "code": "#>      order_updated.\norders_updated <- append(orders, 21, after = 2)\nprint(orders_updated)\n#>  [1] 18 24 21 15 29 27 22 35 19 28 40 26 33",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Insert the value 21 immediately after the second observation and save the resulting vector as order_updated."
    },
    {
     "id": "c100",
     "label": "Problem 1 - Vectors · Part 6 · Using a vectorized operation, create a vector called…",
     "code": "adjusted_orders <- orders_updated * 1.10\nprint(adjusted_orders)\n#>  [1] 19.8 26.4 23.1 16.5 31.9 29.7 24.2 38.5 20.9 30.8 44.0 28.6 36.3",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Using a vectorized operation, create a vector called adjusted_orders in which every value of ordered_updated is increased by 10%."
    },
    {
     "id": "c101",
     "label": "Problem 1 - Vectors · Part 7 · Create the following vector without typing every element…",
     "code": "targets <- seq(from = 5, to = 40, by = 5)\nprint(targets)\n#> [1]  5 10 15 20 25 30 35 40",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Create the following vector without typing every element individually: 5, 10, 15, 20, 25, 30, 35, 40."
    },
    {
     "id": "c102",
     "label": "Problem 2 - Lists · Part 1 · create course_info.",
     "code": "course_info <- list(\"Applied Statistical Computing\", 35, c(\"R\", \"Python\"),\n                    c(88, 92, 79, 95, 84), list(\"Fall 2026\", TRUE))\nprint(course_info)\n#> [[1]]\n#> [1] \"Applied Statistical Computing\"\n#> \n#> [[2]]\n#> [1] 35\n#> \n#> [[3]]\n#> [1] \"R\"      \"Python\"\n#> \n#> [[4]]\n#> [1] 88 92 79 95 84\n#> \n#> [[5]]\n#> [[5]][[1]]\n#> [1] \"Fall 2026\"\n#> \n#> [[5]][[2]]\n#> [1] TRUE",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "create course_info."
    },
    {
     "id": "c103",
     "label": "Problem 2 - Lists · Part 2 · Display the third element of course info using single ([])…",
     "code": "course_info[3]\n#> [[1]]\n#> [1] \"R\"      \"Python\"\ncourse_info[[3]]\n#> [1] \"R\"      \"Python\"\n# Single brackets produce a list and double brackets produce a vector.",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Display the third element of course info using single ([]) and double ([[]]) brackets. Examine the outputs. What is the difference?"
    },
    {
     "id": "c104",
     "label": "Problem 2 - Lists · Part 3 · Extract Python directly from course_info.",
     "code": "course_info[[3]][2]\n#> [1] \"Python\"",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Extract Python directly from course_info."
    },
    {
     "id": "c105",
     "label": "Problem 2 - Lists · Part 4 · Extract the value 95 directly from course_info.",
     "code": "course_info[[4]][4]\n#> [1] 95",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Extract the value 95 directly from course_info."
    },
    {
     "id": "c106",
     "label": "Problem 2 - Lists · Part 5 · Extract Fall 2026 directly from course_info.",
     "code": "course_info[[5]][[1]]\n#> [1] \"Fall 2026\"",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Extract Fall 2026 directly from course_info."
    },
    {
     "id": "c107",
     "label": "Problem 2 - Lists · Part 6 · Change the second element of course_info from 35 to 40.",
     "code": "course_info[[2]] <- 40\nprint(course_info)\n#> [[1]]\n#> [1] \"Applied Statistical Computing\"\n#> \n#> [[2]]\n#> [1] 40\n#> \n#> [[3]]\n#> [1] \"R\"      \"Python\"\n#> \n#> [[4]]\n#> [1] 88 92 79 95 84\n#> \n#> [[5]]\n#> [[5]][[1]]\n#> [1] \"Fall 2026\"\n#> \n#> [[5]][[2]]\n#> [1] TRUE",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Change the second element of course_info from 35 to 40."
    },
    {
     "id": "c108",
     "label": "Problem 2 - Lists · Part 7 · Change the second programming language from “Python” to “SQL”.",
     "code": "course_info[[3]][2] <- \"SQL\"\nprint(course_info[[3]])\n#> [1] \"R\"   \"SQL\"",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Change the second programming language from “Python” to “SQL”."
    },
    {
     "id": "c109",
     "label": "Problem 2 - Lists · Part 8 · Add “Statistics Department” as a new sixth element of…",
     "code": "course_info[[6]] <- \"Statistics Department\"\nprint(course_info)\n#> [[1]]\n#> [1] \"Applied Statistical Computing\"\n#> \n#> [[2]]\n#> [1] 40\n#> \n#> [[3]]\n#> [1] \"R\"   \"SQL\"\n#> \n#> [[4]]\n#> [1] 88 92 79 95 84\n#> \n#> [[5]]\n#> [[5]][[1]]\n#> [1] \"Fall 2026\"\n#> \n#> [[5]][[2]]\n#> [1] TRUE\n#> \n#> \n#> [[6]]\n#> [1] \"Statistics Department\"",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Add “Statistics Department” as a new sixth element of course_info."
    },
    {
     "id": "c110",
     "label": "Problem 2 - Lists · Part 9 · Remove the fourth element of the list.",
     "code": "course_info[[4]] <- NULL\nprint(course_info)\n#> [[1]]\n#> [1] \"Applied Statistical Computing\"\n#> \n#> [[2]]\n#> [1] 40\n#> \n#> [[3]]\n#> [1] \"R\"   \"SQL\"\n#> \n#> [[4]]\n#> [[4]][[1]]\n#> [1] \"Fall 2026\"\n#> \n#> [[4]][[2]]\n#> [1] TRUE\n#> \n#> \n#> [[5]]\n#> [1] \"Statistics Department\"",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Remove the fourth element of the list."
    },
    {
     "id": "c111",
     "label": "Problem 2 - Lists · Part 10 · Create another list called instructor_info containing “Dr.…",
     "code": "instructor_info <- list(\"Dr. Smith\", \"Columbia University\")\ncombined1 <- c(course_info, instructor_info)\nprint(combined1)\n#> [[1]]\n#> [1] \"Applied Statistical Computing\"\n#> \n#> [[2]]\n#> [1] 40\n#> \n#> [[3]]\n#> [1] \"R\"   \"SQL\"\n#> \n#> [[4]]\n#> [[4]][[1]]\n#> [1] \"Fall 2026\"\n#> \n#> [[4]][[2]]\n#> [1] TRUE\n#> \n#> \n#> [[5]]\n#> [1] \"Statistics Department\"\n#> \n#> [[6]]\n#> [1] \"Dr. Smith\"\n#> \n#> [[7]]\n#> [1] \"Columbia University\"\ncombined2 <- list(course_info, instructor_info)\nprint(combined2)\n#> [[1]]\n#> [[1]][[1]]\n#> [1] \"Applied Statistical Computing\"\n#> \n#> [[1]][[2]]\n#> [1] 40\n#> \n#> [[1]][[3]]\n#> [1] \"R\"   \"SQL\"\n#> \n#> [[1]][[4]]\n#> [[1]][[4]][[1]]\n#> [1] \"Fall 2026\"\n#> \n#> [[1]][[4]][[2]]\n#> [1] TRUE\n#> \n#> \n#> [[1]][[5]]\n#> [1] \"Statistics Department\"\n#> \n#> \n#> [[2]]\n#> [[2]][[1]]\n#> [1] \"Dr. Smith\"\n#> \n#> [[2]][[2]]\n#> [1] \"Columbia University\"",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Create another list called instructor_info containing “Dr. Smith” and “Columbia University”. Combine course_info and instructor_info using c() and save the result as combined1. Next, combine course_info and instructor_info using list() and save the result as combined2.Compare combined1 and combined2. How many elements does each contain?"
    },
    {
     "id": "c112",
     "label": "Problem 3 - Matrices · Part 1 · Create a matrix called scores with 4 rows and 3 columns,…",
     "code": "scores <- matrix( c(82, 75, 91, 68, 84, 79, 95, 88, 93, 76, 81, 87), nrow = 4,\n                  byrow = TRUE)\nprint(scores)\n#>      [,1] [,2] [,3]\n#> [1,]   82   75   91\n#> [2,]   68   84   79\n#> [3,]   95   88   93\n#> [4,]   76   81   87",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Create a matrix called scores with 4 rows and 3 columns, arranging the values by row."
    },
    {
     "id": "c113",
     "label": "Problem 3 - Matrices · Part 2 · Extract:",
     "code": "scores[3, 2]\n#> [1] 88",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Extract:\n• Student 3’s Quiz 2 score;"
    },
    {
     "id": "c114",
     "label": "Problem 3 - Matrices · Part 2 · all scores for Student 2;",
     "code": "scores[2, ]\n#> [1] 68 84 79",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Extract:\n• all scores for Student 2;"
    },
    {
     "id": "c115",
     "label": "Problem 3 - Matrices · Part 2 · all Quiz 3 scores;",
     "code": "scores[, 3]\n#> [1] 91 79 93 87",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Extract:\n• all Quiz 3 scores;"
    },
    {
     "id": "c116",
     "label": "Problem 3 - Matrices · Part 2 · the scores for Students 1 and 4 on Quizzes 1 and 3.",
     "code": "scores[c(1, 4), c(1, 3)]\n#>      [,1] [,2]\n#> [1,]   82   91\n#> [2,]   76   87",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Extract:\n• the scores for Students 1 and 4 on Quizzes 1 and 3."
    },
    {
     "id": "c117",
     "label": "Problem 3 - Matrices · Part 3 · Student 2’s Quiz 1 score was entered incorrectly. Replace 68…",
     "code": "scores[2, 1] <- 73\nprint(scores)\n#>      [,1] [,2] [,3]\n#> [1,]   82   75   91\n#> [2,]   73   84   79\n#> [3,]   95   88   93\n#> [4,]   76   81   87",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Student 2’s Quiz 1 score was entered incorrectly. Replace 68 with 73."
    },
    {
     "id": "c118",
     "label": "Problem 3 - Matrices · Part 4 · Add a fourth quiz using the scores 90, 85, 96, 82.",
     "code": "scores <- cbind(scores, c(90, 85, 96, 82))\nprint(scores)\n#>      [,1] [,2] [,3] [,4]\n#> [1,]   82   75   91   90\n#> [2,]   73   84   79   85\n#> [3,]   95   88   93   96\n#> [4,]   76   81   87   82",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Add a fourth quiz using the scores 90, 85, 96, 82."
    },
    {
     "id": "c119",
     "label": "Problem 3 - Matrices · Part 5 · A fifth student joins the dataset with scores 80, 77, 89. Add…",
     "code": "scores2 <- rbind(scores, c(80, 77, 89, 91))\nprint(scores2)\n#>      [,1] [,2] [,3] [,4]\n#> [1,]   82   75   91   90\n#> [2,]   73   84   79   85\n#> [3,]   95   88   93   96\n#> [4,]   76   81   87   82\n#> [5,]   80   77   89   91",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "A fifth student joins the dataset with scores 80, 77, 89. Add this student as a new row to scores and call the resulting matrix scores2."
    },
    {
     "id": "c120",
     "label": "Problem 3 - Matrices · Part 6 · Create a new matrix called bonus_scores by adding 3 points to…",
     "code": "bonus_scores <- scores2 + 3\nprint(bonus_scores)\n#>      [,1] [,2] [,3] [,4]\n#> [1,]   85   78   94   93\n#> [2,]   76   87   82   88\n#> [3,]   98   91   96   99\n#> [4,]   79   84   90   85\n#> [5,]   83   80   92   94",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Create a new matrix called bonus_scores by adding 3 points to every score in scores2. Do this using a vectorized matrix operation."
    },
    {
     "id": "c121",
     "label": "Problem 3 - Matrices · Part 7 · In bonus_scores, replace every score greater than 95 with 100.",
     "code": "bonus_scores[bonus_scores > 95] <- 100\nprint(bonus_scores)\n#>      [,1] [,2] [,3] [,4]\n#> [1,]   85   78   94   93\n#> [2,]   76   87   82   88\n#> [3,]  100   91  100  100\n#> [4,]   79   84   90   85\n#> [5,]   83   80   92   94",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "In bonus_scores, replace every score greater than 95 with 100."
    },
    {
     "id": "c122",
     "label": "Problem 3 - Matrices · Part 8 · Extract only those elements of bonus_scores that are at least…",
     "code": "bonus_scores[bonus_scores >= 90]\n#> [1] 100  91  94 100  90  92  93 100  94",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Extract only those elements of bonus_scores that are at least 90."
    },
    {
     "id": "c123",
     "label": "Problem 3 - Matrices · Part 9 · Remove Student 2 and Quiz 1 from bonus_scores and save the…",
     "code": "reduced_scores <- bonus_scores[-2, -1]\nprint(reduced_scores)\n#>      [,1] [,2] [,3]\n#> [1,]   78   94   93\n#> [2,]   91  100  100\n#> [3,]   84   90   85\n#> [4,]   80   92   94",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Remove Student 2 and Quiz 1 from bonus_scores and save the resulting matrix as reduced_scores."
    },
    {
     "id": "c124",
     "label": "Problem 4 - Data Frames · Part 1 · Use these vectors to create a data frame called employees.",
     "code": "Employee <- c(\"Anna\", \"Ben\", \"Carla\", \"David\", \"Emma\", \"Frank\", \"Grace\",\n              \"Henry\")\nDepartment <- c(\"Analytics\", \"Marketing\", \"Analytics\", \"Finance\", \"Marketing\",\n                \"Analytics\", \"Finance\", \"Analytics\")\nExperience <- c(2, 7, 5, 9, 3, 6, 8, 4)\nSalary <- c(68000, 85000, 79000, 105000, 72000, 92000, 99000, 76000)\nRemote <- c(TRUE, FALSE, TRUE, FALSE, TRUE, FALSE, TRUE, TRUE)\nemployees <- data.frame(Employee, Department, Experience, Salary, Remote)\nprint(employees)\n#>   Employee Department Experience Salary Remote\n#> 1     Anna  Analytics          2  68000   TRUE\n#> 2      Ben  Marketing          7  85000  FALSE\n#> 3    Carla  Analytics          5  79000   TRUE\n#> 4    David    Finance          9 105000  FALSE\n#> 5     Emma  Marketing          3  72000   TRUE\n#> 6    Frank  Analytics          6  92000  FALSE\n#> 7    Grace    Finance          8  99000   TRUE\n#> 8    Henry  Analytics          4  76000   TRUE",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Use these vectors to create a data frame called employees."
    },
    {
     "id": "c125",
     "label": "Problem 4 - Data Frames · Part 2 · Use appropriate R commands to examine:",
     "code": "str(employees)\n#> ’data.frame’:    8 obs. of  5 variables:\n#>  $ Employee  : chr  \"Anna\" \"Ben\" \"Carla\" \"David\" ...\n#>  $ Department: chr  \"Analytics\" \"Marketing\" \"Analytics\" \"Finance\" ...\n#>  $ Experience: num  2 7 5 9 3 6 8 4\n#>  $ Salary    : num  68000 85000 79000 105000 72000 92000 99000 76000\n#>  $ Remote    : logi  TRUE FALSE TRUE FALSE TRUE FALSE ...",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Use appropriate R commands to examine:\n• the structure of employees;"
    },
    {
     "id": "c126",
     "label": "Problem 4 - Data Frames · Part 2 · a summary of its variables;",
     "code": "summary(employees)\n#>    Employee          Department          Experience       Salary\n#>  Length:8           Length:8           Min.   :2.00   Min.   : 68000\n#>  Class :character   Class :character   1st Qu.:3.75   1st Qu.: 75000\n#>  Mode  :character   Mode  :character   Median :5.50   Median : 82000\n#>                                        Mean   :5.50   Mean   : 84500\n#>                                        3rd Qu.:7.25   3rd Qu.: 93750\n#>                                        Max.   :9.00   Max.   :105000\n#>    Remote\n#>  Mode :logical\n#>  FALSE:3\n#>  TRUE :5\n#> \n#> \n#> ",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Use appropriate R commands to examine:\n• a summary of its variables;"
    },
    {
     "id": "c127",
     "label": "Problem 4 - Data Frames · Part 2 · the first three rows;",
     "code": "head(employees, 3)\n#>   Employee Department Experience Salary Remote\n#> 1     Anna  Analytics          2  68000   TRUE\n#> 2      Ben  Marketing          7  85000  FALSE\n#> 3    Carla  Analytics          5  79000   TRUE",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Use appropriate R commands to examine:\n• the first three rows;"
    },
    {
     "id": "c128",
     "label": "Problem 4 - Data Frames · Part 2 · its dimensions.",
     "code": "dim(employees)\n#> [1] 8 5",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Use appropriate R commands to examine:\n• its dimensions."
    },
    {
     "id": "c129",
     "label": "Problem 4 - Data Frames · Part 3 · Extract the Salary variable in three different ways so that:",
     "code": "employees[\"Salary\"]\n#>   Salary\n#> 1  68000\n#> 2  85000\n#> 3  79000\n#> 4 105000\n#> 5  72000\n#> 6  92000\n#> 7  99000\n#> 8  76000",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Extract the Salary variable in three different ways so that:\n• one result is a data frame;"
    },
    {
     "id": "c130",
     "label": "Problem 4 - Data Frames · Part 3 · the other two results are vectors;",
     "code": "employees[[\"Salary\"]]\n#> [1]  68000  85000  79000 105000  72000  92000  99000  76000\n#or\nemployees$Salary\n#> [1]  68000  85000  79000 105000  72000  92000  99000  76000",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Extract the Salary variable in three different ways so that:\n• the other two results are vectors;"
    },
    {
     "id": "c131",
     "label": "Problem 4 - Data Frames · Part 4 · Extract only the Employee, Department, and Salary columns.",
     "code": "employees[, c(\"Employee\", \"Department\", \"Salary\")]\n#>   Employee Department Salary\n#> 1     Anna  Analytics  68000\n#> 2      Ben  Marketing  85000\n#> 3    Carla  Analytics  79000\n#> 4    David    Finance 105000\n#> 5     Emma  Marketing  72000\n#> 6    Frank  Analytics  92000\n#> 7    Grace    Finance  99000\n#> 8    Henry  Analytics  76000",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Extract only the Employee, Department, and Salary columns."
    },
    {
     "id": "c132",
     "label": "Problem 4 - Data Frames · Part 5 · Extract rows 2 through 6 and only the Employee and Experience…",
     "code": "employees[2:6, c(\"Employee\", \"Experience\")]\n#>   Employee Experience\n#> 2      Ben          7\n#> 3    Carla          5\n#> 4    David          9\n#> 5     Emma          3\n#> 6    Frank          6",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Extract rows 2 through 6 and only the Employee and Experience columns."
    },
    {
     "id": "c133",
     "label": "Problem 4 - Data Frames · Part 6 · Extract all employees who have at least 5 years of experience.",
     "code": "employees[employees$Experience >= 5, ]\n#>   Employee Department Experience Salary Remote\n#> 2      Ben  Marketing          7  85000  FALSE\n#> 3    Carla  Analytics          5  79000   TRUE\n#> 4    David    Finance          9 105000  FALSE\n#> 6    Frank  Analytics          6  92000  FALSE\n#> 7    Grace    Finance          8  99000   TRUE",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Extract all employees who have at least 5 years of experience."
    },
    {
     "id": "c134",
     "label": "Problem 4 - Data Frames · Part 7 · Add a new variable called Salary_K that contains salaries…",
     "code": "employees$Salary_K <- employees$Salary / 1000\nprint(employees)\n#>   Employee Department Experience Salary Remote Salary_K\n#> 1     Anna  Analytics          2  68000   TRUE       68\n#> 2      Ben  Marketing          7  85000  FALSE       85\n#> 3    Carla  Analytics          5  79000   TRUE       79\n#> 4    David    Finance          9 105000  FALSE      105\n#> 5     Emma  Marketing          3  72000   TRUE       72\n#> 6    Frank  Analytics          6  92000  FALSE       92\n#> 7    Grace    Finance          8  99000   TRUE       99\n#> 8    Henry  Analytics          4  76000   TRUE       76",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Add a new variable called Salary_K that contains salaries expressed in thousands of dollars. For example, 68000 becomes 68."
    },
    {
     "id": "c135",
     "label": "Problem 4 - Data Frames · Part 8 · Add another variable called Senior that takes the value TRUE…",
     "code": "employees$Senior <- employees$Experience >= 6\nprint(employees)\n#>   Employee Department Experience Salary Remote Salary_K Senior\n#> 1     Anna  Analytics          2  68000   TRUE       68  FALSE\n#> 2      Ben  Marketing          7  85000  FALSE       85   TRUE\n#> 3    Carla  Analytics          5  79000   TRUE       79  FALSE\n#> 4    David    Finance          9 105000  FALSE      105   TRUE\n#> 5     Emma  Marketing          3  72000   TRUE       72  FALSE\n#> 6    Frank  Analytics          6  92000  FALSE       92   TRUE\n#> 7    Grace    Finance          8  99000   TRUE       99   TRUE\n#> 8    Henry  Analytics          4  76000   TRUE       76  FALSE",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Add another variable called Senior that takes the value TRUE when Experience is at least 6 years and FALSE otherwise."
    },
    {
     "id": "c136",
     "label": "Problem 4 - Data Frames · Part 9 · Carla’s salary should be 82,000 instead of 79,000. Modify the…",
     "code": "employees[3, \"Salary\"] <- 82000",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Carla’s salary should be 82,000 instead of 79,000. Modify the appropriate element of the data frame."
    },
    {
     "id": "c137",
     "label": "Problem 4 - Data Frames · Part 10 · Add the following employee as a new row: Employee - Irene;…",
     "code": "Irene <- data.frame(Employee = \"Irene\", Department = \"Marketing\",\n                    Experience = 10, Salary = 110000, Remote = FALSE,\n                    Salary_K = 110, Senior = TRUE)\nemployees <- rbind(employees, Irene)\nprint(employees)\n#>   Employee Department Experience Salary Remote Salary_K Senior\n#> 1     Anna  Analytics          2  68000   TRUE       68  FALSE\n#> 2      Ben  Marketing          7  85000  FALSE       85   TRUE\n#> 3    Carla  Analytics          5  82000   TRUE       79  FALSE\n#> 4    David    Finance          9 105000  FALSE      105   TRUE\n#> 5     Emma  Marketing          3  72000   TRUE       72  FALSE\n#> 6    Frank  Analytics          6  92000  FALSE       92   TRUE\n#> 7    Grace    Finance          8  99000   TRUE       99   TRUE\n#> 8    Henry  Analytics          4  76000   TRUE       76  FALSE\n#> 9    Irene  Marketing         10 110000  FALSE      110   TRUE",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Add the following employee as a new row: Employee - Irene; Department - Marketing; Experience - 10; Salary - 110000; Remote - FALSE."
    }
   ],
   "notes": "Online store orders vector, the `course_info` list, the quiz `scores` matrix, and the `employees` data frame.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
-  "updatedAt": "2026-10-12T15:40:00Z"
+  "updatedAt": "2026-10-12T17:10:00Z"
  },
  "rec-02": {
   "type": "rec",
@@ -1239,99 +1302,176 @@ window.ENTRIES = {
   "chunks": [
    {
     "id": "c138",
-    "label": "If-Else Statements · Part I",
+    "label": "If-Else Statements · Problem 1 · Part I",
     "code": "exam_score <- 84\nhomework_rate <- 0.92\nif (exam_score >= 90 & homework_rate >= 0.90) {\n  status <- \"Excellent Standing\"\n} else if (exam_score >= 80 & homework_rate >= 0.80) {\n  status <- \"Good Standing\"\n} else if (exam_score >= 70 | homework_rate >= 0.95) {\n  status <- \"Conditional Pass\"\n} else {\n  status <- \"Fail\"\n}\nprint(status)\n#> [1] \"Good Standing\"",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Suppose a course assigns a final status to each student based on both the exam score and homework completion rate. Write an if–else statement that assigns a value to a variable called status according to the following rules:\n• Excellent Standing if the exam_score is greater than or equal to 90 and the homework_rate is greater than or equal to 0.9\n• Good Standing if the exam_score is greater than or equal to 80 and the homework_rate is greater than or equal to 0.80\n• Conditional Pass if the exam_score is greater than or equal to 70 and the homework_rate is greater than or equal to 0.95\n• Fail otherwise.\nTest your code with exam_score = 84 and homework_rate = 0.92. Make sure your code prints the value of status."
    },
    {
     "id": "c139",
-    "label": "If-Else Statements · Part II",
-    "code": "exam_scores <- c(94, 82, 76, 68, 88, 91, 73, 59)\nhomework_rates <- c(0.95, 0.84, 0.98, 0.90, 0.72, 0.88, 0.79, 1.00)\n# Use ifelse() to create a logical vector called eligible that is TRUE if a student:",
+    "label": "If-Else Statements · Problem 1 · Part II",
+    "code": "exam_scores <- c(94, 82, 76, 68, 88, 91, 73, 59)\nhomework_rates <- c(0.95, 0.84, 0.98, 0.90, 0.72, 0.88, 0.79, 1.00)\n# Use ifelse() to create a logical vector called eligible that is TRUE if a student:\n\neligible <- ifelse(exam_scores >= 75 & homework_rates >= 0.80,\n                   TRUE, FALSE)\nprint(eligible)\n#> [1]  TRUE  TRUE  TRUE FALSE FALSE  TRUE FALSE FALSE",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Now consider:\nexam_scores <- c(94, 82, 76, 68, 88, 91, 73, 59)\nhomework_rates <- c(0.95, 0.84, 0.98, 0.90, 0.72, 0.88, 0.79, 1.00)\nUse ifelse() to create a logical vector called eligible that is TRUE if a student:\n• has an exam score of at least 75, and\n• has completed at least 80% of the homework.\nOtherwise, the value should be FALSE."
    },
    {
-    "id": "c140",
-    "label": "If-Else Statements · Part II · has completed at least 80% of the homework.",
-    "code": "eligible <- ifelse(exam_scores >= 75 & homework_rates >= 0.80,\n                   TRUE, FALSE)\nprint(eligible)\n#> [1]  TRUE  TRUE  TRUE FALSE FALSE  TRUE FALSE FALSE",
-    "comment": "",
-    "key": false
-   },
-   {
-    "id": "c141",
-    "label": "For Loops",
+    "id": "rec-02-q901",
+    "label": "For Loops · Problem 2 · Setup",
+    "question": "Consider the following matrix of quiz scores (the rows represent students and the columns represent quizzes):",
     "code": "scores <- matrix(c(82, 76, 91, 88,\n                   67, 85, 79, 92,\n                   95, 89, 84, 90,\n                   73, 68, 81, 77),\n                 nrow = 4,\n                 byrow = TRUE)",
     "comment": "",
     "key": false
    },
    {
-    "id": "c142",
-    "label": "For Loops · Part I",
+    "id": "rec-02-q902",
+    "label": "For Loops · Problem 2 · Part I",
+    "question": "Create a matrix called adjusted_scores with the same dimensions as scores. Using nested for loops, examine every element of scores and apply the following rules:\n• if the score is below 70, add 5 points;\n• if the score is between 70 and 89 inclusive, add 3 points;\n• if the score is 90 or higher, leave it unchanged.\nStore the results in adjusted_scores.",
     "code": "adjusted_scores <- matrix(0, nrow = nrow(scores), ncol = ncol(scores))\nfor (i in 1:nrow(scores)) {\n  for (j in 1:ncol(scores)) {\n    if (scores[i, j] < 70) {\n      adjusted_scores[i, j] <- scores[i, j] + 5\n    } else if (scores[i, j] >= 70 & scores[i, j] <= 89) {\n      adjusted_scores[i, j] <- scores[i, j] + 3\n    } else {\n      adjusted_scores[i, j] <- scores[i, j]\n    }\n  }\n}\nprint(adjusted_scores)\n#>      [,1] [,2] [,3] [,4]\n#> [1,]   85   79   91   91\n#> [2,]   72   88   82   92\n#> [3,]   95   92   87   90\n#> [4,]   76   73   84   80",
     "comment": "",
     "key": false
    },
    {
-    "id": "c143",
-    "label": "For Loops · Part II",
+    "id": "rec-02-q903",
+    "label": "For Loops · Problem 2 · Part II",
+    "question": "Create a logical vector called all_passed. For each student, determine whether all adjusted quiz scores are at least 70.",
     "code": "all_passed <- logical(nrow(adjusted_scores))\nfor (i in 1:nrow(adjusted_scores)) {\n  all_passed[i] <- all(adjusted_scores[i, ] >= 70)\n}\nprint(all_passed)\n#> [1] TRUE TRUE TRUE TRUE",
     "comment": "",
     "key": false
    },
    {
-    "id": "c144",
-    "label": "While Loops",
+    "id": "rec-02-q904",
+    "label": "While Loops · Problem 3 · Setup",
+    "question": "Suppose a process starts with value <- 5 and changes according to the following rule:\n• if value is even, divide it by 2;\n• if value is odd, multiply it by 3 and add 1.\nThis is repeated until the value becomes 1.",
     "code": "value <- 5\n# and changes according to the following rule:",
     "comment": "",
     "key": false
    },
    {
-    "id": "c145",
-    "label": "While Loops · Part I",
+    "id": "rec-02-q905",
+    "label": "While Loops · Problem 3 · Part I",
+    "question": "Create an empty vector called sequence_values. Using a while loop:\n• store each value in sequence_values;\n• update value using the rule above;\n• stop when value becomes 1.\nMake sure that 1 is also included as the last element of sequence_values.",
     "code": "sequence_values <- c()\nwhile (value != 1) {\n  sequence_values <- c(sequence_values, value)\n  if (value %% 2 == 0) {\n    value <- value / 2\n  } else {\n    value <- 3 * value + 1\n  }\n}\nsequence_values <- c(sequence_values, 1)\nprint(sequence_values)\n#> [1]  5 16  8  4  2  1",
     "comment": "",
     "key": false
    },
    {
-    "id": "c146",
-    "label": "While Loops · Part II",
+    "id": "rec-02-q906",
+    "label": "While Loops · Problem 3 · Part II",
+    "question": "Add a variable steps <- 0.\nModify the loop so that steps counts how many updates were required before the sequence reached 1.",
     "code": "steps <- 0\n# Modify the loop so that steps counts how many updates were required before the sequence reached 1.\nvalue <- 3\nsequence_values <- c()\nsteps <- 0\nwhile (value != 1) {\n  sequence_values <- c(sequence_values, value)\n  if (value %% 2 == 0) {\n    value <- value / 2\n  } else {\n    value <- 3 * value + 1\n  }\n  steps <- steps + 1\n}\nsequence_values <- c(sequence_values, 1)\nprint(sequence_values)\n#> [1]  3 10  5 16  8  4  2  1\nprint(steps)\n#> [1] 7",
     "comment": "",
     "key": false
    },
    {
-    "id": "c147",
-    "label": "Functions",
-    "code": "list1 <- list(c(1, 3.4, 2, -5), c(2.2, 16, -3, 7), c(\"final\", \"any\", \"can\", \"maybe\", \"world\"))\nfunction1 <- function(x){\nEven <- c(); Odd <- c()\nfor (i in 1:length(x)){\n  if(is.numeric(x[[i]])){\n   for (j in 1:length(x[[i]])) {\n     if(x[[i]][j] %% 2 == 0){\n       Even = c(Even, x[[i]][j])\n     } else if (x[[i]][j] %% 2 == 1){\n       Odd = c(Odd, x[[i]][j])\n     }\n   }\n  }\n}\nreturn(list(Even = length(Even), Odd = length(Odd)))\n}\nfunction1(list1)\n#> $Even\n#> [1] 2\n#> \n#> $Odd\n#> [1] 4\n# Problem 5\n# Write a function neighbor_matrix(n, m) that creates and returns an n x m numeric matrix filled according\n# to the following rules:",
+    "id": "rec-02-q907",
+    "label": "Functions · Problem 4",
+    "question": "Create a function named function1 with a single argument x that counts the number of even and odd numbers in the input list. The function should return a list with two elements: Even representing the count of even numbers and Odd representing the count of odd numbers. Test the function with the following input list: [ [1, 3.4, 2, -5], [2.2, 16, -3, 7], [“final”, “any”, “can”, “maybe”, “world”] ].",
+    "code": "list1 <- list(c(1, 3.4, 2, -5), c(2.2, 16, -3, 7), c(\"final\", \"any\", \"can\", \"maybe\", \"world\"))\nfunction1 <- function(x){\nEven <- c(); Odd <- c()\nfor (i in 1:length(x)){\n  if(is.numeric(x[[i]])){\n   for (j in 1:length(x[[i]])) {\n     if(x[[i]][j] %% 2 == 0){\n       Even = c(Even, x[[i]][j])\n     } else if (x[[i]][j] %% 2 == 1){\n       Odd = c(Odd, x[[i]][j])\n     }\n   }\n  }\n}\nreturn(list(Even = length(Even), Odd = length(Odd)))\n}\nfunction1(list1)\n#> $Even\n#> [1] 2\n#> \n#> $Odd\n#> [1] 4",
     "comment": "",
     "key": false
    },
    {
-    "id": "c148",
-    "label": "Functions · Part 2 · Each subsequent entry is filled using the following rule:",
+    "id": "rec-02-q908",
+    "label": "Functions · Problem 5",
+    "question": "Write a function neighbor_matrix(n, m) that creates and returns an n x m numeric matrix filled according to the following rules:\n1. The top-left entry (row 1, column 1) should start with the value 1.\n2. Each subsequent entry is filled using the following rule:\n• The value of a cell is equal to the sum of its immediate top and left neighbors (if they exist).\n• If a neighbor does not exist (for example, for the first row or first column), treat that neighbor as 0.\nTest your function with n = 4 and m = 5.",
     "code": "neighbor_matrix <- function(n, m) {\n  mat <- matrix(0, nrow = n, ncol = m)\n  for (i in 1:n) {\n    for (j in 1:m) {\n      if (i == 1 & j == 1) {\n        mat[i, j] <- 1\n      } else {\n        top <- ifelse(i > 1, mat[i - 1, j], 0)\n        left <- ifelse(j > 1, mat[i, j - 1], 0)\n        mat[i, j] <- top + left\n      }\n    }\n  }\n  return(mat)\n}\nprint(neighbor_matrix(4, 5))\n#>      [,1] [,2] [,3] [,4] [,5]\n#> [1,]    1    1    1    1    1\n#> [2,]    1    2    3    4    5\n#> [3,]    1    3    6   10   15\n#> [4,]    1    4   10   20   35",
     "comment": "",
     "key": false
    },
    {
-    "id": "c149",
-    "label": "Additional Practice Problems on Functions",
-    "code": " x <- c(10, 15, 11, 4, 3, 8, 17, 34, 4, 11, 12, 17, 21, 1, 31, 36)\nlargest_odd <- function(x) {\n  odd_numbers <- c()\n  for (i in 1:length(x)) {\n    if (x[i] %% 2 != 0) {\n      odd_numbers <- c(odd_numbers, x[i])\n    }\n  }\n  if (length(odd_numbers) == 0) {\n    return(NULL)\n  }\n  largest <- odd_numbers[1]\n  for (i in 1:length(odd_numbers)) {\n    if (odd_numbers[i] > largest) {\n      largest <- odd_numbers[i]\n    }\n  }\n  return(largest)\n}\nlargest_odd(x)\n#> [1] 31\n# Problem 7\n# Write a function first_repeated(x) that takes a numeric vector x and returns the first repeated element.\n# If no element repeats, return NULL.\n# Test your function with the following vector: [10, 15, 11, 4, 3, 8, 17, 34, 4, 11, 12, 17]\nx <- c(10, 15, 11, 4, 3, 8, 17, 34, 4, 11, 12, 17)\nfirst_repeated <- function(x) {\n  for (i in 2:length(x)) {\n    for (j in 1:(i - 1)) {\n      if (x[i] == x[j]) {\n        return(x[i])\n      }\n    }\n  }\n  return(NULL)\n}\nfirst_repeated(x)\n#> [1] 4\n# Problem 8\n# Write a function generate_custom_sequence(n) that generates a sequence of numbers where each number\n# is the sum of the previous two numbers, starting with 1 and 2. The function should return the first n numbers\n# in the sequence.\n# Test your function with n = 10.\nn <- 10\ngenerate_custom_sequence <- function(n) {\n  sequence <- c(1, 2)\n  for (i in 3:n) {\n    sequence[i] <- sequence[i - 1] + sequence[i - 2]\n  }\n  return(sequence)\n}\ngenerate_custom_sequence(10)\n#>  [1]  1  2  3  5  8 13 21 34 55 89\n# Problem 9\n# Write a function longest_run(x) that takes a numeric vector x and returns the longest consecutive sequence\n# of repeated numbers along with its length.\n# Test your function with x = c(1, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 6).\nx <- c(1, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 6)\nlongest_run <- function(x) {\n  current_length <- 1\n  longest_length <- 1\n  longest_value <- x[1]\n  for (i in 2:length(x)) {\n    if (x[i] == x[i - 1]) {\n      current_length <- current_length + 1\n    } else {\n      current_length <- 1\n    }\n    if (current_length > longest_length) {\n      longest_length <- current_length\n      longest_value <- x[i]\n    }\n  }\n  return(c(longest_value, longest_length))\n}\nlongest_run(x)\n#> [1] 4 4\n# Problem 10\n# Write a function sum_of_unique(x) that returns the sum of the elements in a numeric vector x that appear\n# only once.\n# Test your function with c(2, 3, 4, 3, 5, 2, 7).\nx <- c(2, 3, 4, 3, 5, 2, 7)\nsum_of_unique <- function(x) {\n  unique_values <- c()\n  for (i in 1:length(x)) {\n    count <- 0\n    for (j in 1:length(x)) {\n      if (x[i] == x[j]) {\n        count <- count + 1\n      }\n    }\n    if (count == 1) {\n      unique_values <- c(unique_values, x[i])\n    }\n  }\n  return(sum(unique_values))\n}\nsum_of_unique(x)\n#> [1] 16\n# Problem 11\n# Create a function that takes a list of numeric vectors as input and rotates each vector clockwise by one\n# position [for example (1, 2, 3) becomes (3, 1, 2)]. The function should return a new list with the rotated\n# vectors.\n# Test your function with the following input list: [(3, 5, 7, 9), (10, 20, 30), (2, 4, 6, 8, 10)]\ninput_list <- list(c(3, 5, 7, 9), c(10, 20, 30), c(2, 4, 6, 8, 10))\nrotate_vectors <- function(x) {\n  result <- list()\n  for (i in 1:length(x)) {\n    current_vector <- x[[i]]\n    last_value <- current_vector[length(current_vector)]\n    remaining_values <- current_vector[-length(current_vector)]\n    result[[i]] <- c(last_value, remaining_values)\n  }\n  return(result)\n}\nrotate_vectors(input_list)\n#> [[1]]\n#> [1] 9 3 5 7\n#> \n#> [[2]]\n#> [1] 30 10 20\n#> \n#> [[3]]\n#> [1] 10  2  4  6  8\n# Problem 12\n# Create a function named classify_numbers with a single argument num_list that categorizes numbers in\n# the input list into different groups. The function should perform the following steps:",
+    "id": "rec-02-q909",
+    "label": "Extra practice · Problem 6",
+    "question": "Write a function largest_odd(x) that takes a numeric vector x and returns the largest odd number in the vector. If there are no odd numbers, return NULL. Test your function with the following vector: [10, 15, 11, 4, 3, 8, 17, 34, 4, 11, 12, 17, 21, 1, 31, 36]",
+    "code": " x <- c(10, 15, 11, 4, 3, 8, 17, 34, 4, 11, 12, 17, 21, 1, 31, 36)\nlargest_odd <- function(x) {\n  odd_numbers <- c()\n  for (i in 1:length(x)) {\n    if (x[i] %% 2 != 0) {\n      odd_numbers <- c(odd_numbers, x[i])\n    }\n  }\n  if (length(odd_numbers) == 0) {\n    return(NULL)\n  }\n  largest <- odd_numbers[1]\n  for (i in 1:length(odd_numbers)) {\n    if (odd_numbers[i] > largest) {\n      largest <- odd_numbers[i]\n    }\n  }\n  return(largest)\n}\nlargest_odd(x)\n#> [1] 31",
     "comment": "",
     "key": false
    },
    {
-    "id": "c150",
-    "label": "Additional Practice Problems on Functions · Part 2 · Return a list containing four elements:",
-    "code": "num_list <- list(1, -2, 3, c(4, -3), -5, 6, c(\"text\", \"dot\", \"period\"), -8, 9)\nclassify_numbers <- function(num_list) {\n  PositiveEven <- 0\n  PositiveOdd <- 0\n  NegativeEven <- 0\n  NegativeOdd <- 0\n  for (i in 1:length(num_list)) {\n    if (is.numeric(num_list[[i]])) {\n      current_element <- num_list[[i]]\n      for (j in 1:length(current_element)) {\n        current_number <- current_element[j]\n        if (current_number > 0 & current_number %% 2 == 0) {\n          PositiveEven <- PositiveEven + 1\n        } else if (current_number > 0 & current_number %% 2 != 0) {\n          PositiveOdd <- PositiveOdd + 1\n        } else if (current_number < 0 & current_number %% 2 == 0) {\n          NegativeEven <- NegativeEven + 1\n        } else if (current_number < 0 & current_number %% 2 != 0) {\n          NegativeOdd <- NegativeOdd + 1\n        }\n      }\n    }\n  }\n  return(list(PositiveEven = PositiveEven, PositiveOdd = PositiveOdd,\n              NegativeEven = NegativeEven, NegativeOdd = NegativeOdd))\n}\nclassify_numbers(num_list)\n#> $PositiveEven\n#> [1] 2\n#> \n#> $PositiveOdd\n#> [1] 3\n#> \n#> $NegativeEven\n#> [1] 2\n#> \n#> $NegativeOdd\n#> [1] 2\n# Problem 13\n# Create a function named update_sensor_readings that takes two arguments: a matrix representing sensor\n# readings from multiple machines across several days, and a vector containing specific outlier values to be\n# removed. The function should replace all occurrences of each value in the vector with the average of its\n# immediate neighboring values (up, down, left, right) in the matrix. If the outlier is on the edge or corner of\n# the matrix and doesn’t have four neighbors, only use the available neighbors to compute the average.\n# For instance, test your function with the following matrix and outlier vector:\nsensor_matrix <- matrix(c(23.2, 12, 10, 15, 32, 55, 10, 4, 56, 45, 10, 30),\n                        nrow=3, byrow=TRUE)\noutliers <- c(10, 55)\n# Specifically, you should remove all occurrences of the outliers (10 and 55) by replacing them with the average\n# of their neighboring values.\nupdate_sensor_readings <- function(sensor_matrix, outliers) {\n  updated_matrix <- sensor_matrix\n  for (i in 1:nrow(sensor_matrix)) {\n    for (j in 1:ncol(sensor_matrix)) {\n      if (sensor_matrix[i, j] %in% outliers) {\n        neighbors <- c()\n        # Up\n        if (i > 1) {\n          neighbors <- c(neighbors, sensor_matrix[i - 1, j])\n        }\n        # Down\n        if (i < nrow(sensor_matrix)) {\n          neighbors <- c(neighbors, sensor_matrix[i + 1, j])\n        }\n        # Left\n        if (j > 1) {\n          neighbors <- c(neighbors, sensor_matrix[i, j - 1])\n        }\n        # Right\n        if (j < ncol(sensor_matrix)) {\n          neighbors <- c(neighbors, sensor_matrix[i, j + 1])\n        }\n        updated_matrix[i, j] <- mean(neighbors)\n      }\n    }\n  }\n  return(updated_matrix)\n}\nupdate_sensor_readings(sensor_matrix, outliers)\n#>      [,1]  [,2]     [,3] [,4]\n#> [1,] 23.2 12.00 12.33333   15\n#> [2,] 32.0 24.75 19.75000    4\n#> [3,] 56.0 45.00 28.33333   30\n# Problem 14\n# Write a function iterative_trim(x, k) that repeatedly removes the element farthest from the median until\n# k elements remain. Note, after removing each element, you must recalculate the median of the remaining\n# vector before deciding which element to remove next.\n# Test your function with x = (1, 40, 2, -3, 10, 15, 7, 5, 5, 0, -4) and k = 5.\niterative_trim <- function(x, k) {\n  if (k >= length(x)) {\n    return(x)\n  }\n  remaining <- x\n  while (length(remaining) > k) {\n    med <- median(remaining)\n    dist <- abs(remaining - med)\n    farthest_idx <- which.max(dist)\n    remaining <- remaining[-farthest_idx]\n  }\n  return(remaining)\n}\nx = c(1, 40, 2, -3, 10, 15, 7, 5, 5, 0, -4); k = 5\niterative_trim(x, k)\n#> [1] 1 2 5 5 0\n# Problem 15\n# Write a function count_sign_changes(x) that counts how many times a numeric vector changes sign (from\n# positive to negative or vice versa). For example, it should return 3 for x = c(-2, -1, 1, 3, -4, 5).\n# Test your function with x = c(-10, 1, 3, -5, -4, 2, 3, -1, 6, -9).\ncount_sign_changes <- function(x) {\n  count <- 0\n  for (i in 1:(length(x) - 1)) {\n    if ((x[i] > 0 & x[i + 1] < 0) | (x[i] < 0 & x[i + 1] > 0)) {\n      count <- count + 1\n    }\n  }\n  return(count)\n}\nx <- c(-10, 1, 3, -5, -4, 2, 3, -1, 6, -9)\ncount_sign_changes(x)\n#> [1] 6\n# Problem 16\n# Write a function find_plateau(x) that detects the first flat region in a numeric vector, meaning consecutive\n# equal values of length ≥ 3. The function should return the start and end indices of that plateau, or NULL if\n# no plateau exists.\n# Test your function with x = (1, 3, 3, 6, 2, 7, 8, 2, 5, 5, 5, 2).\nfind_plateau <- function(x) {\n  n <- length(x); start <- NULL; count <- 1\n  for (i in 2:n) {\n    if (x[i] == x[i - 1]) {\n      count <- count + 1\n      if (count == 3 & is.null(start)) {\n        start <- i - 2\n      }\n    } else {\n      if (!is.null(start) & count >= 3) {\n        end <- i - 1\n        return(c(start = start, end = end))\n      }\n      count <- 1\n      start <- NULL\n    }\n  }\n  if (!is.null(start) & count >= 3) {\n    end <- n\n    return(c(start = start, end = end))\n  }\n  return(NULL)\n}\nx <- c(1, 3, 3, 6, 2, 7, 8, 2, 5, 5, 5, 2)\nfind_plateau(x)\n#> start   end\n#>     9    11",
+    "id": "rec-02-q910",
+    "label": "Extra practice · Problem 7",
+    "question": "Write a function first_repeated(x) that takes a numeric vector x and returns the first repeated element. If no element repeats, return NULL. Test your function with the following vector: [10, 15, 11, 4, 3, 8, 17, 34, 4, 11, 12, 17]",
+    "code": "x <- c(10, 15, 11, 4, 3, 8, 17, 34, 4, 11, 12, 17)\nfirst_repeated <- function(x) {\n  for (i in 2:length(x)) {\n    for (j in 1:(i - 1)) {\n      if (x[i] == x[j]) {\n        return(x[i])\n      }\n    }\n  }\n  return(NULL)\n}\nfirst_repeated(x)\n#> [1] 4",
+    "comment": "",
+    "key": false
+   },
+   {
+    "id": "rec-02-q911",
+    "label": "Extra practice · Problem 8",
+    "question": "Write a function generate_custom_sequence(n) that generates a sequence of numbers where each number is the sum of the previous two numbers, starting with 1 and 2. The function should return the first n numbers in the sequence. Test your function with n = 10.",
+    "code": "n <- 10\ngenerate_custom_sequence <- function(n) {\n  sequence <- c(1, 2)\n  for (i in 3:n) {\n    sequence[i] <- sequence[i - 1] + sequence[i - 2]\n  }\n  return(sequence)\n}\ngenerate_custom_sequence(10)\n#>  [1]  1  2  3  5  8 13 21 34 55 89",
+    "comment": "",
+    "key": false
+   },
+   {
+    "id": "rec-02-q912",
+    "label": "Extra practice · Problem 9",
+    "question": "Write a function longest_run(x) that takes a numeric vector x and returns the longest consecutive sequence of repeated numbers along with its length. Test your function with x = c(1, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 6).",
+    "code": "x <- c(1, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 6)\nlongest_run <- function(x) {\n  current_length <- 1\n  longest_length <- 1\n  longest_value <- x[1]\n  for (i in 2:length(x)) {\n    if (x[i] == x[i - 1]) {\n      current_length <- current_length + 1\n    } else {\n      current_length <- 1\n    }\n    if (current_length > longest_length) {\n      longest_length <- current_length\n      longest_value <- x[i]\n    }\n  }\n  return(c(longest_value, longest_length))\n}\nlongest_run(x)\n#> [1] 4 4",
+    "comment": "",
+    "key": false
+   },
+   {
+    "id": "rec-02-q913",
+    "label": "Extra practice · Problem 10",
+    "question": "Write a function sum_of_unique(x) that returns the sum of the elements in a numeric vector x that appear only once. Test your function with c(2, 3, 4, 3, 5, 2, 7).",
+    "code": "x <- c(2, 3, 4, 3, 5, 2, 7)\nsum_of_unique <- function(x) {\n  unique_values <- c()\n  for (i in 1:length(x)) {\n    count <- 0\n    for (j in 1:length(x)) {\n      if (x[i] == x[j]) {\n        count <- count + 1\n      }\n    }\n    if (count == 1) {\n      unique_values <- c(unique_values, x[i])\n    }\n  }\n  return(sum(unique_values))\n}\nsum_of_unique(x)\n#> [1] 16",
+    "comment": "",
+    "key": false
+   },
+   {
+    "id": "rec-02-q914",
+    "label": "Extra practice · Problem 11",
+    "question": "Create a function that takes a list of numeric vectors as input and rotates each vector clockwise by one position [for example (1, 2, 3) becomes (3, 1, 2)]. The function should return a new list with the rotated vectors. Test your function with the following input list: [(3, 5, 7, 9), (10, 20, 30), (2, 4, 6, 8, 10)]",
+    "code": "input_list <- list(c(3, 5, 7, 9), c(10, 20, 30), c(2, 4, 6, 8, 10))\nrotate_vectors <- function(x) {\n  result <- list()\n  for (i in 1:length(x)) {\n    current_vector <- x[[i]]\n    last_value <- current_vector[length(current_vector)]\n    remaining_values <- current_vector[-length(current_vector)]\n    result[[i]] <- c(last_value, remaining_values)\n  }\n  return(result)\n}\nrotate_vectors(input_list)\n#> [[1]]\n#> [1] 9 3 5 7\n#> \n#> [[2]]\n#> [1] 30 10 20\n#> \n#> [[3]]\n#> [1] 10  2  4  6  8",
+    "comment": "",
+    "key": false
+   },
+   {
+    "id": "rec-02-q915",
+    "label": "Extra practice · Problem 12",
+    "question": "Create a function named classify_numbers with a single argument num_list that categorizes numbers in the input list into different groups. The function should perform the following steps:\n1. Iterate through each element in the input list and check if it is a number. If it is a number, determine whether it is positive, negative, even, or odd.\n2. Return a list containing four elements:\n• PositiveEven: Count of positive even numbers\n• PositiveOdd: Count of positive odd numbers\n• NegativeEven: Count of negative even numbers\n• NegativeOdd: Count of negative odd numbers\nTest your function with the following input list:\nnum_list <- list(1, -2, 3, c(4, -3), -5, 6, c(\"text\", \"dot\", \"period\"), -8, 9)",
+    "code": "num_list <- list(1, -2, 3, c(4, -3), -5, 6, c(\"text\", \"dot\", \"period\"), -8, 9)\nclassify_numbers <- function(num_list) {\n  PositiveEven <- 0\n  PositiveOdd <- 0\n  NegativeEven <- 0\n  NegativeOdd <- 0\n  for (i in 1:length(num_list)) {\n    if (is.numeric(num_list[[i]])) {\n      current_element <- num_list[[i]]\n      for (j in 1:length(current_element)) {\n        current_number <- current_element[j]\n        if (current_number > 0 & current_number %% 2 == 0) {\n          PositiveEven <- PositiveEven + 1\n        } else if (current_number > 0 & current_number %% 2 != 0) {\n          PositiveOdd <- PositiveOdd + 1\n        } else if (current_number < 0 & current_number %% 2 == 0) {\n          NegativeEven <- NegativeEven + 1\n        } else if (current_number < 0 & current_number %% 2 != 0) {\n          NegativeOdd <- NegativeOdd + 1\n        }\n      }\n    }\n  }\n  return(list(PositiveEven = PositiveEven, PositiveOdd = PositiveOdd,\n              NegativeEven = NegativeEven, NegativeOdd = NegativeOdd))\n}\nclassify_numbers(num_list)\n#> $PositiveEven\n#> [1] 2\n#> \n#> $PositiveOdd\n#> [1] 3\n#> \n#> $NegativeEven\n#> [1] 2\n#> \n#> $NegativeOdd\n#> [1] 2",
+    "comment": "",
+    "key": false
+   },
+   {
+    "id": "rec-02-q916",
+    "label": "Extra practice · Problem 13",
+    "question": "Create a function named update_sensor_readings that takes two arguments: a matrix representing sensor readings from multiple machines across several days, and a vector containing specific outlier values to be removed. The function should replace all occurrences of each value in the vector with the average of its immediate neighboring values (up, down, left, right) in the matrix. If the outlier is on the edge or corner of the matrix and doesn’t have four neighbors, only use the available neighbors to compute the average. For instance, test your function with the following matrix and outlier vector:",
+    "code": "sensor_matrix <- matrix(c(23.2, 12, 10, 15, 32, 55, 10, 4, 56, 45, 10, 30),\n                        nrow=3, byrow=TRUE)\noutliers <- c(10, 55)\n# Specifically, you should remove all occurrences of the outliers (10 and 55) by replacing them with the average\n# of their neighboring values.\nupdate_sensor_readings <- function(sensor_matrix, outliers) {\n  updated_matrix <- sensor_matrix\n  for (i in 1:nrow(sensor_matrix)) {\n    for (j in 1:ncol(sensor_matrix)) {\n      if (sensor_matrix[i, j] %in% outliers) {\n        neighbors <- c()\n        # Up\n        if (i > 1) {\n          neighbors <- c(neighbors, sensor_matrix[i - 1, j])\n        }\n        # Down\n        if (i < nrow(sensor_matrix)) {\n          neighbors <- c(neighbors, sensor_matrix[i + 1, j])\n        }\n        # Left\n        if (j > 1) {\n          neighbors <- c(neighbors, sensor_matrix[i, j - 1])\n        }\n        # Right\n        if (j < ncol(sensor_matrix)) {\n          neighbors <- c(neighbors, sensor_matrix[i, j + 1])\n        }\n        updated_matrix[i, j] <- mean(neighbors)\n      }\n    }\n  }\n  return(updated_matrix)\n}\nupdate_sensor_readings(sensor_matrix, outliers)\n#>      [,1]  [,2]     [,3] [,4]\n#> [1,] 23.2 12.00 12.33333   15\n#> [2,] 32.0 24.75 19.75000    4\n#> [3,] 56.0 45.00 28.33333   30",
+    "comment": "",
+    "key": false
+   },
+   {
+    "id": "rec-02-q917",
+    "label": "Extra practice · Problem 14",
+    "question": "Write a function iterative_trim(x, k) that repeatedly removes the element farthest from the median until k elements remain. Note, after removing each element, you must recalculate the median of the remaining vector before deciding which element to remove next. Test your function with x = (1, 40, 2, -3, 10, 15, 7, 5, 5, 0, -4) and k = 5.",
+    "code": "iterative_trim <- function(x, k) {\n  if (k >= length(x)) {\n    return(x)\n  }\n  remaining <- x\n  while (length(remaining) > k) {\n    med <- median(remaining)\n    dist <- abs(remaining - med)\n    farthest_idx <- which.max(dist)\n    remaining <- remaining[-farthest_idx]\n  }\n  return(remaining)\n}\nx = c(1, 40, 2, -3, 10, 15, 7, 5, 5, 0, -4); k = 5\niterative_trim(x, k)\n#> [1] 1 2 5 5 0",
+    "comment": "",
+    "key": false
+   },
+   {
+    "id": "rec-02-q918",
+    "label": "Extra practice · Problem 15",
+    "question": "Write a function count_sign_changes(x) that counts how many times a numeric vector changes sign (from positive to negative or vice versa). For example, it should return 3 for x = c(-2, -1, 1, 3, -4, 5). Test your function with x = c(-10, 1, 3, -5, -4, 2, 3, -1, 6, -9).",
+    "code": "count_sign_changes <- function(x) {\n  count <- 0\n  for (i in 1:(length(x) - 1)) {\n    if ((x[i] > 0 & x[i + 1] < 0) | (x[i] < 0 & x[i + 1] > 0)) {\n      count <- count + 1\n    }\n  }\n  return(count)\n}\nx <- c(-10, 1, 3, -5, -4, 2, 3, -1, 6, -9)\ncount_sign_changes(x)\n#> [1] 6",
+    "comment": "",
+    "key": false
+   },
+   {
+    "id": "rec-02-q919",
+    "label": "Extra practice · Problem 16",
+    "question": "Write a function find_plateau(x) that detects the first flat region in a numeric vector, meaning consecutive equal values of length ≥ 3. The function should return the start and end indices of that plateau, or NULL if no plateau exists. Test your function with x = (1, 3, 3, 6, 2, 7, 8, 2, 5, 5, 5, 2).",
+    "code": "find_plateau <- function(x) {\n  n <- length(x); start <- NULL; count <- 1\n  for (i in 2:n) {\n    if (x[i] == x[i - 1]) {\n      count <- count + 1\n      if (count == 3 & is.null(start)) {\n        start <- i - 2\n      }\n    } else {\n      if (!is.null(start) & count >= 3) {\n        end <- i - 1\n        return(c(start = start, end = end))\n      }\n      count <- 1\n      start <- NULL\n    }\n  }\n  if (!is.null(start) & count >= 3) {\n    end <- n\n    return(c(start = start, end = end))\n  }\n  return(NULL)\n}\nx <- c(1, 3, 3, 6, 2, 7, 8, 2, 5, 5, 5, 2)\nfind_plateau(x)\n#> start   end\n#>     9    11",
     "comment": "",
     "key": false
    }
   ],
   "notes": "Assigning student `status` with if-else, `ifelse()` eligibility, nested for loops over a scores matrix, a while loop sequence, then function practice problems.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
-  "updatedAt": "2026-10-12T15:40:00Z"
+  "updatedAt": "2026-10-12T17:10:00Z"
  },
  "rec-03": {
   "type": "rec",
@@ -1367,110 +1507,125 @@ window.ENTRIES = {
     "label": "Problem 1",
     "code": "employees <- read.csv(\"employee_survey_data.csv\", stringsAsFactors = TRUE)",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Consider the “employee_survey_data.csv” dataset available on Courseworks. The data was collected by the HR department of a mid-sized tech company with around 1,000 employees. The survey was part of an internal initiative to understand employee satisfaction, retention, and performance across various departments. It was intended to help HR and management identify factors that might influence turnover rates and develop targeted retention strategies. HR used this dataset to investigate relationships between factors such as salary, job satisfaction, work hours, and turnover risk. The goal was to find patterns that could guide future decisions about work policies, benefits, and employee development programs. The dataset consists of 700 observations across 10 variables, with both numerical and categorical features. The features are:\n• Employee_ID (Numeric) - Unique identifier for each employee\n• Age (Numeric) - Age of employees (in years)\n• Sex (Categorical) - Sex of the employee [Levels: Female, Male]\n• Department (Categorical) - Department where the employee works [Levels: Sales, Engineering, HR, Marketing, Finance]\n• Years_at_Company (Numeric) - Number of years the employee has been with the company\n• Salary (Numeric) - Annual salary of the employee (USD)\n• Job_Satisfaction (Categorical) - Employee’s self-reported job satisfaction [Levels: Low, Medium, High]\n• Work_Hours (Numeric) - Average number of hours worked per week\n• Education_Level (Categorical) - Highest level of education attained by the employee [Levels: High School, Bachelor’s, Master’s, PhD]\n• Turnout_Risk (Categorical) - Whether the employee is at risk of leaving the company [Levels: Yes, No]"
    },
    {
     "id": "c152",
     "label": "Problem 1 · Question 1 · How many employees are Female, have a Master’s degree, and…",
     "code": "nrow(employees[employees$Sex == \"Female\" & employees$Education_Level == \"Master's\" &\n          employees$Salary > 80000, ])\n#> [1] 0",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "• How many employees are Female, have a Master’s degree, and earn a Salary above $80,000?"
    },
    {
     "id": "c153",
     "label": "Problem 1 · Question 1 · What is the median Work_Hours for employees in the Marketing…",
     "code": "median_workhours <- tapply(employees$Work_Hours, employees$Department, median)\nmedian_workhours[\"Marketing\"]\n#> Marketing\n#>        45\nmedian_workhours[\"Sales\"]\n#> Sales\n#>    44",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "• What is the median Work_Hours for employees in the Marketing department versus the Sales department?"
    },
    {
     "id": "c154",
     "label": "Problem 1 · Question 1 · What proportion of employees with High job satisfaction are…",
     "code": "high_js <- employees[employees$Job_Satisfaction == \"High\", ]\nmean(high_js$Turnover_Risk == \"Yes\")\n#> [1] 0.4920635",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "• What proportion of employees with High job satisfaction are at risk of turnover?"
    },
    {
     "id": "c155",
     "label": "Problem 1 · Question 1 · Identify the department with the largest proportion of…",
     "code": "turnover <- ifelse(employees$Turnover_Risk == \"Yes\", 1, 0)\ndept_prop <- tapply(turnover, employees$Department, mean)\nnames(which.max(dept_prop))\n#> [1] \"Engineering\"",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "• Identify the department with the largest proportion of employees at risk of turnover."
    },
    {
     "id": "c156",
     "label": "Problem 1 · Question 1 · For each department, calculate the ratio of High job…",
     "code": "high_count <- tapply(employees$Job_Satisfaction == \"High\", employees$Department, sum)\nlow_count <- tapply(employees$Job_Satisfaction == \"Low\", employees$Department, sum)\nratios <- high_count / low_count\nprint(ratios)\n#> Engineering     Finance          HR   Marketing       Sales\n#>   1.5135135   1.2272727   0.9333333   1.1395349   0.9807692",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "• For each department, calculate the ratio of High job satisfaction to Low job satisfaction employees."
    },
    {
     "id": "c157",
     "label": "Problem 1 · Question 2 · Find the top 5 highest paid employees in each department.…",
     "code": "depts <- unique(employees$Department)\ntop5_all <- data.frame()\nfor (d in depts) {\n  dept_data <- employees[employees$Department == d, ]\n  dept_sorted <- dept_data[order(dept_data$Salary, decreasing = TRUE), ]\n  top5 <- head(dept_sorted, 5)\n  top5_all <- rbind(top5_all, top5)\n}\nmean(top5_all$Age)\n#> [1] 41.2",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "• Find the top 5 highest paid employees in each department. What is the average Age of these top earners?"
    },
    {
     "id": "c158",
     "label": "Problem 1 · Question 2 · Compare the average Work_Hours of employees with Salary above…",
     "code": "q25 <- quantile(employees$Salary, 0.25)\nq75 <- quantile(employees$Salary, 0.75)\nlow_group  <- employees[employees$Salary < q25, ]\nhigh_group <- employees[employees$Salary > q75, ]\nmean_low  <- mean(low_group$Work_Hours)\nmean_high <- mean(high_group$Work_Hours)\nc(\"Below 25th\" = mean_low, \"Above 75th\" = mean_high)\n#> Below 25th Above 75th\n#>   45.26857   45.35429",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "• Compare the average Work_Hours of employees with Salary above the 75th percentile versus below the 25th percentile."
    },
    {
     "id": "c159",
     "label": "Problem 1 · Question 2 · Compute the variance and standard deviation of Salary for…",
     "code": "group1 <- employees[employees$Years_at_Company <= 5, \"Salary\"]\ngroup2 <- employees[employees$Years_at_Company > 10, \"Salary\"]\nresults <- data.frame(\n  Group = c(\"<= 5 years\", \"> 10 years\"),\n  Variance = c(var(group1), var(group2)),\n  StdDev   = c(sd(group1), sd(group2)))\nprint(results)\n#>        Group   Variance   StdDev\n#> 1 <= 5 years 1299548258 36049.25\n#> 2 > 10 years 1152605489 33950.04",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "• Compute the variance and standard deviation of Salary for employees with ≤ 5 years versus > 10 years at the company."
    },
    {
     "id": "c160",
     "label": "Problem 1 · Question 2 · Compute the number of employees with Low job satisfaction and…",
     "code": "med <- median(employees$Salary)\nlow_med <- employees[employees$Job_Satisfaction == \"Low\" & employees$Salary < med, ]\nnrow(low_med)\n#> [1] 112",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "• Compute the number of employees with Low job satisfaction and Salary below the median salary."
    },
    {
     "id": "c161",
     "label": "Problem 1 · Question 3 · Add a new factor variable named tenure_groups with levels…",
     "code": "yrs <- employees$Years_at_Company\ngroups <- ifelse(yrs <= 5, \"Short\", ifelse(yrs <= 15, \"Medium\", \"Long\"))\nemployees$tenure_groups <- factor(groups, levels = c(\"Short\", \"Medium\", \"Long\"))",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "• Add a new factor variable named tenure_groups with levels Short, Medium, and Long. Generate this variable based on the Years_at_Company variable without modifying the original Years_at_Company variable. The grouping is done as follows: employees with 0-5 years of tenure belong to the Short group, employees with 6-15 years of tenure belong to the Medium group, and employees with 16+ years belong to the Long group."
    },
    {
     "id": "c162",
     "label": "Problem 1 · Question 3 · Create a barplot to showcase the distribution of the…",
     "code": "barplot(\ntable(employees$tenure_groups),\ncol = c(\"lightsteelblue1\", \"wheat1\", \"thistle2\"),\nborder = \"grey50\",\nxlab = \"Tenure Group\",\nylab = \"Number of Employees\",\nnames.arg = c(\"SHORT\", \"MEDIUM\", \"LONG\"),\nmain = \"Number of Employees by Tenure Group\"\n)\n# Number of Employees by Tenure Group\n# s 0\n# e 0\n# e 3\n# y\n# o\n# l\n# p\n# m\n# E 0\n# f 2\n# o\n# r\n# e\n# b\n# m 0\n# u 0\n# N 1\n# SHORT MEDIUM LONG\n# Tenure Group",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "• Create a barplot to showcase the distribution of the tenure_groups variable. Properly label the plot and axes, change the colors of bars and borders. Also, change the bar names to “SHORT”, “MEDIUM”, and “LONG”."
    },
    {
     "id": "c163",
     "label": "Problem 1 · Question 3 · Create a boxplot illustrating the distribution of Salary…",
     "code": "boxplot(employees$Salary ~ employees$tenure_groups, horizontal = TRUE, notch = TRUE,\ncol = c(\"lightsteelblue1\", \"wheat1\", \"thistle2\"), xlab = \"Salary (in USD)\",\nylab = \"Tenure Group\", main = \"Distribution of Salary by Tenure Group\")\n# Distribution of Salary by Tenure Group\n# g\n# n\n# o\n# L\n# p\n# u\n# o\n# r m\n# G u\n# i\n# e d\n# r e\n# u M\n# n\n# e\n# T\n# t\n# r\n# o\n# h\n# S\n# 40000 60000 80000 100000 120000 140000\n# Salary (in USD)\n# There are no outliers.",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "• Create a boxplot illustrating the distribution of Salary across different categories of the tenure_groups variable. Label the plot and axes appropriately, add a notch to each boxplot. Are there any outliers?"
    },
    {
     "id": "c164",
     "label": "Problem 1 · Question 4 · Compare the mean Salary values across various levels of…",
     "code": "aggregate(Salary ~ Job_Satisfaction, data = employees, FUN = mean)\n#>   Job_Satisfaction   Salary\n#> 1             High 90316.90\n#> 2              Low 89527.42\n#> 3           Medium 91402.17\ndoesnt_exceed_50hrs <- employees$Work_Hours <= 50\nfiltered_employees <- employees[doesnt_exceed_50hrs, ]\naggregate(Salary ~ Job_Satisfaction, data = filtered_employees, FUN = mean)\n#>   Job_Satisfaction   Salary\n#> 1             High 92815.84\n#> 2              Low 89829.69\n#> 3           Medium 90482.96\n# The average salary of employees with high or low levels of job satisfaction tends to be slightly higher than\n# the overall average among those working at most 50 hours per week. However, for employees with medium\n# levels of job satisfaction who do not exceed 50 hours per week of work, the average salary is slightly lower.",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "• Compare the mean Salary values across various levels of Job_Satisfaction. Subsequently, eliminate all observations where Work_Hours exceeds 50 hours per week and repeat the preceding analysis.\nElaborate on the impact of this filtering on the results."
    },
    {
     "id": "c165",
     "label": "Problem 1 · Question 4 · Plot a histogram of the Salary feature before and after…",
     "code": "par(mfrow = c(1, 2))\nhist(\nemployees$Salary,\nbreaks = 10,\ncol = \"lightsteelblue1\",\nxlab = \"Salary (in USD)\",\nylab = \"Number of Employees\",\nmain = \"All Employees\",\nylim = c(0, 70)\n)\nhist(\nfiltered_employees$Salary,\nbreaks = 10,\ncol = \"lightsteelblue1\",\nxlab = \"Salary (in USD)\",\nylab = \"Number of Employees\",\nmain = \"Employees Working\\nAt Most 50 Hours/Week\",\nylim = c(0, 70)\n)\n# Employees Working\n# All Employees\n# At Most 50 Hours/Week\n# 0 0\n# 7 7\n# 0 0\n# 6 6\n# s s\n# e e\n# e 0 e 0\n# y 5 y 5\n# o o\n# l l\n# p p\n# m 0 m 0\n# 4 4\n# E E\n# f f\n# o 0 o 0\n# 3 3\n# r r\n# e e\n# b b\n# 0 0\n# m 2 m 2\n# u u\n# N N\n# 0 0\n# 1 1\n# 0 0\n# 40000 80000 140000 40000 80000 140000\n# Salary (in USD) Salary (in USD)\n# The shapes of the distributions don’t seem to differ significantly before and after filtering.",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "• Plot a histogram of the Salary feature before and after eliminating all observations where Work_Hours exceeds 50 hours per week, and display both histograms side by side. Analyze whether the shape of the distributions differ significantly after filtering. Customize the histograms by adding appropriate labels and a title, changing the colors of the bins, and setting the number of bins in each histogram to 10."
    }
   ],
   "notes": "Analysis of `employee_survey_data.csv` (700 employees, 10 variables): counts and proportions by group, top earners per department, a `tenure_groups` factor, and barplots, notched boxplots and side-by-side histograms.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
-  "updatedAt": "2026-10-12T15:40:00Z"
+  "updatedAt": "2026-10-12T17:10:00Z"
  },
  "rec-04": {
   "type": "rec",
@@ -1503,81 +1658,92 @@ window.ENTRIES = {
     "label": "Problem 1",
     "code": "fun1 <- function(sum, n) {\n  n_trials <- 0\n  n_successes <- 0\n  while (n_successes < n) {\n    n_trials <- n_trials + 1\n    die_1 <- sample(1:6, size = 1, prob = c(0.1, 0.25, 0.2, 0.1, 0.25, 0.1))\n    die_2 <- sample(1:6, size = 1, prob = c(0.15, 0.15, 0.1, 0.15, 0.35, 0.1))\n    if (die_1 + die_2 == sum) {\n      n_successes <- n_successes + 1\n    }\n  }\n  n_trials\n}\nfun1(sum = 10, n = 4)\n#> [1] 39",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Develop a function named fun1 that takes two arguments, sum and n, and uses a while loop to simulate rolling two unfair six-sided dice. The function should continue rolling the dice until a certain sum (summation of the values shown on the faces of these dice) is reached for n times. The probabilities of each face for both dice are not uniform and are given as follows: Die1: {1 - 0.1, 2 - 0.25, 3 - 0.2, 4 - 0.1, 5 - 0.25, 6 - 0.1} and Die2: {1 - 0.15, 2 - 0.15, 3 - 0.1, 4 - 0.15, 5 - 0.35, 6 - 0.1}. The function must return the number of rolls it took to reach the specified sum n times. Test your function with sum = 10 and n = 4."
    },
    {
     "id": "c167",
     "label": "Problem 2",
     "code": "function2 <- function(n, mu, sd) {\n  obs <- rnorm(n, mu, sd)\n  for (sample_size in 1:100) {\n    sample <- sample(obs, size = sample_size)\n    sum <- sum(sample)\n    if (sum > 10) break\n  }\n  means <- c(\"sample\" = mean(sample), \"initial observations\" = mean(obs), \"mu\" = mu)\n  sorted_means <- sort(means, decreasing = TRUE)\n  sorted_means[1]\n  }\nfunction2(n = 500, mu = 3, sd = 2)\n#>   sample\n#> 3.522471",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Create a function (name it function2) that takes on three arguments (n, mu, and sd) and does the following:\n• first it generates n observations from a normal distribution with mean mu and standard deviation sd\n• subsequently, it takes random samples from these n observations until the summation of the selected observations exceeds 10 (you start with a random sample of size 1 and if the condition is not met, you keep increasing the sample size by 1 until the condition is satisfied)\n• afterward, the function compares three mean values: the mean of the sample obtained from the preceding step (if the condition is not satisfied within 100 iterations, it uses the sample from the 100th iteration), the mean of the initial n observations, and the specified value mu\n• lastly, it returns the largest mean value with the corresponding annotation/message (either “mu”, “initial observations”, or “sample”) Test your function with n = 500, mu = 3, and sd = 2"
    },
    {
     "id": "c168",
     "label": "Problem 3",
     "code": "test_scores_variation <- function(mean_score, score_sd) {\n  sapply(1:50, function(n) {\n    random_scores <- rnorm(n, mean = mean_score, sd = score_sd)\n    avg_score <- mean(random_scores)\n    avg_score - mean_score\n  })\n}\ntest_scores_variation(mean_score = 75, score_sd = 10)\n#>  [1] -12.64409851   9.70199161  -5.75691013  -4.28736600  -1.86974128\n#>  [6]   2.93686700   3.30605257   4.33152065  -1.23431712   2.12729701\n#> [11]  -0.46846167   0.41788839   2.26722691   1.58314752   3.06432672\n#> [16]   2.13383378  -2.31369253  -0.03942969  -5.06356508  -0.64496237\n#> [21]   1.24021453  -2.35888903   0.83767381   1.02459248  -1.47622519\n#> [26]   3.04871278   2.53970353   3.21171776   3.59730338   3.37157542\n#> [31]   1.40653652  -2.46270541  -0.14602967   1.05530973   0.32727020\n#> [36]  -0.88144472  -0.04266774  -0.30452008   0.75034830  -0.34420266\n#> [41]   0.55788285   0.83988132  -1.28698689   0.32728714   0.50088404\n#> [46]  -0.55681227  -2.02808449   1.08785088   0.03232265   1.44790219",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Create a function named test_scores_variation that takes two input arguments, mean_score and score_sd, and performs the following simulation: for each integer n between 1 and 50, it generates a sample of size n from a normal distribution with a mean of mean_score and a standard deviation of score_sd. For each sample, the function calculates the average test score and finds the difference between the average score and the mean_score argument. The test_scores_variation function should return a vector containing these differences. Test your function with mean_score = 75 and score_sd = 10."
    },
    {
     "id": "c169",
     "label": "Problem 4",
     "code": "streak_game <- function() {\n  sequence <- c()\n  heads_streak <- 0\n  tails_streak <- 0\n  repeat {\n    flip <- sample(c(\"H\", \"T\"), size = 1)\n    sequence <- c(sequence, flip)\n    if (flip == \"H\") {\n      heads_streak <- heads_streak + 1\n      tails_streak <- 0\n    } else {\n      tails_streak <- tails_streak + 1\n      heads_streak <- 0\n    }\n    if (heads_streak == 3) {\n      winner <- \"3 heads in a row\"\n      break\n    }\n    if (tails_streak == 4) {\n      winner <- \"4 tails in a row\"\n      break\n    }\n  }\n  return(list(\n    sequence = sequence,\n    winner = winner,\n    num_flips = length(sequence)))\n}\nstreak_game()\n#> $sequence\n#>  [1] \"H\" \"T\" \"T\" \"H\" \"H\" \"T\" \"T\" \"H\" \"T\" \"H\" \"H\" \"H\"\n#> \n#> $winner\n#> [1] \"3 heads in a row\"\n#> \n#> $num_flips\n#> [1] 12",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Write a function streak_game() that simulates flipping a fair coin repeatedly until either 3 heads in a row or 4 tails in a row occur. The function should return a list containing the full sequence of flips, a string indicating which condition was met (\"3 heads in a row\" or \"4 tails in a row\"), and the total number of flips performed."
    },
    {
     "id": "c170",
     "label": "Problem 5",
     "code": "rainy_days_sim <- function(p) {\n  consecutive_rain <- 0\n  total_days <- 0\n  while (consecutive_rain < 3) {\n    total_days <- total_days + 1\n    today <- sample(c(\"rainy\", \"sunny\"), size = 1, prob = c(p, 1 - p))\n    if (today == \"rainy\") {\n      consecutive_rain <- consecutive_rain + 1\n    } else {\n      consecutive_rain <- 0\n    }\n  }\n  return(total_days)\n}\nrainy_days_sim(0.4)\n#> [1] 43",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Write a function rainy_days_sim(p) that simulates weather: each day has probability p of being rainy, otherwise sunny. The simulation continues until 3 rainy days in a row occur. The function should return the number of days simulated. Test with p = 0.4."
    },
    {
     "id": "c171",
     "label": "Problem 6",
     "code": "light_bulb_sim <- function(n, p) {\n  time <- 0\n  while (n > 0) {\n    time <- time + 1\n    outcome <- sample(c(\"lit\", \"burnt\"), size = n, prob = c(1 - p, p), replace = TRUE)\n    n <- sum(outcome == \"lit\")\n  }\nreturn(time)\n}\nlight_bulb_sim(n = 6, p = 0.6)\n#> [1] 5",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Write a function light_bulb_sim(n, p) that simulates n light bulbs, each having a probability p of burning out at each time step. Each bulb has the same chance of burning out at each time step, and when a bulb is burned out, it is removed from the sample. You continue the simulation until all bulbs are burned out. The function should return the number of time steps before all bulbs burn out. Test your function with n = 6 and p = 0.6."
    },
    {
     "id": "c172",
     "label": "Problem 7",
     "code": "simulate_quiz <- function(num_questions, base_prob = 0.7) {\n  prob <- base_prob\n  correct <- 0\n  for (i in 1:num_questions) {\n    answer <- sample(c(TRUE, FALSE), size = 1, prob = c(prob, 1 - prob))\n    if (answer) {\n      correct <- correct + 1\n      prob <- min(prob + 0.05, 0.95)\n    } else {\n      prob <- max(prob - 0.05, 0.3)\n    }\n  }\n  score <- correct / num_questions\n  outcome <- ifelse(score >= 0.6, \"pass\", \"fail\")\n  return(list(result = outcome, total_correct = correct))\n}\nsimulate_quiz(num_questions = 20)\n#> $result\n#> [1] \"pass\"\n#> \n#> $total_correct\n#> [1] 19",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Write a function simulate_quiz(num_questions, base_prob = 0.7) that simulates a quiz where each question’s probability of being answered correctly depends on the student’s previous performance:\n• The first question has probability base_prob of being answered correctly.\n• If the student answers correctly, their probability for the next question increases by 0.05, up to a maximum of 0.95.\n• If they answer incorrectly, their probability for the next question decreases by 0.05, down to a minimum of 0.3.\n• The student passes if their final score is at least 60%.\nThe function should return \"pass\" or \"fail\", and the total number of correct answers. Test your function with num_questions = 20 (number of questions)."
    },
    {
     "id": "c173",
     "label": "Problem 8",
     "code": "random_walk <- function(target) {\n  position <- 0; steps <- 0\n  while (abs(position) < target) {\n    step <- sample(c(-1, 1), size = 1)\n    position <- position + step\n    steps <- steps + 1\n  }\noutcome <- ifelse(position == target, \"positive_target\", \"negative_target\")\n  return(list(total_steps = steps, outcome = outcome))\n}\nrandom_walk(target = 15)\n#> $total_steps\n#> [1] 213\n#> \n#> $outcome\n#> [1] \"negative_target\"",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Write a function random_walk(target) that simulates a random walk starting from 0, where each step is +1 or -1 with equal probability. The function continues until the position reaches target or -target. It should return a list with the total number of steps and whether the walker reached the positive or negative target first. Test your function with target = 15."
    },
    {
     "id": "c174",
     "label": "Problem 9",
     "code": "fishing_trip <- function() {\n  attempt <- 0\n  big_fishies <- 0\n  accum_small_fishies <- 0\n  outcome <- \"lose\"\n  while (big_fishies < 5 && accum_small_fishies < 10) {\n    attempt <- attempt + 1\n    fishy <- sample(c(\"big\", \"small\"), size = 1, prob = c(0.2, 0.8))\n    big_fishies <- big_fishies + 1 * (fishy == \"big\")\n    accum_small_fishies <- (accum_small_fishies + 1) * (fishy == \"small\")\n## The cat() function is optional here and is used to make the output more\n## readable\n    cat(paste0(\n      \"Attempt #\", attempt, \"... \",\n      \"Total big fish: \", big_fishies, \", \",\n      \"Accummulated small fish: \", accum_small_fishies, \"\\n\"))\n    if (big_fishies == 5) {\n      outcome <- \"win\"\n    }\n    }\n  return(list(\"attempts\" = attempt, \"outcome\" = outcome))\n  }\nfishing_trip()\n#> Attempt #1... Total big fish: 0, Accummulated small fish: 1\n#> Attempt #2... Total big fish: 0, Accummulated small fish: 2\n#> Attempt #3... Total big fish: 0, Accummulated small fish: 3\n#> Attempt #4... Total big fish: 0, Accummulated small fish: 4\n#> Attempt #5... Total big fish: 0, Accummulated small fish: 5\n#> Attempt #6... Total big fish: 0, Accummulated small fish: 6\n#> Attempt #7... Total big fish: 0, Accummulated small fish: 7\n#> Attempt #8... Total big fish: 0, Accummulated small fish: 8\n#> Attempt #9... Total big fish: 1, Accummulated small fish: 0\n#> Attempt #10... Total big fish: 1, Accummulated small fish: 1\n#> Attempt #11... Total big fish: 2, Accummulated small fish: 0\n#> Attempt #12... Total big fish: 2, Accummulated small fish: 1\n#> Attempt #13... Total big fish: 2, Accummulated small fish: 2\n#> Attempt #14... Total big fish: 2, Accummulated small fish: 3\n#> Attempt #15... Total big fish: 2, Accummulated small fish: 4\n#> Attempt #16... Total big fish: 2, Accummulated small fish: 5\n#> Attempt #17... Total big fish: 3, Accummulated small fish: 0\n#> Attempt #18... Total big fish: 3, Accummulated small fish: 1\n#> Attempt #19... Total big fish: 3, Accummulated small fish: 2\n#> Attempt #20... Total big fish: 3, Accummulated small fish: 3\n#> Attempt #21... Total big fish: 4, Accummulated small fish: 0\n#> Attempt #22... Total big fish: 4, Accummulated small fish: 1\n#> Attempt #23... Total big fish: 4, Accummulated small fish: 2\n#> Attempt #24... Total big fish: 4, Accummulated small fish: 3\n#> Attempt #25... Total big fish: 4, Accummulated small fish: 4\n#> Attempt #26... Total big fish: 4, Accummulated small fish: 5\n#> Attempt #27... Total big fish: 4, Accummulated small fish: 6\n#> Attempt #28... Total big fish: 4, Accummulated small fish: 7\n#> Attempt #29... Total big fish: 4, Accummulated small fish: 8\n#> Attempt #30... Total big fish: 4, Accummulated small fish: 9\n#> Attempt #31... Total big fish: 5, Accummulated small fish: 0\n#> $attempts\n#> [1] 31\n#> \n#> $outcome\n#> [1] \"win\"",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Simulate a fishing game where a player tries to catch a specific type of fish:\n• Each turn, they have a 20% chance of catching a “big fish” and an 80% chance of catching a “small fish”.\n• If they catch 5 big fish, they win immediately.\n• If they catch 10 small fish without catching a big fish, they lose immediately.\n• Otherwise, they keep fishing until they either:\n– Reach 5 big fish and win. – Accumulate 10 small fish without a big fish and lose. The function, named fishing_trip, should return the number of attempts made and the outcome (“win” or “lose”). It takes no arguments but simulates one game per function call."
    },
    {
     "id": "c175",
     "label": "Problem 10",
     "code": "charge_devices <- function(required_charge, attempted_rounds) {\n  phone <- list(\"pcts\" = seq(5, 30, by = 5), \"probs\" = c(0.2, 0.3, 0.2, 0.15, 0.1, 0.05))\n  laptop <- list(\"pcts\" = seq(10, 30, by = 5), \"probs\" = c(0.3, 0.25, 0.2, 0.15, 0.1))\n  attempts_per_round <- replicate(n = attempted_rounds, {\n    attempts <- 0\n    total_charge <- 0\n    while (total_charge < required_charge) {\n      phone_charge <- sample(phone$pcts, size = 1, prob = phone$probs)\n      laptop_charge <- sample(laptop$pcts, size = 1, prob = laptop$probs)\n      total_charge <- total_charge + (phone_charge + laptop_charge)\n      attempts <- attempts + 1\n    }\n    attempts\n    })\n  names(attempts_per_round) <- paste(\"round\", 1:attempted_rounds)\n  return(attempts_per_round)\n  }\ncharge_devices(required_charge = 40, attempted_rounds = 5)\n#> round 1 round 2 round 3 round 4 round 5\n#>       1       3       2       2       2",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Write a function named charge_devices that models charging two different devices (e.g., a phone and a laptop) with a portable battery pack. The function takes two arguments, required_charge (the target total charge in percentage for both devices combined) and attempted_rounds (how many rounds of attempts you want to simulate). The function should simulate charging the devices multiple times until the combined battery percentage reaches or exceeds required_charge in each of the attempted_rounds. The charging efficiency for each device is not constant and is modeled as follows:\n• Phone: {5% - 0.2, 10% - 0.3, 15% - 0.2, 20% - 0.15, 25% - 0.1, 30% - 0.05}\n• Laptop: {10% - 0.3, 15% - 0.25, 20% - 0.2, 25% - 0.15, 30% - 0.1} The function should return a vector of the total number of charge attempts it took in each round to meet or exceed the required_charge for all attempted_rounds.\nTest your function with required_charge = 40 and attempted_rounds = 5."
    },
    {
     "id": "c176",
     "label": "Problem 11",
     "code": "stock_price_simulator <- function(days, start_price, mean_up, mean_down, p_up) {\n  day_means <- sample(c(mean_up, mean_down), size = days, prob = c(p_up, 1 - p_up), replace = TRUE)\n  day_changes <- sapply(day_means, function(day_mean) rnorm(1, mean = day_mean, sd = 1))\n  day_prices <- cumsum(c(start_price, day_changes))[-1]\n  data.frame(\"Day\" = 1:days, \"Price\" = day_prices, \"Change\" = day_changes)\n}\nstock_price_simulator(days = 30, start_price = 100, mean_up = 4, mean_down = -5, p_up = 0.55)\n#>    Day     Price    Change\n#> 1    1 103.87908  3.879076\n#> 2    2  99.70630 -4.172778\n#> 3    3  93.85007 -5.856232\n#> 4    4  88.68780 -5.162262\n#> 5    5  81.99771 -6.690089\n#> 6    6  85.59094  3.593226\n#> 7    7  87.75200  2.161056\n#> 8    8  82.27764 -5.474355\n#> 9    9  79.07776 -3.199879\n#> 10  10  73.09697 -5.980793\n#> 11  11  69.25286 -3.844109\n#> 12  12  74.04248  4.789618\n#> 13  13  79.24507  5.202594\n#> 14  14  74.77343 -4.471645\n#> 15  15  78.67459  3.901159\n#> 16  16  72.32262 -6.351967\n#> 17  17  66.13791 -6.184715\n#> 18  18  70.47056  4.332652\n#> 19  19  74.22709  3.756528\n#> 20  20  78.25655  4.029460\n#> 21  21  72.35124 -5.905303\n#> 22  22  66.49079 -5.860448\n#> 23  23  61.05028 -5.440511\n#> 24  24  54.15146 -6.898822\n#> 25  25  59.27038  5.118918\n#> 26  26  54.94183 -4.328549\n#> 27  27  48.57692 -6.364905\n#> 28  28  52.50854  3.931613\n#> 29  29  47.50999 -4.998544\n#> 30  30  42.69657 -4.813422",
     "comment": "",
-    "key": false
+    "key": false,
+    "question": "Create a function stock_price_simulator that simulates daily stock price changes over days. Each day, the stock has a probability p_up of increasing in value, with the increase drawn from a normal distribution with mean mean_up and standard deviation 1. If the stock decreases, the change is drawn form a normal distribution with mean mean_down and standard deviation 1. The initial stock price is given by start_price. The function should accept parameters: days, start_price, mean_up, mean_down, and p_up. It should return a dataframe with three columns:\n• Day - The day number\n• Price - The stock price at the end of each day\n• Change - The daily gain or loss Test your function with days = 30, start_price = 100, mean_up = 4, mean_down = -5, and p_up = 0.55."
    }
   ],
   "notes": "Unfair dice, sampling until a sum passes 10, `test_scores_variation`, coin streaks, rainy days, light bulbs, an adaptive quiz, a random walk and more simulation functions.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
-  "updatedAt": "2026-10-12T15:40:00Z"
+  "updatedAt": "2026-10-12T17:10:00Z"
  }
 };

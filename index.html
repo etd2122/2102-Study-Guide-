@@ -111,6 +111,10 @@ pre code{font-family:inherit;background:none}
 .chunk-note .label{display:block;margin-bottom:4px}
 .chunk-note p{margin:0 0 6px}
 .chunk-note.none{color:var(--muted);font-style:italic}
+.chunk-side{border-left:1px dashed var(--line);background:var(--panel);min-width:0;display:flex;flex-direction:column}
+.chunk-side .chunk-note{border-left:0}
+.chunk-q{padding:10px 14px;font-size:14px;background:var(--accent-soft);border-bottom:1px dashed var(--line);white-space:pre-line;overflow-wrap:anywhere}
+.chunk-q .label{display:block;margin-bottom:4px;color:var(--accent)}
 .hljs-keyword,.hljs-built_in,.hljs-literal{color:var(--hl-kw)}
 .hljs-string{color:var(--hl-str)}
 .hljs-number{color:var(--hl-num)}
@@ -190,7 +194,7 @@ textarea.mono{font-family:var(--mono);font-size:13px;background:var(--code-bg)}
   .main{padding-inline:16px}
   .head h2{font-size:27px}
   .chunk,.chunk-ed{grid-template-columns:minmax(0,1fr)}
-  .chunk-note{border-left:0;border-top:1px dashed var(--line)}
+  .chunk-side{border-left:0;border-top:1px dashed var(--line)}
   .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -273,7 +277,7 @@ function matches(e){
   if(filterExam!=='all'&&!(e.exams||[]).includes(filterExam))return false;
   if(query){
     const q=query.toLowerCase();
-    const hay=[e.title,tagOf(e),(e.topics||[]).join(' '),e.notes,(e.takeaways||[]).join(' '),...(e.chunks||[]).map(c=>c.label+' '+c.code+' '+c.comment)].join(' ').toLowerCase();
+    const hay=[e.title,tagOf(e),(e.topics||[]).join(' '),e.notes,(e.takeaways||[]).join(' '),...(e.chunks||[]).map(c=>c.label+' '+(c.question||'')+' '+c.code+' '+c.comment)].join(' ').toLowerCase();
     if(!hay.includes(q))return false;
   }
   return true;
@@ -384,7 +388,8 @@ function chunkHTML(c,i){
       <div class="chunk-bar"><span class="lbl">${esc(c.label||('Chunk '+(i+1)))}</span>${c.key?'<span class="star">Exam</span>':''}<button class="btn sm ghost" type="button" data-act="copy" data-i="${i}">Copy</button></div>
       <pre><code class="language-r">${esc(c.code||'')}</code></pre>
     </div>
-    <div class="chunk-note ${c.comment?'':'none'}"><span class="label">My comment</span>${c.comment?`<div class="prose">${md(c.comment)}</div>`:'No comment on this chunk.'}</div>
+    <div class="chunk-side">${c.question?`<div class="chunk-q"><span class="label">Question</span>${esc(c.question)}</div>`:''}
+    <div class="chunk-note ${c.comment?'':'none'}"><span class="label">My comment</span>${c.comment?`<div class="prose">${md(c.comment)}</div>`:'No comment on this chunk.'}</div></div>
   </div>`;
 }
 function guideHTML(){
@@ -466,7 +471,7 @@ function buildIndex(){
       const calls=(code.match(/[A-Za-z_.][A-Za-z0-9_.]*(?=\s*\()/g)||[]).map(x=>stem(x.toLowerCase()));
       const tf=new Map(); let len=0;
       const add=(arr,w)=>{for(const t of arr){tf.set(t,(tf.get(t)||0)+w);len+=w;}};
-      add(toks(c.label),2); add(toks(code),1); add(calls,1.5); add(toks(c.comment),1);
+      add(toks(c.label),2); add(toks(c.question),1.2); add(toks(code),1); add(calls,1.5); add(toks(c.comment),1);
       add(toks((e.topics||[]).join(' ')),0.6); add(toks(e.title),0.6);
       if(/\bfor\s*\(/.test(code))add(['for'],1.5); if(/\bwhile\s*\(/.test(code))add(['while'],1.5); if(/\bif\s*\(/.test(code))add(['if'],1);
       docs.push({eid:e.id,i,e,c,tf,len});
@@ -535,7 +540,7 @@ function renderMatches(){
 }
 
 /* ---------- Editor ---------- */
-function blankDraft(){return {type:filterType!=='all'?filterType:'hw',num:'',title:'',date:new Date().toISOString().slice(0,10),exams:[],topics:[],pdfs:[],chunks:[{id:uid(),label:'',code:'',comment:'',key:false}],notes:'',takeaways:[]};}
+function blankDraft(){return {type:filterType!=='all'?filterType:'hw',num:'',title:'',date:new Date().toISOString().slice(0,10),exams:[],topics:[],pdfs:[],chunks:[{id:uid(),label:'',question:'',code:'',comment:'',key:false}],notes:'',takeaways:[]};}
 function editorHTML(){
   const d=draft;
   return `<header class="head"><div class="eyebrow"><span>${isNew?'New entry':'Editing '+esc(tagOf(d))}</span></div><h2>${esc(d.title||'Untitled')}</h2></header>
@@ -565,6 +570,7 @@ function editorHTML(){
           <button class="btn sm ghost" type="button" data-act="up-chunk" data-i="${i}" ${i===0?'disabled':''} aria-label="Move up">↑</button>
           <button class="btn sm ghost" type="button" data-act="rm-chunk" data-i="${i}">Remove</button></div>
         <div class="field"><label for="c-code-${c.id}">R code</label><textarea class="inp mono" id="c-code-${c.id}" data-ci="${i}" data-k="code" rows="${Math.min(18,Math.max(5,(c.code||'').split('\n').length+1))}" spellcheck="false" placeholder="x <- c(1, 5, 9)&#10;mean(x)">${esc(c.code)}</textarea></div>
+        <div class="field" style="grid-column:1/-1"><label for="c-q-${c.id}">Question</label><textarea class="inp" id="c-q-${c.id}" data-ci="${i}" data-k="question" rows="2" placeholder="The problem this code answers">${esc(c.question||'')}</textarea></div>
         <div class="field"><label for="c-com-${c.id}">My comment</label><textarea class="inp" id="c-com-${c.id}" data-ci="${i}" data-k="comment" rows="5" placeholder="Why this works, what tripped me up, what the output means">${esc(c.comment)}</textarea></div>
       </div>`).join('')}
     </section>
@@ -587,7 +593,7 @@ function readForm(){
 function startEdit(id){
   isNew=!id; curId=id||curId;
   draft=id?JSON.parse(JSON.stringify({...entries[id]})):blankDraft();
-  draft.chunks=(draft.chunks||[]).map(c=>({id:c.id||uid(),label:'',code:'',comment:'',key:false,...c}));
+  draft.chunks=(draft.chunks||[]).map(c=>({id:c.id||uid(),label:'',question:'',code:'',comment:'',key:false,...c}));
   draft.pdfs=draft.pdfs||[];
   draftUploads=[]; draftRemovals=[]; saveMsg=''; editing=true; confirmDelete=false;
   renderList(); renderMain(); window.scrollTo(0,0);
@@ -636,7 +642,7 @@ function saveEdit(){
   if(!draft.title){saveMsg='Add a title before saving.';$('#saveMsg').textContent=saveMsg;$('#f-title').focus();return;}
   const body={type:draft.type,num:draft.num,title:draft.title,date:draft.date,exams:draft.exams,topics:draft.topics,
     pdfs:draft.pdfs.map(({name,size,type})=>({name,size,type})),
-    chunks:draft.chunks.filter(c=>c.code.trim()||c.comment.trim()||c.label.trim()).map(({id,label,code,comment,key})=>({id,label,code,comment,key:!!key})),
+    chunks:draft.chunks.filter(c=>c.code.trim()||c.comment.trim()||c.label.trim()||(c.question||'').trim()).map(({id,label,question,code,comment,key})=>({id,label,question:question||'',code,comment,key:!!key})),
     notes:draft.notes,takeaways:draft.takeaways,updatedAt:new Date().toISOString()};
   const id=isNew?slug(draft):curId;
   entries={...entries,[id]:body};
@@ -742,8 +748,22 @@ renderSide();
   let local=null;
   try{local=JSON.parse(localStorage.getItem(LS_KEY)||'null')}catch(e){}
   try{pendingFiles=JSON.parse(localStorage.getItem(LS_PENDING)||'[]')||[]}catch(e){}
-  if(local&&local.entries&&(!window.ENTRIES_SAVED||!local.base||local.base>=window.ENTRIES_SAVED||local.savedAt>window.ENTRIES_SAVED)){
+  if(local&&local.entries&&(!window.ENTRIES_SAVED||!local.base||local.base>=window.ENTRIES_SAVED)){
     entries=local.entries;
+  }else if(local&&local.entries){
+    // A newer data file arrived: take it, but keep entries edited or added in this browser since the last file.
+    const merged=JSON.parse(JSON.stringify(base));
+    for(const [id,le] of Object.entries(local.entries)){
+      const fe=base[id];
+      if(!fe){ merged[id]=le; continue; }
+      if((le.updatedAt||'')>(local.base||'')){
+        const fq={}; (fe.chunks||[]).forEach(c=>{ if(c.question) fq[c.id]=c.question; });
+        merged[id]={...le,chunks:(le.chunks||[]).map(c=>c.question||!fq[c.id]?c:{...c,question:fq[c.id]})};
+      }
+    }
+    for(const id of Object.keys(base)){ if(!local.entries[id]&&(base[id].updatedAt||'')<=(local.base||'')) delete merged[id]; }
+    entries=merged;
+    try{localStorage.setItem(LS_KEY,JSON.stringify({savedAt:new Date().toISOString(),base:window.ENTRIES_SAVED||'',entries}))}catch(e){}
   }else{
     entries=JSON.parse(JSON.stringify(base));
     try{localStorage.removeItem(LS_KEY)}catch(e){}

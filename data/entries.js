@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-12T22:40:00Z";
+window.ENTRIES_SAVED = "2026-10-13T01:45:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -1249,7 +1249,7 @@ window.ENTRIES = {
     "id": "c135",
     "label": "Problem 4 - Data Frames · Part 8 · Add another variable called Senior that takes the value TRUE…",
     "code": "employees$Senior <- employees$Experience >= 6\nprint(employees)\n#>   Employee Department Experience Salary Remote Salary_K Senior\n#> 1     Anna  Analytics          2  68000   TRUE       68  FALSE\n#> 2      Ben  Marketing          7  85000  FALSE       85   TRUE\n#> 3    Carla  Analytics          5  79000   TRUE       79  FALSE\n#> 4    David    Finance          9 105000  FALSE      105   TRUE\n#> 5     Emma  Marketing          3  72000   TRUE       72  FALSE\n#> 6    Frank  Analytics          6  92000  FALSE       92   TRUE\n#> 7    Grace    Finance          8  99000   TRUE       99   TRUE\n#> 8    Henry  Analytics          4  76000   TRUE       76  FALSE",
-    "comment": "",
+    "comment": "**Why `employees$Experience >= 6` gives a TRUE/FALSE column**\n\nA comparison like `>=` is a **question**, and R asks it of **every element** of the vector at once (it's vectorized). Each answer is TRUE or FALSE, so 8 employees give back 8 answers:\n\n| Employee | Experience | `>= 6`? |\n|---|---|---|\n| Anna | 2 | FALSE |\n| Ben | 7 | TRUE |\n| Carla | 5 | FALSE |\n| David | 9 | TRUE |\n| Emma | 3 | FALSE |\n| Frank | 6 | TRUE |\n| Grace | 8 | TRUE |\n| Henry | 4 | FALSE |\n\n`employees$Senior <- ...` then stores that logical vector as a new column, one value per row. Frank is TRUE because 6 counts when the question says \"at least 6\" (`>=`); with `>` he'd be FALSE.\n\n**No `ifelse()` needed:** `ifelse(employees$Experience >= 6, TRUE, FALSE)` gives the exact same column, because the comparison already produces TRUE/FALSE. Use `ifelse()` when you want **other** labels, e.g. `ifelse(employees$Experience >= 6, \"Senior\", \"Junior\")`.\n\n**Bonus:** TRUE counts as 1 and FALSE as 0, so `sum(employees$Senior)` counts seniors (4) and `mean(employees$Senior)` gives the proportion (0.5).",
     "key": false,
     "question": "Add another variable called Senior that takes the value TRUE when Experience is at least 6 years and FALSE otherwise."
    },
@@ -1272,7 +1272,7 @@ window.ENTRIES = {
   ],
   "notes": "Online store orders vector, the `course_info` list, the quiz `scores` matrix, and the `employees` data frame.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
-  "updatedAt": "2026-10-12T22:40:00Z"
+  "updatedAt": "2026-10-13T01:45:00Z"
  },
  "rec-02": {
   "type": "rec",

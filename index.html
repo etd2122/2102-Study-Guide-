@@ -174,6 +174,13 @@ textarea.mono{font-family:var(--mono);font-size:13px;background:var(--code-bg)}
 .match-box textarea{min-height:130px;font-size:15px}
 .match-box .hint code{font-family:var(--mono);font-size:12px;background:var(--code-bg);padding:0 4px;border-radius:3px}
 .results{display:flex;flex-direction:column;gap:14px}
+.needs{display:flex;flex-direction:column;gap:8px}
+.needs:empty{display:none}
+.need-list{display:flex;flex-wrap:wrap;gap:8px}
+.need{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--mark);background:var(--panel);border-radius:999px;padding:5px 12px 5px 5px;cursor:pointer;font-size:14px;font-weight:500;color:var(--ink)}
+.need:hover{background:var(--mark);color:var(--mark-ink)}
+.need-n{font-family:var(--mono);font-size:12px;font-weight:600;background:var(--mark);color:var(--mark-ink);border-radius:999px;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center}
+.need-go{font-family:var(--mono);font-size:11px;color:var(--muted)}
 .result{border:1px solid var(--line);border-radius:8px;background:var(--panel);overflow:hidden}
 .result-top{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;flex-wrap:wrap}
 .result-rank{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--muted);padding-top:2px;font-variant-numeric:tabular-nums}
@@ -541,6 +548,46 @@ function findMatches(q){
   }
   return res.sort((a,b)=>b.score-a.score).slice(0,10);
 }
+const SKILLS=[
+ [/\bfunction\b|write a function|create a function|construct a function|define a function/,'Write a function','rev-01','Function anatomy'],
+ [/return(s|ing)? (a |the )?list|list (with|containing|of) .*(mean|median|sum|max|min|count|range|value)|several (results|outputs|values)|multiple (results|outputs|values)/,'Return several results in a list','rev-01','Return several results in a list'],
+ [/simulat|random|coin|dice|\bdie\b|\broll|\bflip(s|ped|ping)?\b|sample\(|draw .* from (a |the )?(vector|set|bag|urn)|probabilit/,'Simulate with sample() and set.seed()','rev-01','Simulation with sample() and set.seed()'],
+ [/until|keep (going|rolling|flipping|drawing|trying)|stop (when|once|as soon)|how many (tries|rolls|flips|steps|attempts)/,'Repeat until something happens (break)','rev-01','Repeat until something happens (for loop + break)'],
+ [/normal distribution|normally distributed|rnorm|standard deviation \d|\bsd\s*=|mean \d+ and (a )?standard/,'Normal distribution with rnorm()','rev-01','Normal distribution with rnorm()'],
+ [/(each|every) (element|value|number|entry|grade|score)|label each|classif|categori[sz]e|returns? ['"‘“]?\w+['"’”]? (for|if|when)|pass.*fail|fail.*pass/,'Label every element (loop + if, or ifelse)','rev-01','Classify every element of a vector (for loop + if)'],
+ [/how many|count|number of/,'Count with a loop or sum()','rev-01','Count things with a for loop (counters, next)'],
+ [/matrix|matrices/,'Work with a matrix','rev-02','Matrices: create, access, logical replace'],
+ [/(each|every|per) (row|column)|row ?sums?|column ?means?|rows? of (a|the) matrix/,'apply() on rows / columns','rev-05','apply on rows and columns'],
+ [/(each|every|per|by|for each|across|within) (group|species|team|department|category|level|island|class|region|type|gender|sex|store|country|year)|across .*(group|categor|level)|broken down by|grouped by/,'Group summary with tapply()','rev-03','Group summaries: tapply, table, proportions'],
+ [/import|read (in|the)|\.csv|load the (data|file)|dataset available/,'Import the data (read.csv)','rev-03','Import a CSV (stringsAsFactors)'],
+ [/structure|summary statistics|first (\d+|few|five|three) rows|dimensions|str\(|summary\(/,'Look at the data (str, summary, head)','rev-03','Look at the data'],
+ [/(keep|extract|select|filter|subset|only|remove|drop|exclude|eliminate).*(rows?|observations|employees|passengers|students|stores|records|those|where)|(rows?|observations) (where|with|whose|in which)|older than|younger than/,'Filter rows (df[condition, ])','rev-03','Subset columns and rows'],
+ [/new (column|variable)|add (a |another )?(column|variable)|create (a )?(column|variable)/,'Add a column','rev-03','Add and change columns and rows'],
+ [/factor|levels?\b/,'Factors and levels','rev-02','Factors: levels, counts, groups'],
+ [/top \d|highest|lowest|largest|smallest|sort|order|rank|percentile|quantile|quartile|variance/,'Sort, top n, percentiles','rev-03','Sort, top n, percentiles, spread'],
+ [/\blists?\b|sublist|\[\[/,'Lists: [ ] vs [[ ]]','rev-02','Lists: [ ] vs [[ ]] and $'],
+ [/vector/,'Vectors: create and subset','rev-02','Vectors: subsetting and changing values'],
+ [/\bif\b|otherwise|else|condition/,'if / else if / else','rev-04','Nested if-else'],
+ [/ifelse/,'ifelse() on a vector','rev-04','ifelse() on a vector'],
+ [/\bloop\b|iterate/,'for loop with next / break','rev-04','for loop with next and break'],
+ [/sapply|lapply|apply|without (using )?(a )?loop/,'lapply / sapply','rev-05','lapply and sapply on a list'],
+ [/mapply|pair(s|wise)?|element by element|compare two/,'mapply on pairs','rev-05','mapply on pairs (dice comparison)'],
+ [/histogram|distribution of/,'Histogram','rev-06','Histogram'],
+ [/box ?plot/,'Boxplot by group','rev-06','Boxplot by group (with notch)'],
+ [/bar ?(plot|chart|graph)/,'Barplot','rev-06','Barplot (and side-by-side)'],
+ [/scatter|against|versus|\bvs\.?\b|relationship between/,'Scatterplot','rev-06','Scatterplot colored by group'],
+ [/side.by.side (plots|histograms|graphs)|single (image|figure)|two plots|both histograms|next to each other/,'Two plots side by side','rev-06','Two plots side by side'],
+];
+function detectSkills(q){
+  const low=q.toLowerCase(), found=[], seen=new Set();
+  for(const [re,label,eid,chunk] of SKILLS){
+    const m=low.match(re); if(!m||seen.has(label))continue;
+    const e=entries[eid]; if(!e)continue;
+    const i=(e.chunks||[]).findIndex(c=>c.label===chunk); if(i<0)continue;
+    seen.add(label); found.push({label,eid,i,pos:m.index});
+  }
+  return found.sort((a,b)=>a.pos-b.pos).slice(0,7);
+}
 function matchHTML(){
   return `<header class="head"><div class="eyebrow"><span>Find code for a question</span></div>
     <h2>Where have I done this before?</h2></header>
@@ -549,11 +596,17 @@ function matchHTML(){
       <textarea class="inp" id="matchQ" placeholder="e.g. Write a function that simulates rolling two dice until the sum is 7 and returns the number of rolls">${esc(matchQuery)}</textarea>
       <span class="hint">Matches on wording and on the R functions a question usually needs (<code>tapply</code> for "average by department", <code>while</code> for "keep rolling until"). Searches the code in every entry.</span>
     </div>
+    <div class="needs" id="matchNeeds"></div>
     <div class="results" id="matchResults"></div>`;
 }
 function renderMatches(){
   const box=$('#matchResults'); if(!box)return;
-  if(matchQuery.trim().length<4){box.innerHTML='<p class="empty-line">Results show up here as you type.</p>';return;}
+  const needs=$('#matchNeeds');
+  if(matchQuery.trim().length<4){box.innerHTML='<p class="empty-line">Results show up here as you type.</p>'; if(needs)needs.innerHTML=''; return;}
+  if(needs){
+    const sk=detectSkills(matchQuery);
+    needs.innerHTML=sk.length?`<span class="label">This question needs</span><div class="need-list">${sk.map((k,n)=>`<button class="need" type="button" data-act="goto" data-eid="${esc(k.eid)}" data-i="${k.i}"><span class="need-n">${n+1}</span>${esc(k.label)}<span class="need-go">${esc(tagOf(entries[k.eid]))} →</span></button>`).join('')}</div><span class="hint">Steps in the order the question mentions them. Each opens a review template. Below: the most similar code you've already seen.</span>`:'';
+  }
   const res=findMatches(matchQuery);
   if(!res.length){box.innerHTML='<p class="empty-line">No similar code found. Try describing what the code should do, like "mean salary by department".</p>';return;}
   const top=res[0].score;

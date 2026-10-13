@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-13T21:50:00Z";
+window.ENTRIES_SAVED = "2026-10-13T22:25:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -153,7 +153,7 @@ window.ENTRIES = {
     "id": "c090",
     "label": "Problem 4 [9pt] · Part 3 · Initiate an empty vector vector7. Utilize a while loop to…",
     "code": "vector7 <- vector(mode = \"numeric\")\ni <- 1\nwhile (i < 30) {\n  if (i %% 2 == 1 & i %% 3 != 0) {\n    vector7 <- c(vector7, i)\n  }\n  i <- i + 1\n}\nvector7\n#>  [1]  1  5  7 11 13 17 19 23 25 29",
-    "comment": "**Filling a vector inside a loop**\n\nStart empty (`vector7 <- c()` works too), then add each number that passes: odd (`i %% 2 == 1`) **and** not divisible by 3 (`i %% 3 != 0`). Result: `1 5 7 11 13 17 19 23 25 29`.\n\nThe `i <- i + 1` line is essential in a while loop; without it the loop never ends.\n\n**For-loop version** (exam questions use for loops):\n```r\nvector7 <- c()\nfor (i in 1:29) {\n  if (i %% 2 == 1 & i %% 3 != 0) {\n    vector7 <- c(vector7, i)\n  }\n}\n```",
+    "comment": "**Roadmap: from the question to the code**\n\n**Step 1. Break the question into pieces.** Each phrase becomes one piece of code:\n\n| Question says | Code piece |\n|---|---|\n| \"Initiate an empty vector vector7\" | `vector7 <- vector(mode = \"numeric\")` (or `c()`) |\n| \"Utilize a while loop\" | `while (condition) { ... }` |\n| \"greater than 0\" | start counting at 1: `i <- 1` |\n| \"less than 30\" | keep looping while `i < 30` |\n| \"odd numbers\" | `i %% 2 == 1` (remainder 1 when divided by 2) |\n| \"excluding those divisible by 3\" | `i %% 3 != 0` (remainder is **not** 0) |\n| \"fill vector7\" | `vector7 <- c(vector7, i)` |\n\n**Step 2. Set up before the loop.**\n- An empty `vector7` so there's somewhere to put the answers.\n- A counter `i <- 1`, the number being checked right now.\n\n**Step 3. Write the loop condition.** `while (i < 30)` means \"keep going as long as i is under 30.\" When `i` hits 30 the loop stops, so 30 is never checked.\n\n**Step 4. Inside the loop, test the current number.** `if (i %% 2 == 1 & i %% 3 != 0)` asks both rules at once; `&` means **both** must be TRUE.\n\n**Step 5. If it passes, add it.** `vector7 <- c(vector7, i)` sticks `i` on the end of whatever `vector7` already holds.\n\n**Step 6. Move to the next number.** `i <- i + 1` is **outside** the `if`, so it runs every time. Without it, `i` stays 1 forever and the loop never ends (RStudio freezes; press Esc to stop it).\n\n**Step 7. Print the result.** `vector7` gives `1 5 7 11 13 17 19 23 25 29`.\n\n**Trace of the first few passes:**\n\n| i | odd? | not divisible by 3? | kept? | vector7 after |\n|---|---|---|---|---|\n| 1 | yes | yes | yes | 1 |\n| 2 | no | | no | 1 |\n| 3 | yes | **no** (3 %% 3 = 0) | no | 1 |\n| 4 | no | | no | 1 |\n| 5 | yes | yes | yes | 1 5 |\n| 7 | yes | yes | yes | 1 5 7 |\n| 9 | yes | **no** | no | 1 5 7 |\n| … | | | | |\n| 30 | loop stops | | | final |\n\n**Same thing with a for loop** (exam questions use for loops). The `for` handles the counting, so there's no `i <- 1` and no `i <- i + 1`:\n```r\nvector7 <- c()\nfor (i in 1:29) {\n  if (i %% 2 == 1 & i %% 3 != 0) {\n    vector7 <- c(vector7, i)\n  }\n}\nvector7\n```\n\n**Pattern to reuse:** empty result → loop over the numbers → `if` test → add with `c(result, i)` → print the result.",
     "key": false,
     "question": "Initiate an empty vector vector7. Utilize a while loop to fill vector7 with odd numbers greater than 0 and less than 30, excluding those odd numbers divisible by 3."
    },
@@ -176,7 +176,7 @@ window.ENTRIES = {
   ],
   "notes": "Due September 27, 11:59 PM. Five problems: building vectors with `c()` and `seq()`, `append()` and logical filtering; lists and `unlist()` coercion; the `dfA` data frame with factors and a `High_Performer` column; a for loop and a while loop over `matrix1`; and the functions `categorize_numbers()` and `matrix_summary()`.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
-  "updatedAt": "2026-10-13T21:50:00Z"
+  "updatedAt": "2026-10-13T22:25:00Z"
  },
  "hw-02": {
   "type": "hw",

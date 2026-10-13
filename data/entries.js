@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-13T02:10:00Z";
+window.ENTRIES_SAVED = "2026-10-13T21:50:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -65,7 +65,7 @@ window.ENTRIES = {
     "id": "c079",
     "label": "Problem 2 [9pt] · Part 2 · Extract the third element of listX and assign it to vector6.",
     "code": "vector6 <- listX[[3]]\nvector6\n#> [1] -3  0  3  6",
-    "comment": "**`[[ ]]` vs `[ ]`**\n\n`listX[[3]]` gives the vector `-3 0 3 6` itself, which is what \"assign it to vector6\" wants.\n\n`listX[3]` would give a **list containing** that vector, so `vector6` would be a list, not a vector. Check with `class(vector6)`: it should say `\"numeric\"`.",
+    "comment": "**Why double brackets here**\n\nThe question says to extract the third element and **assign it to vector6**, so `vector6` should be the vector `-3 0 3 6` itself. Only `[[ ]]` gives you that.\n\nThink of a list as a train and each element as a car with cargo inside:\n- `listX[3]` (**single**) unhooks car 3 and gives you a **smaller train** with one car. It's still a list.\n- `listX[[3]]` (**double**) opens car 3 and gives you **the cargo**: the numeric vector.\n\n| | `listX[3]` | `listX[[3]]` |\n|---|---|---|\n| `class()` | `\"list\"` | `\"numeric\"` |\n| `length()` | 1 (one element) | 4 (four numbers) |\n| Prints as | `[[1]]` then `[1] -3 0 3 6` | `[1] -3 0 3 6` |\n| `mean()` | `NA` with a warning | `1.5` |\n| `+ 1` | Error: non-numeric argument | `-2 1 4 7` |\n\nSo with single brackets, `vector6` would be a list and any math on it fails.\n\n**When to use single brackets `[ ]` on a list:** when you want to keep it a list, usually because you're taking **more than one** element:\n- `listX[c(1, 3)]` gives a new list with elements 1 and 3. (`listX[[c(1, 3)]]` does **not** do this; it gives an error.)\n- `listX[-5]` gives the list without element 5.\n\n**After `[[ ]]`, use single brackets inside the vector:** `listX[[3]][2]` gives `0`, the 2nd number. Single brackets on a plain vector already return the value.\n\n**Rule:** `[[ ]]` for one element to work with; `[ ]` to keep a smaller list.",
     "key": false,
     "question": "Extract the third element of listX and assign it to vector6."
    },
@@ -176,7 +176,7 @@ window.ENTRIES = {
   ],
   "notes": "Due September 27, 11:59 PM. Five problems: building vectors with `c()` and `seq()`, `append()` and logical filtering; lists and `unlist()` coercion; the `dfA` data frame with factors and a `High_Performer` column; a for loop and a while loop over `matrix1`; and the functions `categorize_numbers()` and `matrix_summary()`.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
-  "updatedAt": "2026-10-13T02:10:00Z"
+  "updatedAt": "2026-10-13T21:50:00Z"
  },
  "hw-02": {
   "type": "hw",

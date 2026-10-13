@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-13T01:45:00Z";
+window.ENTRIES_SAVED = "2026-10-13T02:10:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -33,7 +33,7 @@ window.ENTRIES = {
     "id": "c075",
     "label": "Problem 1 [7pt] · Part 1 · Create vectors containing {2.5, 4.5, 6.5, 8.5, 10.5, 12.5,…",
     "code": "vector1 <- c(2.5, 4.5, 6.5, 8.5, 10.5, 12.5, 14.5)\nvector1\n#> [1]  2.5  4.5  6.5  8.5 10.5 12.5 14.5\nvector2 <- seq(2.5, 14.5, by = 2)\nvector2\n#> [1]  2.5  4.5  6.5  8.5 10.5 12.5 14.5\nvector3 <- seq(2.5, 14.5, length.out = 7)\nvector3\n#> [1]  2.5  4.5  6.5  8.5 10.5 12.5 14.5",
-    "comment": "",
+    "comment": "**Three ways to make the same vector**\n\n- `c()` types every value out.\n- `seq(from, to, by = 2)` sets the **step size**; R works out how many values that takes.\n- `seq(from, to, length.out = 7)` sets **how many values**; R works out the step.\n\nAll three give `2.5 4.5 6.5 8.5 10.5 12.5 14.5`. Use `by` when you know the gap and `length.out` when you know the count.",
     "key": false,
     "question": "Create vectors containing {2.5, 4.5, 6.5, 8.5, 10.5, 12.5, 14.5} elements in three different ways, using the following functions: c(), seq() with the by argument, and seq() with the length.out argument. Name them vector1, vector2, and vector3, respectively."
    },
@@ -41,7 +41,7 @@ window.ENTRIES = {
     "id": "c076",
     "label": "Problem 1 [7pt] · Part 2 · Append four additional elements to vector2: 10, 20, 30, and…",
     "code": "vector2 <- append(vector2, 10, after = 1)\nvector2 <- append(vector2, 20, after = 0)\nvector2 <- append(vector2, 30, after = 6)\nvector2 <- append(vector2, 40)\nvector2\n#>  [1] 20.0  2.5 10.0  4.5  6.5  8.5 30.0 10.5 12.5 14.5 40.0",
-    "comment": "",
+    "comment": "**How `append()` positions work**\n\n`append(x, value, after = k)` puts the value **right after position k**, so it lands in position k + 1. `after = 0` puts it first; leaving `after` out puts it last.\n\nThe order matters because each line changes `vector2` before the next one runs:\n1. `after = 1`: 10 becomes the 2nd element.\n2. `after = 0`: 20 goes to the front, pushing everything (including 10) one spot right.\n3. `after = 6`: 30 becomes the 7th element of the now-longer vector.\n4. No `after`: 40 goes on the end.\n\nCorrect result: `20.0 2.5 10.0 4.5 6.5 8.5 30.0 10.5 12.5 14.5 40.0` (11 numbers).\n\n**If your numbers repeat:** you ran these lines more than once. Each `append` builds on whatever `vector2` is *now*, so re-running adds 10, 20, 30, 40 again (the Environment pane shows `vector2` longer than `num [1:11]`, e.g. `[1:15]` after one extra run). Fix: reset with `vector2 <- seq(2.5, 14.5, by = 2)`, then run the chunk once. Better: put that reset line at the top of this chunk. Before handing in, use **Session → Restart R**, then **Run → Run All**.",
     "key": false,
     "question": "Append four additional elements to vector2: 10, 20, 30, and 40. Ensure that 10 becomes the second element in the updated vector2, 20 is the first element considering that 10 has been already added, 30 occupies the 7th position given the presence of 10 and 20, and 40 is positioned as the last element after including all the other numbers."
    },
@@ -49,7 +49,7 @@ window.ENTRIES = {
     "id": "c077",
     "label": "Problem 1 [7pt] · Part 3 · Form a new vector encompassing {2, 3, 6, 10, 15, 18, 22, 25,…",
     "code": "vector4 <- c(2, 3, 6, 10, 15, 18, 22, 25, 27, 30, 31, 35, 42)\nvector4\n#>  [1]  2  3  6 10 15 18 22 25 27 30 31 35 42\nvector5 <- vector4[vector4 > 15 & vector4 %% 2 != 0]\nvector5\n#> [1] 25 27 31 35\n27 %in% vector5\n#> [1] TRUE",
-    "comment": "",
+    "comment": "**Filtering a vector with two conditions**\n\n`vector4[vector4 > 15 & vector4 %% 2 != 0]` reads as \"keep values greater than 15 **and** with a remainder when divided by 2\" (odd numbers). Result: `25 27 31 35`.\n\n- `%%` is the remainder: `x %% 2 != 0` means odd, `x %% 2 == 0` means even.\n- `&` needs both conditions TRUE.\n- `27 %in% vector5` asks \"is 27 anywhere in vector5?\" and returns a single TRUE/FALSE.",
     "key": false,
     "question": "Form a new vector encompassing {2, 3, 6, 10, 15, 18, 22, 25, 27, 30, 31, 35, 42} elements and label it vector4. Extract elements greater than 15 and not divisible by 2 through a logical statement, generating a new vector named vector5. Verify the presence of the number 27 within vector5 using a logical operator."
    },
@@ -57,7 +57,7 @@ window.ENTRIES = {
     "id": "c078",
     "label": "Problem 2 [9pt] · Part 1 · Create a list listX with the following elements:",
     "code": "listX <- list(\n  \"Data Science\",\n  100,\n  c(-3, 0, 3, 6),\n  TRUE,\n  list(c(\"A\", \"B\", \"C\"), c(2.5, 5.5, 7.5))\n)\nlistX\n#> [[1]]\n#> [1] \"Data Science\"\n#> [[2]]\n#> [1] 100\n#> [[3]]\n#> [1] -3  0  3  6\n#> [[4]]\n#> [1] TRUE\n#> [[5]]\n#> [[5]][[1]]\n#> [1] \"A\" \"B\" \"C\"\n#> [[5]][[2]]\n#> [1] 2.5 5.5 7.5",
-    "comment": "",
+    "comment": "**A list can hold anything, including another list**\n\n`listX` has 5 elements of different types: text, a number, a vector, a logical, and a **sublist** (`list(c(\"A\",\"B\",\"C\"), c(2.5,5.5,7.5))`).\n\nThat's the point of a list: vectors must be all one type, lists don't. To reach the \"B\" inside the sublist you'd go two levels deep: `listX[[5]][[1]][2]`.",
     "key": false,
     "question": "Create a list listX with the following elements:\n• A character string “Data Science”\n• A numeric value 100\n• A vector {-3, 0, 3, 6}\n• A logical value TRUE\n• A sublist containing vectors {“A”, “B”, “C”} and {2.5, 5.5, 7.5}"
    },
@@ -65,7 +65,7 @@ window.ENTRIES = {
     "id": "c079",
     "label": "Problem 2 [9pt] · Part 2 · Extract the third element of listX and assign it to vector6.",
     "code": "vector6 <- listX[[3]]\nvector6\n#> [1] -3  0  3  6",
-    "comment": "",
+    "comment": "**`[[ ]]` vs `[ ]`**\n\n`listX[[3]]` gives the vector `-3 0 3 6` itself, which is what \"assign it to vector6\" wants.\n\n`listX[3]` would give a **list containing** that vector, so `vector6` would be a list, not a vector. Check with `class(vector6)`: it should say `\"numeric\"`.",
     "key": false,
     "question": "Extract the third element of listX and assign it to vector6."
    },
@@ -73,7 +73,7 @@ window.ENTRIES = {
     "id": "c080",
     "label": "Problem 2 [9pt] · Part 3 · Convert listX into a single vector using unlist(). Explain…",
     "code": "unlist(listX)\n#>  [1] \"Data Science\" \"100\"          \"-3\"           \"0\"            \"3\"\n#>  [6] \"6\"            \"TRUE\"         \"A\"            \"B\"            \"C\"\n#> [11] \"2.5\"          \"5.5\"          \"7.5\"\n# By applying unlist() to listX, we obtain a character vector. From the R documentation for unlist():\n# Given a list structure x, unlist() simplifies it to produce a vector which contains all the atomic\n# components which occur in x. Where possible the list elements are coerced to a common mode\n# during the unlisting, and so the result often ends up as a character vector. Vectors will be coerced\n# to the highest type of the components in the hierarchy:\n#>      NULL<  raw< logical < integer < double < complex< character < list < expression\n# Under the above hierarchy, the highest data type of an atomic element inside listX is “character”, so all\n# other elements are coerced to be of class “character” as well. The result thus becomes a character vector.",
-    "comment": "",
+    "comment": "**Why everything turns into text**\n\n`unlist()` flattens the list into **one vector**, and a vector can only hold one type. R picks the most general type present and converts everything to it:\n\nlogical < integer < double < character\n\n`listX` contains text (\"Data Science\", \"A\"...), so **all** values become character: `100` becomes `\"100\"` and `TRUE` becomes `\"TRUE\"`. That's what the question means by explaining the structure.",
     "key": false,
     "question": "Convert listX into a single vector using unlist(). Explain why the resulting structure appears as it does."
    },
@@ -81,7 +81,7 @@ window.ENTRIES = {
     "id": "c081",
     "label": "Problem 2 [9pt] · Part 4 · Modify listX by replacing the second element with a new…",
     "code": "listX[[2]] <- 200\nlistX\n#> [[1]]\n#> [1] \"Data Science\"\n#> [[2]]\n#> [1] 200\n#> [[3]]\n#> [1] -3  0  3  6\n#> [[4]]\n#> [1] TRUE\n#> [[5]]\n#> [[5]][[1]]\n#> [1] \"A\" \"B\" \"C\"\n#> [[5]][[2]]\n#> [1] 2.5 5.5 7.5",
-    "comment": "",
+    "comment": "**Replacing a list element**\n\n`listX[[2]] <- 200` overwrites the 2nd element (100 becomes 200). Use `[[ ]]` on the left side to change one element. The list keeps the same length; only that value changes.",
     "key": false,
     "question": "Modify listX by replacing the second element with a new value: 200."
    },
@@ -89,7 +89,7 @@ window.ENTRIES = {
     "id": "c082",
     "label": "Problem 2 [9pt] · Part 5 · Create a new list listY by merging listXwith another list…",
     "code": "listY <- c(listX, list(\"Statistics\", 50, FALSE))\nlistY\n#> [[1]]\n#> [1] \"Data Science\"\n#> [[2]]\n#> [1] 200\n#> [[3]]\n#> [1] -3  0  3  6\n#> [[4]]\n#> [1] TRUE\n#> [[5]]\n#> [[5]][[1]]\n#> [1] \"A\" \"B\" \"C\"\n#> [[5]][[2]]\n#> [1] 2.5 5.5 7.5\n#> [[6]]\n#> [1] \"Statistics\"\n#> [[7]]\n#> [1] 50\n#> [[8]]\n#> [1] FALSE\n# The structure of listY differs from that of listX in that it is longer by 3 elements.",
-    "comment": "",
+    "comment": "**`c()` merges lists**\n\n`c(listX, list(\"Statistics\", 50, FALSE))` lays the 3 new elements on the end of `listX`, so `listY` has 5 + 3 = **8** elements. `listX` itself is unchanged.\n\nIf you used `list(listX, ...)` instead, you'd get a list of 2 nested lists, not 8 elements (see Recitation 1, Problem 2 Part 10).",
     "key": false,
     "question": "Create a new list listY by merging listXwith another list containing “Statistics”, 50, and FALSE. Compare the structures of listX and listY."
    },
@@ -97,7 +97,7 @@ window.ENTRIES = {
     "id": "c083",
     "label": "Problem 3 [9pt] · Part 1 · Create a data frame dfA with the following variables:",
     "code": "Team <- c(\"Alpha\", \"Beta\", \"Gamma\", \"Delta\", \"Epsilon\",\n          \"Beta\", \"Alpha\", \"Gamma\", \"Delta\", \"Epsilon\")\nRole <- c(\"Analyst\", \"Manager\", \"Developer\", \"Analyst\", \"Manager\",\n          \"Developer\", \"Analyst\", \"Manager\", \"Developer\", \"Analyst\")\nScore <- c(82, 90, 75, 88, 79, 95, 80, 85, 76, 89)\nCertified <- c(\"Yes\", \"No\", \"Yes\", \"No\", \"Yes\", \"Yes\", \"No\", \"Yes\", \"No\", \"Yes\")\nExperience <- c(3, 5, 7, 2, 6, 8, 4, 3, 5, 9)\ndfA <- data.frame(Team, Role, Score, Certified, Experience)\ndfA\n#>       Team      Role Score Certified Experience\n#> 1    Alpha   Analyst    82       Yes          3\n#> 2     Beta   Manager    90        No          5\n#> 3    Gamma Developer    75       Yes          7\n#> 4    Delta   Analyst    88        No          2\n#> 5  Epsilon   Manager    79       Yes          6\n#> 6     Beta Developer    95       Yes          8\n#> 7    Alpha   Analyst    80        No          4\n#> 8    Gamma   Manager    85       Yes          3\n#> 9    Delta Developer    76        No          5\n#> 10 Epsilon   Analyst    89       Yes          9",
-    "comment": "",
+    "comment": "**Building a data frame from vectors**\n\nMake one vector per column, then `data.frame(Team, Role, Score, Certified, Experience)`. The vector names become the column names.\n\nEvery vector must have the **same length** (10 here), or R gives an error. Each position is one row: Team[1], Role[1], Score[1]... all describe the first person.",
     "key": false,
     "question": "Create a data frame dfA with the following variables:\n• Team - {“Alpha”, “Beta”, “Gamma”, “Delta”, “Epsilon”, “Beta”, “Alpha”, “Gamma”, “Delta”, “Epsilon”}\n• Role - {“Analyst”, “Manager”, “Developer”, “Analyst”, “Manager”, “Developer”, “Analyst”, “Manager”, “Developer”, “Analyst”}\n• Score - {82, 90, 75, 88, 79, 95, 80, 85, 76, 89}\n• Certified - {“Yes”, “No”, “Yes”, “No”, “Yes”, “Yes”, “No”, “Yes”, “No”, “Yes”}\n• Experience - {3, 5, 7, 2, 6, 8, 4, 3, 5, 9}"
    },
@@ -105,7 +105,7 @@ window.ENTRIES = {
     "id": "c084",
     "label": "Problem 3 [9pt] · Part 2 · Compute summary statistics for the Score variable.",
     "code": "summary(dfA$Score)\n#>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.\n#>   75.00   79.25   83.50   83.90   88.75   95.00",
-    "comment": "",
+    "comment": "**`summary()` on a numeric column**\n\n`summary(dfA$Score)` gives six numbers: Min, 1st Quartile (25%), Median, Mean, 3rd Quartile (75%), Max.\n\nUse `$` to pick the one column. `summary(dfA)` would summarize every column at once.",
     "key": false,
     "question": "Compute summary statistics for the Score variable."
    },
@@ -113,7 +113,7 @@ window.ENTRIES = {
     "id": "c085",
     "label": "Problem 3 [9pt] · Part 3 · Convert Certified into a factor if it is not already. Display…",
     "code": "dfA$Certified <- factor(dfA$Certified)\ndfA$Certified\n#>  [1] Yes No  Yes No  Yes Yes No  Yes No  Yes\n#> Levels: No Yes\n# NOTE: The function as.factor() also works here:\ndfA$Certified <- as.factor(dfA$Certified)\ndfA$Certified\n#>  [1] Yes No  Yes No  Yes Yes No  Yes No  Yes\n#> Levels: No Yes\ntable(dfA$Certified)\n#>  No Yes\n#>   4   6",
-    "comment": "",
+    "comment": "**Factors and frequency tables**\n\n`factor()` (or `as.factor()`) turns the text \"Yes\"/\"No\" into a categorical variable with **levels**. Printing it shows `Levels: No Yes`, in alphabetical order by default.\n\n`table(dfA$Certified)` counts how many of each level. That's the \"frequency table\" the question asks for.\n\nIf you read the data with `read.csv(..., stringsAsFactors = TRUE)`, text columns are already factors.",
     "key": false,
     "question": "Convert Certified into a factor if it is not already. Display the frequency table of its values."
    },
@@ -121,7 +121,7 @@ window.ENTRIES = {
     "id": "c086",
     "label": "Problem 3 [9pt] · Part 4 · Add a new column High_Performer, which is TRUE if Score is…",
     "code": "dfA$High_Performer <- dfA$Score > 85 & dfA$Experience > 4\ndfA$High_Performer\n#>  [1] FALSE  TRUE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE  TRUE\n# NOTE: Your first instinct might be to use ifelse() for this question, like so:\ndfA$High_Performer <- ifelse(dfA$Score > 85 & dfA$Experience > 4, TRUE, FALSE)\n# This is not incorrect. However, using ifelse() is redundant if you want to create a logical vector (i.e. a\n# vector containing TRUE and FALSE values) – so instead of writing x <- ifelse(condition, TRUE, FALSE)\n# you can just write x <- condition.",
-    "comment": "",
+    "comment": "**A TRUE/FALSE column without `ifelse()`**\n\n`dfA$Score > 85 & dfA$Experience > 4` checks both conditions for every row at once and returns one TRUE/FALSE per row, which becomes the new column.\n\n`ifelse(condition, TRUE, FALSE)` gives the same thing but is redundant. Use `ifelse()` only when you want other labels, like `\"High\"` / `\"Not high\"`. Note it's `>` (more than) for both, so a score of exactly 85 is FALSE.",
     "key": false,
     "question": "Add a new column High_Performer, which is TRUE if Score is greater than 85 and Experience is more than 4, otherwise FALSE."
    },
@@ -129,7 +129,7 @@ window.ENTRIES = {
     "id": "c087",
     "label": "Problem 3 [9pt] · Part 5 · Extract all employees who belong to the “Gamma” team and are…",
     "code": "dfA[dfA$Team == \"Gamma\" & dfA$Certified == \"Yes\", ]\n#>    Team      Role Score Certified Experience High_Performer\n#> 3 Gamma Developer    75       Yes          7          FALSE\n#> 8 Gamma   Manager    85       Yes          3          FALSE\n# Solution #2 (using the subset() function)\nsubset(dfA, Team == \"Gamma\" & Certified == \"Yes\")\n#>    Team      Role Score Certified Experience High_Performer\n#> 3 Gamma Developer    75       Yes          7          FALSE\n#> 8 Gamma   Manager    85       Yes          3          FALSE",
-    "comment": "",
+    "comment": "**Filtering rows of a data frame**\n\n`dfA[dfA$Team == \"Gamma\" & dfA$Certified == \"Yes\", ]`\n- The condition goes **before** the comma (it picks rows).\n- Nothing after the comma means keep **all columns**.\n- Use `==` to compare (a single `=` is assignment), and the text must match exactly, capitals included.\n\n`subset(dfA, Team == \"Gamma\" & Certified == \"Yes\")` does the same and lets you skip the `dfA$`.",
     "key": false,
     "question": "Extract all employees who belong to the “Gamma” team and are certified."
    },
@@ -137,7 +137,7 @@ window.ENTRIES = {
     "id": "c088",
     "label": "Problem 4 [9pt] · Part 1 · Generate a matrix named matrix1 with 5 columns, filled…",
     "code": "elements <- c(10, 3, 6, 23, -5, -4, 13, 17, 5, 6, -7, -10,\n              13, 39, 20, 2, 1, 9, 11, -22, 23, -15, -3, 6, 12)\nmatrix1 <- matrix(elements, ncol = 5, byrow = TRUE)\nmatrix1\n#>      [,1] [,2] [,3] [,4] [,5]\n#> [1,]   10    3    6   23   -5\n#> [2,]   -4   13   17    5    6\n#> [3,]   -7  -10   13   39   20\n#> [4,]    2    1    9   11  -22\n#> [5,]   23  -15   -3    6   12",
-    "comment": "",
+    "comment": "**Making a matrix row by row**\n\n`matrix(elements, ncol = 5, byrow = TRUE)` fills across each row first. 25 values with 5 columns gives 5 rows automatically.\n\nWithout `byrow = TRUE`, R fills **down the columns** first and the numbers end up in different places. Always check the first row matches the first 5 numbers in the question.",
     "key": false,
     "question": "Generate a matrix named matrix1 with 5 columns, filled row-wise with the elements: 10, 3, 6, 23, -5, -4, 13, 17, 5, 6, -7, -10, 13, 39, 20, 2, 1, 9, 11, -22, 23, -15, -3, 6, 12."
    },
@@ -145,7 +145,7 @@ window.ENTRIES = {
     "id": "c089",
     "label": "Problem 4 [9pt] · Part 2 · Employ a for loop to update the elements of matrix1 according…",
     "code": "for (i in 1:nrow(matrix1)) {\n  for (j in 1:ncol(matrix1)) {\n    if (matrix1[i, j] < 0) {\n      matrix1[i, j] <- 0\n    } else if (matrix1[i, j] >= 0 & matrix1[i, j] < 5) {\n      matrix1[i, j] <- 5\n    } else if (matrix1[i, j] > 10 & matrix1[i, j] < 15) {\n      matrix1[i, j] <- 10\n    } else {\n      matrix1[i, j] <- 100\n    }\n  }\n}\nmatrix1\n#>      [,1] [,2] [,3] [,4] [,5]\n#> [1,]  100    5  100  100    0\n#> [2,]    0   10  100  100  100\n#> [3,]    0    0   10  100  100\n#> [4,]    5    5  100   10    0\n#> [5,]  100    0    0  100   10",
-    "comment": "",
+    "comment": "**Nested for loops over every element**\n\n`i` walks the rows and `j` walks the columns, so `matrix1[i, j]` visits every cell once. The `if / else if / else` chain decides each new value:\n- negative → 0\n- 0 to 4.99 → 5\n- above 10 and below 15 → 10\n- **everything else → 100** (so 5–10 and 15 or more all become 100; exactly 10 also becomes 100 because the rule says *above* 10)\n\n**Same re-run trap as Problem 1:** this loop changes `matrix1` itself. Run it twice and the values change again (0s become 5s, 5s become 100s). Re-create `matrix1` from Part 1 before re-running.",
     "key": false,
     "question": "Employ a for loop to update the elements of matrix1 according to the following criteria: replace negative values with 0; for elements greater than or equal to 0 but less than 5, replace them with 5; for elements less than 15 but greater than 10, replace them with 10; for elements that do not meet the specified conditions, substitute them with 100."
    },
@@ -153,7 +153,7 @@ window.ENTRIES = {
     "id": "c090",
     "label": "Problem 4 [9pt] · Part 3 · Initiate an empty vector vector7. Utilize a while loop to…",
     "code": "vector7 <- vector(mode = \"numeric\")\ni <- 1\nwhile (i < 30) {\n  if (i %% 2 == 1 & i %% 3 != 0) {\n    vector7 <- c(vector7, i)\n  }\n  i <- i + 1\n}\nvector7\n#>  [1]  1  5  7 11 13 17 19 23 25 29",
-    "comment": "",
+    "comment": "**Filling a vector inside a loop**\n\nStart empty (`vector7 <- c()` works too), then add each number that passes: odd (`i %% 2 == 1`) **and** not divisible by 3 (`i %% 3 != 0`). Result: `1 5 7 11 13 17 19 23 25 29`.\n\nThe `i <- i + 1` line is essential in a while loop; without it the loop never ends.\n\n**For-loop version** (exam questions use for loops):\n```r\nvector7 <- c()\nfor (i in 1:29) {\n  if (i %% 2 == 1 & i %% 3 != 0) {\n    vector7 <- c(vector7, i)\n  }\n}\n```",
     "key": false,
     "question": "Initiate an empty vector vector7. Utilize a while loop to fill vector7 with odd numbers greater than 0 and less than 30, excluding those odd numbers divisible by 3."
    },
@@ -161,7 +161,7 @@ window.ENTRIES = {
     "id": "c091",
     "label": "Problem 5 [9pt] · Part 1 · Write a function categorize_numbers() that takes a numeric…",
     "code": "categorize_numbers <- function(vec) {\n  labels <- vector(mode = \"character\", length = length(vec))\n  for (i in 1:length(vec)) {\n    if (vec[i] < 10) {\n      labels[i] <- \"Small\"\n    } else if (vec[i] >= 10 & vec[i] <= 20) {\n      labels[i] <- \"Medium\"\n    } else {\n      labels[i] <- \"Large\"\n    }\n  }\n  labels\n}\ntest_vec <- c(4, 10, 15, 22, 8, 18, 27, 5, 12)\ncategorize_numbers(test_vec)\n#> [1] \"Small\"  \"Medium\" \"Medium\" \"Large\"  \"Small\"  \"Medium\" \"Large\"  \"Small\"\n#> [9] \"Medium\"\n# Solution #2 (without using a for loop)\ncategorize_numbers <- function(vec) {\n  labels <- ifelse(vec < 10, \"Small\", ifelse(vec >= 10 & vec <= 20, \"Medium\", \"Large\"))\n  labels\n}\ntest_vec <- c(4, 10, 15, 22, 8, 18, 27, 5, 12)\ncategorize_numbers(test_vec)\n#> [1] \"Small\"  \"Medium\" \"Medium\" \"Large\"  \"Small\"  \"Medium\" \"Large\"  \"Small\"\n#> [9] \"Medium\"\n# NOTE: This solution is a lot more compact because it uses the ifelse() function instead of if statements.\n# An if statement only works on one element at a time, but ifelse() can deal with a whole vector (or a\n# whole matrix) at once. This can helps us avoid for loops, making our code a lot shorter and simpler.\n# Notice the use of two ifelse() functions, one nested inside the other.\n# The first ifelse() corresponds to the if part that checks whether an element is less than 10:\n# If the element is less than 10 return “Small” as the corresponding category label.\n# If the element is NOT less than 10 we enter the second ifelse(). This corresponds to the\n# else if part that checks whether an element is between 10 and 20 (inclusive).\n# If the element is between 10 and 20 (inclusive) return “Medium” as the category\n# label.\n# If the element is NOT between 10 and 20 (inclusive), meaning that it is\n# greater than 20, return “Large” 10 as the category label. This final piece corresponds\n# to what the else part was handling.",
-    "comment": "",
+    "comment": "**Function that labels each element**\n\nThe loop checks `vec[i]` one at a time and stores the label in the same position `labels[i]`. `labels` is created first with the right length so there's a slot for every answer.\n\nThe solution ends with just `labels`; that works because R returns the last value. Your review session said to **always use `return(labels)`**, so write it that way on the exam.\n\nSolution #2 uses nested `ifelse()`. It works on the whole vector at once, so no loop is needed. `if` only handles one value at a time, which is why the loop version needs `[i]`.",
     "key": false,
     "question": "Write a function categorize_numbers() that takes a numeric vector as input and classifies each element into one of three categories:\n• \"Small\" if the number is less than 10\n• \"Medium\" if the number is between 10 and 20 (inclusive)\n• \"Large\" if the number is greater than 20 The function should return a character vector with the corresponding category labels. Test your function with the vector: {4, 10, 15, 22, 8, 18, 27, 5, 12}."
    },
@@ -169,14 +169,14 @@ window.ENTRIES = {
     "id": "c092",
     "label": "Problem 5 [9pt] · Part 2 · Create a function matrix_summary() that accepts a numeric…",
     "code": "matrix_summary <- function(mat) {\n  # row sums\n  row_sums <- vector(mode = \"numeric\", length = nrow(mat))\n  for (i in 1:nrow(mat)) {\n    row_sums[i] <- sum(mat[i, ])\n  }\n  # column means\n  col_means <- vector(mode = \"numeric\", length = ncol(mat))\n  for (i in 1:ncol(mat)) {\n    col_means[i] <- mean(mat[ , i])\n  }\n  # maximum value\n  max_val <- max(mat)\n  # minimum value\n  min_val <- min(mat)\n  # package everything up in a list\n  summary <- list(\n    \"Row Sums\" = row_sums,\n    \"Column Means\" = col_means,\n    \"Max Value\" = max_val,\n    \"Min Value\" = min_val\n  )\n  summary\n}\ntest_mat <- matrix(c(5, 12, 18, 7, 14, 22, 9, 10, 25, 6, 17, 30), ncol = 3, byrow = TRUE)\nmatrix_summary(test_mat)\n#> $`Row Sums`\n#> [1] 35 43 44 53\n#> $`Column Means`\n#> [1]  6.75 13.25 23.75\n#> $`Max Value`\n#> [1] 30\n#> $`Min Value`\n#> [1] 5\n# Solution #2\n# R has many in-built functions that simplify common operations, so you might have stumbled upon the\n# rowSums and colMeans functions (the corresponding functions rowMeans and colSums also exist).\nmatrix_summary <- function(mat) {\n  summary <- list(\n    \"Row Sums\" = rowSums(mat),\n    \"Column Means\" = colMeans(mat),\n    \"Max Value\" = max(mat),\n    \"Min Value\" = min(mat)\n  )\n  summary\n}\ntest_mat <- matrix(c(5, 12, 18, 7, 14, 22, 9, 10, 25, 6, 17, 30), ncol = 3, byrow = TRUE)\nmatrix_summary(test_mat)\n#> $`Row Sums`\n#> [1] 35 43 44 53\n#> $`Column Means`\n#> [1]  6.75 13.25 23.75\n#> $`Max Value`\n#> [1] 30\n#> $`Min Value`\n#> [1] 5",
-    "comment": "",
+    "comment": "**Function that returns a list of results**\n\nEach piece is computed separately, then packaged with `list(\"Row Sums\" = ..., \"Column Means\" = ..., ...)` so every output is labeled.\n\n- `mat[i, ]` is row i (sum each row); `mat[, i]` is column i (mean of each column).\n- `max(mat)` and `min(mat)` look at every value in the matrix.\n- Shortcuts that give the same answers: `rowSums(mat)`, `colMeans(mat)`, or `apply(mat, 1, sum)` and `apply(mat, 2, mean)`.\n\nAs in Part 1, end with `return(summary)` on the exam.",
     "key": false,
     "question": "Create a function matrix_summary() that accepts a numeric matrix and returns a list containing the following elements:\n• Row Sums - a vector with the sum of each row\n• Column Means - a vector with the mean of each column\n• Max Value - the maximum value in the entire matrix\n• Min Value - the minimum value in the entire matrix Hint: sum(), mean(), max(), min() functions will come in handy.\nTest your function on the matrix:\n  5 12 18 7 14 22   9 10 25 6 17 30"
    }
   ],
   "notes": "Due September 27, 11:59 PM. Five problems: building vectors with `c()` and `seq()`, `append()` and logical filtering; lists and `unlist()` coercion; the `dfA` data frame with factors and a `High_Performer` column; a for loop and a while loop over `matrix1`; and the functions `categorize_numbers()` and `matrix_summary()`.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
-  "updatedAt": "2026-10-12T17:10:00Z"
+  "updatedAt": "2026-10-13T02:10:00Z"
  },
  "hw-02": {
   "type": "hw",

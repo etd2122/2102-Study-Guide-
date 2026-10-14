@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-13T22:35:00Z";
+window.ENTRIES_SAVED = "2026-10-14T00:20:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -1309,6 +1309,14 @@ window.ENTRIES = {
     "question": "Suppose a course assigns a final status to each student based on both the exam score and homework completion rate. Write an if–else statement that assigns a value to a variable called status according to the following rules:\n• Excellent Standing if the exam_score is greater than or equal to 90 and the homework_rate is greater than or equal to 0.9\n• Good Standing if the exam_score is greater than or equal to 80 and the homework_rate is greater than or equal to 0.80\n• Conditional Pass if the exam_score is greater than or equal to 70 and the homework_rate is greater than or equal to 0.95\n• Fail otherwise.\nTest your code with exam_score = 84 and homework_rate = 0.92. Make sure your code prints the value of status."
    },
    {
+    "id": "rec-02-sol2-p1",
+    "label": "If-Else Statements · Problem 1 · Part I · Solution #2 (as a function)",
+    "question": "Suppose a course assigns a final status to each student based on both the exam score and homework completion rate. Write an if–else statement that assigns a value to a variable called status according to the following rules:\n• Excellent Standing if the exam_score is greater than or equal to 90 and the homework_rate is greater than or equal to 0.9\n• Good Standing if the exam_score is greater than or equal to 80 and the homework_rate is greater than or equal to 0.80\n• Conditional Pass if the exam_score is greater than or equal to 70 and the homework_rate is greater than or equal to 0.95\n• Fail otherwise.\nTest your code with exam_score = 84 and homework_rate = 0.92. Make sure your code prints the value of status.",
+    "code": "get_status <- function(exam_score, homework_rate) {\n  if (exam_score >= 90 & homework_rate >= 0.90) {\n    return(\"Excellent Standing\")\n  } else if (exam_score >= 80 & homework_rate >= 0.80) {\n    return(\"Good Standing\")\n  } else if (exam_score >= 70 & homework_rate >= 0.95) {\n    return(\"Conditional Pass\")\n  } else {\n    return(\"Fail\")\n  }\n}\n\nstatus <- get_status(exam_score = 84, homework_rate = 0.92)\nprint(status)\n#> [1] \"Good Standing\"\n\n# Extra checks\nget_status(95, 0.95)\n#> [1] \"Excellent Standing\"\nget_status(75, 0.97)\n#> [1] \"Conditional Pass\"\nget_status(50, 0.85)\n#> [1] \"Fail\"",
+    "key": false,
+    "comment": "**Same rules, written as a function.** Every rule says \"**and**\", so each condition uses `&`: both parts must be TRUE.\n\n**Why `|` gives the wrong answer:** with `|` only one part has to be TRUE. For the test values (84, 0.92), `84 >= 90 | 0.92 >= 0.90` is `FALSE | TRUE` = TRUE, so `|` returns \"Excellent\" even though the exam score is only 84. With `&` it's FALSE, R moves on, and the second rule gives **\"Good Standing\"**.\n\n**Things to get right:**\n- Labels must match the question exactly: \"Excellent Standing\", not \"Excellent Score\".\n- The question wants a **variable** called `status`, so call the function and save the result: `status <- get_status(84, 0.92)`, then `print(status)`.\n- Don't name the function `status`. Saving the result into `status` would overwrite the function.\n\n**Note on Solution #1:** its third rule uses `|` (`exam_score >= 70 | homework_rate >= 0.95`), but the question says **and**. It doesn't change the answer for 84 / 0.92, but `&` matches the rule. With `&`, (75, 0.97) is a Conditional Pass and (75, 0.90) is a Fail.\n\n**Reading tip:** \"and / both\" → `&`; \"or / either / at least one\" → `|`."
+   },
+   {
     "id": "c139",
     "label": "If-Else Statements · Problem 1 · Part II",
     "code": "exam_scores <- c(94, 82, 76, 68, 88, 91, 73, 59)\nhomework_rates <- c(0.95, 0.84, 0.98, 0.90, 0.72, 0.88, 0.79, 1.00)\n# Use ifelse() to create a logical vector called eligible that is TRUE if a student:\n\neligible <- ifelse(exam_scores >= 75 & homework_rates >= 0.80,\n                   TRUE, FALSE)\nprint(eligible)\n#> [1]  TRUE  TRUE  TRUE FALSE FALSE  TRUE FALSE FALSE",
@@ -1471,7 +1479,7 @@ window.ENTRIES = {
   ],
   "notes": "Assigning student `status` with if-else, `ifelse()` eligibility, nested for loops over a scores matrix, a while loop sequence, then function practice problems.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
-  "updatedAt": "2026-10-12T17:10:00Z"
+  "updatedAt": "2026-10-14T00:20:00Z"
  },
  "rec-03": {
   "type": "rec",

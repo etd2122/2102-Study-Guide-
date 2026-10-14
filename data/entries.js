@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-14T01:30:00Z";
+window.ENTRIES_SAVED = "2026-10-14T16:30:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -2404,5 +2404,486 @@ window.ENTRIES = {
    "set.seed(1); rnorm(n, mean, sd); sample(x, size, replace = TRUE, prob = ...)"
   ],
   "updatedAt": "2026-10-12T17:45:00Z"
+ },
+ "lec-04": {
+  "type": "lec",
+  "num": "04",
+  "title": "R Markdown: writing and knitting homework files",
+  "date": "",
+  "exams": [],
+  "topics": [
+   "R Markdown",
+   "knitting",
+   "chunk options",
+   "markdown formatting"
+  ],
+  "pdfs": [],
+  "chunks": [
+   {
+    "id": "lec-04-c01",
+    "label": "Creating and knitting an R Markdown file",
+    "question": "R Markdown files (.Rmd) combine text, code and results. Homework is submitted as a PDF, which needs a LaTeX distribution (TinyTeX). The YAML header stores the title, author and output format.",
+    "code": "# Run once in the Console (installs LaTeX so you can knit to PDF)\ntinytex::install_tinytex()\n\n# New file: File > New File > R Markdown...\n# The YAML header at the top of the file looks like this:\n# ---\n# title: \"Homework Assignment 2\"\n# author: \"Your Name\"\n# output: pdf_document\n# ---\n\n# Knit: click the Knit button (top of the editor)\n#   - HTML while you are fixing errors (shows in the Viewer tab)\n#   - PDF for the final version you submit",
+    "comment": "**Workflow for every homework**\n1. **Once per computer:** run `tinytex::install_tinytex()` in the Console. Without it, knitting to PDF fails.\n2. **New file:** File → New File → R Markdown…, then delete the example text below the YAML header.\n3. **YAML header** (between the `---` lines): title, author, `output: pdf_document`.\n4. Write each question as a header, put the code in chunks, and add any explanation as plain text.\n5. **Knit to HTML** while you're working: it's faster and errors are easier to spot.\n6. **Knit to PDF** for the final version and submit that.\n\n**Why knitting catches the repeat-run problem:** knitting runs the whole file **once, top to bottom, in a fresh session**. If your code only works because of something you ran earlier in the Console, the knit fails. That's what the grader sees, so knit early.\n\n**If knitting fails:** read the line number in the error, then run the chunks above it in order (Run → Run All) to find the one that breaks.",
+    "key": false
+   },
+   {
+    "id": "lec-04-c02",
+    "label": "Text formatting with Markdown",
+    "question": "Markdown is the plain-text formatting used in the text parts of an R Markdown file: headers, bold and italics, lists, tables, links, equations and line breaks.",
+    "code": "# Top Level Header (for example, Question 1)\n## Second Level Header (for example, Question 1 part a)\n### Third Level Header\n\n**bold**   _italics_   ~~crossed out~~\n\n> A block quote\n\n* Bullet point 1\n* Bullet point 2\n  * bullet point 2a\n\n1. Numbered point 1\n2. Numbered point 2\n\nFirst Header  | Second Header\n------------- | -------------\nContent Cell  | Content Cell\n\n[Your first link](http://posit.co)\n\nInline equation: $A = \\pi*r^{2}$\n\n***            (horizontal line)\n\\newpage       (start a new page in the PDF)",
+    "comment": "**What you'll actually use in homework**\n- `#` / `##` headers for each question and part, so the PDF is easy to grade.\n- `**bold**` for the answer sentence when a question asks you to explain.\n- Plain sentences under the code to interpret the output (\"The mean salary is higher in…\").\n\n**Spacing rules that trip people up**\n- A blank line is needed **between paragraphs**. Two lines with no blank line between them run together.\n- A blank line is needed **before a list** or the bullets won't render.\n- A header needs a space after the `#`: `# Question 1`, not `#Question 1`.\n\n**Careful:** inside an R chunk, `#` starts a **comment**, not a header. Headers only work in the text parts, outside the ```{r} ``` fences.",
+    "key": false
+   },
+   {
+    "id": "lec-04-c03",
+    "label": "R chunks and chunk options",
+    "question": "Code runs inside chunks that start with ```{r} and end with ```. Chunk options (eval, include, echo, results) control whether the code runs and whether the code and output appear in the final document.",
+    "code": "```{r}\nprint(2 + 2)\n```\n#> [1] 4\n\n```{r, eval = FALSE}\nprint(2 + 2)        # shown, NOT run, no output\n```\n\n```{r, include = FALSE}\nprint(2 + 2)        # run, but neither code nor output shown\n```\n\n```{r, echo = FALSE}\nprint(2 + 2)        # output shown, code hidden\n```\n\n```{r, results = 'hide'}\nprint(2 + 2)        # code shown, output hidden\n```",
+    "comment": "**Default: always show code and output.** The course says to include the code in every homework answer unless told otherwise, so most chunks are plain ```{r}.\n\n| Option | Runs the code? | Shows code? | Shows output? | Use it for |\n|---|---|---|---|---|\n| (none) | yes | yes | yes | almost every answer |\n| `eval = FALSE` | **no** | yes | no | showing code that would break or take forever |\n| `include = FALSE` | yes | no | no | setup, e.g. `library(dplyr)` |\n| `echo = FALSE` | yes | **no** | yes | showing only a plot/result |\n| `results = 'hide'` | yes | yes | **no** | hiding a long printout |\n\n**Shortcuts:** insert a chunk with **Cmd + Option + I** (Mac). Run the current line with **Cmd + Enter**, the whole chunk with **Cmd + Shift + Enter**.\n\n**Watch out:** `eval = FALSE` code never runs, so any object it would have created doesn't exist for later chunks.",
+    "key": false
+   }
+  ],
+  "notes": "How to build homework files in R Markdown (`.Rmd`): text + R code + output in one PDF. Course notes: https://ap4347.github.io/2102/lecture-04.html",
+  "takeaways": [
+   "Homework is submitted as a knitted PDF; install TinyTeX once with tinytex::install_tinytex().",
+   "Code goes inside ```{r} ... ``` chunks; the output appears under it when you knit.",
+   "Knit to HTML while fixing errors, then knit to PDF at the end.",
+   "Chunk options: eval = FALSE (show, do not run), echo = FALSE (hide code), include = FALSE (run, hide all), results = \"hide\" (hide output)."
+  ],
+  "updatedAt": "2026-10-14T16:30:00Z"
+ },
+ "lec-09": {
+  "type": "lec",
+  "num": "09",
+  "title": "Probability: binomial, geometric and normal distributions; random data",
+  "date": "",
+  "exams": [],
+  "topics": [
+   "probability",
+   "dbinom",
+   "pbinom",
+   "dgeom",
+   "pgeom",
+   "dnorm",
+   "pnorm",
+   "qnorm",
+   "rnorm",
+   "set.seed",
+   "sample"
+  ],
+  "pdfs": [],
+  "chunks": [
+   {
+    "id": "lec-09-c01",
+    "label": "Binomial: dbinom() for exactly x successes",
+    "question": "Your train is on time with probability 0.7 each day, independently, for 5 days (n = 5, p = 0.7). What is the probability you attend exactly 3 meetings?",
+    "code": "dbinom(x = 3, size = 5, prob = 0.7)\n#> [1] 0.3087\n\nchoose(n = 5, k = 3)*(0.7^3)*(0.3^2)\n#> [1] 0.3087",
+    "comment": "**Is it binomial?** Check the 4 conditions: a **fixed** number of trials (5 days), each trial is success/failure (on time or late), trials are **independent**, and the **same** probability each time (0.7). All four hold → `binom`.\n\n**Reading the call:** `dbinom(x = 3, size = 5, prob = 0.7)`\n- `x` = number of successes you're asking about\n- `size` = number of trials (n)\n- `prob` = success probability per trial (p)\n\n**Result:** 0.3087. The second line checks it by hand with the formula C(5,3) × 0.7³ × 0.3².\n\n**\"Exactly\" → `d`.** For \"at most\" or \"at least\", see `pbinom()` below.",
+    "key": false
+   },
+   {
+    "id": "lec-09-c02",
+    "label": "Binomial: pbinom() for at most x successes",
+    "question": "What is the probability you attend at most 4 meetings (0, 1, 2, 3 or 4)?",
+    "code": "pbinom(q = 4, size = 5, prob = 0.7)\n#> [1] 0.83193\n\ndbinom(x = 0, size = 5, prob = 0.7) +\ndbinom(x = 1, size = 5, prob = 0.7) + \ndbinom(x = 2, size = 5, prob = 0.7) + \ndbinom(x = 3, size = 5, prob = 0.7) + \ndbinom(x = 4, size = 5, prob = 0.7)\n#> [1] 0.83193",
+    "comment": "**\"At most 4\" = P(X ≤ 4) → `pbinom(q = 4, size = 5, prob = 0.7)` = 0.83193.** The second block shows it's just `dbinom()` for 0, 1, 2, 3 and 4 added up.\n\n**Turning other wordings into `pbinom()`** (n = 5, p = 0.7):\n\n| Question | Math | R |\n|---|---|---|\n| at most 4 | P(X ≤ 4) | `pbinom(4, 5, 0.7)` |\n| fewer than 4 | P(X ≤ 3) | `pbinom(3, 5, 0.7)` |\n| at least 3 | 1 − P(X ≤ 2) | `1 - pbinom(2, 5, 0.7)` = 0.83692 |\n| more than 4 | 1 − P(X ≤ 4) | `1 - pbinom(4, 5, 0.7)` |\n\n**Trap:** for counts, \"at least 3\" means 3 is included, so subtract `pbinom(2, ...)`, not `pbinom(3, ...)`.",
+    "key": false
+   },
+   {
+    "id": "lec-09-c03",
+    "label": "Geometric: dgeom() (read the warning)",
+    "question": "Each newborn is a girl with probability 0.55, independently. Find the probability for the number of children observed until the first girl is born.",
+    "code": "dgeom(x = 6, prob = 0.55)\n#> [1] 0.004567071",
+    "comment": "**Geometric = how long until the first success** (one parameter, `prob`).\n\n**⚠ Important: R counts *failures before* the first success, not the total number of children.**\n- `dgeom(x = 6, prob = 0.55)` = P(6 boys, then a girl) = 0.45⁶ × 0.55 = **0.004567**. That's the first girl being the **7th** child.\n- The lecture describes this as \"observe 6 children to get the first girl\", but that would be **`dgeom(5, 0.55)`** = 0.45⁵ × 0.55 = **0.0101** (5 boys, then a girl on child 6).\n\n(Both checked in R: `dgeom(6, 0.55)` equals `0.45^6 * 0.55`, and `dgeom(5, 0.55)` equals `0.45^5 * 0.55`.)\n\n**Rule:** if the question counts **trials** (children, rolls, attempts) up to and including the success, use `x = trials - 1` in `dgeom()` and `pgeom()`.",
+    "key": false
+   },
+   {
+    "id": "lec-09-c04",
+    "label": "Geometric: pgeom() for at most",
+    "question": "What is the probability that the first girl is born within the first few children (cumulative)?",
+    "code": "pgeom(q = 5, prob = 0.55)\n#> [1] 0.9916962",
+    "comment": "**`pgeom(q, prob)` = P(at most q failures before the first success).**\n\n- `pgeom(q = 5, prob = 0.55)` = **0.9917** = P(at most 5 boys before the first girl) = first girl is among the first **6** children. (Check: 1 − 0.45⁶ = 0.9917.)\n- For \"first girl within at most **5** children\" (as the lecture words it), use `pgeom(4, 0.55)` = 1 − 0.45⁵ = **0.9815**.\n\n**Same rule as `dgeom()`:** subtract 1 from a number of trials to get R's number of failures.",
+    "key": false
+   },
+   {
+    "id": "lec-09-c05",
+    "label": "Normal: dnorm() draws the bell curve",
+    "question": "For a normal distribution with mean 2.5 and standard deviation 0.5, compute the height of the density curve over a range of x values and plot it.",
+    "code": "x <- seq(-10, 10, by = .1)\n\n\ny <- dnorm(x, mean = 2.5, sd = 0.5)\n\n\nplot(x,y)",
+    "comment": "**`dnorm(x, mean, sd)` = height of the bell curve at x.** For a continuous distribution this is **not** a probability (P(X = exactly 2.5) is 0). It's used for drawing the curve.\n\n**Reading the code**\n1. `x <- seq(-10, 10, by = .1)`: a fine grid of x values.\n2. `y <- dnorm(x, mean = 2.5, sd = 0.5)`: the curve's height at each.\n3. `plot(x, y)`: the bell shape, centered at 2.5, narrow because sd is small.\n\n**For probabilities with a normal distribution, use `pnorm()`**, not `dnorm()`.",
+    "key": false
+   },
+   {
+    "id": "lec-09-c06",
+    "label": "Normal: pnorm() for probabilities",
+    "question": "For X ~ Normal(mean = 2, sd = 5): what is the probability that X is less than 3? Between 1.5 and 3?",
+    "code": "pnorm(q = 3, mean = 2, sd = 5)\n#> [1] 0.5792597\n\npnorm(q = 3, mean = 2, sd = 5) - pnorm(q = 1.5, mean = 2, sd = 5)\n#> [1] 0.1190875",
+    "comment": "**`pnorm(q, mean, sd)` = P(X < q)**, the area to the **left** of q.\n\n**Three shapes of question:**\n\n| Question | R |\n|---|---|\n| less than 3 | `pnorm(3, mean = 2, sd = 5)` = 0.5793 |\n| more than 3 | `1 - pnorm(3, mean = 2, sd = 5)` |\n| between 1.5 and 3 | `pnorm(3, 2, 5) - pnorm(1.5, 2, 5)` = 0.1191 |\n\n**\"Between\":** area left of the bigger value minus area left of the smaller value.\n\n**With continuous distributions, < and ≤ give the same answer**, unlike `pbinom()`, so you don't need the \"subtract 1\" adjustment.\n\n**Check with simulation (ties to `rnorm()`):** `mean(rnorm(100000, 2, 5) < 3)` comes out close to 0.579.",
+    "key": true
+   },
+   {
+    "id": "lec-09-c07",
+    "label": "Normal: qnorm() for percentiles",
+    "question": "Find the 60th percentile (0.6 quantile) of a normal distribution with mean 2 and sd 5.",
+    "code": "qnorm(p = 0.6, mean = 2, sd = 5)\n#> [1] 3.266736\n\nqnorm(p = 0.6, mean = 2, sd = 5)\n#> [1] 3.266736\n\npnorm(q = 3.266736, mean = 2, sd = 5)\n#> [1] 0.6",
+    "comment": "**`qnorm(p, mean, sd)` goes the other way from `pnorm()`:** you give a probability and get the value.\n- `qnorm(0.6, 2, 5)` = 3.2667, so 60% of values are below 3.27.\n- `pnorm(3.266736, 2, 5)` = 0.6 brings you back, which is why `qnorm` is called the inverse of `pnorm`.\n\n**Common uses**\n- \"Top 10% cutoff\" → `qnorm(0.9, mean, sd)`.\n- Median of a normal → `qnorm(0.5, mean, sd)` = the mean.\n\n**Don't mix it up with `quantile()`:** `quantile(data, 0.6)` finds a percentile of **actual data**. `qnorm(0.6, ...)` finds it for the **theoretical** normal distribution.",
+    "key": false
+   },
+   {
+    "id": "lec-09-c08",
+    "label": "Normal: rnorm() generates data",
+    "question": "Generate 50 observations from a normal distribution with mean 2 and sd 5 and draw a histogram of them.",
+    "code": "x <- rnorm(n = 50, mean = 2, sd = 5)\n\nhist(x,\n     \n     xlab = \"VALUES\",\n     \n     ylab = \"FREQUENCY\",\n     \n     main = \"Generating Values from a  Normal Distribution\",\n     \n     col = \"orange\",\n     \n     border = \"black\")",
+    "comment": "**`rnorm(n, mean, sd)`: n random values.** This is the one the review session said to focus on.\n\n**Reading the code:** 50 draws → `hist()` with labels, title and colors (the same customization asked for on homework).\n\n**What the exam can ask you to do with the draws:**\n- `mean(x)`, `sd(x)`: close to 2 and 5, not exact (random sample).\n- `mean(x > 3)`: share of values above 3.\n- `any(x < 0)`, `all(x > 0)`: yes/no checks (Homework 2, Problem 1 Part 4).\n- Fill a matrix: `matrix(x, nrow = 2)`.\n\n**Always `set.seed(1)` first** (see the next chunk) so your numbers match every time, and put it **inside** the function if the question asks for a function.\n\n**Third argument = standard deviation.** If a question gives a variance of 25, use `sd = 5`.",
+    "key": true
+   },
+   {
+    "id": "lec-09-c09",
+    "label": "set.seed() makes random numbers repeatable",
+    "question": "Generate 10 random values from Normal(3, 4) several times. Why are they different each time, and how can you get the same values every time?",
+    "code": "rnorm(n = 10, mean = 3, sd = 4)\n#>  [1]  8.0432676 -0.7824982  3.5421453  0.0409310  5.2319814\n#>  [6] -0.3997414  0.3470129  2.2136478  1.9628163 -0.4032279\n\nrnorm(n = 10, mean = 3, sd = 4)\n#>  [1]  8.2843920 -2.5887828  5.8872710  1.3211625 -6.9323006\n#>  [6]  1.7536471  0.2038652  0.1838746 -1.1442351 -4.5612113\n\nrnorm(n = 10, mean = 3, sd = 4)\n#>  [1] -0.5264196  4.6432254  9.3326611  1.8002603 12.3218438\n#>  [6]  5.0916077  3.8303269  6.2587804 -4.5151450  6.3218954\n\nset.seed(1)    # Initialize generator to known state\n\nrnorm(n = 10, mean = 3, sd = 4)   # Generate ten random numbers\n#>  [1]  0.4941848  3.7345733 -0.3425144  9.3811232  4.3180311\n#>  [6] -0.2818735  4.9497162  5.9532988  5.3031254  1.7784465\n\nset.seed(1)    # Reinitialize to the same known state\n\nrnorm(n = 10, mean = 3, sd = 4)   # Generate the same ten \"random\" numbers\n#>  [1]  0.4941848  3.7345733 -0.3425144  9.3811232  4.3180311\n#>  [6] -0.2818735  4.9497162  5.9532988  5.3031254  1.7784465",
+    "comment": "**Without a seed:** each `rnorm()` call gives new numbers (the first three blocks).\n\n**With `set.seed(1)`:** R's random number generator restarts from the same point, so the same code gives the **same** numbers (last block: both calls print identical values).\n\n**Rules**\n- Call `set.seed(1)` **right before** the random code, every time you want to reproduce it.\n- Inside a function: put `set.seed(1)` as the **first line of the body**, so every call of the function gives the same result.\n- The seed number doesn't matter, but the exam will tell you which one. Different seeds give different numbers.\n- Your numbers will only match the key if you run the same random calls **in the same order** after the seed.",
+    "key": true
+   },
+   {
+    "id": "lec-09-c10",
+    "label": "sample(): random samples with and without replacement",
+    "question": "Randomly select 6 values from 1 to 20, first without replacement and then with replacement.",
+    "code": "x <- 1:20\n\nsample(x, 6)\n#> [1]  9 15  5 20 17 14\n\nx <- 1:20\n\nsample(x, 6, replace = TRUE)\n#> [1]  5  5  2 10 12 15",
+    "comment": "**`sample(x, size)`**\n- **Without replacement** (default): each value can be picked at most once. Like dealing cards.\n- **`replace = TRUE`:** values can repeat (`5 5` in the output). Like rolling a die.\n\n**Which one?**\n- Rolling dice, flipping coins, repeated trials → `replace = TRUE`.\n- Picking people, drawing a sample of rows → no replacement.\n\n**Error to recognize:** `sample(1:6, 10)` fails (\"cannot take a sample larger than the population\") because you can't pick 10 different values from 6 without replacement.\n\n**Random rows of a data frame:** `df[sample(1:nrow(df), 5), ]`.",
+    "key": true
+   },
+   {
+    "id": "lec-09-c11",
+    "label": "Random sequences: coins and weighted outcomes",
+    "question": "Simulate 15 fair coin tosses. Then simulate 20 tosses of a biased coin that lands heads with probability 0.8.",
+    "code": "sample(c(\"H\", \"T\"), 15, replace = TRUE)\n#>  [1] \"H\" \"T\" \"H\" \"T\" \"T\" \"T\" \"T\" \"H\" \"T\" \"T\" \"T\" \"T\" \"T\" \"H\"\n#> [15] \"H\"\n\nsample(c(\"H\", \"T\"), 20, replace = TRUE, prob = c(0.8, 0.2))\n#>  [1] \"H\" \"T\" \"H\" \"H\" \"H\" \"H\" \"H\" \"H\" \"H\" \"H\" \"T\" \"H\" \"H\" \"H\"\n#> [15] \"H\" \"H\" \"H\" \"H\" \"H\" \"T\"",
+    "comment": "**Simulating any experiment = `sample(outcomes, number_of_trials, replace = TRUE)`.**\n\n**Weights with `prob =`:** one probability per outcome, **in the same order** as the outcomes:\n`sample(c(\"H\", \"T\"), 20, replace = TRUE, prob = c(0.8, 0.2))` → mostly H.\n\n**Same pattern as the homework/recitation dice problems:**\n- Unfair die: `sample(1:6, n, replace = TRUE, prob = c(0.1, 0.3, 0.2, 0.05, 0.3, 0.05))`\n- Count outcomes: `table(...)`; share of heads: `mean(tosses == \"H\")`.\n\n**Check:** the probabilities must add up to 1 and have the same length as the outcomes.",
+    "key": false
+   },
+   {
+    "id": "lec-09-c12",
+    "label": "sample(x) shuffles a vector",
+    "question": "Generate random permutations (shuffles) of the numbers 1 to 10.",
+    "code": "x <- 1:10\n\nprint(x)\n#>  [1]  1  2  3  4  5  6  7  8  9 10\n\nsample(x)             # permutation 1\n#>  [1]  6  1  3  8 10  4  2  7  9  5\n\nsample(x)             # permutation 2\n#>  [1]  4  8  1  9  6 10  3  7  5  2",
+    "comment": "**`sample(x)` with no size = shuffle all of x**, each value once in a random order. Each call gives a new order (unless you set a seed).\n\n**Uses**\n- Randomly reorder rows: `df[sample(nrow(df)), ]`.\n- Random assignment: shuffle names, then split into groups.",
+    "key": false
+   }
+  ],
+  "notes": "**The d / p / q / r naming pattern** (works for every distribution: `binom`, `geom`, `norm`, `pois`, `unif`, …)\n\n| Prefix | Gives you | Question it answers |\n|---|---|---|\n| `d` | density / probability of **exactly** x | \"probability of exactly 3\" |\n| `p` | cumulative probability **≤ x** | \"probability of at most 4\", \"less than 3\" |\n| `q` | the **value** for a given probability (inverse of `p`) | \"60th percentile\" |\n| `r` | **random** draws | \"generate 50 observations\" |\n\nThe review session said to focus on the **normal distribution and `rnorm()`**, plus `sample()` and `set.seed()`. Course notes: https://ap4347.github.io/2102/lecture-09.html",
+  "takeaways": [
+   "d = exactly x, p = at most x (≤), q = value for a probability, r = random draws.",
+   "P(X > x) = 1 - pnorm(x, mean, sd); P(a < X < b) = pnorm(b, ...) - pnorm(a, ...).",
+   "rnorm(n, mean, sd): the third argument is the standard deviation, not the variance.",
+   "set.seed(1) before random code makes the results repeat exactly.",
+   "sample(x, n, replace = TRUE, prob = ...) for dice, coins and weighted draws.",
+   "R's dgeom/pgeom count failures before the first success, not total trials."
+  ],
+  "updatedAt": "2026-10-14T16:30:00Z"
+ },
+ "lec-11": {
+  "type": "lec",
+  "num": "11",
+  "title": "dplyr: group_by, summarise, across and joining two tables",
+  "date": "",
+  "exams": [],
+  "topics": [
+   "dplyr",
+   "group_by",
+   "summarise",
+   "across",
+   "inner_join",
+   "left_join",
+   "right_join",
+   "full_join",
+   "semi_join",
+   "anti_join",
+   "set operations"
+  ],
+  "pdfs": [],
+  "chunks": [
+   {
+    "id": "lec-11-c01",
+    "label": "group_by(): grouping a data frame",
+    "question": "Group the flights data by origin airport, and by origin and carrier.",
+    "code": "by_origin <- flights %>% group_by(origin)\n\nby_origin\n#> # A tibble: 336,776 × 19\n#> # Groups:   origin [3]\n#>     year month   day dep_time sched_dep_time dep_delay\n#>    <int> <int> <int>    <int>          <int>     <int>\n#>  1  2013     1     1      517            515         2\n#>  2  2013     1     1      533            529         4\n#>  3  2013     1     1      542            540         2\n#>  4  2013     1     1      544            545        -1\n#>  5  2013     1     1      554            600        -6\n#>  6  2013     1     1      554            558        -4\n#>  7  2013     1     1      555            600        -5\n#>  8  2013     1     1      557            600        -3\n#>  9  2013     1     1      557            600        -3\n#> 10  2013     1     1      558            600        -2\n#> # ℹ 336,766 more rows\n#> # ℹ 13 more variables: arr_time <int>,\n#> #   sched_arr_time <int>, arr_delay <int>, carrier <fct>,\n#> #   flight <int>, tailnum <fct>, origin <fct>, dest <fct>,\n#> #   air_time <int>, distance <int>, hour <int>,\n#> #   minute <int>, time_hour <fct>\n\nby_origin_carrier <- flights %>% group_by(origin, carrier)\n\nby_origin_carrier\n#> # A tibble: 336,776 × 19\n#> # Groups:   origin, carrier [35]\n#>     year month   day dep_time sched_dep_time dep_delay\n#>    <int> <int> <int>    <int>          <int>     <int>\n#>  1  2013     1     1      517            515         2\n#>  2  2013     1     1      533            529         4\n#>  3  2013     1     1      542            540         2\n#>  4  2013     1     1      544            545        -1\n#>  5  2013     1     1      554            600        -6\n#>  6  2013     1     1      554            558        -4\n#>  7  2013     1     1      555            600        -5\n#>  8  2013     1     1      557            600        -3\n#>  9  2013     1     1      557            600        -3\n#> 10  2013     1     1      558            600        -2\n#> # ℹ 336,766 more rows\n#> # ℹ 13 more variables: arr_time <int>,\n#> #   sched_arr_time <int>, arr_delay <int>, carrier <fct>,\n#> #   flight <int>, tailnum <fct>, origin <fct>, dest <fct>,\n#> #   air_time <int>, distance <int>, hour <int>,\n#> #   minute <int>, time_hour <fct>",
+    "comment": "**`group_by()` doesn't change the data.** It only tags it: notice `# Groups: origin [3]` (3 airports) and `# Groups: origin, carrier [35]` (35 combinations). The rows are the same.\n\n**The point is what comes next:** any `summarise()`, `mutate()` or `filter()` after `group_by()` runs **separately for each group**.\n\n**Base R equivalent you already know:** `tapply(flights$arr_delay, flights$origin, mean, na.rm = TRUE)`. `group_by` + `summarise` is the dplyr way, and it can do many summaries at once.",
+    "key": false
+   },
+   {
+    "id": "lec-11-c02",
+    "label": "summarise(): one row per group",
+    "question": "Calculate the average arrival delay for each origin airport. Then add the median and the number of flights.",
+    "code": "by_origin %>% summarise(Mean = mean(arr_delay, na.rm = T))\n#> # A tibble: 3 × 2\n#>   origin  Mean\n#>   <fct>  <dbl>\n#> 1 EWR     9.11\n#> 2 JFK     5.55\n#> 3 LGA     5.78\n\nby_origin %>% \n  \n  summarise(Mean = mean(arr_delay, na.rm = T),\n            \n            Median = median(arr_delay, na.rm = T),\n            \n            Count = n())\n#> # A tibble: 3 × 4\n#>   origin  Mean Median  Count\n#>   <fct>  <dbl>  <dbl>  <int>\n#> 1 EWR     9.11     -4 120835\n#> 2 JFK     5.55     -6 111279\n#> 3 LGA     5.78     -5 104662",
+    "comment": "**`group_by(origin) %>% summarise(Mean = mean(arr_delay, na.rm = T))`** → 3 rows (one per airport), 2 columns (the group + the summary).\n\n**Pieces**\n- `Mean = ...`: you choose the new column's name.\n- `na.rm = T`: **needed**. `arr_delay` has missing values, and without it the mean comes out `NA`.\n- `n()`: counts rows in each group (no argument).\n\n**Useful summary functions:** `mean`, `median`, `sd`, `IQR`, `min`, `max`, `n()`, `n_distinct()`, `first()`, `last()`.\n\n**Exam translation:** \"average ___ for each ___\" → `group_by(each) %>% summarise(avg = mean(___, na.rm = TRUE))`.",
+    "key": true
+   },
+   {
+    "id": "lec-11-c03",
+    "label": "Combining summarise() with filter() and arrange(); ungroup()",
+    "question": "For each carrier, count the flights and the standard deviation of distance; keep carriers with fewer than 10,000 flights and sort by the standard deviation (largest first). Then remove grouping.",
+    "code": "by_carrier <- flights %>% group_by(carrier)\n\nby_carrier %>%\n  \n  summarise (Count = n(), Distance_sd = sd(distance)) %>%\n  \n  filter(Count < 10000) %>%\n  \n  arrange(desc(Distance_sd))\n#> # A tibble: 7 × 3\n#>   carrier Count Distance_sd\n#>   <fct>   <int>       <dbl>\n#> 1 OO         32       206. \n#> 2 FL       3260       161. \n#> 3 YV        601       160. \n#> 4 VX       5162        88.0\n#> 5 AS        714         0  \n#> 6 F9        685         0  \n#> 7 HA        342         0\n\nby_carrier %>%\n  \n  ungroup() %>%\n  \n  summarise(flights = n())\n#> # A tibble: 1 × 1\n#>   flights\n#>     <int>\n#> 1  336776",
+    "comment": "**Read the pipe as steps:**\n1. `group_by(carrier)`\n2. `summarise(Count = n(), Distance_sd = sd(distance))`: one row per carrier.\n3. `filter(Count < 10000)`: filters the **summary** rows, not the flights. You can filter on columns you just created.\n4. `arrange(desc(Distance_sd))`: largest first.\n\n**`ungroup()`:** removes the grouping so the next summary uses all rows: `ungroup() %>% summarise(flights = n())` gives one row with the total count. If a later step gives oddly grouped results, an `ungroup()` usually fixes it.",
+    "key": false
+   },
+   {
+    "id": "lec-11-c04",
+    "label": "across(): the same summary on many columns",
+    "question": "Compute the mean departure delay, arrival delay and air time for each origin/carrier without writing mean() three times. Then apply summaries to all numeric or factor columns.",
+    "code": "flights %>% \n  \n  group_by(origin, carrier) %>%\n  \n  summarise(Mean_dep_delay = mean(dep_delay, na.rm = T),\n            \n            Mean_arrival_delay = mean(arr_delay, na.rm = T),\n            \n            Mean_air_time = mean(air_time, na.rm = T))\n#> `summarise()` has grouped output by 'origin'. You can\n#> override using the `.groups` argument.\n#> # A tibble: 35 × 5\n#> # Groups:   origin [3]\n#>    origin carrier Mean_dep_delay Mean_arrival_delay\n#>    <fct>  <fct>            <dbl>              <dbl>\n#>  1 EWR    9E                5.95              1.62 \n#>  2 EWR    AA               10.0               0.978\n#>  3 EWR    AS                5.80             -9.93 \n#>  4 EWR    B6               13.1               9.39 \n#>  5 EWR    DL               12.1               8.78 \n#>  6 EWR    EV               20.2              17.0  \n#>  7 EWR    MQ               17.5              16.3  \n#>  8 EWR    OO               20.8              21.5  \n#>  9 EWR    UA               12.5               3.48 \n#> 10 EWR    US                3.74              0.977\n#> # ℹ 25 more rows\n#> # ℹ 1 more variable: Mean_air_time <dbl>\n\nflights %>% \n  \n  group_by(origin, carrier) %>%\n  \n  summarise(across(\n    \n    c(dep_delay, arr_delay, air_time),\n    \n    ~ mean(.x, na.rm = T)\n    \n  ))\n#> `summarise()` has grouped output by 'origin'. You can\n#> override using the `.groups` argument.\n#> # A tibble: 35 × 5\n#> # Groups:   origin [3]\n#>    origin carrier dep_delay arr_delay air_time\n#>    <fct>  <fct>       <dbl>     <dbl>    <dbl>\n#>  1 EWR    9E           5.95     1.62     103. \n#>  2 EWR    AA          10.0      0.978    196. \n#>  3 EWR    AS           5.80    -9.93     326. \n#>  4 EWR    B6          13.1      9.39     118. \n#>  5 EWR    DL          12.1      8.78     125. \n#>  6 EWR    EV          20.2     17.0       94.0\n#>  7 EWR    MQ          17.5     16.3      112. \n#>  8 EWR    OO          20.8     21.5      137. \n#>  9 EWR    UA          12.5      3.48     207. \n#> 10 EWR    US           3.74     0.977    138. \n#> # ℹ 25 more rows\n\nflights %>% \n  \n  summarise(across(where(is.factor), n_distinct))\n#> # A tibble: 1 × 5\n#>   carrier tailnum origin  dest time_hour\n#>     <int>   <int>  <int> <int>     <int>\n#> 1      16    4044      3   105      6936\n\nflights %>% \n  \n  group_by(origin) %>%\n  \n  summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE)))\n#> # A tibble: 3 × 15\n#>   origin  year month   day dep_time sched_dep_time dep_delay\n#>   <fct>  <dbl> <dbl> <dbl>    <dbl>          <dbl>     <dbl>\n#> 1 EWR     2013  6.49  15.7    1337.          1322.      15.1\n#> 2 JFK     2013  6.50  15.7    1399.          1402.      12.1\n#> 3 LGA     2013  6.67  15.7    1310.          1308.      10.3\n#> # ℹ 8 more variables: arr_time <dbl>, sched_arr_time <dbl>,\n#> #   arr_delay <dbl>, flight <dbl>, air_time <dbl>,\n#> #   distance <dbl>, hour <dbl>, minute <dbl>\n\nmin_max <- list(\n  \n  min = ~min(.x, na.rm = TRUE), \n  \n  max = ~max(.x, na.rm = TRUE)\n)\n\nflights %>% \n  \n  group_by(origin) %>%\n  \n  summarise(across(where(is.numeric), min_max))\n#> # A tibble: 3 × 29\n#>   origin year_min year_max month_min month_max day_min\n#>   <fct>     <int>    <int>     <int>     <int>   <int>\n#> 1 EWR        2013     2013         1        12       1\n#> 2 JFK        2013     2013         1        12       1\n#> 3 LGA        2013     2013         1        12       1\n#> # ℹ 23 more variables: day_max <int>, dep_time_min <int>,\n#> #   dep_time_max <int>, sched_dep_time_min <int>,\n#> #   sched_dep_time_max <int>, dep_delay_min <int>,\n#> #   dep_delay_max <int>, arr_time_min <int>,\n#> #   arr_time_max <int>, sched_arr_time_min <int>,\n#> #   sched_arr_time_max <int>, arr_delay_min <int>,\n#> #   arr_delay_max <int>, flight_min <int>, …\n\nflights %>% \n  \n  group_by(origin) %>%\n  \n  summarise(across(where(is.numeric), min_max,\n                   \n                   .names = \"{.fn}.{.col}\"\n                   \n                   ))\n#> # A tibble: 3 × 29\n#>   origin min.year max.year min.month max.month min.day\n#>   <fct>     <int>    <int>     <int>     <int>   <int>\n#> 1 EWR        2013     2013         1        12       1\n#> 2 JFK        2013     2013         1        12       1\n#> 3 LGA        2013     2013         1        12       1\n#> # ℹ 23 more variables: max.day <int>, min.dep_time <int>,\n#> #   max.dep_time <int>, min.sched_dep_time <int>,\n#> #   max.sched_dep_time <int>, min.dep_delay <int>,\n#> #   max.dep_delay <int>, min.arr_time <int>,\n#> #   max.arr_time <int>, min.sched_arr_time <int>,\n#> #   max.sched_arr_time <int>, min.arr_delay <int>,\n#> #   max.arr_delay <int>, min.flight <int>, …",
+    "comment": "**Problem:** copying `mean(..., na.rm = T)` for each column is long and error-prone.\n\n**`across(columns, function)`** inside `summarise()` applies one function to several columns:\n- `across(c(dep_delay, arr_delay, air_time), ~ mean(.x, na.rm = T))`\n- `~ mean(.x, na.rm = T)` is a short function: `.x` stands for \"the current column\".\n\n**Picking columns:**\n- by name: `c(dep_delay, arr_delay)`\n- by type: `where(is.numeric)`, `where(is.factor)`\n\n**Several functions:** give a named list, `list(min = ~min(.x, na.rm = TRUE), max = ~max(.x, na.rm = TRUE))`. Columns get names like `year_min`. Change the pattern with `.names = \"{.fn}.{.col}\"` → `min.year`.\n\n**Message you'll see:** \"`summarise()` has grouped output by 'origin'\". With two grouping variables, the result stays grouped by the first one. It's informational, not an error.",
+    "key": false
+   },
+   {
+    "id": "lec-11-c05",
+    "label": "Joins: the toy tables df1 and df2",
+    "question": "Mutating joins match rows by key and copy columns from one table to the other. Arguments: x (primary table), y (secondary table), by (the key), keep (keep both key columns).",
+    "code": "df1 <- data.frame(\n  \n  a = c(1, 2, 3, 2, 4),\n  \n  b = c(10, 20, 30, 35, 40),\n  \n  c  = c(100, 200, 300, 350, 400)\n  \n)\n\nprint(df1)\n#>   a  b   c\n#> 1 1 10 100\n#> 2 2 20 200\n#> 3 3 30 300\n#> 4 2 35 350\n#> 5 4 40 400\n\ndf2 <- data.frame(\n  \n  a =  c(1, 2, 5, 4, 6, 2),\n  \n  b  =  c(10, 40, 50, 40, 60, 50),\n  \n  x = c(15, 25, 35, 45, 55, 65),\n  \n  z = c(150, 200, 350, 400, 550, 270)\n\n)\n\nprint(df2)\n#>   a  b  x   z\n#> 1 1 10 15 150\n#> 2 2 40 25 200\n#> 3 5 50 35 350\n#> 4 4 40 45 400\n#> 5 6 60 55 550\n#> 6 2 50 65 270",
+    "comment": "**Words to know**\n- **x** = first/primary table (left of `%>%`), **y** = second table.\n- **key (`by`)** = the column(s) used to match rows.\n- If a row of x matches **several** rows of y, it appears once **per match**.\n\n**Look at the keys before joining:** in `df1`, `a = 2` appears twice; in `df2`, `a = 2` also appears twice. Joining by `a` alone will multiply those rows (2 × 2 = 4 rows for a = 2). That's the many-to-many warning you'll see next.\n\n**Run this chunk before the join examples.**",
+    "key": false
+   },
+   {
+    "id": "lec-11-c06",
+    "label": "inner_join(): only matching rows",
+    "question": "Join df1 and df2 keeping only rows whose keys match in both, by a; by a and b; and by c = z (different names), with and without keep = T.",
+    "code": "# Merging tables by the \"a\" variable\n\ndf1 %>%\n  \n  inner_join(df2, by = \"a\")\n#> Warning in inner_join(., df2, by = \"a\"): Detected an unexpected many-to-many relationship between\n#> `x` and `y`.\n#> ℹ Row 2 of `x` matches multiple rows in `y`.\n#> ℹ Row 2 of `y` matches multiple rows in `x`.\n#> ℹ If a many-to-many relationship is expected, set\n#>   `relationship = \"many-to-many\"` to silence this warning.\n#>   a b.x   c b.y  x   z\n#> 1 1  10 100  10 15 150\n#> 2 2  20 200  40 25 200\n#> 3 2  20 200  50 65 270\n#> 4 2  35 350  40 25 200\n#> 5 2  35 350  50 65 270\n#> 6 4  40 400  40 45 400\n\n# Merging tables by the \"a\" and \"b\" variable\n\ndf1 %>%\n  \n  inner_join(df2, by = c(\"a\", \"b\"))\n#>   a  b   c  x   z\n#> 1 1 10 100 15 150\n#> 2 4 40 400 45 400\n\n## Merging tables by the \"c\" and \"z\" variable (Have different variable names)\n\ndf1 %>%\n  \n  inner_join(df2, by = c(\"c\" = \"z\"))\n#>   a.x b.x   c a.y b.y  x\n#> 1   2  20 200   2  40 25\n#> 2   2  35 350   5  50 35\n#> 3   4  40 400   4  40 45\n\n## Merging tables by the \"c\" and \"z\" variable (Have different variable names) and keeping both key variables in the output table\n\ndf1 %>%\n  \n  inner_join(df2, by = c(\"c\" = \"z\"), keep = T)\n#>   a.x b.x   c a.y b.y  x   z\n#> 1   2  20 200   2  40 25 200\n#> 2   2  35 350   5  50 35 350\n#> 3   4  40 400   4  40 45 400",
+    "comment": "**Rule:** an inner join keeps only rows whose key exists in **both** tables.\n\n**Example by example**\n1. `by = \"a\"`: a = 3 (only in df1) and a = 5, 6 (only in df2) disappear. a = 2 appears 2 × 2 = 4 times → **many-to-many warning**. `b` is in both but isn't a key → `b.x` (df1) and `b.y` (df2).\n2. `by = c(\"a\", \"b\")`: **both** must match → only (1, 10) and (4, 40) → 2 rows. No suffixes, because the shared columns were keys.\n3. `by = c(\"c\" = \"z\")`: different names. Matches df1's `c` with df2's `z`. Output keeps the name `c`.\n4. `keep = T`: keeps **both** key columns (`c` and `z`).\n\n**Takeaway:** more keys → stricter matching → fewer rows and no duplicates.",
+    "key": true
+   },
+   {
+    "id": "lec-11-c07",
+    "label": "left_join(): keep everything from x",
+    "question": "Join df1 and df2 keeping every row of df1.",
+    "code": "# Merging tables by the \"a\" variable\n\ndf1 %>%\n  \n  left_join(df2, by = \"a\")\n#> Warning in left_join(., df2, by = \"a\"): Detected an unexpected many-to-many relationship between\n#> `x` and `y`.\n#> ℹ Row 2 of `x` matches multiple rows in `y`.\n#> ℹ Row 2 of `y` matches multiple rows in `x`.\n#> ℹ If a many-to-many relationship is expected, set\n#>   `relationship = \"many-to-many\"` to silence this warning.\n#>   a b.x   c b.y  x   z\n#> 1 1  10 100  10 15 150\n#> 2 2  20 200  40 25 200\n#> 3 2  20 200  50 65 270\n#> 4 3  30 300  NA NA  NA\n#> 5 2  35 350  40 25 200\n#> 6 2  35 350  50 65 270\n#> 7 4  40 400  40 45 400\n\n# Merging tables by the \"a\" and \"b\" variable\n\ndf1 %>%\n  \n  left_join(df2, by = c(\"a\", \"b\"))\n#>   a  b   c  x   z\n#> 1 1 10 100 15 150\n#> 2 2 20 200 NA  NA\n#> 3 3 30 300 NA  NA\n#> 4 2 35 350 NA  NA\n#> 5 4 40 400 45 400\n\n## Merging tables by the \"c\" and \"z\" variable (Have different variable names)\n\ndf1 %>%\n  \n  left_join(df2, by = c(\"c\" = \"z\"))\n#>   a.x b.x   c a.y b.y  x\n#> 1   1  10 100  NA  NA NA\n#> 2   2  20 200   2  40 25\n#> 3   3  30 300  NA  NA NA\n#> 4   2  35 350   5  50 35\n#> 5   4  40 400   4  40 45",
+    "comment": "**Rule:** every row of x (df1) stays. Where there's no match in y, the y columns are `NA`.\n\n- `by = \"a\"`: a = 3 has no match → kept with `NA` in `b.y`, `x`, `z`. a = 2 still multiplies (4 rows).\n- `by = c(\"a\", \"b\")`: all 5 rows of df1, only 2 with real values from df2.\n- `by = c(\"c\" = \"z\")`: all 5 rows; 3 matched.\n\n**Most common join**, because you never lose your main data. Use it when the question says \"add ___ to the data\".\n\n**Count check:** a left join always has **at least** as many rows as x. More than x means the key isn't unique in y.",
+    "key": true
+   },
+   {
+    "id": "lec-11-c08",
+    "label": "right_join(): keep everything from y",
+    "question": "Join df1 and df2 keeping every row of df2.",
+    "code": "# Merging tables by the \"a\" variable\n\ndf1 %>%\n  \n  right_join(df2, by = \"a\")\n#> Warning in right_join(., df2, by = \"a\"): Detected an unexpected many-to-many relationship between\n#> `x` and `y`.\n#> ℹ Row 2 of `x` matches multiple rows in `y`.\n#> ℹ Row 2 of `y` matches multiple rows in `x`.\n#> ℹ If a many-to-many relationship is expected, set\n#>   `relationship = \"many-to-many\"` to silence this warning.\n#>   a b.x   c b.y  x   z\n#> 1 1  10 100  10 15 150\n#> 2 2  20 200  40 25 200\n#> 3 2  20 200  50 65 270\n#> 4 2  35 350  40 25 200\n#> 5 2  35 350  50 65 270\n#> 6 4  40 400  40 45 400\n#> 7 5  NA  NA  50 35 350\n#> 8 6  NA  NA  60 55 550\n\n# Merging tables by the \"a\" and \"b\" variable\n\ndf1 %>%\n  \n  right_join(df2, by = c(\"a\", \"b\"))\n#>   a  b   c  x   z\n#> 1 1 10 100 15 150\n#> 2 4 40 400 45 400\n#> 3 2 40  NA 25 200\n#> 4 5 50  NA 35 350\n#> 5 6 60  NA 55 550\n#> 6 2 50  NA 65 270\n\n## Merging tables by the \"c\" and \"z\" variable (Have different variable names)\n\ndf1 %>%\n  \n  right_join(df2, by = c(\"c\" = \"z\"))\n#>   a.x b.x   c a.y b.y  x\n#> 1   2  20 200   2  40 25\n#> 2   2  35 350   5  50 35\n#> 3   4  40 400   4  40 45\n#> 4  NA  NA 150   1  10 15\n#> 5  NA  NA 550   6  60 55\n#> 6  NA  NA 270   2  50 65",
+    "comment": "**Rule:** every row of y (df2) stays. Matched rows come first (in df1's order), then df2's unmatched rows with `NA` in df1's columns.\n\n- `by = \"a\"`: a = 5 and a = 6 appear at the bottom with `NA` for `b.x` and `c`.\n- `by = c(\"c\" = \"z\")`: unmatched df2 rows keep their `z` value in the `c` column.\n\n**Same rows as `left_join` with the tables swapped:** `df1 %>% right_join(df2)` keeps the same rows as `df2 %>% left_join(df1)` (column order differs). Many people just always use `left_join` and put the table they want to keep first.",
+    "key": false
+   },
+   {
+    "id": "lec-11-c09",
+    "label": "full_join(): keep everything",
+    "question": "Join df1 and df2 keeping all rows from both tables.",
+    "code": "# Merging tables by the \"a\" variable\n\ndf1 %>%\n  \n  full_join(df2, by = \"a\")\n#> Warning in full_join(., df2, by = \"a\"): Detected an unexpected many-to-many relationship between\n#> `x` and `y`.\n#> ℹ Row 2 of `x` matches multiple rows in `y`.\n#> ℹ Row 2 of `y` matches multiple rows in `x`.\n#> ℹ If a many-to-many relationship is expected, set\n#>   `relationship = \"many-to-many\"` to silence this warning.\n#>   a b.x   c b.y  x   z\n#> 1 1  10 100  10 15 150\n#> 2 2  20 200  40 25 200\n#> 3 2  20 200  50 65 270\n#> 4 3  30 300  NA NA  NA\n#> 5 2  35 350  40 25 200\n#> 6 2  35 350  50 65 270\n#> 7 4  40 400  40 45 400\n#> 8 5  NA  NA  50 35 350\n#> 9 6  NA  NA  60 55 550\n\n# Merging tables by the \"a\" and \"b\" variable\n\ndf1 %>%\n  \n  full_join(df2, by = c(\"a\", \"b\"))\n#>   a  b   c  x   z\n#> 1 1 10 100 15 150\n#> 2 2 20 200 NA  NA\n#> 3 3 30 300 NA  NA\n#> 4 2 35 350 NA  NA\n#> 5 4 40 400 45 400\n#> 6 2 40  NA 25 200\n#> 7 5 50  NA 35 350\n#> 8 6 60  NA 55 550\n#> 9 2 50  NA 65 270\n\n## Merging tables by the \"c\" and \"z\" variable (Have different variable names)\n\ndf1 %>%\n  \n  full_join(df2, by = c(\"c\" = \"z\"))\n#>   a.x b.x   c a.y b.y  x\n#> 1   1  10 100  NA  NA NA\n#> 2   2  20 200   2  40 25\n#> 3   3  30 300  NA  NA NA\n#> 4   2  35 350   5  50 35\n#> 5   4  40 400   4  40 45\n#> 6  NA  NA 150   1  10 15\n#> 7  NA  NA 550   6  60 55\n#> 8  NA  NA 270   2  50 65",
+    "comment": "**Rule:** all matches + unmatched rows from x + unmatched rows from y. `NA` fills in whatever side is missing.\n\n**Counting rows (`by = c(\"a\", \"b\")`):** 2 matched + 3 only in df1 + 4 only in df2 = **9**.\n\n**When to use:** \"combine all the information from both tables\" or \"show everything, matched or not\".",
+    "key": false
+   },
+   {
+    "id": "lec-11-c10",
+    "label": "Filtering joins: semi_join() and anti_join()",
+    "question": "Keep rows of df1 that have a match in df2 (semi_join), and rows of df1 that have no match (anti_join).",
+    "code": "df1 %>%\n  \n  semi_join(df2, by = \"a\")\n#>   a  b   c\n#> 1 1 10 100\n#> 2 2 20 200\n#> 3 2 35 350\n#> 4 4 40 400\n\ndf1 %>%\n  \n  semi_join(df2, by = c(\"a\", \"b\"))\n#>   a  b   c\n#> 1 1 10 100\n#> 2 4 40 400\n\ndf1 %>%\n  \n  anti_join(df2, by = \"a\")\n#>   a  b   c\n#> 1 3 30 300\n\ndf1 %>%\n  \n  anti_join(df2, by = c(\"a\", \"b\"))\n#>   a  b   c\n#> 1 2 20 200\n#> 2 3 30 300\n#> 3 2 35 350",
+    "comment": "**Filtering joins never add columns. They only keep or drop rows of x.**\n- `semi_join(df2, by = \"a\")` → df1 rows whose `a` appears in df2 (4 rows). a = 2 is **not** duplicated, unlike `inner_join`.\n- `anti_join(df2, by = \"a\")` → df1 rows with no match: only a = 3.\n\n**Typical questions**\n- \"Which ___ appear in both?\" → `semi_join`\n- \"Which ___ have no match / are missing?\" → `anti_join`\n\n`semi_join` + `anti_join` together always give back all of x.",
+    "key": true
+   },
+   {
+    "id": "lec-11-c11",
+    "label": "Set operations: intersect(), union(), setdiff()",
+    "question": "For two tables with the same columns, find rows in both, rows in either, and rows in one but not the other.",
+    "code": "df1 <- data.frame(\n  \n  a = c(1, 2, 3, 4, 5),\n  \n  b = c(10, 20, 30, 40, 50)\n  \n)\n\ndf1\n#>   a  b\n#> 1 1 10\n#> 2 2 20\n#> 3 3 30\n#> 4 4 40\n#> 5 5 50\n\ndf2 <- data.frame(\n  \n  a = c(1, 2, 3, 4, 5),\n  \n  b = c(10, 15, 30, 45, 65)\n  \n)\n\ndf2\n#>   a  b\n#> 1 1 10\n#> 2 2 15\n#> 3 3 30\n#> 4 4 45\n#> 5 5 65\n\nintersect(df1, df2)\n#>   a  b\n#> 1 1 10\n#> 2 3 30\n\nunion(df1, df2)\n#>   a  b\n#> 1 1 10\n#> 2 2 20\n#> 3 3 30\n#> 4 4 40\n#> 5 5 50\n#> 6 2 15\n#> 7 4 45\n#> 8 5 65\n\nsetdiff(df1, df2)\n#>   a  b\n#> 1 2 20\n#> 2 4 40\n#> 3 5 50\n\nsetdiff(df2, df1)\n#>   a  b\n#> 1 2 15\n#> 2 4 45\n#> 3 5 65",
+    "comment": "**Set operations compare whole rows** and need the **same columns** in both tables.\n- `intersect(df1, df2)` → rows in both: (1, 10), (3, 30).\n- `union(df1, df2)` → all distinct rows from either (duplicates appear once): 8.\n- `setdiff(df1, df2)` → in df1 but not df2. **Order matters:** `setdiff(df2, df1)` is the opposite question.\n\n**vs joins:** joins match on **key columns** and can bring in new columns. Set operations need identical columns and match on **every** column.\n\n**If tables have extra columns,** `select()` the shared ones first (see Practice 9).",
+    "key": false
+   },
+   {
+    "id": "lec-11-p00",
+    "label": "Practice · Setup: the two data sets",
+    "question": "Here are two data sets that you can use to practice two-table verbs: data1 (13 people: Name, Age, State, state_abr, City, Salary) and data2 (14 cities: State, state_abbriviation, City, Average_salary).",
+    "code": "library(dplyr)\n\ndata1 <- data.frame(\n  Name = c(\"James\", \"Linda\", \"Jim\", \"Margo\", \"Nick\", \"Stacy\", \"Mary\", \"Tom\", \"Anna\", \"Bob\", \"Jeniffer\", \"Lucas\", \"Amy\"),\n  Age = c(22, 56, 34, 48, 19, 25, 31, 68, 72, 42, 39, 52, 39),\n  State = c(\"California\", \"New York\", \"New York\", \"California\", \"Michigan\", \"Texas\", \"Ohio\", \"Arizona\", \"Texas\", \"Florida\", \"Nebraska\", \"Indiana\", \"Florida\"),\n  state_abr = c(\"CA\", \"NY\", \"NY\", \"CA\", \"MI\", \"TX\", \"OH\", \"AZ\", \"TX\", \"FL\", \"NE\", \"IN\", \"FL\"),\n  City = c(\"Los Angeles\", \"New York\", \"Buffalo\", \"San Diego\", \"Detroit\", \"Austin\", \"Cleveland\", \"Phoenix\", \"Houston\", \"Tampa\", \"Lincoln\", \"Indianapolis\", \"Miami\"),\n  Salary = c(30000, 96500, 72000, 59000, 54300, 25000, 61000, 64000, 74700, 40000, 83000, 92400, 82000)\n)\n\ndata2 <- data.frame(\n  State = c(\"Washington\", \"Florida\", \"Nebraska\", \"Indiana\", \"Florida\",\"California\", \"New York\", \"New York\", \"California\", \"Michigan\", \"Texas\", \"Ohio\", \"Arizona\", \"Utah\"),\n  state_abbriviation = c(\"WA\", \"FL\", \"NE\", \"IN\", \"FL\",\"CA\", \"NY\", \"NY\", \"CA\", \"MI\", \"TX\", \"OH\", \"AZ\", \"UT\"),\n  City = c( \"Seatle\", \"Tampa\", \"Lincoln\", \"Indianapolis\", \"Miami\",\"Los Angeles\", \"New York\", \"Ithaca\", \"San Francisco\", \"Detroit\", \"Dallas\", \"Cleveland\", \"Phoenix\", \"Salt Lake City\"),\n  Average_salary = c(63500, 53900, 59900, 59800, 57900, 79000, 80000, 75000, 85000, 54000, 63800, 57000, 61000, 58600)\n)\n\ndata1\n#>        Name Age      State state_abr         City Salary\n#> 1     James  22 California        CA  Los Angeles  30000\n#> 2     Linda  56   New York        NY     New York  96500\n#> 3       Jim  34   New York        NY      Buffalo  72000\n#> 4     Margo  48 California        CA    San Diego  59000\n#> 5      Nick  19   Michigan        MI      Detroit  54300\n#> 6     Stacy  25      Texas        TX       Austin  25000\n#> 7      Mary  31       Ohio        OH    Cleveland  61000\n#> 8       Tom  68    Arizona        AZ      Phoenix  64000\n#> 9      Anna  72      Texas        TX      Houston  74700\n#> 10      Bob  42    Florida        FL        Tampa  40000\n#> 11 Jeniffer  39   Nebraska        NE      Lincoln  83000\n#> 12    Lucas  52    Indiana        IN Indianapolis  92400\n#> 13      Amy  39    Florida        FL        Miami  82000\ndata2\n#>         State state_abbriviation           City Average_salary\n#> 1  Washington                 WA         Seatle          63500\n#> 2     Florida                 FL          Tampa          53900\n#> 3    Nebraska                 NE        Lincoln          59900\n#> 4     Indiana                 IN   Indianapolis          59800\n#> 5     Florida                 FL          Miami          57900\n#> 6  California                 CA    Los Angeles          79000\n#> 7    New York                 NY       New York          80000\n#> 8    New York                 NY         Ithaca          75000\n#> 9  California                 CA  San Francisco          85000\n#> 10   Michigan                 MI        Detroit          54000\n#> 11      Texas                 TX         Dallas          63800\n#> 12       Ohio                 OH      Cleveland          57000\n#> 13    Arizona                 AZ        Phoenix          61000\n#> 14       Utah                 UT Salt Lake City          58600",
+    "comment": "**What each table is**\n- `data1`: one row per **person**: their state, city and salary.\n- `data2`: one row per **city**: its state and the average salary there.\n\n**Before any join, ask two questions:**\n1. **What links a row in one table to a row in the other?** Here that's the place the person lives: State + City. (The abbreviations link too, but the columns have **different names**: `state_abr` vs `state_abbriviation`.)\n2. **Which table is my \"main\" one (x)?** If the question is about people, put `data1` first; if it's about cities, put `data2` first.\n\n**Spot the traps now:** several states appear more than once in **both** tables (California, New York, Florida), and some cities appear in only one table (Buffalo, Seatle…). Both matter for the joins below.\n\nRun this chunk first; every practice chunk below uses `data1` and `data2`.",
+    "key": false
+   },
+   {
+    "id": "lec-11-p01",
+    "label": "Practice 1 · Find the common columns",
+    "question": "Which variables do data1 and data2 have in common? Which of them should be used as the join key?",
+    "code": "names(data1)\n#> [1] \"Name\"      \"Age\"       \"State\"     \"state_abr\" \"City\"      \"Salary\"   \nnames(data2)\n#> [1] \"State\"              \"state_abbriviation\" \"City\"              \n#> [4] \"Average_salary\"    \nintersect(names(data1), names(data2))\n#> [1] \"State\" \"City\" ",
+    "comment": "**How to read it:** `intersect()` on two vectors of names returns the names in both: **State** and **City**.\n\n**Choosing the key:**\n- A key should identify **one** row in the other table. `State` alone doesn't (data2 has two Florida, two California, two New York rows) → Practice 2 shows what goes wrong.\n- `State` + `City` together does: each city/state pair appears once in data2.\n- `state_abr` and `state_abbriviation` hold the same information under different names → Practice 6 shows how to join on columns with different names.\n\n**Exam habit:** run `names()` (or `str()`) on both tables before writing a join.",
+    "key": false
+   },
+   {
+    "id": "lec-11-p02",
+    "label": "Practice 2 · Join by State only (and why it goes wrong)",
+    "question": "Join data1 and data2 by State. How many rows does the result have, and why is it more than 13?",
+    "code": "by_state <- data1 %>% inner_join(data2, by = \"State\")\n#> Warning: Detected an unexpected many-to-many relationship between `x` and `y`.\nnrow(by_state)\n#> [1] 19\nhead(by_state[, c(\"Name\", \"State\", \"City.x\", \"City.y\")], 6)\n#>    Name      State      City.x        City.y\n#> 1 James California Los Angeles   Los Angeles\n#> 2 James California Los Angeles San Francisco\n#> 3 Linda   New York    New York      New York\n#> 4 Linda   New York    New York        Ithaca\n#> 5   Jim   New York     Buffalo      New York\n#> 6   Jim   New York     Buffalo        Ithaca",
+    "comment": "**What happened:** 13 people went in, **19 rows** came out, plus a *many-to-many* warning (R's full warning has a few more lines than shown here).\n\n**Why:** a join pairs **every** matching row. James lives in California, and data2 has **two** California rows (Los Angeles and San Francisco), so James appears twice, once next to each city. Same for every California, New York and Florida person:\n\n| State | people in data1 | rows in data2 | rows out |\n|---|---|---|---|\n| California | 2 | 2 | 4 |\n| New York | 2 | 2 | 4 |\n| Florida | 2 | 2 | 4 |\n| Texas | 2 | 1 | 2 |\n| others (5 states) | 1 each | 1 each | 5 |\n\n4 + 4 + 4 + 2 + 5 = **19**.\n\n**Clues that the key is wrong:**\n- the many-to-many warning\n- more rows out than you expected\n- `City.x` and `City.y` columns that disagree (Los Angeles next to San Francisco)\n\n**`.x` / `.y`:** both tables have a `City` column that wasn't used as a key, so R keeps both and adds `.x` (from data1) and `.y` (from data2).\n\n**Fix:** use a key that identifies one row → Practice 3.",
+    "key": true
+   },
+   {
+    "id": "lec-11-p03",
+    "label": "Practice 3 · inner_join by State and City",
+    "question": "Combine the two tables so that each person is matched with the average salary of their own city. Keep only people whose city appears in data2.",
+    "code": "matched <- data1 %>% inner_join(data2, by = c(\"State\", \"City\"))\nmatched\n#>       Name Age      State state_abr         City Salary state_abbriviation\n#> 1    James  22 California        CA  Los Angeles  30000                 CA\n#> 2    Linda  56   New York        NY     New York  96500                 NY\n#> 3     Nick  19   Michigan        MI      Detroit  54300                 MI\n#> 4     Mary  31       Ohio        OH    Cleveland  61000                 OH\n#> 5      Tom  68    Arizona        AZ      Phoenix  64000                 AZ\n#> 6      Bob  42    Florida        FL        Tampa  40000                 FL\n#> 7 Jeniffer  39   Nebraska        NE      Lincoln  83000                 NE\n#> 8    Lucas  52    Indiana        IN Indianapolis  92400                 IN\n#> 9      Amy  39    Florida        FL        Miami  82000                 FL\n#>   Average_salary\n#> 1          79000\n#> 2          80000\n#> 3          54000\n#> 4          57000\n#> 5          61000\n#> 6          53900\n#> 7          59900\n#> 8          59800\n#> 9          57900\nnrow(matched)\n#> [1] 9",
+    "comment": "**Steps**\n1. Primary table `data1` (people) on the left of `%>%`.\n2. `inner_join()` because the question says keep **only** people whose city is in data2.\n3. `by = c(\"State\", \"City\")`: **both** must match.\n\n**Result:** 9 of 13 people. Each row now has their `Salary` **and** the city's `Average_salary`.\n\n**Who's missing and why:** Jim (Buffalo), Margo (San Diego), Stacy (Austin) and Anna (Houston): their cities aren't in data2, and an inner join drops unmatched rows from **both** sides.\n\n**Column order:** all of data1's columns, then data2's columns that weren't keys (`state_abbriviation`, `Average_salary`). No `.x`/`.y` this time, because the only shared columns were the keys.",
+    "key": true
+   },
+   {
+    "id": "lec-11-p04",
+    "label": "Practice 4 · left_join: keep every person",
+    "question": "Add each city's average salary to data1, but keep all 13 people even if their city is not in data2.",
+    "code": "all_people <- data1 %>% left_join(data2, by = c(\"State\", \"City\"))\nall_people\n#>        Name Age      State state_abr         City Salary state_abbriviation\n#> 1     James  22 California        CA  Los Angeles  30000                 CA\n#> 2     Linda  56   New York        NY     New York  96500                 NY\n#> 3       Jim  34   New York        NY      Buffalo  72000               <NA>\n#> 4     Margo  48 California        CA    San Diego  59000               <NA>\n#> 5      Nick  19   Michigan        MI      Detroit  54300                 MI\n#> 6     Stacy  25      Texas        TX       Austin  25000               <NA>\n#> 7      Mary  31       Ohio        OH    Cleveland  61000                 OH\n#> 8       Tom  68    Arizona        AZ      Phoenix  64000                 AZ\n#> 9      Anna  72      Texas        TX      Houston  74700               <NA>\n#> 10      Bob  42    Florida        FL        Tampa  40000                 FL\n#> 11 Jeniffer  39   Nebraska        NE      Lincoln  83000                 NE\n#> 12    Lucas  52    Indiana        IN Indianapolis  92400                 IN\n#> 13      Amy  39    Florida        FL        Miami  82000                 FL\n#>    Average_salary\n#> 1           79000\n#> 2           80000\n#> 3              NA\n#> 4              NA\n#> 5           54000\n#> 6              NA\n#> 7           57000\n#> 8           61000\n#> 9              NA\n#> 10          53900\n#> 11          59900\n#> 12          59800\n#> 13          57900\nsum(is.na(all_people$Average_salary))\n#> [1] 4",
+    "comment": "**`left_join()` keeps every row of the left table (x).** People with no matching city still appear, with `NA` in the columns that came from data2.\n\n**Result:** 13 rows. `sum(is.na(...))` counts the 4 people without a match (Jim, Margo, Stacy, Anna).\n\n**inner vs left, in one line:** inner = only matches; left = everything from x, matches filled in where they exist.\n\n**When the question says** \"keep all ___\", \"add information to\", or \"don't lose any observations\" → `left_join()` with that table first. This is the most common join.",
+    "key": true
+   },
+   {
+    "id": "lec-11-p05",
+    "label": "Practice 5 · Join, then compare (mutate, filter, arrange)",
+    "question": "Which people earn more than the average salary in their city? Show their name, city, salary, the city average and the difference, sorted from the largest difference.",
+    "code": "data1 %>%\n  inner_join(data2, by = c(\"State\", \"City\")) %>%\n  mutate(Difference = Salary - Average_salary) %>%\n  filter(Difference > 0) %>%\n  select(Name, City, Salary, Average_salary, Difference) %>%\n  arrange(desc(Difference))\n#>       Name         City Salary Average_salary Difference\n#> 1    Lucas Indianapolis  92400          59800      32600\n#> 2      Amy        Miami  82000          57900      24100\n#> 3 Jeniffer      Lincoln  83000          59900      23100\n#> 4    Linda     New York  96500          80000      16500\n#> 5     Mary    Cleveland  61000          57000       4000\n#> 6      Tom      Phoenix  64000          61000       3000\n#> 7     Nick      Detroit  54300          54000        300",
+    "comment": "**This is the typical exam shape: join first, then use single-table verbs.** Read the pipe top to bottom:\n\n1. `inner_join(...)`: put each person's salary next to their city's average (9 people).\n2. `mutate(Difference = Salary - Average_salary)`: new column, computed row by row.\n3. `filter(Difference > 0)`: keep people above their city average.\n4. `select(...)`: keep only the columns asked for.\n5. `arrange(desc(Difference))`: biggest gap first.\n\n**Result:** 7 people, biggest gap first: Lucas (+32,600), Amy (+24,100), Jeniffer (+23,100), Linda (+16,500), Mary, Tom, and Nick (+300). James and Bob earn less than their city average, so `filter()` drops them.\n\n**Why join first:** `Salary` and `Average_salary` live in different tables. You can only subtract them once they're in the same row.\n\n**Template:** `x %>% join(y, by = ...) %>% mutate(...) %>% filter(...) %>% select(...) %>% arrange(...)`",
+    "key": true
+   },
+   {
+    "id": "lec-11-p06",
+    "label": "Practice 6 · Keys with different names",
+    "question": "Join data1 and data2 using the state abbreviation and the city. The abbreviation column is called state_abr in data1 and state_abbriviation in data2.",
+    "code": "data1 %>%\n  inner_join(data2, by = c(\"state_abr\" = \"state_abbriviation\", \"City\"))\n#>       Name Age    State.x state_abr         City Salary    State.y\n#> 1    James  22 California        CA  Los Angeles  30000 California\n#> 2    Linda  56   New York        NY     New York  96500   New York\n#> 3     Nick  19   Michigan        MI      Detroit  54300   Michigan\n#> 4     Mary  31       Ohio        OH    Cleveland  61000       Ohio\n#> 5      Tom  68    Arizona        AZ      Phoenix  64000    Arizona\n#> 6      Bob  42    Florida        FL        Tampa  40000    Florida\n#> 7 Jeniffer  39   Nebraska        NE      Lincoln  83000   Nebraska\n#> 8    Lucas  52    Indiana        IN Indianapolis  92400    Indiana\n#> 9      Amy  39    Florida        FL        Miami  82000    Florida\n#>   Average_salary\n#> 1          79000\n#> 2          80000\n#> 3          54000\n#> 4          57000\n#> 5          61000\n#> 6          53900\n#> 7          59900\n#> 8          59800\n#> 9          57900",
+    "comment": "**Syntax for different names:** `by = c(\"name_in_x\" = \"name_in_y\")`. Mix it with same-name keys by just listing them: `c(\"state_abr\" = \"state_abbriviation\", \"City\")`.\n\n**Result:** the same 9 people as Practice 3. The output keeps data1's name (`state_abr`) for the key.\n\n**Why `State.x` and `State.y` appear:** `State` is in both tables but **wasn't** a key this time, so R keeps both copies and adds suffixes (`.x` from data1, `.y` from data2).\n\n**Add `keep = TRUE`** if you want both key columns (`state_abr` and `state_abbriviation`) in the output, like the `c = z` example in the lecture.",
+    "key": false
+   },
+   {
+    "id": "lec-11-p07",
+    "label": "Practice 7 · semi_join and anti_join: who has a match?",
+    "question": "Which people live in a city that appears in data2? Which people do not?",
+    "code": "# people whose city IS in data2 (no columns added)\ndata1 %>% semi_join(data2, by = c(\"State\", \"City\"))\n#>       Name Age      State state_abr         City Salary\n#> 1    James  22 California        CA  Los Angeles  30000\n#> 2    Linda  56   New York        NY     New York  96500\n#> 3     Nick  19   Michigan        MI      Detroit  54300\n#> 4     Mary  31       Ohio        OH    Cleveland  61000\n#> 5      Tom  68    Arizona        AZ      Phoenix  64000\n#> 6      Bob  42    Florida        FL        Tampa  40000\n#> 7 Jeniffer  39   Nebraska        NE      Lincoln  83000\n#> 8    Lucas  52    Indiana        IN Indianapolis  92400\n#> 9      Amy  39    Florida        FL        Miami  82000\n\n# people whose city is NOT in data2\ndata1 %>% anti_join(data2, by = c(\"State\", \"City\"))\n#>    Name Age      State state_abr      City Salary\n#> 1   Jim  34   New York        NY   Buffalo  72000\n#> 2 Margo  48 California        CA San Diego  59000\n#> 3 Stacy  25      Texas        TX    Austin  25000\n#> 4  Anna  72      Texas        TX   Houston  74700",
+    "comment": "**Filtering joins only keep or drop rows of x. They never add columns.**\n- `semi_join()` = keep x rows that **have** a match → 9 people, still only data1's 6 columns.\n- `anti_join()` = keep x rows that **don't** have a match → Jim, Margo, Stacy, Anna.\n\n**Compare with Practice 3:** `inner_join` gives the same 9 people but also adds data2's columns. Use `semi_join` when the question only asks *which* rows match.\n\n**`anti_join` is the go-to for checking problems:** \"which observations have no match / are missing from the other table?\" One line, no NAs to count.",
+    "key": true
+   },
+   {
+    "id": "lec-11-p08",
+    "label": "Practice 8 · right_join and full_join: the other side",
+    "question": "Which cities in data2 have no matching person in data1? How many rows does a full join of the two tables have?",
+    "code": "# cities with nobody from data1\ndata2 %>% anti_join(data1, by = c(\"State\", \"City\"))\n#>        State state_abbriviation           City Average_salary\n#> 1 Washington                 WA         Seatle          63500\n#> 2   New York                 NY         Ithaca          75000\n#> 3 California                 CA  San Francisco          85000\n#> 4      Texas                 TX         Dallas          63800\n#> 5       Utah                 UT Salt Lake City          58600\n\n# full join keeps everything from both tables\neverything <- data1 %>% full_join(data2, by = c(\"State\", \"City\"))\nnrow(everything)\n#> [1] 18\n\n# right_join keeps every row of data2 (y)\nnrow(data1 %>% right_join(data2, by = c(\"State\", \"City\")))\n#> [1] 14",
+    "comment": "**Flip the table order to ask about the other side:** `data2 %>% anti_join(data1, ...)` lists the 5 cities with no person (Seatle, Ithaca, San Francisco, Dallas, Salt Lake City).\n\n**Counting a full join:** 9 matched rows + 4 people with no city (Jim, Margo, Stacy, Anna) + 5 cities with no person = **18**. Unmatched rows get `NA` on the side they're missing.\n\n**right_join:** keeps all 14 rows of data2 (9 matched + 5 unmatched cities). `data1 %>% right_join(data2)` keeps the same rows as `data2 %>% left_join(data1)`; only the column order differs. Most people just use `left_join` with the tables swapped.\n\n| Join | Keeps |\n|---|---|\n| `inner_join(x, y)` | only matches |\n| `left_join(x, y)` | all of x |\n| `right_join(x, y)` | all of y |\n| `full_join(x, y)` | all of both |",
+    "key": false
+   },
+   {
+    "id": "lec-11-p09",
+    "label": "Practice 9 · Set operations on states",
+    "question": "Which states appear in both data sets? Which states appear in data2 but not in data1?",
+    "code": "states1 <- data1 %>% select(State)\nstates2 <- data2 %>% select(State)\n\nintersect(states1, states2)   # in both\n#>        State\n#> 1 California\n#> 2   New York\n#> 3   Michigan\n#> 4      Texas\n#> 5       Ohio\n#> 6    Arizona\n#> 7    Florida\n#> 8   Nebraska\n#> 9    Indiana\nsetdiff(states2, states1)     # in data2 only\n#>        State\n#> 1 Washington\n#> 2       Utah\nsetdiff(states1, states2)     # in data1 only\n#> [1] State\n#> <0 rows> (or 0-length row.names)",
+    "comment": "**Set operations need tables with the same columns**, so first `select()` just the `State` column from each.\n\n- `intersect()` → states in both: 9 states, each listed once.\n- `setdiff(states2, states1)` → in data2 but not data1: **Washington** and **Utah**.\n- `setdiff(states1, states2)` → in data1 but not data2: none (0 rows).\n\n**Order matters for `setdiff()`:** it's \"first minus second\", so swapping the tables answers the opposite question.\n\n**Set operations vs joins:** set operations compare **whole rows** of tables with identical columns; joins match on key columns and can combine different columns.",
+    "key": false
+   }
+  ],
+  "notes": "Continues the `flights` data from Lecture 10, then covers combining two tables. Course notes: https://ap4347.github.io/2102/lecture-11.html\n\n**Join cheat sheet**\n\n| Function | Keeps | Adds columns? |\n|---|---|---|\n| `inner_join(x, y)` | rows with a match in both | yes |\n| `left_join(x, y)` | all of x | yes (NA where no match) |\n| `right_join(x, y)` | all of y | yes |\n| `full_join(x, y)` | everything | yes |\n| `semi_join(x, y)` | x rows **with** a match | no |\n| `anti_join(x, y)` | x rows **without** a match | no |\n\nThe **Practice** chunks at the bottom walk through the lecture's practice data sets (`data1`, `data2`) step by step.\n\n*Note: the practice outputs were generated with a base-R stand-in for the join functions, checked to reproduce all 25 join outputs printed in this lecture exactly. Your RStudio output should match.*",
+  "takeaways": [
+   "group_by() + summarise() = one row per group; add n() for counts and na.rm = TRUE for missing values.",
+   "across(columns, ~ mean(.x, na.rm = TRUE)) applies the same summary to many columns.",
+   "by = c(\"x_name\" = \"y_name\") joins on columns with different names.",
+   "A many-to-many warning or more rows than expected means the join key is not unique: add another key column.",
+   "left_join keeps every row of the first table; anti_join finds rows with no match.",
+   "Non-key columns with the same name get .x (first table) and .y (second table)."
+  ],
+  "updatedAt": "2026-10-14T16:30:00Z"
+ },
+ "lec-12": {
+  "type": "lec",
+  "num": "12",
+  "title": "tidyr: tidy data, pivoting, separating and missing values",
+  "date": "",
+  "exams": [],
+  "topics": [
+   "tidyr",
+   "tidy data",
+   "pivot_longer",
+   "pivot_wider",
+   "separate",
+   "unite",
+   "complete",
+   "fill",
+   "replace_na",
+   "drop_na"
+  ],
+  "pdfs": [],
+  "chunks": [
+   {
+    "id": "lec-12-c01",
+    "label": "What tidy data looks like (table1 to table4)",
+    "question": "The same data (country, year, cases, population) organised five different ways. Which one is tidy?",
+    "code": "print(table1)\n#> # A tibble: 6 × 4\n#>   country      year  cases population\n#>   <chr>       <dbl>  <dbl>      <dbl>\n#> 1 Afghanistan  1999    745   19987071\n#> 2 Afghanistan  2000   2666   20595360\n#> 3 Brazil       1999  37737  172006362\n#> 4 Brazil       2000  80488  174504898\n#> 5 China        1999 212258 1272915272\n#> 6 China        2000 213766 1280428583\n\nprint(table2)\n#> # A tibble: 12 × 4\n#>    country      year type            count\n#>    <chr>       <dbl> <chr>           <dbl>\n#>  1 Afghanistan  1999 cases             745\n#>  2 Afghanistan  1999 population   19987071\n#>  3 Afghanistan  2000 cases            2666\n#>  4 Afghanistan  2000 population   20595360\n#>  5 Brazil       1999 cases           37737\n#>  6 Brazil       1999 population  172006362\n#>  7 Brazil       2000 cases           80488\n#>  8 Brazil       2000 population  174504898\n#>  9 China        1999 cases          212258\n#> 10 China        1999 population 1272915272\n#> 11 China        2000 cases          213766\n#> 12 China        2000 population 1280428583\n\nprint(table3)\n#> # A tibble: 6 × 3\n#>   country      year rate             \n#>   <chr>       <dbl> <chr>            \n#> 1 Afghanistan  1999 745/19987071     \n#> 2 Afghanistan  2000 2666/20595360    \n#> 3 Brazil       1999 37737/172006362  \n#> 4 Brazil       2000 80488/174504898  \n#> 5 China        1999 212258/1272915272\n#> 6 China        2000 213766/1280428583\n\nprint(table4a) # cases\n#> # A tibble: 3 × 3\n#>   country     `1999` `2000`\n#>   <chr>        <dbl>  <dbl>\n#> 1 Afghanistan    745   2666\n#> 2 Brazil       37737  80488\n#> 3 China       212258 213766\n\nprint(table4b) # population\n#> # A tibble: 3 × 3\n#>   country         `1999`     `2000`\n#>   <chr>            <dbl>      <dbl>\n#> 1 Afghanistan   19987071   20595360\n#> 2 Brazil       172006362  174504898\n#> 3 China       1272915272 1280428583",
+    "comment": "**Three rules of tidy data**\n1. Each **variable** has its own column.\n2. Each **observation** has its own row.\n3. Each **value** has its own cell.\n\n**Check each table**\n- `table1` → **tidy**: country, year, cases, population are all columns; one row per country-year.\n- `table2` → each country-year is split over **two rows** (`type` = cases / population) → fix with `pivot_wider()`.\n- `table3` → `rate` holds **two values** in one cell (\"745/19987071\") → fix with `separate()`.\n- `table4a`/`4b` → years are **column names** → fix with `pivot_longer()`.\n\n**Why it matters:** dplyr functions (`filter`, `mutate`, `group_by`, joins) and plots all expect tidy data.",
+    "key": false
+   },
+   {
+    "id": "lec-12-c02",
+    "label": "pivot_longer(): column names that are really values",
+    "question": "In table4a the columns 1999 and 2000 are years (values), not variables. Reshape table4a and table4b into tidy form and join them.",
+    "code": "print(table4a) # cases\n#> # A tibble: 3 × 3\n#>   country     `1999` `2000`\n#>   <chr>        <dbl>  <dbl>\n#> 1 Afghanistan    745   2666\n#> 2 Brazil       37737  80488\n#> 3 China       212258 213766\n\ntable4a %>% \n  \n  pivot_longer(c(`1999`, `2000`), names_to = \"year\", values_to = \"cases\")\n#> # A tibble: 6 × 3\n#>   country     year   cases\n#>   <chr>       <chr>  <dbl>\n#> 1 Afghanistan 1999     745\n#> 2 Afghanistan 2000    2666\n#> 3 Brazil      1999   37737\n#> 4 Brazil      2000   80488\n#> 5 China       1999  212258\n#> 6 China       2000  213766\n\ntable4b %>%\n  \n  pivot_longer(c(`1999`, `2000`), names_to = \"year\", values_to = \"population\")\n#> # A tibble: 6 × 3\n#>   country     year  population\n#>   <chr>       <chr>      <dbl>\n#> 1 Afghanistan 1999    19987071\n#> 2 Afghanistan 2000    20595360\n#> 3 Brazil      1999   172006362\n#> 4 Brazil      2000   174504898\n#> 5 China       1999  1272915272\n#> 6 China       2000  1280428583\n\ntidy4a <- table4a %>% \n  \n  pivot_longer(c(`1999`, `2000`), names_to = \"year\", values_to = \"cases\")\n\n\n\ntidy4b <- table4b %>% \n  \n  pivot_longer(c(`1999`, `2000`), names_to = \"year\", values_to = \"population\")\n\n\ntidy_4a_4b <- left_join(tidy4a, tidy4b)\n#> Joining with `by = join_by(country, year)`\n\nprint(tidy_4a_4b)\n#> # A tibble: 6 × 4\n#>   country     year   cases population\n#>   <chr>       <chr>  <dbl>      <dbl>\n#> 1 Afghanistan 1999     745   19987071\n#> 2 Afghanistan 2000    2666   20595360\n#> 3 Brazil      1999   37737  172006362\n#> 4 Brazil      2000   80488  174504898\n#> 5 China       1999  212258 1272915272\n#> 6 China       2000  213766 1280428583",
+    "comment": "**Three things to tell `pivot_longer()`:**\n1. **Which columns** to stack: `c(\\`1999\\`, \\`2000\\`)`. Backticks are needed because the names start with numbers.\n2. **`names_to`**: new column for the old column **names** → `\"year\"`.\n3. **`values_to`**: new column for the **values** → `\"cases\"`.\n\n3 rows × 2 year columns → **6 rows**, one per country-year.\n\n**Then join:** both tidy tables share `country` and `year`, so `left_join(tidy4a, tidy4b)` lines up cases and population (\"Joining with `by = join_by(country, year)`\" = it found the shared columns itself).\n\n**Picking columns other ways:** `-country` (everything except country), `starts_with(\"wk\")`, `new_sp_m014:newrel_f65` (a range).",
+    "key": true
+   },
+   {
+    "id": "lec-12-c03",
+    "label": "pivot_wider(): one observation over several rows",
+    "question": "In table2 each country-year appears in two rows (type = cases or population). Spread type into its own columns.",
+    "code": "print(table2)\n#> # A tibble: 12 × 4\n#>    country      year type            count\n#>    <chr>       <dbl> <chr>           <dbl>\n#>  1 Afghanistan  1999 cases             745\n#>  2 Afghanistan  1999 population   19987071\n#>  3 Afghanistan  2000 cases            2666\n#>  4 Afghanistan  2000 population   20595360\n#>  5 Brazil       1999 cases           37737\n#>  6 Brazil       1999 population  172006362\n#>  7 Brazil       2000 cases           80488\n#>  8 Brazil       2000 population  174504898\n#>  9 China        1999 cases          212258\n#> 10 China        1999 population 1272915272\n#> 11 China        2000 cases          213766\n#> 12 China        2000 population 1280428583\n\ntable2 %>%\n  \n  pivot_wider(names_from = type, values_from = count)\n#> # A tibble: 6 × 4\n#>   country      year  cases population\n#>   <chr>       <dbl>  <dbl>      <dbl>\n#> 1 Afghanistan  1999    745   19987071\n#> 2 Afghanistan  2000   2666   20595360\n#> 3 Brazil       1999  37737  172006362\n#> 4 Brazil       2000  80488  174504898\n#> 5 China        1999 212258 1272915272\n#> 6 China        2000 213766 1280428583",
+    "comment": "**Two things to tell `pivot_wider()`:**\n- **`names_from = type`**: which column holds the **new column names** (cases, population).\n- **`values_from = count`**: which column holds the **values** to fill them.\n\n12 rows → **6 rows**, now tidy (same as table1).\n\n**Longer vs wider:** `pivot_longer` = more rows, fewer columns (names → values). `pivot_wider` = fewer rows, more columns (values → names). They undo each other.",
+    "key": true
+   },
+   {
+    "id": "lec-12-c04",
+    "label": "separate(): split one column into several",
+    "question": "In table3 the rate column holds cases and population as \"745/19987071\". Split it into two columns. Also split year into century and year by position.",
+    "code": "print(table3)\n#> # A tibble: 6 × 3\n#>   country      year rate             \n#>   <chr>       <dbl> <chr>            \n#> 1 Afghanistan  1999 745/19987071     \n#> 2 Afghanistan  2000 2666/20595360    \n#> 3 Brazil       1999 37737/172006362  \n#> 4 Brazil       2000 80488/174504898  \n#> 5 China        1999 212258/1272915272\n#> 6 China        2000 213766/1280428583\n\ntable3 %>%\n  \n  separate(rate, into = c(\"cases\", \"population\"), sep = \"/\")\n#> # A tibble: 6 × 4\n#>   country      year cases  population\n#>   <chr>       <dbl> <chr>  <chr>     \n#> 1 Afghanistan  1999 745    19987071  \n#> 2 Afghanistan  2000 2666   20595360  \n#> 3 Brazil       1999 37737  172006362 \n#> 4 Brazil       2000 80488  174504898 \n#> 5 China        1999 212258 1272915272\n#> 6 China        2000 213766 1280428583\n\ntable3 %>% \n  \n  separate(rate, into = c(\"cases\", \"population\"), convert = TRUE)\n#> # A tibble: 6 × 4\n#>   country      year  cases population\n#>   <chr>       <dbl>  <int>      <int>\n#> 1 Afghanistan  1999    745   19987071\n#> 2 Afghanistan  2000   2666   20595360\n#> 3 Brazil       1999  37737  172006362\n#> 4 Brazil       2000  80488  174504898\n#> 5 China        1999 212258 1272915272\n#> 6 China        2000 213766 1280428583\n\ntable3 %>% \n  \n  separate(year, into = c(\"century\", \"year\"), sep = 2)\n#> # A tibble: 6 × 4\n#>   country     century year  rate             \n#>   <chr>       <chr>   <chr> <chr>            \n#> 1 Afghanistan 19      99    745/19987071     \n#> 2 Afghanistan 20      00    2666/20595360    \n#> 3 Brazil      19      99    37737/172006362  \n#> 4 Brazil      20      00    80488/174504898  \n#> 5 China       19      99    212258/1272915272\n#> 6 China       20      00    213766/1280428583\n\ntable3 %>% \n  \n  separate(year, into = c(\"century\", \"year\"), sep = 3)\n#> # A tibble: 6 × 4\n#>   country     century year  rate             \n#>   <chr>       <chr>   <chr> <chr>            \n#> 1 Afghanistan 199     9     745/19987071     \n#> 2 Afghanistan 200     0     2666/20595360    \n#> 3 Brazil      199     9     37737/172006362  \n#> 4 Brazil      200     0     80488/174504898  \n#> 5 China       199     9     212258/1272915272\n#> 6 China       200     0     213766/1280428583\n\ntable3 %>% \n  \n  separate(year, into = c(\"century\", \"year\"), sep = -3)\n#> # A tibble: 6 × 4\n#>   country     century year  rate             \n#>   <chr>       <chr>   <chr> <chr>            \n#> 1 Afghanistan 1       999   745/19987071     \n#> 2 Afghanistan 2       000   2666/20595360    \n#> 3 Brazil      1       999   37737/172006362  \n#> 4 Brazil      2       000   80488/174504898  \n#> 5 China       1       999   212258/1272915272\n#> 6 China       2       000   213766/1280428583",
+    "comment": "**`separate(col, into = c(\"new1\", \"new2\"), sep = ...)`**\n- `sep = \"/\"` → split at the slash.\n- No `sep` → splits at any non-letter/number character (worked here too).\n\n**`convert = TRUE`:** after splitting, the pieces are **text** (`<chr>`), so math on them fails. `convert = TRUE` turns them into numbers (`<int>`).\n\n**Splitting by position (`sep = number`):**\n- `sep = 2` → after the 2nd character: \"1999\" → \"19\" + \"99\".\n- `sep = -3` → 3 characters from the right: \"1999\" → \"1\" + \"999\".\n\n**Use it when** one cell holds two pieces of information (a date like \"2024-05\", \"Smith, John\", \"m014\" = sex + age).",
+    "key": false
+   },
+   {
+    "id": "lec-12-c05",
+    "label": "unite(): combine columns into one",
+    "question": "In table5 the year is split into century (\"19\") and year (\"99\"). Combine them back into one column.",
+    "code": "print(table5)\n#> # A tibble: 6 × 4\n#>   country     century year  rate             \n#>   <chr>       <chr>   <chr> <chr>            \n#> 1 Afghanistan 19      99    745/19987071     \n#> 2 Afghanistan 20      00    2666/20595360    \n#> 3 Brazil      19      99    37737/172006362  \n#> 4 Brazil      20      00    80488/174504898  \n#> 5 China       19      99    212258/1272915272\n#> 6 China       20      00    213766/1280428583\n\ntable5 %>% \n  \n  unite(new, century, year)\n#> # A tibble: 6 × 3\n#>   country     new   rate             \n#>   <chr>       <chr> <chr>            \n#> 1 Afghanistan 19_99 745/19987071     \n#> 2 Afghanistan 20_00 2666/20595360    \n#> 3 Brazil      19_99 37737/172006362  \n#> 4 Brazil      20_00 80488/174504898  \n#> 5 China       19_99 212258/1272915272\n#> 6 China       20_00 213766/1280428583\n\ntable5 %>% \n  \n  unite(new, century, year, sep = \"\")\n#> # A tibble: 6 × 3\n#>   country     new   rate             \n#>   <chr>       <chr> <chr>            \n#> 1 Afghanistan 1999  745/19987071     \n#> 2 Afghanistan 2000  2666/20595360    \n#> 3 Brazil      1999  37737/172006362  \n#> 4 Brazil      2000  80488/174504898  \n#> 5 China       1999  212258/1272915272\n#> 6 China       2000  213766/1280428583",
+    "comment": "**`unite(new_name, col1, col2, sep = ...)`** is the opposite of `separate()`.\n- Default `sep` is `\"_\"` → \"19_99\".\n- `sep = \"\"` → \"1999\".\n\n**Order of arguments:** the **new** column name comes first, then the columns to combine.",
+    "key": false
+   },
+   {
+    "id": "lec-12-c06",
+    "label": "Missing values: complete(), fill(), replace_na(), drop_na()",
+    "question": "The stocks data has an explicit missing value (NA for 2015 Q4) and an implicit one (2016 Q1 is not in the data at all). Make missing values explicit and then fill, replace or drop them.",
+    "code": "stocks <- data.frame(\n  \n  year   = c(2015, 2015, 2015, 2015, 2016, 2016, 2016),\n  \n  qtr    = c(   1,    2,    3,    4,    2,    3,    4),\n  \n  return = c(1.88, 0.59, 0.35,   NA, 0.92, 0.17, 2.66)\n)\n\nprint(stocks)\n#>   year qtr return\n#> 1 2015   1   1.88\n#> 2 2015   2   0.59\n#> 3 2015   3   0.35\n#> 4 2015   4     NA\n#> 5 2016   2   0.92\n#> 6 2016   3   0.17\n#> 7 2016   4   2.66\n\nstocks %>% \n  \n  pivot_wider(names_from = year, values_from = return)\n#> # A tibble: 4 × 3\n#>     qtr `2015` `2016`\n#>   <dbl>  <dbl>  <dbl>\n#> 1     1   1.88  NA   \n#> 2     2   0.59   0.92\n#> 3     3   0.35   0.17\n#> 4     4  NA      2.66\n\nstocks %>% \n  \n  complete(year, qtr)\n#> # A tibble: 8 × 3\n#>    year   qtr return\n#>   <dbl> <dbl>  <dbl>\n#> 1  2015     1   1.88\n#> 2  2015     2   0.59\n#> 3  2015     3   0.35\n#> 4  2015     4  NA   \n#> 5  2016     1  NA   \n#> 6  2016     2   0.92\n#> 7  2016     3   0.17\n#> 8  2016     4   2.66\n\nstocks %>% \n  \n  complete(year, qtr) %>%\n  \n  fill(return)\n#> # A tibble: 8 × 3\n#>    year   qtr return\n#>   <dbl> <dbl>  <dbl>\n#> 1  2015     1   1.88\n#> 2  2015     2   0.59\n#> 3  2015     3   0.35\n#> 4  2015     4   0.35\n#> 5  2016     1   0.35\n#> 6  2016     2   0.92\n#> 7  2016     3   0.17\n#> 8  2016     4   2.66\n\nstocks %>% \n  \n  complete(year, qtr) %>%\n  \n  fill(return, .direction = \"up\")\n#> # A tibble: 8 × 3\n#>    year   qtr return\n#>   <dbl> <dbl>  <dbl>\n#> 1  2015     1   1.88\n#> 2  2015     2   0.59\n#> 3  2015     3   0.35\n#> 4  2015     4   0.92\n#> 5  2016     1   0.92\n#> 6  2016     2   0.92\n#> 7  2016     3   0.17\n#> 8  2016     4   2.66\n\nstocks %>% \n  \n  complete(year, qtr) %>%\n  \n  replace_na(list(return = 0))\n#> # A tibble: 8 × 3\n#>    year   qtr return\n#>   <dbl> <dbl>  <dbl>\n#> 1  2015     1   1.88\n#> 2  2015     2   0.59\n#> 3  2015     3   0.35\n#> 4  2015     4   0   \n#> 5  2016     1   0   \n#> 6  2016     2   0.92\n#> 7  2016     3   0.17\n#> 8  2016     4   2.66\n\nstocks %>% \n  \n  complete(year, qtr) %>%\n  \n  drop_na()\n#> # A tibble: 6 × 3\n#>    year   qtr return\n#>   <dbl> <dbl>  <dbl>\n#> 1  2015     1   1.88\n#> 2  2015     2   0.59\n#> 3  2015     3   0.35\n#> 4  2016     2   0.92\n#> 5  2016     3   0.17\n#> 6  2016     4   2.66",
+    "comment": "**Two kinds of missing**\n- **Explicit:** the row is there with `NA` (2015 Q4).\n- **Implicit:** the row is just absent (2016 Q1). You can't see it with `is.na()`.\n\n**Tools**\n- `complete(year, qtr)`: adds every year × quarter combination, so the 2016 Q1 row appears with `NA` (7 → 8 rows).\n- `pivot_wider()`: also exposes it, as a table with a gap.\n- `fill(return)`: replaces `NA` with the **previous** value (down). `.direction = \"up\"` uses the **next** value.\n- `replace_na(list(return = 0))`: replaces `NA` with a fixed value.\n- `drop_na()`: removes rows with any `NA` (8 → 6 rows).\n\n**Which to use:** filling makes sense for things that carry forward (a price, a status); 0 only when missing really means none; dropping when the row is useless without the value. When in doubt, say what you chose in a sentence on the homework.",
+    "key": false
+   },
+   {
+    "id": "lec-12-c07",
+    "label": "Practice: religion and income (pivot_longer)",
+    "question": "relig_income has one column per income bracket. Reshape it so each row is a religion × income bracket with its frequency.",
+    "code": "relig_income %>% \n  \n  pivot_longer(-religion, names_to = \"income\", values_to = \"frequency\")\n#> # A tibble: 180 × 3\n#>    religion income             frequency\n#>    <chr>    <chr>                  <dbl>\n#>  1 Agnostic <$10k                     27\n#>  2 Agnostic $10-20k                   34\n#>  3 Agnostic $20-30k                   60\n#>  4 Agnostic $30-40k                   81\n#>  5 Agnostic $40-50k                   76\n#>  6 Agnostic $50-75k                  137\n#>  7 Agnostic $75-100k                 122\n#>  8 Agnostic $100-150k                109\n#>  9 Agnostic >150k                     84\n#> 10 Agnostic Don't know/refused        96\n#> # ℹ 170 more rows",
+    "comment": "**Spot the problem:** the income brackets (`<$10k`, `$10-20k`…) are column **names** but they're really values of an \"income\" variable → `pivot_longer()`.\n\n**`-religion`** = \"stack every column except religion\". Shorter than listing all 10 brackets.\n\n18 religions × 10 brackets = **180 rows**.",
+    "key": false
+   },
+   {
+    "id": "lec-12-c08",
+    "label": "Practice: WHO tuberculosis data (pivot + separate)",
+    "question": "The who data stores type of diagnosis, sex and age group in column names such as new_sp_m014. Tidy it step by step.",
+    "code": "who1 <- who %>%\n  \n    pivot_longer(\n    \n    cols = new_sp_m014:newrel_f65,\n    \n    names_to = \"key\",\n    \n    values_to = \"cases\", \n    \n    values_drop_na = TRUE)\n\nprint(who1)\n#> # A tibble: 76,046 × 6\n#>    country     iso2  iso3   year key          cases\n#>    <chr>       <chr> <chr> <dbl> <chr>        <dbl>\n#>  1 Afghanistan AF    AFG    1997 new_sp_m014      0\n#>  2 Afghanistan AF    AFG    1997 new_sp_m1524    10\n#>  3 Afghanistan AF    AFG    1997 new_sp_m2534     6\n#>  4 Afghanistan AF    AFG    1997 new_sp_m3544     3\n#>  5 Afghanistan AF    AFG    1997 new_sp_m4554     5\n#>  6 Afghanistan AF    AFG    1997 new_sp_m5564     2\n#>  7 Afghanistan AF    AFG    1997 new_sp_m65       0\n#>  8 Afghanistan AF    AFG    1997 new_sp_f014      5\n#>  9 Afghanistan AF    AFG    1997 new_sp_f1524    38\n#> 10 Afghanistan AF    AFG    1997 new_sp_f2534    36\n#> # ℹ 76,036 more rows\n\n## just run this code\n\nwho2 <- who1 %>% \n  \n  mutate(key = stringr::str_replace(key, \"newrel\", \"new_rel\"))\n\nwho3 <- who2 %>% \n  \n  separate(key, c(\"new\", \"type\", \"sexage\"), sep = \"_\")\n\nprint(who3)\n#> # A tibble: 76,046 × 8\n#>    country     iso2  iso3   year new   type  sexage cases\n#>    <chr>       <chr> <chr> <dbl> <chr> <chr> <chr>  <dbl>\n#>  1 Afghanistan AF    AFG    1997 new   sp    m014       0\n#>  2 Afghanistan AF    AFG    1997 new   sp    m1524     10\n#>  3 Afghanistan AF    AFG    1997 new   sp    m2534      6\n#>  4 Afghanistan AF    AFG    1997 new   sp    m3544      3\n#>  5 Afghanistan AF    AFG    1997 new   sp    m4554      5\n#>  6 Afghanistan AF    AFG    1997 new   sp    m5564      2\n#>  7 Afghanistan AF    AFG    1997 new   sp    m65        0\n#>  8 Afghanistan AF    AFG    1997 new   sp    f014       5\n#>  9 Afghanistan AF    AFG    1997 new   sp    f1524     38\n#> 10 Afghanistan AF    AFG    1997 new   sp    f2534     36\n#> # ℹ 76,036 more rows\n\nwho4 <- who3 %>%\n  \n  separate(sexage, c(\"sex\", \"age\"), sep = 1)\n\nprint(who4)\n#> # A tibble: 76,046 × 9\n#>    country   iso2  iso3   year new   type  sex   age   cases\n#>    <chr>     <chr> <chr> <dbl> <chr> <chr> <chr> <chr> <dbl>\n#>  1 Afghanis… AF    AFG    1997 new   sp    m     014       0\n#>  2 Afghanis… AF    AFG    1997 new   sp    m     1524     10\n#>  3 Afghanis… AF    AFG    1997 new   sp    m     2534      6\n#>  4 Afghanis… AF    AFG    1997 new   sp    m     3544      3\n#>  5 Afghanis… AF    AFG    1997 new   sp    m     4554      5\n#>  6 Afghanis… AF    AFG    1997 new   sp    m     5564      2\n#>  7 Afghanis… AF    AFG    1997 new   sp    m     65        0\n#>  8 Afghanis… AF    AFG    1997 new   sp    f     014       5\n#>  9 Afghanis… AF    AFG    1997 new   sp    f     1524     38\n#> 10 Afghanis… AF    AFG    1997 new   sp    f     2534     36\n#> # ℹ 76,036 more rows",
+    "comment": "**A real cleaning pipeline: one problem at a time.**\n1. **`pivot_longer(new_sp_m014:newrel_f65, names_to = \"key\", values_to = \"cases\", values_drop_na = TRUE)`**: 56 code columns → one `key` column. `values_drop_na = TRUE` drops the empty cells.\n2. **`str_replace(key, \"newrel\", \"new_rel\")`**: fixes inconsistent names so every key has two underscores (given code, \"just run this\").\n3. **`separate(key, c(\"new\", \"type\", \"sexage\"), sep = \"_\")`**: \"new_sp_m014\" → \"new\", \"sp\", \"m014\".\n4. **`separate(sexage, c(\"sex\", \"age\"), sep = 1)`**: \"m014\" → \"m\" + \"014\" (split after the 1st character).\n\n**Pattern:** look at the messy column names, write down what each piece means, then pivot first and separate after.",
+    "key": false
+   },
+   {
+    "id": "lec-12-c09",
+    "label": "Practice: Billboard charts (pivot_longer with starts_with)",
+    "question": "The billboard data has one column per week on the chart (wk1, wk2, …). Reshape it so each row is a song in a week with its rank.",
+    "code": "billboard2 <- billboard %>% \n  \n  pivot_longer(\n    \n    cols = starts_with(\"wk\"), \n    \n    names_to = \"week\",\n    \n    values_to = \"rank\", \n    \n    values_drop_na = TRUE)\n\nprint(billboard2)\n#> # A tibble: 5,307 × 5\n#>    artist  track                   date.entered week   rank\n#>    <chr>   <chr>                   <date>       <chr> <dbl>\n#>  1 2 Pac   Baby Don't Cry (Keep... 2000-02-26   wk1      87\n#>  2 2 Pac   Baby Don't Cry (Keep... 2000-02-26   wk2      82\n#>  3 2 Pac   Baby Don't Cry (Keep... 2000-02-26   wk3      72\n#>  4 2 Pac   Baby Don't Cry (Keep... 2000-02-26   wk4      77\n#>  5 2 Pac   Baby Don't Cry (Keep... 2000-02-26   wk5      87\n#>  6 2 Pac   Baby Don't Cry (Keep... 2000-02-26   wk6      94\n#>  7 2 Pac   Baby Don't Cry (Keep... 2000-02-26   wk7      99\n#>  8 2Ge+her The Hardest Part Of ... 2000-09-02   wk1      91\n#>  9 2Ge+her The Hardest Part Of ... 2000-09-02   wk2      87\n#> 10 2Ge+her The Hardest Part Of ... 2000-09-02   wk3      92\n#> # ℹ 5,297 more rows\n\nbillboard3 <- billboard %>% \n  \n  pivot_longer(\n    \n    cols = starts_with(\"wk\"), \n    \n    names_to = \"week\",\n    \n    names_prefix = \"wk\",\n    \n    names_transform = as.integer,\n    \n    values_to = \"rank\", \n    \n    values_drop_na = TRUE)\n\n\nprint(billboard3)\n#> # A tibble: 5,307 × 5\n#>    artist  track                   date.entered  week  rank\n#>    <chr>   <chr>                   <date>       <int> <dbl>\n#>  1 2 Pac   Baby Don't Cry (Keep... 2000-02-26       1    87\n#>  2 2 Pac   Baby Don't Cry (Keep... 2000-02-26       2    82\n#>  3 2 Pac   Baby Don't Cry (Keep... 2000-02-26       3    72\n#>  4 2 Pac   Baby Don't Cry (Keep... 2000-02-26       4    77\n#>  5 2 Pac   Baby Don't Cry (Keep... 2000-02-26       5    87\n#>  6 2 Pac   Baby Don't Cry (Keep... 2000-02-26       6    94\n#>  7 2 Pac   Baby Don't Cry (Keep... 2000-02-26       7    99\n#>  8 2Ge+her The Hardest Part Of ... 2000-09-02       1    91\n#>  9 2Ge+her The Hardest Part Of ... 2000-09-02       2    87\n#> 10 2Ge+her The Hardest Part Of ... 2000-09-02       3    92\n#> # ℹ 5,297 more rows\n\nbillboard3 %>%\n  \n  arrange(artist, track, week)\n#> # A tibble: 5,307 × 5\n#>    artist  track                   date.entered  week  rank\n#>    <chr>   <chr>                   <date>       <int> <dbl>\n#>  1 2 Pac   Baby Don't Cry (Keep... 2000-02-26       1    87\n#>  2 2 Pac   Baby Don't Cry (Keep... 2000-02-26       2    82\n#>  3 2 Pac   Baby Don't Cry (Keep... 2000-02-26       3    72\n#>  4 2 Pac   Baby Don't Cry (Keep... 2000-02-26       4    77\n#>  5 2 Pac   Baby Don't Cry (Keep... 2000-02-26       5    87\n#>  6 2 Pac   Baby Don't Cry (Keep... 2000-02-26       6    94\n#>  7 2 Pac   Baby Don't Cry (Keep... 2000-02-26       7    99\n#>  8 2Ge+her The Hardest Part Of ... 2000-09-02       1    91\n#>  9 2Ge+her The Hardest Part Of ... 2000-09-02       2    87\n#> 10 2Ge+her The Hardest Part Of ... 2000-09-02       3    92\n#> # ℹ 5,297 more rows",
+    "comment": "**`cols = starts_with(\"wk\")`** picks all 76 week columns without typing them.\n\n**`values_drop_na = TRUE`**: most songs drop off the chart early, so most week cells are `NA`; this keeps only the weeks each song was ranked.\n\n**Next steps you might be asked for:**\n- turn \"wk1\" into the number 1 (`readr::parse_number(week)`), then `group_by(track)` and `summarise(best = min(rank))`.",
+    "key": false
+   }
+  ],
+  "notes": "Reshaping data so each variable is a column and each observation is a row. Course notes: https://ap4347.github.io/2102/lecture-12.html\n\n**Which function?**\n\n| Problem in the data | Function |\n|---|---|\n| column **names** are values (`1999`, `2000`) | `pivot_longer()` |\n| one observation spread over several **rows** | `pivot_wider()` |\n| two values in one cell (`\"745/19987071\"`) | `separate()` |\n| one value split across columns | `unite()` |\n| missing combinations / `NA`s | `complete()`, `fill()`, `replace_na()`, `drop_na()` |",
+  "takeaways": [
+   "Tidy: each variable a column, each observation a row, each value a cell.",
+   "pivot_longer(cols, names_to = \"new name col\", values_to = \"new value col\") makes data longer.",
+   "pivot_wider(names_from = col, values_from = col) makes data wider.",
+   "separate(col, into = c(...), sep = \"/\") splits; convert = TRUE turns text numbers into numbers.",
+   "complete() makes implicit missing values explicit; fill(), replace_na(), drop_na() handle NAs."
+  ],
+  "updatedAt": "2026-10-14T16:30:00Z"
  }
 };

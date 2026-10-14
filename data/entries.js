@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-14T17:00:00Z";
+window.ENTRIES_SAVED = "2026-10-14T17:20:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -1847,8 +1847,8 @@ window.ENTRIES = {
    {
     "id": "c152",
     "label": "Problem 1 · Question 1 · How many employees are Female, have a Master’s degree, and…",
-    "code": "nrow(employees[employees$Sex == \"Female\" & employees$Education_Level == \"Master's\" &\n          employees$Salary > 80000, ])\n#> [1] 0",
-    "comment": "",
+    "code": "nrow(employees[employees$Sex == \"Female\" & employees$Education_Level == \"Master's\" &\n          employees$Salary > 80000, ])\n#> [1] 0\n\n# Solution #2: same count, no nrow() needed\nsum(employees$Sex == \"Female\" & employees$Education_Level == \"Master's\" &\n      employees$Salary > 80000)\n\n# If you get 0, check how the level is spelled in the data:\nlevels(employees$Education_Level)",
+    "comment": "**Why `nrow()` comes first: read it from the inside out.** R runs the innermost part first, and `nrow()` is the last step even though it's written first.\n\n1. **Build the TRUE/FALSE test** (one TRUE/FALSE per employee):\n   `employees$Sex == \"Female\" & employees$Education_Level == \"Master's\" & employees$Salary > 80000`\n   `&` because the question says Female **and** Master's **and** above $80,000. All three must be TRUE.\n2. **Keep those rows:** `employees[ test , ]`. The test goes **before** the comma (rows), and nothing after the comma means \"keep all columns\". The result is a smaller data frame with only the matching employees.\n3. **Count them:** the question asks **\"How many employees\"**, and each employee is one row, so `nrow()` of that smaller data frame is the answer.\n\nSo the line is just `nrow( filtered data frame )`. You could write it in two lines to see it more clearly:\n\n```r\nfem_masters <- employees[employees$Sex == \"Female\" & employees$Education_Level == \"Master's\" & employees$Salary > 80000, ]\nnrow(fem_masters)\n```\n\n**Solution #2, `sum()` of the test:** TRUE counts as 1 and FALSE as 0, so `sum(test)` counts the TRUEs directly. There's no data frame and no comma to forget, and you get the same number.\n\n**Common mistakes**\n- Forgetting the comma, as in `employees[test]`. Without it R treats the test as picking **columns**, and you get an error or the wrong thing.\n- Using `length()` instead of `nrow()`. `length()` of a data frame is the number of **columns** (10), not rows.\n- Using `|` (or) instead of `&` (and).\n\n**If you get 0, check the spelling.** `\"Master's\"` has to match the data **exactly**, including the apostrophe: a curly ’ vs a straight ' counts as a different word. Run `levels(employees$Education_Level)` and copy the level from there.\n\n**Solve similar questions like this:** \"How many ___ are A and B and C?\" → `nrow(df[cond1 & cond2 & cond3, ])` or `sum(cond1 & cond2 & cond3)`. \"What proportion …?\" → swap `sum` for `mean` (as in the High job satisfaction question below).",
     "key": false,
     "question": "• How many employees are Female, have a Master’s degree, and earn a Salary above $80,000?"
    },
@@ -1959,7 +1959,7 @@ window.ENTRIES = {
   ],
   "notes": "Analysis of `employee_survey_data.csv` (700 employees, 10 variables): counts and proportions by group, top earners per department, a `tenure_groups` factor, and barplots, notched boxplots and side-by-side histograms.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
-  "updatedAt": "2026-10-12T17:10:00Z"
+  "updatedAt": "2026-10-14T17:20:00Z"
  },
  "rec-04": {
   "type": "rec",

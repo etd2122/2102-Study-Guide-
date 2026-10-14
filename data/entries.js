@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-14T00:20:00Z";
+window.ENTRIES_SAVED = "2026-10-14T00:25:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -1320,7 +1320,7 @@ window.ENTRIES = {
     "id": "c139",
     "label": "If-Else Statements · Problem 1 · Part II",
     "code": "exam_scores <- c(94, 82, 76, 68, 88, 91, 73, 59)\nhomework_rates <- c(0.95, 0.84, 0.98, 0.90, 0.72, 0.88, 0.79, 1.00)\n# Use ifelse() to create a logical vector called eligible that is TRUE if a student:\n\neligible <- ifelse(exam_scores >= 75 & homework_rates >= 0.80,\n                   TRUE, FALSE)\nprint(eligible)\n#> [1]  TRUE  TRUE  TRUE FALSE FALSE  TRUE FALSE FALSE",
-    "comment": "",
+    "comment": "**Roadmap: from the question to the code**\n\n**Step 1. Break the question into pieces.**\n\n| Question says | Code piece |\n|---|---|\n| two vectors of 8 students | `exam_scores <- c(...)`, `homework_rates <- c(...)` |\n| \"Use ifelse()\" | `ifelse(test, value_if_TRUE, value_if_FALSE)` |\n| \"a logical vector called eligible\" | `eligible <- ...` holding TRUE/FALSE |\n| \"exam score of at least 75\" | `exam_scores >= 75` (\"at least\" = `>=`) |\n| \"**and** completed at least 80% of the homework\" | `& homework_rates >= 0.80` (80% = 0.80) |\n| \"Otherwise, FALSE\" | the third argument of `ifelse()` |\n\n**Step 2. Why `ifelse()` and not `if`.** `if ()` answers **one** yes/no question. Here you have 8 students, so you need 8 answers. `ifelse()` checks every position at once and gives one answer per student. Putting the whole vector in `if (exam_scores >= 75)` gives an error (\"the condition has length > 1\").\n\n**Step 3. How R lines up the two vectors.** It compares them **position by position**: student 1's score goes with student 1's rate, student 2's with student 2's, and so on. Both vectors must be the same length.\n\n**Step 4. Trace every student:**\n\n| Student | Score | ≥ 75? | Rate | ≥ 0.80? | Both (`&`)? |\n|---|---|---|---|---|---|\n| 1 | 94 | TRUE | 0.95 | TRUE | **TRUE** |\n| 2 | 82 | TRUE | 0.84 | TRUE | **TRUE** |\n| 3 | 76 | TRUE | 0.98 | TRUE | **TRUE** |\n| 4 | 68 | FALSE | 0.90 | TRUE | FALSE |\n| 5 | 88 | TRUE | 0.72 | FALSE | FALSE |\n| 6 | 91 | TRUE | 0.88 | TRUE | **TRUE** |\n| 7 | 73 | FALSE | 0.79 | FALSE | FALSE |\n| 8 | 59 | FALSE | 1.00 | TRUE | FALSE |\n\nResult: `TRUE TRUE TRUE FALSE FALSE TRUE FALSE FALSE`. Students 4 and 5 show why it's `&`: each passes one rule but not both. With `|` they'd wrongly be TRUE.\n\n**Step 5. Shortcut.** Since you want TRUE/FALSE anyway, `ifelse(..., TRUE, FALSE)` is optional: `eligible <- exam_scores >= 75 & homework_rates >= 0.80` gives the same vector. Use `ifelse()` when the question asks for it or wants other labels: `ifelse(..., \"Eligible\", \"Not eligible\")`.\n\n**What to remember**\n- `if` = one value; `ifelse()` = a whole vector.\n- `ifelse(test, yes, no)`: the test first, then what to give when TRUE, then when FALSE.\n- Comparisons on vectors go position by position and return one TRUE/FALSE each.\n- \"at least\" = `>=`, \"more than\" = `>`; percentages become decimals (80% = 0.80).\n- \"and\" → `&`, \"or\" → `|`.\n- A logical vector is useful afterwards: `sum(eligible)` counts the TRUEs (4), and `exam_scores[eligible]` keeps only eligible students' scores (94 82 76 91).",
     "key": false,
     "question": "Now consider:\nexam_scores <- c(94, 82, 76, 68, 88, 91, 73, 59)\nhomework_rates <- c(0.95, 0.84, 0.98, 0.90, 0.72, 0.88, 0.79, 1.00)\nUse ifelse() to create a logical vector called eligible that is TRUE if a student:\n• has an exam score of at least 75, and\n• has completed at least 80% of the homework.\nOtherwise, the value should be FALSE."
    },
@@ -1479,7 +1479,7 @@ window.ENTRIES = {
   ],
   "notes": "Assigning student `status` with if-else, `ifelse()` eligibility, nested for loops over a scores matrix, a while loop sequence, then function practice problems.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
-  "updatedAt": "2026-10-14T00:20:00Z"
+  "updatedAt": "2026-10-14T00:25:00Z"
  },
  "rec-03": {
   "type": "rec",

@@ -277,7 +277,7 @@ function miniMd(text){
     if(!l.trim()){i++;continue;}
     if(/^\s*\|/.test(l)){
       const rows=[]; while(i<lines.length&&/^\s*\|/.test(lines[i])){rows.push(lines[i]);i++;}
-      const cells=r=>r.trim().replace(/^\||\|$/g,'').split('|').map(c=>mdInline(c.trim()));
+      const cells=r=>r.trim().replace(/\\\|/g,'\u0000').replace(/^\||\|$/g,'').split('|').map(c=>mdInline(c.trim().replace(/\u0000/g,'|')));
       const body=rows.filter((r,k)=>!(k===1&&/^[\s|:-]+$/.test(r)));
       html+='<table><thead><tr>'+cells(body[0]).map(c=>'<th>'+c+'</th>').join('')+'</tr></thead><tbody>'+
         body.slice(1).map(r=>'<tr>'+cells(r).map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table>';

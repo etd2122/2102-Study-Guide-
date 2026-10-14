@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-14T00:40:00Z";
+window.ENTRIES_SAVED = "2026-10-14T00:50:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -1361,7 +1361,7 @@ window.ENTRIES = {
     "label": "While Loops · Problem 3 · Part I",
     "question": "Create an empty vector called sequence_values. Using a while loop:\n• store each value in sequence_values;\n• update value using the rule above;\n• stop when value becomes 1.\nMake sure that 1 is also included as the last element of sequence_values.",
     "code": "sequence_values <- c()\nwhile (value != 1) {\n  sequence_values <- c(sequence_values, value)\n  if (value %% 2 == 0) {\n    value <- value / 2\n  } else {\n    value <- 3 * value + 1\n  }\n}\nsequence_values <- c(sequence_values, 1)\nprint(sequence_values)\n#> [1]  5 16  8  4  2  1",
-    "comment": "",
+    "comment": "**Why `c()`?**\n\n`sequence_values <- c()` makes an **empty vector** (R prints it as `NULL`). It's the container the loop fills. Each pass, `sequence_values <- c(sequence_values, value)` means \"take everything collected so far, add the current value on the end, and save it back under the same name\":\n\n| Pass | value | sequence_values after |\n|---|---|---|\n| start | 5 | (empty) |\n| 1 | 5 → 16 | 5 |\n| 2 | 16 → 8 | 5 16 |\n| 3 | 8 → 4 | 5 16 8 |\n| 4 | 4 → 2 | 5 16 8 4 |\n| 5 | 2 → 1 | 5 16 8 4 2 |\n| loop stops (value is 1) | | then `c(sequence_values, 1)` → **5 16 8 4 2 1** |\n\n**Why `c()` here but `logical(n)` or `matrix(0, ...)` in Problem 2:** there you knew the size ahead of time (4 students, 4 × 4 scores), so you made a container with that many slots and filled `[i]`. Here you **don't know** how many steps the sequence will take, so you start empty and grow it with `c(old, new)`.\n\n**Why add 1 after the loop:** `while (value != 1)` checks **before** each pass. Once `value` becomes 1, the loop stops without storing it, so 1 has to be added afterwards.\n\n---\n\n**Common mistake: a typo in the name inside the loop**\n\n```r\nsequence_value <- c(sequence_values, value)    # missing \"s\" on the left\n```\nR treats `sequence_value` and `sequence_values` as **two different variables**. Each pass saves into the new `sequence_value`, while `sequence_values` never changes and stays empty. After the loop, `c(empty, 1)` prints just **`1`**. The Environment pane shows the giveaway: a `sequence_value` holding `2` (the last value saved) next to `sequence_values` holding `1`.\n\n**Rule:** in a \"grow\" line, the name on the left of `<-` must be **exactly** the same as the first name inside `c( )`. If the output is shorter than expected or empty, check the Environment pane for a near-duplicate name.\n\n---\n\n**Related problems (same \"grow a vector\" pattern)**\n- **Homework 1, Problem 4 Part 3:** fill `vector7` with odd numbers using `vector7 <- c(vector7, i)`.\n- **Recitation 2, Problem 3 Part II:** same loop plus a counter, `steps <- steps + 1`.\n- **Recitation 4 simulations** (streak game, random walk, rainy days): keep going until a condition, collecting results along the way.\n- **Rev 01, \"Repeat until something happens\":** the for-loop + `break` version.\n\n**How to solve similar problems**\n1. Is the final length known? **No** → start with `result <- c()`. **Yes** → `result <- numeric(n)` (or `logical(n)`, `character(n)`) and fill `result[i]`.\n2. Set the starting value (`value <- 5`).\n3. Write the stopping rule as the loop condition: \"until value becomes 1\" → `while (value != 1)`.\n4. Inside the loop, in this order: **save** the current value (`result <- c(result, value)`), then **update** it using the rule.\n5. After the loop, add anything the condition skipped (here the final 1), then `print(result)`.\n6. Check by tracing 2–3 passes by hand, like the table above.",
     "key": false
    },
    {
@@ -1479,7 +1479,7 @@ window.ENTRIES = {
   ],
   "notes": "Assigning student `status` with if-else, `ifelse()` eligibility, nested for loops over a scores matrix, a while loop sequence, then function practice problems.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
-  "updatedAt": "2026-10-14T00:40:00Z"
+  "updatedAt": "2026-10-14T00:50:00Z"
  },
  "rec-03": {
   "type": "rec",

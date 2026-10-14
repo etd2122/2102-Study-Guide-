@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-14T00:35:00Z";
+window.ENTRIES_SAVED = "2026-10-14T00:40:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -1345,7 +1345,7 @@ window.ENTRIES = {
     "label": "For Loops · Problem 2 · Part II",
     "question": "Create a logical vector called all_passed. For each student, determine whether all adjusted quiz scores are at least 70.",
     "code": "all_passed <- logical(nrow(adjusted_scores))\nfor (i in 1:nrow(adjusted_scores)) {\n  all_passed[i] <- all(adjusted_scores[i, ] >= 70)\n}\nprint(all_passed)\n#> [1] TRUE TRUE TRUE TRUE",
-    "comment": "",
+    "comment": "**Roadmap: from the question to the code**\n\n| Question says | Code piece |\n|---|---|\n| \"a logical vector called all_passed\" | `all_passed <- logical(...)` |\n| \"For each student\" (each **row**) | `for (i in 1:nrow(adjusted_scores))` |\n| \"**all** adjusted quiz scores\" | `all(...)` on that student's row `adjusted_scores[i, ]` |\n| \"are at least 70\" | `>= 70` |\n\n**Step 1. Make the empty container.** `logical(nrow(adjusted_scores))` makes `FALSE FALSE FALSE FALSE`, one slot per student. Same idea as the 0-matrix in Part I: build it first, fill it in the loop.\n\n**Step 2. Loop over students = rows.** In `scores`, rows are students and columns are quizzes, so \"for each student\" means `i` goes over `1:nrow(...)`.\n\n**Step 3. Grab one student's whole row.** `adjusted_scores[i, ]`: the blank after the comma means every quiz. For student 2 that's `72 88 82 92`.\n\n**Step 4. Check each quiz, then combine.**\n- `adjusted_scores[2, ] >= 70` → `TRUE TRUE TRUE TRUE` (one answer per quiz).\n- `all(...)` squeezes those into **one** answer: TRUE only if every quiz passed.\n\n**Step 5. Store it in that student's slot.** `all_passed[i] <- ...`.\n\n**Result:** `TRUE TRUE TRUE TRUE`. Every student passes after the Part I bonus. On the **original** `scores`, the same code gives `TRUE FALSE TRUE FALSE`: student 2 has a 67 and student 4 a 68. That's a good way to check the code actually does something.\n\n**The one-line version:** `apply(adjusted_scores >= 70, 1, all)` gives the same vector (`1` = do it for each row). Use the loop if the question says \"for loop\".\n\n---\n\n**How to solve similar problems**\n\n1. **\"For each ___\"** tells you what to loop over: student → row (`1:nrow`, `m[i, ]`), quiz → column (`1:ncol`, `m[, j]`), element of a vector → `1:length(x)`, `x[i]`.\n2. **What kind of answer per item?**\n   - yes/no → `logical(n)` container, fill with TRUE/FALSE\n   - a number → `numeric(n)` (or `vector(mode = \"numeric\", length = n)`)\n   - a label → `character(n)`\n3. **Which summary word?**\n\n| Question word | Function | Example |\n|---|---|---|\n| \"all\", \"every\", \"none below\" | `all()` | did the student pass every quiz? |\n| \"any\", \"at least one\" | `any()` | did the student score 90+ on any quiz? → `TRUE TRUE TRUE FALSE` (original scores) |\n| \"how many\" | `sum()` | how many quizzes 90+? → `1 1 2 0` |\n| \"what proportion\" | `mean()` | share of quizzes passed |\n| \"highest / average / total\" | `max()`, `mean()`, `sum()` | best quiz per student |\n\n4. **Template:**\n```r\nresult <- logical(nrow(m))          # or numeric(...)\nfor (i in 1:nrow(m)) {\n  result[i] <- all(m[i, ] >= 70)    # swap all/any/sum/mean and the condition\n}\nprint(result)\n```\nFor **each quiz** instead of each student, change `nrow` → `ncol` and `m[i, ]` → `m[, i]`: \"did every student pass quiz j?\" on the original scores gives `FALSE FALSE TRUE TRUE`.",
     "key": false
    },
    {
@@ -1479,7 +1479,7 @@ window.ENTRIES = {
   ],
   "notes": "Assigning student `status` with if-else, `ifelse()` eligibility, nested for loops over a scores matrix, a while loop sequence, then function practice problems.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
-  "updatedAt": "2026-10-14T00:35:00Z"
+  "updatedAt": "2026-10-14T00:40:00Z"
  },
  "rec-03": {
   "type": "rec",

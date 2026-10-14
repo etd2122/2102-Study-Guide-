@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-14T00:25:00Z";
+window.ENTRIES_SAVED = "2026-10-14T00:35:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -1337,7 +1337,7 @@ window.ENTRIES = {
     "label": "For Loops · Problem 2 · Part I",
     "question": "Create a matrix called adjusted_scores with the same dimensions as scores. Using nested for loops, examine every element of scores and apply the following rules:\n• if the score is below 70, add 5 points;\n• if the score is between 70 and 89 inclusive, add 3 points;\n• if the score is 90 or higher, leave it unchanged.\nStore the results in adjusted_scores.",
     "code": "adjusted_scores <- matrix(0, nrow = nrow(scores), ncol = ncol(scores))\nfor (i in 1:nrow(scores)) {\n  for (j in 1:ncol(scores)) {\n    if (scores[i, j] < 70) {\n      adjusted_scores[i, j] <- scores[i, j] + 5\n    } else if (scores[i, j] >= 70 & scores[i, j] <= 89) {\n      adjusted_scores[i, j] <- scores[i, j] + 3\n    } else {\n      adjusted_scores[i, j] <- scores[i, j]\n    }\n  }\n}\nprint(adjusted_scores)\n#>      [,1] [,2] [,3] [,4]\n#> [1,]   85   79   91   91\n#> [2,]   72   88   82   92\n#> [3,]   95   92   87   90\n#> [4,]   76   73   84   80",
-    "comment": "",
+    "comment": "**Why the matrix starts full of 0s**\n\n`adjusted_scores <- matrix(0, nrow = nrow(scores), ncol = ncol(scores))` builds an **empty container** the same size as `scores` (4 × 4) before the loop runs:\n```\n     [,1] [,2] [,3] [,4]\n[1,]    0    0    0    0\n...\n```\nThe 0s are **placeholders**, not real values. Every cell gets overwritten inside the loop, so none of the 0s survive to the final answer.\n\n**Why you need it at all:** the loop writes one cell at a time with `adjusted_scores[i, j] <- ...`. You can only fill a cell of something that already exists:\n- No `adjusted_scores` yet → error: *object 'adjusted_scores' not found*.\n- `adjusted_scores <- c()` (an empty vector) → error: *incorrect number of subscripts on matrix*, because `[i, j]` needs rows and columns.\n\nSo the matrix gives the loop a 4 × 4 grid of slots to fill. `nrow(scores)` and `ncol(scores)` make it match the input's size automatically, so it still works if `scores` changes size.\n\n**Why 0 and not something else:** any filler works because it all gets replaced. Other choices:\n- `matrix(NA, nrow = ..., ncol = ...)`: safer for checking your work, since any cell the loop forgot to fill shows up as `NA` instead of a believable 0.\n- `adjusted_scores <- scores`: start from a copy and change it in place.\n\n**Walk through one cell (row 2, column 1):** `scores[2, 1]` is 67. That's below 70, so `adjusted_scores[2, 1] <- 67 + 5` replaces the 0 with **72**. The double loop does this for all 16 cells.\n\n**Same pattern elsewhere:** Part II starts with `logical(nrow(adjusted_scores))` (a vector of FALSEs, one per student), and Homework 1, Problem 5 starts with `vector(mode = \"character\", length = ...)`. **Make the empty container first, then fill it in the loop.**",
     "key": false
    },
    {
@@ -1479,7 +1479,7 @@ window.ENTRIES = {
   ],
   "notes": "Assigning student `status` with if-else, `ifelse()` eligibility, nested for loops over a scores matrix, a while loop sequence, then function practice problems.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
-  "updatedAt": "2026-10-14T00:25:00Z"
+  "updatedAt": "2026-10-14T00:35:00Z"
  },
  "rec-03": {
   "type": "rec",

@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-14T01:10:00Z";
+window.ENTRIES_SAVED = "2026-10-14T01:20:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -1381,6 +1381,22 @@ window.ENTRIES = {
     "key": false
    },
    {
+    "id": "rec-02-p4-sol2",
+    "label": "Functions · Problem 4 · Solution #2 (counters, for loops over values)",
+    "question": "Create a function named function1 with a single argument x that counts the number of even and odd numbers in the input list. The function should return a list with two elements: Even representing the count of even numbers and Odd representing the count of odd numbers. Test the function with the following input list: [ [1, 3.4, 2, -5], [2.2, 16, -3, 7], [“final”, “any”, “can”, “maybe”, “world”] ].",
+    "code": "list1 <- list(c(1, 3.4, 2, -5), c(2.2, 16, -3, 7),\n              c(\"final\", \"any\", \"can\", \"maybe\", \"world\"))\n\ncount_even_odd <- function(x) {\n  even <- 0                              # counters instead of collecting numbers\n  odd <- 0\n  for (vec in x) {                       # each vector in the list\n    if (!is.numeric(vec)) {\n      next                               # skip the text vector\n    }\n    for (num in vec) {                   # each number in that vector\n      if (num %% 2 == 0) {\n        even <- even + 1\n      } else if (num %% 2 == 1) {        # 3.4 and 2.2 are neither\n        odd <- odd + 1\n      }\n    }\n  }\n  return(list(Even = even, Odd = odd))\n}\n\ncount_even_odd(list1)\n#> $Even\n#> [1] 2\n#> $Odd\n#> [1] 4",
+    "key": false,
+    "comment": "**What's different from Solution #1**\n\n- **Counters instead of collecting.** Solution #1 builds vectors `Even` and `Odd`, then takes `length()` of each at the end. Here `even <- even + 1` counts directly, so there's less to track and no `length()` step.\n- **Loops over values, not positions.** `for (vec in x)` hands you each vector itself (no `x[[i]]`), and `for (num in vec)` hands you each number (no `x[[i]][j]`). Use this style when you don't need the position number.\n- **`next` to skip text.** Instead of wrapping everything in `if (is.numeric(...)) { ... }`, it skips non-numeric elements up front, which keeps the loop body flatter.\n\n**Steps**\n1. `even <- 0`, `odd <- 0`.\n2. Outer loop over the vectors in the list; `next` if it isn't numeric.\n3. Inner loop over the numbers; add 1 to the right counter.\n4. `return(list(Even = even, Odd = odd))` → Even 2, Odd 4.\n\n**Remember:** `for (v in x)` gives values; `for (i in 1:length(x))` gives positions. Use positions when you need to write into `result[i]` or look at a neighbor `x[i - 1]`."
+   },
+   {
+    "id": "rec-02-p4-sol3",
+    "label": "Functions · Problem 4 · Solution #3 (no loops: sapply + unlist)",
+    "question": "Create a function named function1 with a single argument x that counts the number of even and odd numbers in the input list. The function should return a list with two elements: Even representing the count of even numbers and Odd representing the count of odd numbers. Test the function with the following input list: [ [1, 3.4, 2, -5], [2.2, 16, -3, 7], [“final”, “any”, “can”, “maybe”, “world”] ].",
+    "code": "list1 <- list(c(1, 3.4, 2, -5), c(2.2, 16, -3, 7),\n              c(\"final\", \"any\", \"can\", \"maybe\", \"world\"))\n\ncount_even_odd2 <- function(x) {\n  keep <- sapply(x, is.numeric)          # TRUE TRUE FALSE: which elements are numbers\n  nums <- unlist(x[keep])                # one numeric vector of all the numbers\n  return(list(Even = sum(nums %% 2 == 0),\n              Odd  = sum(nums %% 2 == 1)))\n}\n\ncount_even_odd2(list1)\n#> $Even\n#> [1] 2\n#> $Odd\n#> [1] 4\n\n# Why the sapply step matters: unlisting everything turns it all into text\nunlist(list1)[1:4]\n#> [1] \"1\"   \"3.4\" \"2\"   \"-5\" ",
+    "key": false,
+    "comment": "**The no-loop version, step by step**\n\n1. **`sapply(x, is.numeric)`** asks each list element \"are you numbers?\" → `TRUE TRUE FALSE`.\n2. **`x[keep]`** keeps only the numeric elements (single brackets, because you want a smaller **list**).\n3. **`unlist(...)`** flattens them into one vector: `1 3.4 2 -5 2.2 16 -3 7`.\n4. **`nums %% 2 == 0`** checks every number at once → TRUE/FALSE vector. **`sum()`** counts the TRUEs (TRUE = 1). Same for `== 1`.\n\n**Why step 1 matters:** if you `unlist(list1)` without removing the text vector first, **everything** becomes text (`\"1\" \"3.4\" \"2\" \"-5\"`), because a vector can only hold one type, and `%%` then gives an error. The last lines of the code show this.\n\n**When to use which:**\n- Exam says \"use a for loop\" → Solution #1 or #2.\n- No loop requirement → this one is shortest. It's the same counting idea as `sum(eligible)` in Problem 1 Part II.\n\n**Pieces worth remembering:** `sapply(list, function)` = one answer per element; `unlist()` = flatten a list into a vector; `sum(condition)` = count how many are TRUE."
+   },
+   {
     "id": "rec-02-q908",
     "label": "Functions · Problem 5",
     "question": "Write a function neighbor_matrix(n, m) that creates and returns an n x m numeric matrix filled according to the following rules:\n1. The top-left entry (row 1, column 1) should start with the value 1.\n2. Each subsequent entry is filled using the following rule:\n• The value of a cell is equal to the sum of its immediate top and left neighbors (if they exist).\n• If a neighbor does not exist (for example, for the first row or first column), treat that neighbor as 0.\nTest your function with n = 4 and m = 5.",
@@ -1479,7 +1495,7 @@ window.ENTRIES = {
   ],
   "notes": "Assigning student `status` with if-else, `ifelse()` eligibility, nested for loops over a scores matrix, a while loop sequence, then function practice problems.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
-  "updatedAt": "2026-10-14T01:10:00Z"
+  "updatedAt": "2026-10-14T01:00:00Z"
  },
  "rec-03": {
   "type": "rec",

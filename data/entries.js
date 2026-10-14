@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-14T01:20:00Z";
+window.ENTRIES_SAVED = "2026-10-14T01:30:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -1421,11 +1421,27 @@ window.ENTRIES = {
     "key": false
    },
    {
+    "id": "rec-02-p6-sol2",
+    "label": "Extra practice · Problem 6 · Solution #2 (filter first, then max())",
+    "question": "Write a function largest_odd(x) that takes a numeric vector x and returns the largest odd number in the vector. If there are no odd numbers, return NULL. Test your function with the following vector: [10, 15, 11, 4, 3, 8, 17, 34, 4, 11, 12, 17, 21, 1, 31, 36]",
+    "code": "largest_odd2 <- function(x) {\n  odds <- x[x %% 2 != 0]          # keep only the odd numbers\n  if (length(odds) == 0) {\n    return(NULL)                  # none found\n  }\n  return(max(odds))\n}\n\nx <- c(10, 15, 11, 4, 3, 8, 17, 34, 4, 11, 12, 17, 21, 1, 31, 36)\nlargest_odd2(x)\n#> [1] 31\nlargest_odd2(c(2, 4, 6))          # no odds\n#> NULL",
+    "comment": "**Why it's simpler:** Solution #1 uses two loops: one to collect the odd numbers and one to find the biggest by hand. This version does each step with one tool:\n1. `x[x %% 2 != 0]` keeps only the odd numbers (the same filter as `vector4[vector4 > 15]` in Homework 1).\n2. Empty → `return(NULL)`.\n3. `max()` finds the largest. No running-max loop needed.\n\n**Result:** 31, and `NULL` for `c(2, 4, 6)`.\n\n**Remember:** \"find the ___ of the values that ___\" → filter with `x[condition]`, then summarize with `max`, `min`, `sum`, `mean` or `length`.",
+    "key": false
+   },
+   {
     "id": "rec-02-q910",
     "label": "Extra practice · Problem 7",
     "question": "Write a function first_repeated(x) that takes a numeric vector x and returns the first repeated element. If no element repeats, return NULL. Test your function with the following vector: [10, 15, 11, 4, 3, 8, 17, 34, 4, 11, 12, 17]",
     "code": "x <- c(10, 15, 11, 4, 3, 8, 17, 34, 4, 11, 12, 17)\nfirst_repeated <- function(x) {\n  for (i in 2:length(x)) {\n    for (j in 1:(i - 1)) {\n      if (x[i] == x[j]) {\n        return(x[i])\n      }\n    }\n  }\n  return(NULL)\n}\nfirst_repeated(x)\n#> [1] 4",
     "comment": "**Roadmap**\n\n| Question says | Code |\n|---|---|\n| \"first_repeated(x)\" | `function(x)` |\n| \"returns the first repeated element\" | for each position, check whether that value appeared **earlier** |\n| \"If no element repeats, return NULL\" | `return(NULL)` after the loops finish |\n\n**Steps**\n1. Outer loop `i` from **2** (position 1 has nothing before it).\n2. Inner loop `j` over every earlier position `1:(i - 1)`.\n3. If `x[i] == x[j]`, the value at `i` is a repeat. `return(x[i])` **immediately**: `return` exits the whole function, so you get the first one found.\n4. If both loops finish without returning, nothing repeated → `return(NULL)`.\n\n**Trace:** scanning 10, 15, 11, 4, 3, 8, 17, 34, then position 9 is **4**, which matches position 4. Result: **4**. (11 and 17 also repeat, but later.)\n\n**`return` inside a loop** is the clean way to say \"stop as soon as you find it.\"\n\n**One-line version:** `x[duplicated(x)][1]`. `duplicated()` marks values seen before.",
+    "key": false
+   },
+   {
+    "id": "rec-02-p7-sol2",
+    "label": "Extra practice · Problem 7 · Solution #2 (one loop with a \"seen\" list)",
+    "question": "Write a function first_repeated(x) that takes a numeric vector x and returns the first repeated element. If no element repeats, return NULL. Test your function with the following vector: [10, 15, 11, 4, 3, 8, 17, 34, 4, 11, 12, 17]",
+    "code": "first_repeated2 <- function(x) {\n  seen <- c()                     # values we've already passed\n  for (value in x) {\n    if (value %in% seen) {\n      return(value)               # seen before = first repeat\n    }\n    seen <- c(seen, value)\n  }\n  return(NULL)\n}\n\nx <- c(10, 15, 11, 4, 3, 8, 17, 34, 4, 11, 12, 17)\nfirst_repeated2(x)\n#> [1] 4\nfirst_repeated2(c(1, 2, 3))       # no repeats\n#> NULL",
+    "comment": "**Why it's simpler:** Solution #1 uses two nested loops, comparing each value to every earlier one. This version walks through once and keeps a list of values already passed:\n1. `seen <- c()`, empty to start.\n2. For each value: is it already in `seen`? (`%in%` checks the whole vector at once.) Yes → that's the first repeat, return it.\n3. No → add it to `seen` and keep going.\n4. Loop finishes → no repeats → `NULL`.\n\n**Trace:** 10, 15, 11, 4, 3, 8, 17, 34 all get added. The next 4 is already in `seen` → return **4**.\n\n**Remember:** `value %in% vector` replaces an inner loop whenever you're asking \"have I seen this?\" or \"is this in the list?\"",
     "key": false
    },
    {
@@ -1437,11 +1453,27 @@ window.ENTRIES = {
     "key": false
    },
    {
+    "id": "rec-02-p8-sol2",
+    "label": "Extra practice · Problem 8 · Solution #2 (grow until long enough)",
+    "question": "Write a function generate_custom_sequence(n) that generates a sequence of numbers where each number is the sum of the previous two numbers, starting with 1 and 2. The function should return the first n numbers in the sequence. Test your function with n = 10.",
+    "code": "generate_custom_sequence2 <- function(n) {\n  sequence <- c(1, 2)\n  while (length(sequence) < n) {\n    last_two <- sequence[length(sequence)] + sequence[length(sequence) - 1]\n    sequence <- c(sequence, last_two)       # add the next number on the end\n  }\n  return(sequence[1:n])                     # also works for n = 1\n}\n\ngenerate_custom_sequence2(10)\n#>  [1]  1  2  3  5  8 13 21 34 55 89\ngenerate_custom_sequence2(1)\n#> [1] 1",
+    "comment": "**Why it's simpler (and safer):** instead of filling positions 3 to n, keep adding the sum of the last two numbers until the vector is long enough.\n1. Start with `c(1, 2)`.\n2. While it's shorter than n: last + second-to-last, add it on the end with `c()`.\n3. Return `sequence[1:n]`.\n\n**Fixes a hidden problem:** Solution #1 uses `for (i in 3:n)`, and when n is 1 or 2, `3:n` counts **down** and breaks. Here the `while` just doesn't run, and `[1:n]` trims it. `generate_custom_sequence2(1)` gives `1`.\n\n**Remember:** `x[length(x)]` is the last value and `x[length(x) - 1]` the one before it. \"Grow until long enough\" = `while (length(x) < n)`.",
+    "key": false
+   },
+   {
     "id": "rec-02-q912",
     "label": "Extra practice · Problem 9",
     "question": "Write a function longest_run(x) that takes a numeric vector x and returns the longest consecutive sequence of repeated numbers along with its length. Test your function with x = c(1, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 6).",
     "code": "x <- c(1, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 6)\nlongest_run <- function(x) {\n  current_length <- 1\n  longest_length <- 1\n  longest_value <- x[1]\n  for (i in 2:length(x)) {\n    if (x[i] == x[i - 1]) {\n      current_length <- current_length + 1\n    } else {\n      current_length <- 1\n    }\n    if (current_length > longest_length) {\n      longest_length <- current_length\n      longest_value <- x[i]\n    }\n  }\n  return(c(longest_value, longest_length))\n}\nlongest_run(x)\n#> [1] 4 4",
     "comment": "**Roadmap**\n\n| Question says | Code |\n|---|---|\n| \"longest consecutive sequence of repeated numbers\" | compare each value to the **one before it** |\n| track the current run and the best run | `current_length`, `longest_length`, `longest_value` |\n| \"along with its length\" | `return(c(longest_value, longest_length))` |\n\n**Steps**\n1. Start everything at the first element: current run = 1, best run = 1, best value = `x[1]`.\n2. Loop from position 2.\n3. Same as the previous value (`x[i] == x[i - 1]`)? Run grows: `current_length + 1`. Different? Run restarts at 1.\n4. If the current run beats the best, update the best length **and** value.\n5. Return value and length.\n\n**Trace on 1, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 6:** the run of 2s reaches 3 (new best), the 3s reach 2 (not better), the 4s reach 4 (new best). Result: **4 4** (the value 4, run length 4).\n\n**Pattern: \"running best\"**: keep a current count plus a best-so-far, and update the best only when the current one beats it. Problem 16 uses the same idea.",
+    "key": false
+   },
+   {
+    "id": "rec-02-p9-sol2",
+    "label": "Extra practice · Problem 9 · Solution #2 (rle() does the counting)",
+    "question": "Write a function longest_run(x) that takes a numeric vector x and returns the longest consecutive sequence of repeated numbers along with its length. Test your function with x = c(1, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 6).",
+    "code": "longest_run2 <- function(x) {\n  runs <- rle(x)                  # run lengths: each value and how many times in a row\n  best <- which.max(runs$lengths) # position of the longest run\n  return(c(runs$values[best], runs$lengths[best]))\n}\n\nx <- c(1, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 6)\nrle(x)                            # what rle() gives back\n#> Run Length Encoding\n#>   lengths: int [1:6] 1 3 2 4 1 1\n#>   values : num [1:6] 1 2 3 4 5 6\nlongest_run2(x)\n#> [1] 4 4",
+    "comment": "**Why it's simpler:** R has a built-in function for exactly this. `rle()` (\"run length encoding\") turns a vector into its runs:\n```\nlengths: 1 3 2 4 1 1\nvalues : 1 2 3 4 5 6\n```\nwhich reads \"one 1, three 2s, two 3s, four 4s, one 5, one 6\".\n\n1. `runs <- rle(x)`.\n2. `which.max(runs$lengths)` → position of the longest run (the 4th run).\n3. Return that run's value and length → **4 4**.\n\n**Use the loop version (Solution #1) if the exam says \"use a for loop.\"** Knowing `rle()` still helps you check your answer. It solves Problem 16 too: the first run with `lengths >= 3`.\n\n**Remember:** `which.max()` gives the **position** of the biggest value; use it to pick the matching item from another vector.",
     "key": false
    },
    {
@@ -1453,11 +1485,27 @@ window.ENTRIES = {
     "key": false
    },
    {
+    "id": "rec-02-p10-sol2",
+    "label": "Extra practice · Problem 10 · Solution #2 (count with sum(x == value))",
+    "question": "Write a function sum_of_unique(x) that returns the sum of the elements in a numeric vector x that appear only once. Test your function with c(2, 3, 4, 3, 5, 2, 7).",
+    "code": "sum_of_unique2 <- function(x) {\n  total <- 0\n  for (value in x) {\n    if (sum(x == value) == 1) {   # how many times does this value appear?\n      total <- total + value\n    }\n  }\n  return(total)\n}\n\nx <- c(2, 3, 4, 3, 5, 2, 7)\nsum_of_unique2(x)\n#> [1] 16\nx == 3                            # what the check looks at for value 3\n#> [1] FALSE  TRUE FALSE  TRUE FALSE FALSE FALSE",
+    "comment": "**Why it's simpler:** Solution #1 counts each value's appearances with an inner loop. `sum(x == value)` does the same in one step:\n- `x == 3` → `FALSE TRUE FALSE TRUE FALSE FALSE FALSE` (TRUE wherever x is 3)\n- `sum()` counts the TRUEs → 2 → appears twice → skip.\n\n1. `total <- 0`.\n2. For each value: appears exactly once? Add it to `total`.\n3. Return `total` → 4 + 5 + 7 = **16**.\n\nIt also adds as it goes, so there's no extra vector to collect and sum at the end.\n\n**Remember:** `sum(condition)` = \"how many are TRUE.\" It replaces an inner counting loop almost every time.",
+    "key": false
+   },
+   {
     "id": "rec-02-q914",
     "label": "Extra practice · Problem 11",
     "question": "Create a function that takes a list of numeric vectors as input and rotates each vector clockwise by one position [for example (1, 2, 3) becomes (3, 1, 2)]. The function should return a new list with the rotated vectors. Test your function with the following input list: [(3, 5, 7, 9), (10, 20, 30), (2, 4, 6, 8, 10)]",
     "code": "input_list <- list(c(3, 5, 7, 9), c(10, 20, 30), c(2, 4, 6, 8, 10))\nrotate_vectors <- function(x) {\n  result <- list()\n  for (i in 1:length(x)) {\n    current_vector <- x[[i]]\n    last_value <- current_vector[length(current_vector)]\n    remaining_values <- current_vector[-length(current_vector)]\n    result[[i]] <- c(last_value, remaining_values)\n  }\n  return(result)\n}\nrotate_vectors(input_list)\n#> [[1]]\n#> [1] 9 3 5 7\n#> \n#> [[2]]\n#> [1] 30 10 20\n#> \n#> [[3]]\n#> [1] 10  2  4  6  8",
     "comment": "**Roadmap**\n\n| Question says | Code |\n|---|---|\n| \"takes a list of numeric vectors\" | loop over the list: `x[[i]]` |\n| \"rotates each vector by one: (1,2,3) → (3,1,2)\" | last value goes to the front |\n| \"return a new list\" | `result <- list()`, fill `result[[i]]`, `return(result)` |\n\n**Steps**\n1. Start an empty **list**: `result <- list()` (a list because the vectors have different lengths).\n2. Loop over each vector with `[[i]]`.\n3. Last value: `v[length(v)]`. Everything except the last: `v[-length(v)]`.\n4. Glue them: `c(last_value, remaining_values)` and store in `result[[i]]`.\n5. Return the list.\n\n**Example:** `c(3, 5, 7, 9)` → last = 9, rest = `3 5 7` → **9 3 5 7**.\n\n**Remember:** `v[length(v)]` = last element; negative index `v[-k]` = everything except position k. Use `[[i]] <-` to put something into a list slot.",
+    "key": false
+   },
+   {
+    "id": "rec-02-p11-sol2",
+    "label": "Extra practice · Problem 11 · Solution #2 (lapply() instead of the loop)",
+    "question": "Create a function that takes a list of numeric vectors as input and rotates each vector clockwise by one position [for example (1, 2, 3) becomes (3, 1, 2)]. The function should return a new list with the rotated vectors. Test your function with the following input list: [(3, 5, 7, 9), (10, 20, 30), (2, 4, 6, 8, 10)]",
+    "code": "rotate_vectors2 <- function(x) {\n  rotate_one <- function(v) {\n    return(c(v[length(v)], v[-length(v)]))   # last value first, then the rest\n  }\n  return(lapply(x, rotate_one))              # do it to every vector in the list\n}\n\ninput_list <- list(c(3, 5, 7, 9), c(10, 20, 30), c(2, 4, 6, 8, 10))\nrotate_vectors2(input_list)\n#> [[1]]\n#> [1] 9 3 5 7\n#> [[2]]\n#> [1] 30 10 20\n#> [[3]]\n#> [1] 10  2  4  6  8",
+    "comment": "**Why it's simpler:** write the rotation for **one** vector as a small function, then let `lapply()` apply it to every vector in the list. `lapply()` always returns a list, which is what the question asks for.\n\n1. `rotate_one(v)`: `c(v[length(v)], v[-length(v)])` → last value, then everything except the last.\n2. `lapply(x, rotate_one)` → runs it on each vector, collects the results in a list.\n\n**Result:** `9 3 5 7`, `30 10 20`, `10 2 4 6 8`.\n\n**Pattern to reuse:** \"do ___ to each vector in a list\" → solve it for one vector first, then `lapply(list, that_function)`. This is also the easiest way to write it on an exam: get one case working, then apply it.",
     "key": false
    },
    {
@@ -1469,11 +1517,27 @@ window.ENTRIES = {
     "key": false
    },
    {
+    "id": "rec-02-p12-sol2",
+    "label": "Extra practice · Problem 12 · Solution #2 (no loops: unlist + sum(conditions))",
+    "question": "Create a function named classify_numbers with a single argument num_list that categorizes numbers in the input list into different groups. The function should perform the following steps:\n1. Iterate through each element in the input list and check if it is a number. If it is a number, determine whether it is positive, negative, even, or odd.\n2. Return a list containing four elements:\n• PositiveEven: Count of positive even numbers\n• PositiveOdd: Count of positive odd numbers\n• NegativeEven: Count of negative even numbers\n• NegativeOdd: Count of negative odd numbers\nTest your function with the following input list:\nnum_list <- list(1, -2, 3, c(4, -3), -5, 6, c(\"text\", \"dot\", \"period\"), -8, 9)",
+    "code": "classify_numbers2 <- function(num_list) {\n  nums <- unlist(num_list[sapply(num_list, is.numeric)])   # all numbers, text dropped\n  return(list(PositiveEven = sum(nums > 0 & nums %% 2 == 0),\n              PositiveOdd  = sum(nums > 0 & nums %% 2 != 0),\n              NegativeEven = sum(nums < 0 & nums %% 2 == 0),\n              NegativeOdd  = sum(nums < 0 & nums %% 2 != 0)))\n}\n\nnum_list <- list(1, -2, 3, c(4, -3), -5, 6, c(\"text\", \"dot\", \"period\"), -8, 9)\nclassify_numbers2(num_list)\n#> $PositiveEven\n#> [1] 2\n#> $PositiveOdd\n#> [1] 3\n#> $NegativeEven\n#> [1] 2\n#> $NegativeOdd\n#> [1] 2",
+    "comment": "**Why it's simpler:** four counters and a nested loop become four `sum()` lines.\n1. `sapply(num_list, is.numeric)` → which elements are numbers. `num_list[...]` keeps those, and `unlist()` flattens them into one vector: `1 -2 3 4 -3 -5 6 -8 9`.\n2. Each category is one condition, and `sum()` counts the TRUEs:\n   - `nums > 0 & nums %% 2 == 0` → positive even → 2\n   - `nums > 0 & nums %% 2 != 0` → positive odd → 3\n   - `nums < 0 & nums %% 2 == 0` → negative even → 2\n   - `nums < 0 & nums %% 2 != 0` → negative odd → 2\n\n**Why drop the text first:** `unlist()` on everything would turn all the numbers into text (a vector holds one type), and `%%` would fail.\n\nSame idea as Problem 4, Solution #3. Use Solution #1 if the exam asks for loops.",
+    "key": false
+   },
+   {
     "id": "rec-02-q916",
     "label": "Extra practice · Problem 13",
     "question": "Create a function named update_sensor_readings that takes two arguments: a matrix representing sensor readings from multiple machines across several days, and a vector containing specific outlier values to be removed. The function should replace all occurrences of each value in the vector with the average of its immediate neighboring values (up, down, left, right) in the matrix. If the outlier is on the edge or corner of the matrix and doesn’t have four neighbors, only use the available neighbors to compute the average. For instance, test your function with the following matrix and outlier vector:",
     "code": "sensor_matrix <- matrix(c(23.2, 12, 10, 15, 32, 55, 10, 4, 56, 45, 10, 30),\n                        nrow=3, byrow=TRUE)\noutliers <- c(10, 55)\n# Specifically, you should remove all occurrences of the outliers (10 and 55) by replacing them with the average\n# of their neighboring values.\nupdate_sensor_readings <- function(sensor_matrix, outliers) {\n  updated_matrix <- sensor_matrix\n  for (i in 1:nrow(sensor_matrix)) {\n    for (j in 1:ncol(sensor_matrix)) {\n      if (sensor_matrix[i, j] %in% outliers) {\n        neighbors <- c()\n        # Up\n        if (i > 1) {\n          neighbors <- c(neighbors, sensor_matrix[i - 1, j])\n        }\n        # Down\n        if (i < nrow(sensor_matrix)) {\n          neighbors <- c(neighbors, sensor_matrix[i + 1, j])\n        }\n        # Left\n        if (j > 1) {\n          neighbors <- c(neighbors, sensor_matrix[i, j - 1])\n        }\n        # Right\n        if (j < ncol(sensor_matrix)) {\n          neighbors <- c(neighbors, sensor_matrix[i, j + 1])\n        }\n        updated_matrix[i, j] <- mean(neighbors)\n      }\n    }\n  }\n  return(updated_matrix)\n}\nupdate_sensor_readings(sensor_matrix, outliers)\n#>      [,1]  [,2]     [,3] [,4]\n#> [1,] 23.2 12.00 12.33333   15\n#> [2,] 32.0 24.75 19.75000    4\n#> [3,] 56.0 45.00 28.33333   30",
     "comment": "**Roadmap**\n\n| Question says | Code |\n|---|---|\n| matrix + vector of outliers | `function(sensor_matrix, outliers)` |\n| check every cell | nested loops `i`, `j` |\n| \"replace all occurrences of each value in the vector\" | `if (sensor_matrix[i, j] %in% outliers)` |\n| \"average of up, down, left, right\" | collect neighbors with `c()`, then `mean()` |\n| \"only use the available neighbors\" at edges | check `i > 1`, `i < nrow`, `j > 1`, `j < ncol` before each |\n\n**Steps**\n1. Copy the matrix: `updated_matrix <- sensor_matrix`. Read from the original and write to the copy, so a replaced value doesn't affect later averages.\n2. Loop over every cell.\n3. Is it an outlier? `%in%` checks against the whole outlier vector at once.\n4. Start `neighbors <- c()` and add each neighbor **only if it exists**:\n   - up `[i - 1, j]` if `i > 1`\n   - down `[i + 1, j]` if `i < nrow`\n   - left `[i, j - 1]` if `j > 1`\n   - right `[i, j + 1]` if `j < ncol`\n5. Replace with `mean(neighbors)`.\n\n**Check two cells:**\n- `[2, 2]` = 55: up 12, down 45, left 32, right 10 → (12 + 45 + 32 + 10) / 4 = **24.75**.\n- `[1, 3]` = 10 (top edge, no up): down 10, left 12, right 15 → 37 / 3 = **12.33**.\n\nNeighbors use the **original** values, outliers included. That's how the posted answer works.\n\n**Pattern:** edge checks `i > 1`, `i < nrow(m)`, `j > 1`, `j < ncol(m)` are the same as Problem 5.",
+    "key": false
+   },
+   {
+    "id": "rec-02-p13-sol2",
+    "label": "Extra practice · Problem 13 · Solution #2 (one edge check instead of four)",
+    "question": "Create a function named update_sensor_readings that takes two arguments: a matrix representing sensor readings from multiple machines across several days, and a vector containing specific outlier values to be removed. The function should replace all occurrences of each value in the vector with the average of its immediate neighboring values (up, down, left, right) in the matrix. If the outlier is on the edge or corner of the matrix and doesn’t have four neighbors, only use the available neighbors to compute the average. For instance, test your function with the following matrix and outlier vector:",
+    "code": "update_sensor_readings2 <- function(sensor_matrix, outliers) {\n  updated <- sensor_matrix\n  moves <- list(c(-1, 0), c(1, 0), c(0, -1), c(0, 1))      # up, down, left, right\n  for (i in 1:nrow(sensor_matrix)) {\n    for (j in 1:ncol(sensor_matrix)) {\n      if (sensor_matrix[i, j] %in% outliers) {\n        neighbors <- c()\n        for (move in moves) {\n          r <- i + move[1]\n          k <- j + move[2]\n          inside <- r >= 1 & r <= nrow(sensor_matrix) & k >= 1 & k <= ncol(sensor_matrix)\n          if (inside) {\n            neighbors <- c(neighbors, sensor_matrix[r, k])\n          }\n        }\n        updated[i, j] <- mean(neighbors)\n      }\n    }\n  }\n  return(updated)\n}\n\nsensor_matrix <- matrix(c(23.2, 12, 10, 15, 32, 55, 10, 4, 56, 45, 10, 30),\n                        nrow = 3, byrow = TRUE)\nupdate_sensor_readings2(sensor_matrix, outliers = c(10, 55))\n#>      [,1]  [,2]     [,3] [,4]\n#> [1,] 23.2 12.00 12.33333   15\n#> [2,] 32.0 24.75 19.75000    4\n#> [3,] 56.0 45.00 28.33333   30",
+    "comment": "**Why it's simpler:** Solution #1 writes four separate `if` blocks (up, down, left, right), each with its own edge check. This version lists the four directions once and loops over them:\n- `moves`: up = `(-1, 0)`, down = `(1, 0)`, left = `(0, -1)`, right = `(0, 1)` (row change, column change).\n- For each move: neighbor position `r = i + row change`, `k = j + column change`.\n- **One** check: is that position inside the matrix (`r` between 1 and nrow, `k` between 1 and ncol)? If yes, add it.\n\nEverything else is the same: copy the matrix, loop over every cell, `%in% outliers`, average the neighbors. Same result (24.75, 19.75, 12.33, 28.33).\n\n**Why `k` and not `c`:** naming a variable `c` would hide the `c()` function you're using on the next line.\n\n**Pattern to reuse:** whenever you'd write the same `if` four times with small changes, put the changes in a list and loop over it.",
     "key": false
    },
    {
@@ -1485,11 +1549,27 @@ window.ENTRIES = {
     "key": false
    },
    {
+    "id": "rec-02-p14-sol2",
+    "label": "Extra practice · Problem 14 · Solution #2 (shorter while loop)",
+    "question": "Write a function iterative_trim(x, k) that repeatedly removes the element farthest from the median until k elements remain. Note, after removing each element, you must recalculate the median of the remaining vector before deciding which element to remove next. Test your function with x = (1, 40, 2, -3, 10, 15, 7, 5, 5, 0, -4) and k = 5.",
+    "code": "iterative_trim2 <- function(x, k) {\n  while (length(x) > k) {\n    distance <- abs(x - median(x))       # how far each value is from the median\n    x <- x[-which.max(distance)]         # drop the farthest one\n  }\n  return(x)\n}\n\nx <- c(1, 40, 2, -3, 10, 15, 7, 5, 5, 0, -4)\niterative_trim2(x, k = 5)\n#> [1] 1 2 5 5 0\niterative_trim2(c(1, 2), k = 5)          # already small enough\n#> [1] 1 2",
+    "comment": "**Why it's simpler:** same idea as Solution #1, with less setup.\n- No separate `remaining` copy: inside a function, changing `x` doesn't change the original outside, so you can work on `x` directly.\n- No `if (k >= length(x))` check needed: if `x` is already short enough, the `while` never runs and `x` comes back unchanged (`c(1, 2)` with k = 5 gives `1 2`).\n- Two lines per pass: distances from the median, then drop the farthest with `x[-which.max(distance)]`.\n\n**Result:** 1 2 5 5 0 (the same 40, 15, 10, 7, −4, −3 get removed in the same order).\n\n**Remember:** the median is recalculated every pass because it's inside the loop. Putting `median(x)` before the loop would give a different (wrong) answer.",
+    "key": false
+   },
+   {
     "id": "rec-02-q918",
     "label": "Extra practice · Problem 15",
     "question": "Write a function count_sign_changes(x) that counts how many times a numeric vector changes sign (from positive to negative or vice versa). For example, it should return 3 for x = c(-2, -1, 1, 3, -4, 5). Test your function with x = c(-10, 1, 3, -5, -4, 2, 3, -1, 6, -9).",
     "code": "count_sign_changes <- function(x) {\n  count <- 0\n  for (i in 1:(length(x) - 1)) {\n    if ((x[i] > 0 & x[i + 1] < 0) | (x[i] < 0 & x[i + 1] > 0)) {\n      count <- count + 1\n    }\n  }\n  return(count)\n}\nx <- c(-10, 1, 3, -5, -4, 2, 3, -1, 6, -9)\ncount_sign_changes(x)\n#> [1] 6",
     "comment": "**Roadmap**\n\n| Question says | Code |\n|---|---|\n| \"how many times … changes sign\" | compare each value with the **next** one |\n| \"from positive to negative or vice versa\" | `(x[i] > 0 & x[i + 1] < 0) \\| (x[i] < 0 & x[i + 1] > 0)` |\n| count them | `count <- 0`, `count <- count + 1` |\n\n**Steps**\n1. `count <- 0`.\n2. Loop `i` from 1 to `length(x) - 1`. Stop one early because you look at `x[i + 1]`; going to `length(x)` would compare against an element that doesn't exist.\n3. If the pair goes + → − **or** − → +, add 1.\n4. Return `count`.\n\n**Trace on −10, 1, 3, −5, −4, 2, 3, −1, 6, −9:** changes at −10→1, 3→−5, −4→2, 3→−1, −1→6, 6→−9 = **6**.\n\n**Pattern: \"compare neighbors\"** → loop to `length(x) - 1` and use `x[i]` with `x[i + 1]`. Problems 9 and 16 do the same with `x[i - 1]` (loop starting at 2).",
+    "key": false
+   },
+   {
+    "id": "rec-02-p15-sol2",
+    "label": "Extra practice · Problem 15 · Solution #2 (multiply neighbors: negative = sign change)",
+    "question": "Write a function count_sign_changes(x) that counts how many times a numeric vector changes sign (from positive to negative or vice versa). For example, it should return 3 for x = c(-2, -1, 1, 3, -4, 5). Test your function with x = c(-10, 1, 3, -5, -4, 2, 3, -1, 6, -9).",
+    "code": "count_sign_changes2 <- function(x) {\n  count <- 0\n  for (i in 1:(length(x) - 1)) {\n    if (x[i] * x[i + 1] < 0) {           # negative product = signs are different\n      count <- count + 1\n    }\n  }\n  return(count)\n}\n\nx <- c(-10, 1, 3, -5, -4, 2, 3, -1, 6, -9)\ncount_sign_changes2(x)\n#> [1] 6\ncount_sign_changes2(c(-2, -1, 1, 3, -4, 5))   # example from the question\n#> [1] 3\n\n# One-line version: multiply each value by the next one\nsum(x[-1] * x[-length(x)] < 0)\n#> [1] 6",
+    "comment": "**Why it's simpler:** two numbers have different signs exactly when their **product is negative** (positive × negative < 0). That replaces Solution #1's long condition\n`(x[i] > 0 & x[i + 1] < 0) | (x[i] < 0 & x[i + 1] > 0)` with `x[i] * x[i + 1] < 0`.\n\n**Results:** 6 for the test vector, and 3 for the question's example `c(-2, -1, 1, 3, -4, 5)`.\n\n**One-line version:** `sum(x[-1] * x[-length(x)] < 0)`\n- `x[-1]` = every value except the first; `x[-length(x)]` = every value except the last. Lined up, those are each value and the one after it.\n- Multiply them pairwise, check `< 0`, and count with `sum()`.\n\n**Bonus:** a 0 in the data gives a product of 0, which isn't negative, so it doesn't count as a sign change. The original condition treats 0 the same way.",
     "key": false
    },
    {
@@ -1499,11 +1579,19 @@ window.ENTRIES = {
     "code": "find_plateau <- function(x) {\n  n <- length(x); start <- NULL; count <- 1\n  for (i in 2:n) {\n    if (x[i] == x[i - 1]) {\n      count <- count + 1\n      if (count == 3 & is.null(start)) {\n        start <- i - 2\n      }\n    } else {\n      if (!is.null(start) & count >= 3) {\n        end <- i - 1\n        return(c(start = start, end = end))\n      }\n      count <- 1\n      start <- NULL\n    }\n  }\n  if (!is.null(start) & count >= 3) {\n    end <- n\n    return(c(start = start, end = end))\n  }\n  return(NULL)\n}\nx <- c(1, 3, 3, 6, 2, 7, 8, 2, 5, 5, 5, 2)\nfind_plateau(x)\n#> start   end\n#>     9    11",
     "comment": "**Roadmap**\n\n| Question says | Code |\n|---|---|\n| \"consecutive equal values\" | compare `x[i]` with `x[i - 1]` |\n| \"of length ≥ 3\" | count the current run |\n| \"the first flat region\" | return as soon as one is found |\n| \"start and end indices\" | `return(c(start = ..., end = ...))` |\n| \"or NULL if no plateau exists\" | `return(NULL)` at the very end |\n\n**Steps**\n1. `count <- 1` (current run length) and `start <- NULL` (no plateau yet).\n2. Loop from position 2:\n   - Same as before → `count + 1`. When `count` hits 3, the plateau started 2 positions back: `start <- i - 2`.\n   - Different → if a plateau was running, it ended at `i - 1` → return start and end. Otherwise reset `count <- 1`.\n3. After the loop: a plateau may run to the very end of the vector, so check once more (end = `n`).\n4. Nothing found → `return(NULL)`.\n\n**Trace on 1, 3, 3, 6, 2, 7, 8, 2, 5, 5, 5, 2:** the 3s only reach a run of 2 (not a plateau). The 5s at positions 9–11 reach 3, then position 12 is different → **start 9, end 11**.\n\n**Same \"running count\" idea as Problem 9.** The extra check after the loop handles a run that's still going when the vector ends.",
     "key": false
+   },
+   {
+    "id": "rec-02-p16-sol2",
+    "label": "Extra practice · Problem 16 · Solution #2 (look for 3 in a row, then stretch)",
+    "question": "Write a function find_plateau(x) that detects the first flat region in a numeric vector, meaning consecutive equal values of length ≥ 3. The function should return the start and end indices of that plateau, or NULL if no plateau exists. Test your function with x = (1, 3, 3, 6, 2, 7, 8, 2, 5, 5, 5, 2).",
+    "code": "find_plateau2 <- function(x) {\n  n <- length(x)\n  for (i in 1:(n - 2)) {\n    if (x[i] == x[i + 1] & x[i] == x[i + 2]) {   # first 3 in a row starts at i\n      end <- i + 2\n      while (end < n) {                          # stretch it while it keeps going\n        if (x[end + 1] == x[i]) {\n          end <- end + 1\n        } else {\n          break\n        }\n      }\n      return(c(start = i, end = end))\n    }\n  }\n  return(NULL)\n}\n\nx <- c(1, 3, 3, 6, 2, 7, 8, 2, 5, 5, 5, 2)\nfind_plateau2(x)\n#> start   end \n#>     9    11 \nfind_plateau2(c(1, 4, 4, 4, 4, 2))      # longer plateau\n#> start   end \n#>     2     5 \nfind_plateau2(c(1, 2, 2, 3))            # no plateau\n#> NULL",
+    "comment": "**Why it's simpler:** Solution #1 tracks a running count, a start that resets, and a special check after the loop. This version reads like the definition:\n1. Walk through positions `i` (stopping 2 early so `i + 2` exists).\n2. Are `x[i]`, `x[i + 1]` and `x[i + 2]` all equal? That's the **first** plateau, starting at `i`.\n3. Stretch the end forward while the next value is the same (stop at the end of the vector or the first different value).\n4. Return start and end. If the loop finishes, there's no plateau → `NULL`.\n\n**Results:** start 9, end 11 for the test vector. `c(1, 4, 4, 4, 4, 2)` → 2 to 5 (stretches past 3). `c(1, 2, 2, 3)` → `NULL`.\n\n**Why `break`:** the inner `while (end < n)` keeps the stretch from running past the last position, and `break` stops it at the first different value.\n\n**Remember:** \"first ___ in the vector\" → loop and `return()` as soon as you find it (same as Problem 7).",
+    "key": false
    }
   ],
   "notes": "Assigning student `status` with if-else, `ifelse()` eligibility, nested for loops over a scores matrix, a while loop sequence, then function practice problems.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
-  "updatedAt": "2026-10-14T01:20:00Z"
+  "updatedAt": "2026-10-14T01:30:00Z"
  },
  "rec-03": {
   "type": "rec",

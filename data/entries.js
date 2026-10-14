@@ -1405,6 +1405,14 @@ window.ENTRIES = {
     "key": false
    },
    {
+    "id": "rec-02-p5-sol2",
+    "label": "Functions · Problem 5 · Solution #2 (simpler: start with 1s)",
+    "question": "Write a function neighbor_matrix(n, m) that creates and returns an n x m numeric matrix filled according to the following rules:\n1. The top-left entry (row 1, column 1) should start with the value 1.\n2. Each subsequent entry is filled using the following rule:\n• The value of a cell is equal to the sum of its immediate top and left neighbors (if they exist).\n• If a neighbor does not exist (for example, for the first row or first column), treat that neighbor as 0.\nTest your function with n = 4 and m = 5.",
+    "code": "neighbor_matrix2 <- function(n, m) {\n  mat <- matrix(1, nrow = n, ncol = m)   # start with every cell = 1\n  for (i in 2:n) {                       # skip row 1: it stays all 1s\n    for (j in 2:m) {                     # skip column 1: it stays all 1s\n      mat[i, j] <- mat[i - 1, j] + mat[i, j - 1]   # cell above + cell to the left\n    }\n  }\n  return(mat)\n}\n\nprint(neighbor_matrix2(4, 5))\n#>      [,1] [,2] [,3] [,4] [,5]\n#> [1,]    1    1    1    1    1\n#> [2,]    1    2    3    4    5\n#> [3,]    1    3    6   10   15\n#> [4,]    1    4   10   20   35\n\n# Same answer as the posted solution?\nneighbor_matrix <- function(n, m) {\n  mat <- matrix(0, nrow = n, ncol = m)\n  for (i in 1:n) {\n    for (j in 1:m) {\n      if (i == 1 & j == 1) {\n        mat[i, j] <- 1\n      } else {\n        top <- ifelse(i > 1, mat[i - 1, j], 0)\n        left <- ifelse(j > 1, mat[i, j - 1], 0)\n        mat[i, j] <- top + left\n      }\n    }\n  }\n  return(mat)\n}\nidentical(neighbor_matrix2(4, 5), neighbor_matrix(4, 5))\n#> [1] TRUE",
+    "key": true,
+    "comment": "**The trick: the edges are always 1, so fill them first and skip them.**\n\n- **Row 1:** nothing above (counts as 0), so each cell = 0 + the cell to its left. The left one is 1, so the whole row is 1s.\n- **Column 1:** nothing to the left (0), so each cell = the cell above + 0. The whole column is 1s.\n\nSo start with **every** cell = 1: `matrix(1, nrow = n, ncol = m)`. Then only the inside cells need work, and every inside cell **always** has a cell above and a cell to its left, so no `if`, no `ifelse`, and no edge checks.\n\n**Steps**\n1. `mat <- matrix(1, nrow = n, ncol = m)`, a grid of 1s.\n2. Loop rows from **2** and columns from **2** (row 1 and column 1 are already right).\n3. Each cell = cell above `mat[i - 1, j]` + cell to the left `mat[i, j - 1]`.\n4. `return(mat)`.\n\n**Fill order (4 × 5):** each number is above + left:\n```\n1  1  1  1  1\n1  2  3  4  5      2 = 1 + 1,  3 = 1 + 2,  4 = 1 + 3 ...\n1  3  6 10 15      6 = 3 + 3, 10 = 4 + 6 ...\n1  4 10 20 35     35 = 15 + 20\n```\nThe loops go left to right, top to bottom, so the cell above and the cell to the left are always finished before they're needed.\n\n**Comparison with Solution #1:** same answer (`identical()` is TRUE in the code), but Solution #1 starts with 0s and has to handle the corner and the edges inside the loop with `if` and `ifelse`. Here the starting value does that work.\n\n**Limit:** this assumes at least 2 rows and 2 columns. With `n = 1`, `2:1` counts **down** (`2 1`), so the loop would break. Solution #1 handles that case.\n\n**Pattern to reuse:** if the edges follow a simple rule, set them up **before** the loop, then loop only over the cells that need the real calculation."
+   },
+   {
     "id": "rec-02-q909",
     "label": "Extra practice · Problem 6",
     "question": "Write a function largest_odd(x) that takes a numeric vector x and returns the largest odd number in the vector. If there are no odd numbers, return NULL. Test your function with the following vector: [10, 15, 11, 4, 3, 8, 17, 34, 4, 11, 12, 17, 21, 1, 31, 36]",
@@ -1495,7 +1503,7 @@ window.ENTRIES = {
   ],
   "notes": "Assigning student `status` with if-else, `ifelse()` eligibility, nested for loops over a scores matrix, a while loop sequence, then function practice problems.\n\nCode chunks below are from the posted solutions, with printed output marked `#>`.",
   "takeaways": [],
-  "updatedAt": "2026-10-14T01:00:00Z"
+  "updatedAt": "2026-10-14T01:20:00Z"
  },
  "rec-03": {
   "type": "rec",

@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-14T16:30:00Z";
+window.ENTRIES_SAVED = "2026-10-14T16:35:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -2885,5 +2885,101 @@ window.ENTRIES = {
    "complete() makes implicit missing values explicit; fill(), replace_na(), drop_na() handle NAs."
   ],
   "updatedAt": "2026-10-14T16:30:00Z"
+ },
+ "kit-01": {
+  "type": "kit",
+  "num": "",
+  "title": "Files, setup and quick checks",
+  "date": "",
+  "exams": [],
+  "topics": [
+   "read.csv",
+   "read.table",
+   "write.csv",
+   "setwd",
+   "library",
+   "str",
+   "summary",
+   "missing values",
+   "types",
+   "table"
+  ],
+  "pdfs": [],
+  "chunks": [
+   {
+    "id": "kit-01-c01",
+    "label": "Start of every R file / session",
+    "question": "Clear the workspace, check where R is looking for files, set the folder, and load packages.",
+    "code": "rm(list = ls())                  # clear everything from the Environment\n\ngetwd()                          # which folder is R using right now?\nsetwd(\"~/Desktop/STAT2102\")      # point R at your class folder (Mac path)\n# Session > Set Working Directory > Choose Directory...  does the same with clicks\n\ninstall.packages(\"dplyr\")        # ONCE per computer (in the Console, not in your .Rmd)\nlibrary(dplyr)                   # EVERY session / at the top of every .Rmd\nlibrary(tidyverse)               # loads dplyr, tidyr, ggplot2 ... all at once",
+    "comment": "**Order that avoids most errors:** clear → set folder → load packages → import data.\n\n- **`setwd()`**: R looks for files in this folder. If `read.csv()` says *cannot open file*, the folder is wrong. Check with `getwd()` and `list.files()`.\n- **`install.packages()` vs `library()`**: install once (downloads it); `library()` every session (turns it on). Don't put `install.packages()` in a homework `.Rmd`, because it re-installs every time you knit.\n- **Error \"could not find function `%>%`\" or \"`filter`\"** → you forgot `library(dplyr)`.\n\n**In R Markdown:** the folder is automatically the one the `.Rmd` file is saved in, so keep the data file **next to** the `.Rmd` and you won't need `setwd()`.",
+    "key": true
+   },
+   {
+    "id": "kit-01-c02",
+    "label": "Import data: read.csv() and read.table()",
+    "question": "Import a data set into R so that text columns become factors.",
+    "code": "df <- read.csv(\"employees.csv\", stringsAsFactors = TRUE)\nstr(df)\n#> 'data.frame':\t6 obs. of  4 variables:\n#>  $ Employee  : Factor w/ 6 levels \"Anna\",\"Ben\",\"Carla\",..: 1 2 3 4 5 6\n#>  $ Department: Factor w/ 3 levels \"Analytics\",\"Finance\",..: 1 3 1 2 3 1\n#>  $ Experience: int  2 7 5 NA 3 6\n#>  $ Salary    : int  68000 85000 NA 105000 72000 92000\n\n# read.table() is the general version: say there's a header and what separates values\ndf_tab <- read.table(\"employees.txt\", header = TRUE, sep = \"\\t\", stringsAsFactors = TRUE)\ndim(df_tab)\n#> [1] 6 4\n\n# Can't find the path? Pick the file in a window instead:\n# df <- read.csv(file.choose(), stringsAsFactors = TRUE)",
+    "comment": "**Which one?**\n- `.csv` file → `read.csv(\"file.csv\", stringsAsFactors = TRUE)`. It already knows there's a header and that values are separated by commas.\n- Anything else (`.txt`, tab- or space-separated) → `read.table(\"file.txt\", header = TRUE, sep = \"\\t\")`. `sep = \",\"` for commas, `sep = \"\"` (default) for spaces.\n\n**`stringsAsFactors = TRUE`**: text columns become **factors** (check: `str()` says `Factor`). The review session said to use this; it's what `tapply()`, `table()`, `boxplot(y ~ group)` and `barplot()` expect.\n\n**Common errors**\n- *cannot open file … No such file or directory* → wrong folder or misspelled name (check `getwd()` and `list.files()`).\n- Everything ends up in one column → wrong `sep`.\n- First row of data became the column names (or the other way around) → fix `header =`.",
+    "key": true
+   },
+   {
+    "id": "kit-01-c03",
+    "label": "Save data: write.csv() and write.table()",
+    "question": "Export a data frame to a file.",
+    "code": "df <- read.csv(\"employees.csv\", stringsAsFactors = TRUE)\ndf$Salary_K <- df$Salary / 1000\n\nwrite.csv(df, \"employees_clean.csv\", row.names = FALSE)\nwrite.table(df, \"employees_clean.txt\", sep = \"\\t\", row.names = FALSE)\n\nlist.files(pattern = \"clean\")     # check the files were created\n#> [1] \"employees_clean.csv\" \"employees_clean.txt\"",
+    "comment": "**Always add `row.names = FALSE`.** Without it R writes an extra unnamed first column (1, 2, 3…), which shows up as `X` when you read the file back in.\n\nThe file is saved in the **working directory** (`getwd()`). Give a full path to save somewhere else.",
+    "key": false
+   },
+   {
+    "id": "kit-01-c04",
+    "label": "First look at a data set",
+    "question": "Examine the structure, a summary of the variables, the first rows and the dimensions of a data frame.",
+    "code": "df <- read.csv(\"employees.csv\", stringsAsFactors = TRUE)\n\nstr(df)          # column names, types, first values\n#> 'data.frame':\t6 obs. of  4 variables:\n#>  $ Employee  : Factor w/ 6 levels \"Anna\",\"Ben\",\"Carla\",..: 1 2 3 4 5 6\n#>  $ Department: Factor w/ 3 levels \"Analytics\",\"Finance\",..: 1 3 1 2 3 1\n#>  $ Experience: int  2 7 5 NA 3 6\n#>  $ Salary    : int  68000 85000 NA 105000 72000 92000\nsummary(df)      # min / median / mean / max, counts for factors, NA's\n#>   Employee     Department   Experience      Salary      \n#>  Anna :1   Analytics:3    Min.   :2.0   Min.   : 68000  \n#>  Ben  :1   Finance  :1    1st Qu.:3.0   1st Qu.: 72000  \n#>  Carla:1   Marketing:2    Median :5.0   Median : 85000  \n#>  David:1                  Mean   :4.6   Mean   : 84400  \n#>  Emma :1                  3rd Qu.:6.0   3rd Qu.: 92000  \n#>  Frank:1                  Max.   :7.0   Max.   :105000  \n#>                           NA's   :1     NA's   :1       \nhead(df, 3)      # first 3 rows   (tail(df, 3) = last 3)\n#>   Employee Department Experience Salary\n#> 1     Anna  Analytics          2  68000\n#> 2      Ben  Marketing          7  85000\n#> 3    Carla  Analytics          5     NA\ndim(df)          # rows, columns\n#> [1] 6 4\nnrow(df); ncol(df)\n#> [1] 6\n#> [1] 4\nnames(df)        # same as colnames(df)\n#> [1] \"Employee\"   \"Department\" \"Experience\" \"Salary\"    \nlevels(df$Department)\n#> [1] \"Analytics\" \"Finance\"   \"Marketing\"\n# View(df)       # opens a spreadsheet-style tab (RStudio only, not in a knitted file)",
+    "comment": "**Run these right after importing, every time.** They answer the questions you need before writing any code:\n- What are the column names exactly (capitals, underscores)? → `names()`\n- Are text columns factors and numbers numeric? → `str()`\n- Are there missing values? → `summary()` shows `NA's`\n- How big is it? → `dim()`\n\n**Use `head()` after each change** (new column, filter) to show the manipulation worked, as the review session suggested.\n\n**`View()` doesn't work when knitting**, so leave it out of homework files.",
+    "key": true
+   },
+   {
+    "id": "kit-01-c05",
+    "label": "Missing values (NA)",
+    "question": "Find and handle missing values: count them, ignore them in calculations, or remove rows that have them.",
+    "code": "df <- read.csv(\"employees.csv\", stringsAsFactors = TRUE)\n\nis.na(df$Salary)              # TRUE where missing\n#> [1] FALSE FALSE  TRUE FALSE FALSE FALSE\nsum(is.na(df$Salary))         # how many missing\n#> [1] 1\ncolSums(is.na(df))            # missing per column\n#>   Employee Department Experience     Salary \n#>          0          0          1          1 \n\nmean(df$Salary)               # NA: one missing value spoils the result\n#> [1] NA\nmean(df$Salary, na.rm = TRUE) # ignore the NAs\n#> [1] 84400\n\ncomplete <- na.omit(df)       # drop rows with ANY missing value\nnrow(complete)\n#> [1] 4\ndf[!is.na(df$Salary), ]       # drop rows missing just Salary\n#>   Employee Department Experience Salary\n#> 1     Anna  Analytics          2  68000\n#> 2      Ben  Marketing          7  85000\n#> 4    David    Finance         NA 105000\n#> 5     Emma  Marketing          3  72000\n#> 6    Frank  Analytics          6  92000",
+    "comment": "**Rule:** any calculation that touches an `NA` returns `NA`. Add **`na.rm = TRUE`** to `mean()`, `median()`, `sum()`, `sd()`, `min()`, `max()`, and inside `tapply(..., mean, na.rm = TRUE)` and `summarise(m = mean(x, na.rm = TRUE))`.\n\n**Don't test with `== NA`**. It always gives NA. Use `is.na(x)`; `!is.na(x)` means \"not missing\".\n\n**Removing:** `na.omit(df)` drops a row if **any** column is missing (here 6 → 4 rows). To only drop rows missing one variable, filter on that column.",
+    "key": true
+   },
+   {
+    "id": "kit-01-c06",
+    "label": "Check and convert types",
+    "question": "Check what type a variable is and convert between numeric, character and factor.",
+    "code": "df <- read.csv(\"employees.csv\", stringsAsFactors = TRUE)\n\nclass(df$Salary)\n#> [1] \"integer\"\nclass(df$Department)\n#> [1] \"factor\"\n\nas.character(df$Department)          # factor -> text\n#> [1] \"Analytics\" \"Marketing\" \"Analytics\" \"Finance\"   \"Marketing\" \"Analytics\"\nas.numeric(c(\"10\", \"20.5\", \"abc\"))   # text -> numbers (\"abc\" becomes NA, with a warning)\n#> [1] 10.0 20.5   NA\n#> Warning message: NAs introduced by coercion\n\nf <- factor(c(\"10\", \"20\", \"10\"))\nas.numeric(f)                        # WRONG: gives the level codes 1 2 1\n#> [1] 1 2 1\nas.numeric(as.character(f))          # RIGHT: 10 20 10\n#> [1] 10 20 10\n\ndf$Department <- factor(df$Department, levels = c(\"Finance\", \"Marketing\", \"Analytics\"))\nlevels(df$Department)\n#> [1] \"Finance\"   \"Marketing\" \"Analytics\"",
+    "comment": "**Most common type problems**\n- Numbers read in as text (because one cell had a typo) → `as.numeric()`. Values that can't convert become `NA`.\n- **Factor of numbers:** `as.numeric(f)` gives the internal codes (1, 2, 1), **not** the values. Always go through `as.character()` first.\n- Want the categories in a specific order (tables, plots)? `factor(x, levels = c(...))`.\n\n`class()` tells you the type: `\"numeric\"`, `\"integer\"`, `\"character\"`, `\"factor\"`, `\"logical\"`, `\"data.frame\"`.",
+    "key": false
+   },
+   {
+    "id": "kit-01-c07",
+    "label": "Counting, unique values and sorting",
+    "question": "Count how many times each value appears, find the distinct values, and sort.",
+    "code": "df <- read.csv(\"employees.csv\", stringsAsFactors = TRUE)\n\ntable(df$Department)                          # counts per category\n#> Analytics   Finance Marketing \n#>         3         1         2 \nprop.table(table(df$Department))              # proportions\n#> Analytics   Finance Marketing \n#> 0.5000000 0.1666667 0.3333333 \nsort(table(df$Department), decreasing = TRUE) # most common first\n#> Analytics Marketing   Finance \n#>         3         2         1 \n\nunique(df$Department)                         # distinct values\n#> [1] Analytics Marketing Finance  \n#> Levels: Analytics Finance Marketing\nlength(unique(df$Department))                 # how many distinct\n#> [1] 3\n\nsort(df$Salary, decreasing = TRUE)            # sort a vector (NAs dropped)\n#> [1] 105000  92000  85000  72000  68000\ndf[order(df$Salary, decreasing = TRUE), ]     # sort the ROWS of a data frame\n#>   Employee Department Experience Salary\n#> 4    David    Finance         NA 105000\n#> 6    Frank  Analytics          6  92000\n#> 2      Ben  Marketing          7  85000\n#> 5     Emma  Marketing          3  72000\n#> 1     Anna  Analytics          2  68000\n#> 3    Carla  Analytics          5     NA\nwhich.max(df$Salary); df$Employee[which.max(df$Salary)]\n#> [1] 4\n#> [1] David\n#> Levels: Anna Ben Carla David Emma Frank",
+    "comment": "- `table()` counts; `prop.table(table())` turns counts into shares.\n- `sort()` sorts **one vector**; `order()` gives the row order for sorting a **whole data frame**.\n- `which.max()` gives the **position** of the largest value, so use it to look up the matching name in another column.\n- `round(x, 2)` for cleaner printed numbers, e.g. `round(prop.table(table(x)), 2)`.",
+    "key": false
+   },
+   {
+    "id": "kit-01-c08",
+    "label": "R Markdown homework skeleton",
+    "question": "The parts every homework .Rmd file needs.",
+    "code": "---\ntitle: \"Homework Assignment 3\"\nauthor: \"Emelia Davis\"\noutput: pdf_document\n---\n\n```{r setup, include = FALSE}\nlibrary(dplyr)\ndf <- read.csv(\"data.csv\", stringsAsFactors = TRUE)\n```\n\n# Problem 1\n\n## Part 1\n\n```{r}\n# your code for Part 1\n```\n\nShort sentence interpreting the output.",
+    "comment": "**Setup chunk with `include = FALSE`** loads packages and data without cluttering the PDF.\n\n**Before submitting:** Session → Restart R, then **Knit → Knit to PDF**. Knitting runs everything once from the top in a fresh session, the same way your grader sees it.\n\nSee **Lecture 04** for formatting and chunk options.",
+    "key": false
+   }
+  ],
+  "notes": "Code you use in almost every homework and on the exam: setting up, importing and saving data, first checks, missing values, types and counting.\n\n**Add your own:** click **Edit** on this entry and use **+ Add chunk**, or make a new entry with **+ New entry** and pick the type **Everyday code**. Two of these chunks (the setup lines and the R Markdown skeleton) are shown without output because they only make sense in your own RStudio.",
+  "takeaways": [
+   "read.csv(\"file.csv\", stringsAsFactors = TRUE); read.table(\"file.txt\", header = TRUE, sep = \"\\t\").",
+   "write.csv(df, \"file.csv\", row.names = FALSE).",
+   "After importing: str(), summary(), head(), dim(), names().",
+   "Add na.rm = TRUE to mean/sum/median/sd when there are NAs; test with is.na(), never == NA.",
+   "Factor of numbers → as.numeric(as.character(f)).",
+   "install.packages() once in the Console; library() every session and at the top of every .Rmd."
+  ],
+  "updatedAt": "2026-10-14T16:10:00Z"
  }
 };

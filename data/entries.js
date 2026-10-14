@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-14T16:45:00Z";
+window.ENTRIES_SAVED = "2026-10-14T16:50:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -3137,6 +3137,14 @@ window.ENTRIES = {
     "key": true
    },
    {
+    "id": "kit-01-c02b",
+    "label": "Read a file straight from Downloads (full path)",
+    "key": true,
+    "question": "Import a CSV that is sitting in your Downloads folder without moving it or changing the working directory.",
+    "code": "carseats <- read.csv(\"~/Downloads/carseats.csv\", stringsAsFactors = TRUE)\nstr(carseats)\n\n# same idea for other files / folders\nemployees <- read.csv(\"~/Downloads/employee_survey_data.csv\", stringsAsFactors = TRUE)\ndf_txt    <- read.table(\"~/Downloads/data.txt\", header = TRUE, sep = \"\\t\", stringsAsFactors = TRUE)\ndf_desk   <- read.csv(\"~/Desktop/STAT2102/data.csv\", stringsAsFactors = TRUE)\n\n# not sure of the exact name? list what's in Downloads\nlist.files(\"~/Downloads\", pattern = \"csv\")",
+    "comment": "**How the path works (Mac)**\n- `~` = your home folder, so `\"~/Downloads/carseats.csv\"` = the file `carseats.csv` inside **Downloads**.\n- The whole path goes **inside quotes**, with forward slashes `/`.\n- **Capital D** in `Downloads` and `Desktop`, and the file name must match exactly, including `.csv`.\n\n**If you get \"cannot open file … No such file or directory\":**\n1. Run `list.files(\"~/Downloads\", pattern = \"csv\")` and copy the name exactly as it prints (browsers sometimes save a second copy as `carseats (1).csv`).\n2. Or skip typing the path: `read.csv(file.choose(), stringsAsFactors = TRUE)` opens a window to pick the file.\n\n**For homework you knit:** it's safer to move the CSV into the **same folder as your `.Rmd`** and use just `read.csv(\"carseats.csv\", ...)`. A Downloads path works on your computer only, and breaks if the file is moved or renamed.\n\n**Windows:** the path looks like `\"C:/Users/YourName/Downloads/carseats.csv\"` (forward slashes, or double backslashes `\\\\`)."
+   },
+   {
     "id": "kit-01-c03",
     "label": "Save data: write.csv() and write.table()",
     "question": "Export a data frame to a file.",
@@ -3194,6 +3202,6 @@ window.ENTRIES = {
    "Factor of numbers → as.numeric(as.character(f)).",
    "install.packages() once in the Console; library() every session and at the top of every .Rmd."
   ],
-  "updatedAt": "2026-10-14T16:10:00Z"
+  "updatedAt": "2026-10-14T16:50:00Z"
  }
 };

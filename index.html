@@ -276,6 +276,10 @@ function miniMd(text){
   while(i<lines.length){
     const l=lines[i];
     if(!l.trim()){i++;continue;}
+    if(/^\s*```/.test(l)){
+      const code=[]; i++; while(i<lines.length&&!/^\s*```/.test(lines[i])){code.push(lines[i]);i++;} i++;
+      html+='<pre><code class="language-r">'+code.join('\n')+'</code></pre>'; continue;
+    }
     if(/^\s*\|/.test(l)){
       const rows=[]; while(i<lines.length&&/^\s*\|/.test(lines[i])){rows.push(lines[i]);i++;}
       const cells=r=>r.trim().replace(/\\\|/g,'\u0000').replace(/^\||\|$/g,'').split('|').map(c=>mdInline(c.trim().replace(/\u0000/g,'|')));
@@ -295,7 +299,8 @@ function miniMd(text){
       html+=(ordered?'<ol>':'<ul>')+items.map(x=>'<li>'+mdInline(x)+'</li>').join('')+(ordered?'</ol>':'</ul>');
       continue;
     }
-    const para=[]; while(i<lines.length&&lines[i].trim()&&!/^\s*(\||[-*]\s|\d+\.\s|#)/.test(lines[i])){para.push(lines[i]);i++;}
+    const para=[]; while(i<lines.length&&lines[i].trim()&&!/^\s*(\||[-*]\s|\d+\.\s|#|```)/.test(lines[i])){para.push(lines[i]);i++;}
+    if(!para.length){para.push(l);i++;}   // always move forward (e.g. an indented '# ...' line)
     html+='<p>'+mdInline(para.join(' '))+'</p>';
   }
   return html;

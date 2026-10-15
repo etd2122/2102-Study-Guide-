@@ -13,7 +13,7 @@
   --paper:#f4f7fb; --panel:#ffffff; --ink:#152033; --muted:#5a6677; --line:#d9e0ea;
   --accent:#1f5fae; --accent-ink:#ffffff; --accent-soft:#e2ecf8; --mark:#f6dc5c; --mark-ink:#3a2f00;
   --code-bg:#eef2f8; --danger:#b3261e; --danger-soft:#fbe7e5;
-  --t-hw:#1f5fae; --t-rec:#257a5c; --t-lec:#55617a; --t-prac:#a5610f; --t-kit:#7a3fa0;
+  --t-hw:#1f5fae; --t-rec:#257a5c; --t-lec:#55617a; --t-prac:#a5610f; --t-kit:#7a3fa0; --t-core:#b3332b;
   --hl-kw:#8a2f9e; --hl-str:#2b7a2b; --hl-num:#b3541e; --hl-com:#7a8496; --hl-fn:#1f5fae;
   color-scheme:light;
   --display:"Familjen Grotesk","Helvetica Neue",Arial,sans-serif;
@@ -58,7 +58,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .item .tag{font-family:var(--mono);font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
 .item .t{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .item .meta{grid-column:2;font-size:12px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap}
-.tc-kit{color:var(--t-kit)}.tc-hw{color:var(--t-hw)}.tc-rec{color:var(--t-rec)}.tc-lec{color:var(--t-lec)}.tc-prac{color:var(--t-prac)}
+.tc-core{color:var(--t-core)}.tc-kit{color:var(--t-kit)}.tc-hw{color:var(--t-hw)}.tc-rec{color:var(--t-rec)}.tc-lec{color:var(--t-lec)}.tc-prac{color:var(--t-prac)}
 .side-foot{margin-top:auto;font-size:12px;color:var(--muted)}
 .savebox{border:1px solid var(--mark);background:var(--panel);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px;font-size:13px}
 .savebox b{font-family:var(--display);font-size:15px}
@@ -113,6 +113,7 @@ pre code{font-family:inherit;background:none}
 .chunk-note.none{color:var(--muted);font-style:italic}
 .chunk-side{border-left:1px dashed var(--line);background:var(--panel);min-width:0;display:flex;flex-direction:column}
 .chunk-side .chunk-note{border-left:0}
+.prose img{display:block;max-width:100%;height:auto;margin:6px 0 10px;border:1px solid var(--line);border-radius:6px;background:#fff}
 .chunk-q{padding:10px 14px;font-size:14px;background:var(--accent-soft);border-bottom:1px dashed var(--line);white-space:pre-line;overflow-wrap:anywhere}
 .chunk-q .label{display:block;margin-bottom:4px;color:var(--accent)}
 .hljs-keyword,.hljs-built_in,.hljs-literal{color:var(--hl-kw)}
@@ -242,8 +243,8 @@ textarea.mono{font-family:var(--mono);font-size:13px;background:var(--code-bg)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
 <script>
 (function(){
-const TYPES={kit:{label:'Everyday code',short:'Kit'},hw:{label:'Homework',short:'HW'},rec:{label:'Recitation',short:'Rec'},lec:{label:'Lecture',short:'Lec'},prac:{label:'Exam review',short:'Rev'}};
-const TYPE_ORDER=['kit','prac','hw','rec','lec'];
+const TYPES={core:{label:'Must-know',short:'Core'},kit:{label:'Everyday code',short:'Kit'},hw:{label:'Homework',short:'HW'},rec:{label:'Recitation',short:'Rec'},lec:{label:'Lecture',short:'Lec'},prac:{label:'Exam review',short:'Rev'}};
+const TYPE_ORDER=['core','kit','prac','hw','rec','lec'];
 const EXAMS=['Midterm 1','Midterm 2','Final'];
 
 let canWrite=true; const localUrls={};
@@ -280,6 +281,8 @@ function miniMd(text){
       const code=[]; i++; while(i<lines.length&&!/^\s*```/.test(lines[i])){code.push(lines[i]);i++;} i++;
       html+='<pre><code class="language-r">'+code.join('\n')+'</code></pre>'; continue;
     }
+    let im=l.trim().match(/^\[?!\[([^\]]*)\]\(([^)\s]+)\)(?:\]\(([^)\s]+)\))?$/);
+    if(im){const img='<img src="'+im[2]+'" alt="'+im[1]+'" loading="lazy">';html+=im[3]?'<a href="'+im[3]+'" target="_blank" rel="noopener">'+img+'</a>':img;i++;continue;}
     if(/^\s*\|/.test(l)){
       const rows=[]; while(i<lines.length&&/^\s*\|/.test(lines[i])){rows.push(lines[i]);i++;}
       const cells=r=>r.trim().replace(/\\\|/g,'\u0000').replace(/^\||\|$/g,'').split('|').map(c=>mdInline(c.trim().replace(/\u0000/g,'|')));
@@ -398,14 +401,14 @@ function entryHTML(id,e){
     <div class="badges">${(e.exams||[]).map(x=>`<span class="badge exam">${esc(x)}</span>`).join('')}${(e.topics||[]).map(x=>`<span class="badge">${esc(x)}</span>`).join('')}</div>
   </header>
 
-  <section class="block" ${(e.type==='prac'||e.type==='kit')&&!pdfs.length?'hidden':''}>
+  <section class="block" ${(e.type==='prac'||e.type==='kit'||e.type==='core')&&!pdfs.length?'hidden':''}>
     <div class="block-h"><h3>Files<span class="count">${pdfs.length}</span></h3>
 
     </div>
     ${pdfs.length?`<div class="files">${pdfs.map(fileHTML).join('')}</div>`:`<p class="empty-line">No files yet. Use Edit to attach the assignment PDF, your solutions, or screenshots of output.</p>`}
   </section>
 
-  <section class="block" ${(e.type==='prac'||e.type==='kit')&&!chunks.length?'hidden':''}>
+  <section class="block" ${(e.type==='prac'||e.type==='kit'||e.type==='core')&&!chunks.length?'hidden':''}>
     <div class="block-h"><h3>Code<span class="count">${chunks.length} chunk${chunks.length===1?'':'s'}</span></h3></div>
     ${chunks.length?chunks.map((c,i)=>chunkHTML(c,i)).join(''):`<p class="empty-line">No code yet. Use Edit to paste chunks or import an .R / .Rmd file.</p>`}
   </section>
@@ -557,9 +560,9 @@ function findMatches(q){
 const SKILLS=[
  [/\bfunction\b|write a function|create a function|construct a function|define a function/,'Write a function','rev-01','Function anatomy'],
  [/return(s|ing)? (a |the )?list|list (with|containing|of) .*(mean|median|sum|max|min|count|range|value)|several (results|outputs|values)|multiple (results|outputs|values)/,'Return several results in a list','rev-01','Return several results in a list'],
- [/simulat|random|coin|dice|\bdie\b|\broll|\bflip(s|ped|ping)?\b|sample\(|draw .* from (a |the )?(vector|set|bag|urn)/,'Simulate with sample() and set.seed()','rev-01','Simulation with sample() and set.seed()'],
- [/until|keep (going|rolling|flipping|drawing|trying)|stop (when|once|as soon)|how many (tries|rolls|flips|steps|attempts)/,'Repeat until something happens (break)','rev-01','Repeat until something happens (for loop + break)'],
- [/normal distribution|normally distributed|rnorm|standard deviation \d|\bsd\s*=|mean \d+ and (a )?standard/,'Normal distribution with rnorm()','rev-01','Normal distribution with rnorm()'],
+ [/simulat|random|coin|dice|\bdie\b|\broll|\bflip(s|ped|ping)?\b|sample\(|draw .* from (a |the )?(vector|set|bag|urn)/,'Simulate with sample() and set.seed()','core-01','sample() and set.seed(): the basics'],
+ [/until|keep (going|rolling|flipping|drawing|trying)|stop (when|once|as soon)|how many (tries|rolls|flips|steps|attempts)/,'Repeat until something happens (while / break)','core-02','Roll until something happens (while loop)'],
+ [/normal distribution|normally distributed|rnorm|standard deviation \d|\bsd\s*=|mean \d+ and (a )?standard/,'Normal distribution with rnorm()','core-03','Normal: rnorm to generate data, then check it'],
  [/(each|every) (element|value|number|entry|grade|score)|label each|classif|categori[sz]e|returns? ['"‘“]?\w+['"’”]? (for|if|when)|pass.*fail|fail.*pass/,'Label every element (loop + if, or ifelse)','rev-01','Classify every element of a vector (for loop + if)'],
  [/how many|count|number of/,'Count with a loop or sum()','rev-01','Count things with a for loop (counters, next)'],
  [/matrix|matrices/,'Work with a matrix','rev-02','Matrices: create, access, logical replace'],
@@ -584,17 +587,35 @@ const SKILLS=[
  [/different (column |variable )?names|named differently/,'Join keys with different names','lec-11','Practice 6 · Keys with different names'],
  [/pivot|reshape|one column (per|for each)|long(er)? format|wide(r)? format|column names (are|that are) (values|years)|tidy/,'Reshape with pivot_longer / pivot_wider','lec-12','pivot_longer(): column names that are really values'],
  [/separate\(|separate (the|a|one|it|this|that) |split (the |a |one )?column|\bunite\b|combine (the )?columns/,'Split or combine columns (separate / unite)','lec-12','separate(): split one column into several'],
- [/binomial|successes|trials? .*probabilit|dbinom|pbinom|(at most|at least|exactly|fewer than|more than) \d+ (of|out of) \d+/,'Binomial probability (dbinom / pbinom)','lec-09','Binomial: pbinom() for at most x successes'],
- [/percentile|quantile .*normal|normal .*(percentile|cutoff)|qnorm/,'Normal percentile (qnorm)','lec-09','Normal: qnorm() for percentiles'],
- [/probability (that|of) .*(less|more|greater|between|below|above)|pnorm|normally distributed .* probability/,'Normal probability (pnorm)','lec-09','Normal: pnorm() for probabilities'],
+ [/binomial|successes|trials? .*probabilit|dbinom|pbinom|(at most|at least|exactly|fewer than|more than) \d+ (of|out of) \d+/,'Binomial probability (dbinom / pbinom)','core-03','Binomial: exactly, at most, at least, between'],
+ [/percentile|quantile .*normal|normal .*(percentile|cutoff)|qnorm/,'Normal percentile (qnorm)','core-03','Normal probabilities: less than, greater than, between, percentiles'],
+ [/probability (that|of) .*(less|more|greater|between|below|above)|pnorm|normally distributed .* probability/,'Normal probability (pnorm)','core-03','Normal probabilities: less than, greater than, between, percentiles'],
  [/group_by|summari[sz]e|across\(|dplyr/,'group_by() + summarise()','lec-11','summarise(): one row per group'],
  [/missing|\bna\b|\bnas\b|na\.rm|is\.na/,'Missing values (is.na, na.rm, na.omit)','kit-01','Missing values (NA)'],
  [/convert|as\.numeric|as\.character|as\.factor|data type|class\(/,'Check and convert types','kit-01','Check and convert types'],
- [/histogram|distribution of/,'Histogram','rev-06','Histogram'],
- [/box ?plot/,'Boxplot by group','rev-06','Boxplot by group (with notch)'],
- [/bar ?(plot|chart|graph)/,'Barplot','rev-06','Barplot (and side-by-side)'],
- [/scatter|against|versus|\bvs\.?\b|relationship between/,'Scatterplot','rev-06','Scatterplot colored by group'],
- [/side.by.side (plots|histograms|graphs)|single (image|figure)|two plots|both histograms|next to each other/,'Two plots side by side','rev-06','Two plots side by side'],
+ [/histogram|distribution of/,'Histogram','core-04','Histogram (with a normal curve on top)'],
+ [/box ?plot|outlier/,'Boxplot by group','core-04','Boxplot by group (notch, horizontal, outliers)'],
+ [/(grouped|side.by.side|stacked|clustered) bar|bar ?(plot|chart|graph)s? .*(by|for each|across) (group|department|category|level|gender|sex|class)/,'Grouped barplot with a legend','core-04','Side-by-side (grouped) barplot with a legend'],
+ [/bar ?(plot|chart|graph)/,'Barplot','core-04','Barplot: counts of a categorical variable (die rolls)'],
+ [/scatter|against|versus|\bvs\.?\b|relationship between/,'Scatterplot','core-04','Scatterplot: two numeric variables, colors by group, trend line'],
+ [/side.by.side (plots|histograms|graphs)|single (image|figure)|two plots|both histograms|next to each other/,'Two plots side by side','core-04','Several plots in one window: par(mfrow)'],
+ [/line (plot|graph|chart)|over time|running (proportion|average|mean|total)|cumulative|random walk|stock price|law of large numbers/,'Line plot (type = "l")','core-04','Line plot: running proportion of heads (law of large numbers)'],
+ [/density curve|bell curve|normal curve|dnorm|plot (the|a|two|three) (normal|distribution|density)|curve\(/,'Draw a distribution curve','core-04','Distribution curves: compare normals with curve() and lines()'],
+ [/legend|colou?r(s|ed)?\b|label (the )?(axes|plot|graph)|title|customi[sz]e/,'Plot options (title, labels, colors, legend)','core-04','Plot options cheat sheet'],
+ [/\btwo dice|pair of dice|both dice|sum of (the )?(two |both )?dice|doubles/,'Two dice: sums and doubles','core-01','Two dice: sums, doubles and comparisons'],
+ [/\bdice\b|\bdie\b|\broll(s|ed|ing)?\b/,'Roll a die: counts and proportions','core-01','Roll dice: one die, many rolls, counts and proportions'],
+ [/unfair|weighted|biased|loaded|probabilit(y|ies) (for|of) each (face|outcome|side)|lands? (on )?(heads|tails|\d) with probability/,'Unfair dice / coins with prob =','core-01','Unfair (weighted) dice and coins with prob ='],
+ [/\bcoins?\b|heads|tails/,'Flip coins and count heads','core-01','Flip coins: count heads (sample vs rbinom)'],
+ [/\bcards?\b|\bdeck\b|\bpoker\b|\baces?\b|\bsuits?\b|\bhearts\b|\bspades\b|\bdeal(t|s|ing)?\b/,'Deck of cards: build, deal, count','core-01','Build a deck of cards and deal a hand'],
+ [/\burn\b|\bbag\b|marbles?|\bballs?\b|without replacement|with replacement/,'Draw from an urn / bag','core-01','Draw from an urn / bag (without replacement)'],
+ [/shuffle|permutation|random (rows|order|winner|team|group)|split .* (randomly|into (two |random )?(teams|groups))|randomly (select|choose|pick)/,'Random rows / shuffle','core-01','Random rows, random people and shuffling'],
+ [/estimate .*probabilit|probability (that|of)|chance (that|of)|proportion of (times|simulations|trials|games|runs)|on average|expected (number|value)|\d{3,} (times|simulations|trials|repetitions)/,'Estimate a probability by simulation (replicate)','core-02','Template: estimate any probability with replicate()'],
+ [/at least one|at least once/,'"At least one" (any + complement)','core-02','"At least one": dice and complement rule'],
+ [/birthday|share (a|the same)|duplicate|same (value|number|birthday) (twice|more than once)/,'Any duplicates (birthday problem)','core-02','Birthday problem (any duplicates)'],
+ [/store|save (the |each |all )?(result|outcome|value)s?|record (the |each )|vector of (results|outcomes|sums|values)/,'Store results from a loop','core-02','Store results from a loop (for loop vs sapply)'],
+ [/geometric|first (success|six|head|time)|until the first|number of (trials|tries|attempts) (until|before)/,'Geometric: wait for the first success','core-03','Geometric: waiting for the first success (watch the off-by-one)'],
+ [/uniform|runif|between 0 and 1/,'Uniform random numbers (runif)','core-03','Uniform: runif for random numbers between a and b'],
+ [/sample means?|sampling distribution|central limit|clt|means? of (many|each|the) samples?|average of each sample/,'Sample means (CLT)','core-03','Sample means: how the average behaves (CLT)'],
 ];
 function detectSkills(q){
   const low=q.toLowerCase(), found=[], seen=new Set();

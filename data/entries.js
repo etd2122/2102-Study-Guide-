@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-15T00:40:00Z";
+window.ENTRIES_SAVED = "2026-10-15T17:30:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -3217,5 +3217,378 @@ window.ENTRIES = {
   ],
   "updatedAt": "2026-10-14T17:00:00Z",
   "remember": []
+ },
+ "core-01": {
+  "type": "core",
+  "num": "01",
+  "title": "Random draws: dice, coins, cards and sample()",
+  "date": "",
+  "exams": [],
+  "topics": [
+   "sample",
+   "set.seed",
+   "dice",
+   "coins",
+   "cards",
+   "deck",
+   "urn",
+   "replace",
+   "prob",
+   "table"
+  ],
+  "pdfs": [],
+  "notes": "The building blocks of every simulation question: rolling dice, flipping coins, dealing cards and drawing from an urn, all with `sample()`.\n\n**The one rule to remember:** `sample(x, size, replace = ?, prob = ?)`\n- **replace = TRUE** → things can repeat (dice, coins, anything you \"do again\").\n- **replace = FALSE** (the default) → no repeats (cards, people, balls taken out of an urn).\n- **prob =** → unfair dice/coins: one probability per item in `x`, same order.\n\nRun `set.seed(1)` first if you want the same \"random\" numbers every time (outputs here use it).",
+  "takeaways": [
+   "Dice and coins: sample(..., replace = TRUE). Cards, people and urns: replace = FALSE (the default).",
+   "Unfair outcomes: prob = c(...), one probability per item, in the same order as x.",
+   "Count how many: sum(x == value). Proportion: mean(x == value).",
+   "table(factor(x, levels = 1:6)) so faces that never came up still show as 0.",
+   "Deal from a deck: build it with rep() or expand.grid(), then sample(deck, 5)."
+  ],
+  "updatedAt": "2026-10-15T17:30:00Z",
+  "remember": [],
+  "chunks": [
+   {
+    "id": "core-01-c01",
+    "label": "sample() and set.seed(): the basics",
+    "question": "How do I draw random values from a set of options, with or without repeats, and make the result repeatable?",
+    "code": "set.seed(1)                         # same random numbers every time you run from here\nsample(1:10, 3)                     # 3 numbers, no repeats (replace = FALSE is the default)\n#> [1] 9 4 7\nsample(1:10, 3, replace = TRUE)     # 3 numbers, repeats allowed\n#> [1] 1 2 7\nsample(c(\"A\", \"B\", \"C\"))            # no size: shuffles the whole vector\n#> [1] \"C\" \"B\" \"A\"\nsample(5)                           # shortcut: shuffles 1:5\n#> [1] 3 5 1 4 2",
+    "comment": "**`sample(x, size, replace, prob)`** picks `size` items from `x`.\n\n| You want | Code |\n|---|---|\n| pick without repeats (cards, people) | `sample(x, k)` |\n| pick with repeats (dice, coins) | `sample(x, k, replace = TRUE)` |\n| unfair / weighted picks | `sample(x, k, replace = TRUE, prob = c(...))` |\n| shuffle everything | `sample(x)` |\n\n**Common error:** `sample(1:6, 10)` fails with \"cannot take a sample larger than the population when 'replace = FALSE'\". You asked for 10 items from 6 without repeats; add `replace = TRUE`.\n\n**`set.seed(any number)`** makes the next random draws repeatable. Use it when a question says \"set the seed to …\" or when you want to check your answer twice. **Trap:** `sample(5)` shuffles 1:5. It doesn't return the number 5.",
+    "key": true
+   },
+   {
+    "id": "core-01-c02",
+    "label": "Roll dice: one die, many rolls, counts and proportions",
+    "question": "Roll a fair six-sided die 20 times. How often did each face come up? What proportion were sixes? What is the average roll?",
+    "code": "set.seed(1)\nsample(1:6, 1)                                # roll one die\n#> [1] 1\n\nrolls <- sample(1:6, 20, replace = TRUE)      # roll a die 20 times\nrolls\n#>  [1] 4 1 2 5 3 6 2 3 3 1 5 5 2 6 6 2 1 5 5 1\ntable(rolls)                                  # how many of each face\n#> rolls\n#> 1 2 3 4 5 6 \n#> 4 4 3 1 5 3 \ntable(factor(rolls, levels = 1:6))            # same, but faces that never came up show 0\n#> 1 2 3 4 5 6 \n#> 4 4 3 1 5 3 \nsum(rolls == 6)                               # how many sixes\n#> [1] 3\nmean(rolls == 6)                              # proportion of sixes\n#> [1] 0.15\nmean(rolls)                                   # average roll (true average is 3.5)\n#> [1] 3.4",
+    "comment": "**The pattern:** roll many times with `sample(1:6, n, replace = TRUE)`, then summarize.\n- `table(rolls)` → counts per face.\n- `sum(rolls == 6)` → **how many** sixes: `rolls == 6` is TRUE/FALSE, and TRUE counts as 1.\n- `mean(rolls == 6)` → **proportion** of sixes, the share of TRUEs.\n- `mean(rolls)` → the average face value. The long-run average of a fair die is 3.5.\n\n**Why `factor(rolls, levels = 1:6)`:** `table()` only lists values that appeared. If no 3 was rolled, the table has 5 columns, so counts end up under the wrong face when you compare tables or divide by 6 probabilities (that bug is in the HW 2 solutions). Setting `levels = 1:6` keeps all six faces, with 0 where needed.\n\n**Similar questions:** \"a 20-sided die\" → `sample(1:20, ...)`. \"Roll until …\" → see the next tab entry. \"Proportion of even rolls\" → `mean(rolls %% 2 == 0)`.",
+    "key": true
+   },
+   {
+    "id": "core-01-c03",
+    "label": "Two dice: sums, doubles and comparisons",
+    "question": "Roll two dice 1,000 times. What is the distribution of the sum? Estimate P(sum = 7) and P(doubles).",
+    "code": "set.seed(1)\nn <- 1000\ndie1 <- sample(1:6, n, replace = TRUE)\ndie2 <- sample(1:6, n, replace = TRUE)\ntotal <- die1 + die2                    # adds roll by roll (element-wise)\n\ntable(total)\n#> total\n#>   2   3   4   5   6   7   8   9  10  11  12 \n#>  28  50  79 112 148 167 150 105  82  58  21 \nmean(total == 7)                        # estimate; exact is 6/36 = 0.1667\n#> [1] 0.167\nmean(die1 == die2)                      # doubles; exact is 6/36\n#> [1] 0.14\nmean(total >= 10)                       # sum of 10 or more; exact is 6/36\n#> [1] 0.161\nmean(die1 > die2)                       # first die beats the second; exact is 15/36 = 0.4167\n#> [1] 0.424\n\n# Exact answers by listing all 36 outcomes\nall_rolls <- expand.grid(d1 = 1:6, d2 = 1:6)\nnrow(all_rolls)\n#> [1] 36\nmean(all_rolls$d1 + all_rolls$d2 == 7)\n#> [1] 0.1666667",
+    "comment": "**Roll each die separately, then combine:** `die1 + die2` adds **position by position**, so `total[1]` is the sum of the first pair of rolls. Any combination works the same way: `die1 * die2`, `pmax(die1, die2)` (the larger of each pair), `die1 == die2` (doubles).\n\n**Estimates vs exact:** with 1,000 rolls, estimates land close to the exact answers but not exactly on them. More rolls → closer.\n\n**Exact answers with `expand.grid()`:** it lists every combination (6 × 6 = 36 rows), so `mean(condition)` over those rows is the **exact** probability. It's a great way to check a simulation.\n\n**Other dice setups**\n- 3 dice: add `die3` the same way. \n- Unfair dice: add `prob =` (see the next chunk).\n- One line: `rowSums(matrix(sample(1:6, 2 * n, replace = TRUE), ncol = 2))`.",
+    "key": true
+   },
+   {
+    "id": "core-01-c04",
+    "label": "Unfair (weighted) dice and coins with prob =",
+    "question": "A die lands on 6 with probability 0.5 and on each other face with probability 0.1. Roll it 1,000 times. Flip a coin that lands heads 70% of the time 10 times.",
+    "code": "set.seed(1)\nprobs <- c(0.1, 0.1, 0.1, 0.1, 0.1, 0.5)       # one probability per face, in order 1..6\nsum(probs)                                     # must add to 1\n#> [1] 1\nloaded <- sample(1:6, 1000, replace = TRUE, prob = probs)\nround(table(loaded) / 1000, 3)                 # observed proportions, close to probs\n#> loaded\n#>     1     2     3     4     5     6 \n#> 0.110 0.088 0.086 0.090 0.106 0.520 \n\ncoin <- sample(c(\"H\", \"T\"), 10, replace = TRUE, prob = c(0.7, 0.3))\ncoin\n#>  [1] \"H\" \"H\" \"H\" \"T\" \"H\" \"H\" \"H\" \"H\" \"T\" \"H\"\nsum(coin == \"H\")\n#> [1] 8",
+    "comment": "**`prob =` gives one probability per item of `x`, in the same order.** For `sample(1:6, ..., prob = probs)`, `probs[1]` belongs to face 1, …, `probs[6]` to face 6. For `c(\"H\", \"T\")` with `prob = c(0.7, 0.3)`, H gets 0.7.\n\n**Checks that save points**\n- `sum(probs)` should be 1. R rescales if it isn't, but then you've usually typed something wrong.\n- Need `replace = TRUE` whenever you draw more items than there are options.\n- `table(x) / n` (or `prop.table(table(x))`) should look like `probs` for a large n.\n\n**Exam wording:** \"Die1: {1 - 0.1, 2 - 0.25, …}\" → `sample(1:6, 1, prob = c(0.1, 0.25, ...))` (Recitation 4, Problem 1). \"Charge amounts 5, 10, …, 30 with probabilities …\" → `sample(seq(5, 30, by = 5), 1, prob = c(...))`.",
+    "key": true
+   },
+   {
+    "id": "core-01-c05",
+    "label": "Flip coins: count heads (sample vs rbinom)",
+    "question": "Flip a fair coin 10 times and count the heads. Repeat the 10-flip experiment 5 times.",
+    "code": "set.seed(1)\nflips <- sample(c(\"H\", \"T\"), 10, replace = TRUE)\nflips\n#>  [1] \"H\" \"T\" \"H\" \"H\" \"T\" \"H\" \"H\" \"H\" \"T\" \"T\"\nsum(flips == \"H\")                         # number of heads in these 10 flips\n#> [1] 6\n\n# Shortcut: the number of heads in 10 flips is Binomial(10, 0.5)\nrbinom(1, size = 10, prob = 0.5)          # one experiment of 10 flips -> heads count\n#> [1] 4\nrbinom(5, size = 10, prob = 0.5)          # 5 experiments -> 5 heads counts\n#> [1] 4 6 5 6 5\n\n# 0/1 coding: 1 = heads\ncoin01 <- sample(0:1, 10, replace = TRUE)\nsum(coin01)\n#> [1] 3",
+    "comment": "**Two ways to \"flip\":**\n- `sample(c(\"H\", \"T\"), n, replace = TRUE)` gives the **actual sequence**. Use it when the question cares about order or streaks (\"3 heads in a row\").\n- `rbinom(k, size = n, prob = p)` gives just the **number of heads** in n flips, repeated k times. Use it when only the count matters.\n\n**rbinom's arguments:** the first number is **how many experiments**, `size` is **flips per experiment**, `prob` is P(heads). `rbinom(5, 10, 0.5)` = five numbers, each the heads count from 10 flips. A common mistake is swapping the first argument and `size`.\n\n**Streaks need the sequence:** for \"until 3 heads in a row\", flip one at a time inside a `while` loop (Recitation 4, Problem 4).",
+    "key": true
+   },
+   {
+    "id": "core-01-c06",
+    "label": "Build a deck of cards and deal a hand",
+    "question": "Create a standard 52-card deck, deal a 5-card hand, and count the aces and hearts in it.",
+    "code": "ranks <- c(\"A\", 2:10, \"J\", \"Q\", \"K\")\nsuits <- c(\"Hearts\", \"Diamonds\", \"Clubs\", \"Spades\")\n\n# Way 1: a character vector like \"A Hearts\"\ndeck <- paste(rep(ranks, times = 4), rep(suits, each = 13))\nlength(deck)\n#> [1] 52\nhead(deck, 3)\n#> [1] \"A Hearts\" \"2 Hearts\" \"3 Hearts\"\n\n# Way 2: a data frame with rank and suit columns (easier to count)\ndeck_df <- expand.grid(rank = ranks, suit = suits, stringsAsFactors = FALSE)\nnrow(deck_df)\n#> [1] 52\n\nset.seed(1)\nhand <- deck_df[sample(1:52, 5), ]       # deal 5 cards: 5 random ROWS, no repeats\nhand\n#>    rank     suit\n#> 4     4   Hearts\n#> 39    K    Clubs\n#> 1     A   Hearts\n#> 34    8    Clubs\n#> 23   10 Diamonds\nsum(hand$rank == \"A\")                    # aces in the hand\n#> [1] 1\nsum(hand$suit == \"Hearts\")               # hearts in the hand\n#> [1] 2\nany(duplicated(hand$rank))               # TRUE if the hand has at least a pair\n#> [1] FALSE",
+    "comment": "**Building the deck**\n- `rep(ranks, times = 4)` repeats the 13 ranks 4 times, and `rep(suits, each = 13)` repeats each suit 13 times. Lined up together, they give every rank–suit pair exactly once. `paste()` glues them into \"A Hearts\", \"2 Hearts\", ….\n- `expand.grid(rank = ranks, suit = suits)` makes **every combination** as a data frame (52 rows). It's easier to count with `hand$rank == \"A\"`. `stringsAsFactors = FALSE` keeps plain text.\n\n**Dealing = sampling without replacement.** A card can't be dealt twice, so **never** use `replace = TRUE` for cards. For the data frame, sample **row numbers** (`sample(1:52, 5)`), then take those rows.\n\n**Useful checks on a hand**\n- `sum(hand$suit == \"Hearts\")`: how many hearts.\n- `all(hand$suit == hand$suit[1])`: all the same suit (a flush).\n- `any(duplicated(hand$rank))`: at least one pair.\n- `hand$rank %in% c(\"J\", \"Q\", \"K\")`: face cards.\n\n**Only care about one feature?** Build a smaller vector: `ranks_only <- rep(ranks, 4)`, then `sample(ranks_only, 5)`.",
+    "key": true
+   },
+   {
+    "id": "core-01-c07",
+    "label": "Draw from an urn / bag (without replacement)",
+    "question": "A bag has 5 red, 3 blue and 2 green balls. Draw 3 without replacement. Estimate the probability that all 3 are red.",
+    "code": "bag <- rep(c(\"red\", \"blue\", \"green\"), times = c(5, 3, 2))\nbag\n#>  [1] \"red\"   \"red\"   \"red\"   \"red\"   \"red\"   \"blue\"  \"blue\"  \"blue\"  \"green\"\n#> [10] \"green\"\ntable(bag)\n#> bag\n#>  blue green   red \n#>     3     2     5 \n\nset.seed(1)\nsample(bag, 3)                                   # one draw of 3 balls\n#> [1] \"green\" \"red\"   \"blue\" \n\n# Probability all three are red: simulate many draws\nall_red <- replicate(10000, all(sample(bag, 3) == \"red\"))\nmean(all_red)\n#> [1] 0.0836\nchoose(5, 3) / choose(10, 3)                     # exact: 10/120 = 0.0833\n#> [1] 0.08333333",
+    "comment": "**Build the bag with `rep(values, times = counts)`:** `rep(c(\"red\", \"blue\", \"green\"), times = c(5, 3, 2))` gives 5 reds, 3 blues and 2 greens in one vector. Then `sample(bag, k)` draws k balls without replacement, because the default `replace = FALSE` means balls are **not put back**.\n\n**\"With replacement\" (put the ball back)?** Add `replace = TRUE`. Or use `prob =` with the proportions: `sample(c(\"red\", \"blue\", \"green\"), 3, replace = TRUE, prob = c(.5, .3, .2))`.\n\n**Estimating a probability (the key trick):** `replicate(10000, <one experiment that gives TRUE/FALSE>)` repeats the experiment and collects 10,000 TRUE/FALSEs. `mean()` of them is the estimated probability. The next tab entry covers this in detail.\n\n**Exact check with `choose()`:** `choose(n, k)` is the number of ways to pick k from n. P(all 3 red) = ways to pick 3 of the 5 reds ÷ ways to pick any 3 of the 10 = 10 / 120.",
+    "key": true
+   },
+   {
+    "id": "core-01-c08",
+    "label": "Random rows, random people and shuffling",
+    "question": "Pick 3 random rows from a data frame, pick a random winner from a list of names, and shuffle a vector into random order.",
+    "code": "df <- data.frame(name = c(\"Ana\", \"Ben\", \"Cara\", \"Dev\", \"Eli\", \"Fay\"),\n                 score = c(88, 92, 75, 64, 95, 81))\nset.seed(1)\ndf[sample(nrow(df), 3), ]                 # 3 random rows\n#>   name score\n#> 1  Ana    88\n#> 4  Dev    64\n#> 3 Cara    75\nsample(df$name, 1)                        # one random winner\n#> [1] \"Ana\"\nsample(df$name)                           # shuffled order (a random permutation)\n#> [1] \"Ben\"  \"Eli\"  \"Cara\" \"Dev\"  \"Fay\"  \"Ana\" \n\n# Split into two random teams of 3\nshuffled <- sample(df$name)\nteam1 <- shuffled[1:3]\nteam2 <- shuffled[4:6]\nteam1; team2\n#> [1] \"Cara\" \"Fay\"  \"Ana\" \n#> [1] \"Dev\" \"Eli\" \"Ben\"",
+    "comment": "**Random rows:** `df[sample(nrow(df), k), ]`. `sample(nrow(df), k)` picks k row **numbers**, and putting them before the comma keeps those rows, all columns.\n\n**Shuffle:** `sample(x)` with no size returns all of x in random order. Use it to split into random groups: shuffle once, then take positions 1–3, 4–6, ….\n\n**Train/test style split:** `idx <- sample(nrow(df), 0.7 * nrow(df))`, then `df[idx, ]` and `df[-idx, ]`. The minus sign means \"all rows except these\".",
+    "key": false
+   }
+  ]
+ },
+ "core-02": {
+  "type": "core",
+  "num": "02",
+  "title": "Simulating probabilities: replicate, loops and functions",
+  "date": "",
+  "exams": [],
+  "topics": [
+   "simulation",
+   "replicate",
+   "probability",
+   "at least one",
+   "while",
+   "repeat",
+   "for loop",
+   "sapply",
+   "function",
+   "list"
+  ],
+  "pdfs": [],
+  "notes": "How to turn \"what is the probability that …\" or \"on average, how many …\" into code.\n\n**The universal recipe**\n1. Write code for **one** experiment that returns TRUE/FALSE (did the event happen?) or a number.\n2. Repeat it many times: `replicate(10000, ...)`, `sapply(1:10000, function(i) ...)` or a `for` loop.\n3. `mean()` of the TRUE/FALSEs is the **probability**; `mean()` of the numbers is the **average**.\n4. If you can, check against the exact answer.",
+  "takeaways": [
+   "Probability by simulation: mean(replicate(10000, <one experiment that returns TRUE/FALSE>)).",
+   "Average by simulation: mean(replicate(10000, <one experiment that returns a number>)).",
+   "'At least one': any(...). 'All': all(...). 'Exactly k': sum(...) == k.",
+   "Until something happens: a while loop with a counter. A known number of repeats: for, sapply or replicate.",
+   "Wrap it in a function with arguments so you can rerun it with different n, p or targets."
+  ],
+  "updatedAt": "2026-10-15T17:30:00Z",
+  "remember": [],
+  "chunks": [
+   {
+    "id": "core-02-c01",
+    "label": "Template: estimate any probability with replicate()",
+    "question": "What is the general way to estimate a probability or an average by simulation?",
+    "code": "set.seed(1)\n# 1. ONE experiment -> TRUE/FALSE\none_experiment <- function() {\n  rolls <- sample(1:6, 2, replace = TRUE)\n  sum(rolls) == 7\n}\none_experiment()\n#> [1] FALSE\n\n# 2. Repeat it many times, 3. average\nresults <- replicate(10000, one_experiment())\nhead(results)\n#> [1] FALSE FALSE FALSE FALSE FALSE  TRUE\nmean(results)               # estimated P(sum of two dice = 7); exact 1/6 = 0.1667\n#> [1] 0.1655\n\n# Same thing in one line\nmean(replicate(10000, sum(sample(1:6, 2, replace = TRUE)) == 7))\n#> [1] 0.1684",
+    "comment": "**`replicate(n, expr)`** runs `expr` n times and collects the results in a vector. If each run returns TRUE/FALSE, **`mean()` gives the proportion of TRUEs**, which is the estimated probability.\n\n**Write the one-experiment part first and run it a few times by itself.** If one experiment is right, the whole simulation is right.\n\n**More repetitions = more accurate:** 10,000 is a good default. The estimate is usually within about ±0.01 of the truth.\n\n**Same thing, other ways to write it**\n- `sapply(1:10000, function(i) one_experiment())`\n- a `for` loop: `res <- logical(10000); for (i in 1:10000) res[i] <- one_experiment()`, then `mean(res)`\n\n**Turning words into the TRUE/FALSE line**\n\n| Question says | One-experiment line |\n|---|---|\n| \"at least one six\" | `any(rolls == 6)` |\n| \"all heads\" | `all(flips == \"H\")` |\n| \"exactly 2 aces\" | `sum(hand == \"A\") == 2` |\n| \"more than 3 heads\" | `sum(flips == \"H\") > 3` |\n| \"sum is 7\" | `sum(rolls) == 7` |",
+    "key": true
+   },
+   {
+    "id": "core-02-c02",
+    "label": "\"At least one\": dice and complement rule",
+    "question": "Roll a die 4 times. What is the probability of getting at least one six? Compare the simulation with the exact answer.",
+    "code": "set.seed(1)\nat_least_one_six <- replicate(10000, any(sample(1:6, 4, replace = TRUE) == 6))\nmean(at_least_one_six)\n#> [1] 0.5148\n\n1 - (5/6)^4                     # exact: 1 - P(no sixes in 4 rolls)\n#> [1] 0.5177469",
+    "comment": "**`any()`** is TRUE if at least one element is TRUE, which is exactly \"at least one\".\n\n**Exact answer with the complement rule:** P(at least one) = 1 − P(none). P(no six on one roll) = 5/6, so for 4 independent rolls it's (5/6)⁴, giving **0.518**.\n\n**Similar:** \"at least one head in 5 flips\" → `any(sample(c(\"H\",\"T\"), 5, TRUE) == \"H\")`, exact 1 − 0.5⁵. \"At least one ace in a 5-card hand\" → the next chunk.",
+    "key": true
+   },
+   {
+    "id": "core-02-c03",
+    "label": "Cards: probability of a hand",
+    "question": "Deal 5 cards from a standard deck. Estimate P(at least one ace), P(all the same suit), and P(the first two cards are both hearts).",
+    "code": "ranks <- rep(c(\"A\", 2:10, \"J\", \"Q\", \"K\"), times = 4)\nsuits <- rep(c(\"Hearts\", \"Diamonds\", \"Clubs\", \"Spades\"), each = 13)\n\nset.seed(1)\ndeal <- function() sample(1:52, 5)          # row numbers of the 5 cards\n\n# P(at least one ace)\nmean(replicate(10000, any(ranks[deal()] == \"A\")))\n#> [1] 0.3372\n1 - choose(48, 5) / choose(52, 5)           # exact: 0.341\n#> [1] 0.341158\n\n# P(flush: all five the same suit)\nmean(replicate(10000, { s <- suits[deal()]; all(s == s[1]) }))\n#> [1] 0.0026\n4 * choose(13, 5) / choose(52, 5)           # exact: 0.00198 (rare!)\n#> [1] 0.001980792\n\n# P(first two cards both hearts)\nmean(replicate(10000, all(suits[sample(1:52, 2)] == \"Hearts\")))\n#> [1] 0.0605\n(13/52) * (12/51)                           # exact: 0.0588\n#> [1] 0.05882353",
+    "comment": "**Trick: deal card positions, then look them up.** `sample(1:52, 5)` picks 5 positions without replacement. `ranks[positions]` and `suits[positions]` give those cards' ranks and suits, kept matched because they use the **same** positions.\n\n**Several lines inside `replicate`:** wrap them in `{ }`. The **last line** is what gets returned (`all(s == s[1])` here).\n\n**Rare events need more repetitions:** a flush happens about 2 times in 1,000 hands, so 10,000 deals gives only about 20 flushes and a rough estimate. Use 100,000 for rare events.\n\n**Exact formulas used**\n- At least one ace: 1 − P(no aces) = 1 − choose(48, 5) / choose(52, 5) (all 5 cards from the 48 non-aces).\n- Flush: 4 suits × choose(13, 5) ways ÷ choose(52, 5) hands.\n- Two hearts in a row: 13/52 for the first × 12/51 for the second (one heart is gone).",
+    "key": true
+   },
+   {
+    "id": "core-02-c04",
+    "label": "Birthday problem (any duplicates)",
+    "question": "In a room of 23 people, what is the probability that at least two share a birthday?",
+    "code": "set.seed(1)\nshared <- replicate(10000, {\n  bdays <- sample(1:365, 23, replace = TRUE)\n  any(duplicated(bdays))\n})\nmean(shared)\n#> [1] 0.5026\n\n1 - prod((365:343) / 365)            # exact: 0.507\n#> [1] 0.5072972\n\n# How does it change with group size?\np_shared <- sapply(c(10, 23, 30, 50), function(n)\n  mean(replicate(5000, any(duplicated(sample(1:365, n, replace = TRUE))))))\nround(p_shared, 2)\n#> [1] 0.12 0.51 0.71 0.97",
+    "comment": "**`duplicated(x)`** marks each value that already appeared earlier in x. `any(duplicated(x))` is TRUE if there's **at least one repeat**, so at least two people share a birthday.\n\n**`replace = TRUE`:** two people **can** have the same birthday.\n\n**The `sapply` over group sizes** answers \"how does the probability change with n?\" in one line. Swap in any list of values. The same pattern works for any \"repeat the simulation for several parameter values\" question.\n\n**Exact:** P(all different) = 365/365 × 364/365 × … × 343/365 (23 factors), so P(shared) = 1 − that = **0.507**.",
+    "key": false
+   },
+   {
+    "id": "core-02-c05",
+    "label": "Roll until something happens (while loop)",
+    "question": "How many rolls does it take to get the first six? How many rolls to see every face at least once? Average over many runs.",
+    "code": "set.seed(1)\nrolls_until_six <- function() {\n  rolls <- 0\n  repeat {\n    rolls <- rolls + 1\n    if (sample(1:6, 1) == 6) break\n  }\n  rolls\n}\nrolls_until_six()\n#> [1] 7\nmean(replicate(10000, rolls_until_six()))      # theory: 1/p = 6\n#> [1] 6.0009\n\nrolls_until_all_faces <- function() {\n  seen <- c()\n  rolls <- 0\n  while (length(unique(seen)) < 6) {\n    rolls <- rolls + 1\n    seen <- c(seen, sample(1:6, 1))\n  }\n  rolls\n}\nmean(replicate(10000, rolls_until_all_faces()))   # theory: 6*(1 + 1/2 + ... + 1/6) = 14.7\n#> [1] 14.7568",
+    "comment": "**When you don't know how many tries it will take → `while` or `repeat`.**\n- `repeat { ...; if (done) break }` checks the stopping rule **as written**.\n- `while (not done) { ... }` puts the **opposite** of the stopping rule in the condition.\n\n**Always:** start a counter at 0, add 1 each pass, return the counter.\n\n**\"Until every face appears\":** keep a vector of what you've seen; `length(unique(seen)) < 6` means not all faces seen yet.\n\n**Check with theory:** the average wait for an event with probability p is **1/p** (6 rolls for a six). Your simulated mean should be close.\n\n**More \"until\" questions are in Recitation 4:** until a sum shows up n times, until k in a row, until reaching ±target, until all bulbs burn out.",
+    "key": true
+   },
+   {
+    "id": "core-02-c06",
+    "label": "Simulation function with arguments, returning a list",
+    "question": "Write a function that flips a coin n times with P(heads) = p and returns the flips, the number of heads and the proportion of heads.",
+    "code": "flip_coins <- function(n, p = 0.5) {\n  flips <- sample(c(\"H\", \"T\"), n, replace = TRUE, prob = c(p, 1 - p))\n  heads <- sum(flips == \"H\")\n  list(flips = flips, heads = heads, prop_heads = heads / n)\n}\n\nset.seed(1)\nresult <- flip_coins(10, p = 0.7)\nresult\n#> $flips\n#>  [1] \"H\" \"H\" \"H\" \"T\" \"H\" \"T\" \"T\" \"H\" \"H\" \"H\"\n#> $heads\n#> [1] 7\n#> $prop_heads\n#> [1] 0.7\nresult$heads                                   # pull out one part with $\n#> [1] 7\n\n# Run it for several n values at once\nsapply(c(10, 100, 1000, 10000), function(n) flip_coins(n)$prop_heads)\n#> [1] 0.5000 0.4600 0.4830 0.4985",
+    "comment": "**Function template for simulation questions**\n```r\nname <- function(arg1, arg2 = default) {\n  # 1. simulate\n  # 2. compute the things asked for\n  list(thing1 = ..., thing2 = ...)     # 3. return them (several outputs -> a list)\n}\n```\n- **Default arguments** (`p = 0.5`) let you call `flip_coins(10)` without giving p.\n- **Return a `list()`** when the outputs are different types or lengths (a vector of flips plus single numbers). Get parts with `result$heads` or `result[[\"heads\"]]`.\n- **One output?** Just make it the last line.\n\n**`sapply` over inputs:** the last line shows the proportion of heads getting closer to 0.5 as n grows (law of large numbers). Swap in any function and any vector of inputs.",
+    "key": true
+   },
+   {
+    "id": "core-02-c07",
+    "label": "Store results from a loop (for loop vs sapply)",
+    "question": "Simulate 1,000 rounds of rolling two dice and record the sum of each round. Then find the most common sum.",
+    "code": "set.seed(1)\nn_rounds <- 1000\n\n# for loop: make an empty vector first, then fill slot i\nsums <- numeric(n_rounds)\nfor (i in 1:n_rounds) {\n  sums[i] <- sum(sample(1:6, 2, replace = TRUE))\n}\n\n# sapply: builds the vector for you\nsums2 <- sapply(1:n_rounds, function(i) sum(sample(1:6, 2, replace = TRUE)))\n\n# replicate: when you don't need i at all\nsums3 <- replicate(n_rounds, sum(sample(1:6, 2, replace = TRUE)))\n\ntable(sums)\n#> sums\n#>   2   3   4   5   6   7   8   9  10  11  12 \n#>  30  54  89 108 138 165 143 100  83  61  29 \nnames(which.max(table(sums)))                  # most common sum\n#> [1] \"7\"",
+    "comment": "**Three ways to repeat and collect** (pick one):\n\n| | Needs | Best when |\n|---|---|---|\n| `for` + `result[i] <- ...` | an empty vector first: `numeric(n)` / `character(n)` / `logical(n)` | the code is long, or step i depends on step i−1 |\n| `sapply(1:n, function(i) ...)` | nothing | you use `i` (e.g. sample size = i) |\n| `replicate(n, ...)` | nothing | each repeat is identical |\n\n**Common mistake in loops:** forgetting the `[i]`, as in `sums <- sum(...)`. That overwrites the whole vector each time, so you end up with one number.\n\n**Most common value:** `names(which.max(table(x)))`. `which.max` finds the biggest count, and `names` gives the value it belongs to (as text; wrap in `as.numeric()` if you need a number).",
+    "key": true
+   }
+  ]
+ },
+ "core-03": {
+  "type": "core",
+  "num": "03",
+  "title": "Distributions: d / p / q / r for normal, binomial, geometric and uniform",
+  "date": "",
+  "exams": [],
+  "topics": [
+   "rnorm",
+   "pnorm",
+   "qnorm",
+   "dnorm",
+   "dbinom",
+   "pbinom",
+   "rbinom",
+   "dgeom",
+   "pgeom",
+   "runif",
+   "normal",
+   "binomial",
+   "geometric",
+   "uniform",
+   "CLT"
+  ],
+  "pdfs": [],
+  "notes": "Every distribution in R has four functions. The first letter says what you get:\n\n| Letter | Gives | Normal | Binomial | Geometric | Uniform |\n|---|---|---|---|---|---|\n| **d** | height / P(X = x) | `dnorm` | `dbinom` | `dgeom` | `dunif` |\n| **p** | P(X ≤ q), area to the left | `pnorm` | `pbinom` | `pgeom` | `punif` |\n| **q** | the value with area p to its left (percentile) | `qnorm` | `qbinom` | `qgeom` | `qunif` |\n| **r** | random draws | `rnorm` | `rbinom` | `rgeom` | `runif` |\n\n**`p` is always \"less than or equal to\".** For \"greater than\", use `1 - p...()` (or `lower.tail = FALSE`). For \"between a and b\", use `p(b) - p(a)`.",
+  "takeaways": [
+   "d = exactly / height, p = at most (area to the left), q = percentile, r = random draws.",
+   "Greater than: 1 - pnorm(x, m, s). Between: pnorm(b, m, s) - pnorm(a, m, s).",
+   "Binomial 'at least k': 1 - pbinom(k - 1, n, p). Mind the k - 1!",
+   "R's geometric counts FAILURES before the first success: first success on try t → dgeom(t - 1, p).",
+   "Check a simulation: mean(rnorm(...) > x) should be close to 1 - pnorm(x, ...)."
+  ],
+  "updatedAt": "2026-10-15T17:30:00Z",
+  "remember": [],
+  "chunks": [
+   {
+    "id": "core-03-c01",
+    "label": "Normal: rnorm to generate data, then check it",
+    "question": "Generate 1,000 test scores from a normal distribution with mean 70 and standard deviation 10. Check the sample mean and sd, and find the proportion above 85.",
+    "code": "set.seed(1)\nscores <- rnorm(1000, mean = 70, sd = 10)\nhead(round(scores, 1))\n#> [1] 63.7 71.8 61.6 86.0 73.3 61.8\nmean(scores)                 # close to 70\n#> [1] 69.88352\nsd(scores)                   # close to 10\n#> [1] 10.34916\nmean(scores > 85)            # proportion above 85 in the sample\n#> [1] 0.076\n1 - pnorm(85, 70, 10)        # the exact probability, for comparison\n#> [1] 0.0668072\nsummary(scores)\n#>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. \n#>   39.92   63.03   69.65   69.88   76.88  108.10 ",
+    "comment": "**`rnorm(n, mean, sd)`:** n random values. The argument is the **standard deviation**, not the variance. If a question gives variance 25, use `sd = 5`.\n\n**The sample won't match exactly:** `mean(scores)` is near 70, not exactly 70. More draws → closer.\n\n**Proportions from data vs probabilities from the formula**\n- `mean(scores > 85)` = share of **your sample** above 85.\n- `1 - pnorm(85, 70, 10)` = exact probability for the **distribution**.\n- They should be close; that's a good sanity check.\n\n**Round if the question wants whole numbers:** `round(rnorm(...))`. A plot of this data is in the Visualizations entry.",
+    "key": true
+   },
+   {
+    "id": "core-03-c02",
+    "label": "Normal probabilities: less than, greater than, between, percentiles",
+    "question": "Heights are normal with mean 170 cm and sd 8 cm. Find P(height < 160), P(height > 185), P(165 < height < 175), and the height that marks the top 10%.",
+    "code": "pnorm(160, mean = 170, sd = 8)                          # less than 160\n#> [1] 0.1056498\n1 - pnorm(185, mean = 170, sd = 8)                      # greater than 185\n#> [1] 0.03039636\npnorm(185, mean = 170, sd = 8, lower.tail = FALSE)      # same thing\n#> [1] 0.03039636\npnorm(175, 170, 8) - pnorm(165, 170, 8)                 # between 165 and 175\n#> [1] 0.4680289\nqnorm(0.90, mean = 170, sd = 8)                         # top 10% starts here (90th percentile)\n#> [1] 180.2524\nqnorm(0.25, 170, 8)                                     # 25th percentile\n#> [1] 164.6041\n\n# The 68-95-99.7 rule\npnorm(1) - pnorm(-1)\n#> [1] 0.6826895\npnorm(2) - pnorm(-2)\n#> [1] 0.9544997",
+    "comment": "**`pnorm(x, mean, sd)` = area to the LEFT of x = P(X ≤ x).** Everything else comes from that:\n\n| Question says | Code |\n|---|---|\n| less than / at most / below x | `pnorm(x, m, s)` |\n| greater than / at least / above x | `1 - pnorm(x, m, s)` |\n| between a and b | `pnorm(b, m, s) - pnorm(a, m, s)` |\n| the value with p of the area below it | `qnorm(p, m, s)` |\n| top 10% / the cut-off for the highest 10% | `qnorm(0.90, m, s)` |\n| bottom 5% | `qnorm(0.05, m, s)` |\n\n**For the normal, `<` and `≤` give the same answer** (continuous, so P(X = x) = 0). That's **not** true for the binomial; see the next chunk.\n\n**`pnorm(1)` with no mean/sd** uses the standard normal (mean 0, sd 1). That's where the 68% / 95% within 1 / 2 sd comes from.\n\n**`qnorm` undoes `pnorm`:** `pnorm(qnorm(0.9, 170, 8), 170, 8)` gives back 0.9.",
+    "key": true
+   },
+   {
+    "id": "core-03-c03",
+    "label": "Binomial: exactly, at most, at least, between",
+    "question": "A free-throw shooter makes 70% of shots. In 10 shots, find P(exactly 7), P(at most 7), P(at least 8), and P(between 5 and 8). Simulate 1,000 games too.",
+    "code": "dbinom(7, size = 10, prob = 0.7)                          # exactly 7\n#> [1] 0.2668279\npbinom(7, size = 10, prob = 0.7)                          # at most 7  (0..7)\n#> [1] 0.6172172\n1 - pbinom(7, size = 10, prob = 0.7)                      # at least 8 (8..10)\n#> [1] 0.3827828\nsum(dbinom(8:10, size = 10, prob = 0.7))                  # same, adding the pieces\n#> [1] 0.3827828\npbinom(8, 10, 0.7) - pbinom(4, 10, 0.7)                   # between 5 and 8 inclusive\n#> [1] 0.8033427\nsum(dbinom(5:8, 10, 0.7))                                 # same\n#> [1] 0.8033427\n\nset.seed(1)\nmade <- rbinom(1000, size = 10, prob = 0.7)               # 1000 games of 10 shots\nhead(made)\n#> [1] 8 8 7 5 8 5\nmean(made)                                                # close to n*p = 7\n#> [1] 6.983\nmean(made >= 8)                                           # close to 1 - pbinom(7, 10, 0.7)\n#> [1] 0.385",
+    "comment": "**When is it binomial?** A fixed number of tries (n = `size`), each a success or failure with the same probability p, and the question asks **how many successes**.\n\n**The `- 1` trap.** The binomial counts whole numbers, so \"less than\" and \"at most\" are different:\n\n| Question says | Code |\n|---|---|\n| exactly k | `dbinom(k, n, p)` |\n| at most k (≤ k) | `pbinom(k, n, p)` |\n| less than k (< k) | `pbinom(k - 1, n, p)` |\n| at least k (≥ k) | `1 - pbinom(k - 1, n, p)` |\n| more than k (> k) | `1 - pbinom(k, n, p)` |\n| between a and b (inclusive) | `pbinom(b, n, p) - pbinom(a - 1, n, p)` |\n\n**When unsure, add the pieces:** `sum(dbinom(a:b, n, p))` gives P(a ≤ X ≤ b) directly. No `- 1` to think about.\n\n**`rbinom(k, size, prob)`** simulates k experiments. The mean is about n × p and the variance about n × p × (1 − p).",
+    "key": true
+   },
+   {
+    "id": "core-03-c04",
+    "label": "Geometric: waiting for the first success (watch the off-by-one)",
+    "question": "Each roll of a die has a 1/6 chance of a six. What is the probability that the first six comes on the 4th roll? Within the first 4 rolls?",
+    "code": "p <- 1/6\ndgeom(3, prob = p)          # first six ON roll 4 = 3 failures first\n#> [1] 0.09645062\n(5/6)^3 * (1/6)             # same thing by hand\n#> [1] 0.09645062\n\npgeom(3, prob = p)          # first six WITHIN 4 rolls (0 to 3 failures)\n#> [1] 0.5177469\n1 - (5/6)^4                 # same thing: 1 - P(no six in 4 rolls)\n#> [1] 0.5177469\n\nset.seed(1)\nwaits <- rgeom(10000, prob = p) + 1        # +1 turns \"failures\" into \"roll number\"\nmean(waits)                                # close to 1/p = 6\n#> [1] 6.1004\nmean(waits == 4)                           # close to dgeom(3, p)\n#> [1] 0.0948",
+    "comment": "**R's geometric counts FAILURES before the first success, not the trial number.**\n- \"First success on trial t\" → **`dgeom(t - 1, p)`**\n- \"First success within t trials\" (on or before t) → **`pgeom(t - 1, p)`**\n- \"Takes more than t trials\" → `1 - pgeom(t - 1, p)` = (1 − p)^t\n- Random **trial numbers** → `rgeom(n, p) + 1`\n\nLecture 9's example (`dgeom(6, .55)` for \"the 7th child\") gets this wrong; see the warning in Lecture 09.\n\n**Check by hand:** first six on roll 4 = fail, fail, fail, success = (5/6)³ × (1/6). If R and your hand calculation agree, you've used the right argument.\n\n**Average wait = 1/p.** For a six that's 6 rolls.",
+    "key": true
+   },
+   {
+    "id": "core-03-c05",
+    "label": "Uniform: runif for random numbers between a and b",
+    "question": "Generate 5 random numbers between 0 and 1, and 5 between 10 and 20. Use runif to make an event happen with probability 0.3.",
+    "code": "set.seed(1)\nrunif(5)                          # between 0 and 1\n#> [1] 0.2655087 0.3721239 0.5728534 0.9082078 0.2016819\nrunif(5, min = 10, max = 20)      # between 10 and 20\n#> [1] 18.98390 19.44675 16.60798 16.29114 10.61786\npunif(0.3)                        # P(U <= 0.3) = 0.3\n#> [1] 0.3\n\n# An event with probability 0.3\nhappens <- runif(10) < 0.3\nhappens\n#>  [1]  TRUE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE\nmean(runif(10000) < 0.3)          # close to 0.3\n#> [1] 0.3023\n\n# Random whole numbers: use sample, not runif\nsample(1:10, 5, replace = TRUE)\n#> [1]  1  4 10 10  6",
+    "comment": "**`runif(n, min, max)`** gives decimals spread evenly between min and max (default 0 to 1).\n\n**`runif(1) < p` is TRUE with probability p:** a uniform number lands below p exactly p of the time. It's a quick way to simulate any yes/no event, e.g. \"each day rains with probability 0.4\" → `runif(1) < 0.4`.\n\n**Whole numbers?** Use `sample(1:10, ...)`, not `round(runif(...))`. Rounding makes the end values (1 and 10) half as likely as the others.",
+    "key": false
+   },
+   {
+    "id": "core-03-c06",
+    "label": "Sample means: how the average behaves (CLT)",
+    "question": "Take 1,000 samples of size 25 from a normal distribution with mean 70 and sd 10, and compute each sample mean. What are the mean and sd of the sample means?",
+    "code": "set.seed(1)\nsample_means <- replicate(1000, mean(rnorm(25, mean = 70, sd = 10)))\nmean(sample_means)            # close to 70\n#> [1] 70.00938\nsd(sample_means)              # close to 10 / sqrt(25) = 2\n#> [1] 1.870706\n\n# Works for non-normal data too: means of 30 die rolls\ndie_means <- replicate(1000, mean(sample(1:6, 30, replace = TRUE)))\nmean(die_means)               # close to 3.5\n#> [1] 3.517733\nsd(die_means)                 # close to sd of one roll / sqrt(30)\n#> [1] 0.3062086\nsd(1:6) * sqrt(5/6) / sqrt(30)\n#> [1] 0.3118048",
+    "comment": "**One sample mean per repetition:** `replicate(1000, mean(rnorm(25, 70, 10)))`. Each run draws a new sample of 25 and keeps only its average.\n\n**What to say about the result**\n- The sample means are centered at the **true mean** (70).\n- Their spread is **σ / √n** = 10 / 5 = **2**. Bigger samples → less spread.\n- Their histogram looks **normal**, even when the original data isn't (die rolls). That's the Central Limit Theorem.\n\n**Similar question:** \"how does the average change with sample size?\" → `sapply(c(5, 25, 100), function(n) sd(replicate(1000, mean(rnorm(n, 70, 10)))))`. The sd should shrink like 1/√n. Recitation 4, Problem 3 is the same idea.",
+    "key": true
+   }
+  ]
+ },
+ "core-04": {
+  "type": "core",
+  "num": "04",
+  "title": "Visualizations: every base-R plot you need",
+  "date": "",
+  "exams": [],
+  "topics": [
+   "hist",
+   "barplot",
+   "boxplot",
+   "plot",
+   "scatterplot",
+   "curve",
+   "abline",
+   "legend",
+   "par mfrow",
+   "colors"
+  ],
+  "pdfs": [],
+  "notes": "Every plot type from Lecture 8 and the recitations, with the picture it makes. Each chunk makes its own data, so you can run it anywhere.\n\n**Any question asking for a plot is graded on:** a title (`main =`), axis labels (`xlab =`, `ylab =`), and whatever customization it names (colors, bins, notch, horizontal, names). Tick them off one by one. The **Plot options cheat sheet** at the bottom lists every argument.\n\n| Data | Plot |\n|---|---|\n| one numeric variable | `hist()` (shape) or `boxplot()` (spread and outliers) |\n| one categorical variable | `barplot(table(x))` |\n| numeric by group | `boxplot(y ~ group)` |\n| two numeric variables | `plot(x, y)` (scatter) |\n| something over time / steps | `plot(x, y, type = \"l\")` (line) |\n| a distribution's curve | `curve(dnorm(x, m, s), from, to)` |",
+  "takeaways": [
+   "Every plot: main =, xlab =, ylab = and the customizations the question names.",
+   "barplot needs counts: barplot(table(x)). hist and boxplot take the raw numbers.",
+   "Add to an existing plot: abline(), lines(), points(), curve(..., add = TRUE), legend().",
+   "Side by side: par(mfrow = c(1, 2)) ... then par(mfrow = c(1, 1)) to reset.",
+   "A density curve on a histogram needs hist(..., freq = FALSE) so both use the same y scale."
+  ],
+  "updatedAt": "2026-10-15T17:30:00Z",
+  "remember": [],
+  "chunks": [
+   {
+    "id": "core-04-c01",
+    "label": "Histogram (with a normal curve on top)",
+    "question": "Simulate 500 normal values (mean 70, sd 10). Draw a histogram with 15 bins, a title, axis labels and colors, and add the normal curve on top.",
+    "code": "set.seed(1)\nscores <- rnorm(500, mean = 70, sd = 10)\nhist(scores,\n     breaks = 15,                       # about 15 bins\n     freq = FALSE,                      # y-axis = density, so a curve can be added\n     col = \"lightblue\", border = \"white\",\n     main = \"Simulated Test Scores\",\n     xlab = \"Score\", ylab = \"Density\")\ncurve(dnorm(x, mean = 70, sd = 10), add = TRUE, col = \"red\", lwd = 2)\nabline(v = mean(scores), lty = 2)       # dashed line at the sample mean",
+    "comment": "[![Histogram (with a normal curve on top)](files/plots/core-hist.png)](files/plots/core-hist.png)\n\n**Histogram = shape of ONE numeric variable.** Give it the raw numbers; don't use `table()`.\n\n**Key arguments**\n- `breaks = 15` → about 15 bins (R rounds to nice numbers). For exact bins, give the cut points: `breaks = seq(30, 110, by = 5)`.\n- `freq = FALSE` → the y-axis shows **density** instead of counts. You need this to draw a density curve on top, because both are then on the same scale. Leave it out (counts) when there's no curve.\n- `col =` fills the bars; `border =` colors the outlines.\n\n**Adding things on top** (after the plot is drawn)\n- `curve(dnorm(x, m, s), add = TRUE)`: the theoretical curve. Write `x` literally; curve fills it in.\n- `abline(v = value)`: a vertical line. `lty = 2` makes it dashed and `lwd = 2` makes it thicker.\n\n**Describing a histogram:** center (where is the peak?), spread (how wide?), shape (symmetric, or a long tail to the right/left?), and any gaps or unusual values.",
+    "key": true
+   },
+   {
+    "id": "core-04-c02",
+    "label": "Barplot: counts of a categorical variable (die rolls)",
+    "question": "Roll a die 600 times and draw a barplot of how often each face appeared, with colored bars, custom bar names and a line at the expected count.",
+    "code": "set.seed(1)\nrolls <- sample(1:6, 600, replace = TRUE)\ncounts <- table(factor(rolls, levels = 1:6))\ncounts\n#>   1   2   3   4   5   6 \n#> 106  95  90 102 109  98 \nbarplot(counts,\n        col = rainbow(6), border = \"grey30\",\n        names.arg = c(\"One\", \"Two\", \"Three\", \"Four\", \"Five\", \"Six\"),\n        main = \"600 Rolls of a Fair Die\",\n        xlab = \"Face\", ylab = \"Count\",\n        ylim = c(0, 130))\nabline(h = 100, lty = 2, col = \"red\")    # expected count: 600/6",
+    "comment": "[![Barplot: counts of a categorical variable (die rolls)](files/plots/core-bar.png)](files/plots/core-bar.png)\n\n**`barplot()` needs the counts:** use `barplot(table(x))`, **not** `barplot(x)`. Plotting the raw rolls draws 600 bars, one per roll.\n\n**Key arguments**\n- `names.arg = c(...)` → bar labels, **in the table's order** (check with `names(counts)`).\n- `col = c(...)` → one color per bar (or one color for all). `rainbow(6)` and `heat.colors(6)` generate colors.\n- `ylim = c(0, max)` → leave room above the tallest bar.\n- `horiz = TRUE` → horizontal bars.\n\n**Proportions instead of counts:** `barplot(prop.table(counts))`. With proportions, the expected line would be at `abline(h = 1/6)`.\n\n**Bar order:** bars follow the **factor level order**. Set it with `factor(x, levels = c(...))` before `table()` (as in Recitation 3's tenure groups).",
+    "key": true
+   },
+   {
+    "id": "core-04-c03",
+    "label": "Side-by-side (grouped) barplot with a legend",
+    "question": "For a small survey, draw a grouped barplot of job satisfaction by department, with a legend.",
+    "code": "set.seed(1)\ndept <- sample(c(\"Sales\", \"HR\", \"Finance\"), 200, replace = TRUE)\nsatisfaction <- factor(sample(c(\"Low\", \"Medium\", \"High\"), 200, replace = TRUE),\n                       levels = c(\"Low\", \"Medium\", \"High\"))\ntab <- table(satisfaction, dept)          # rows = satisfaction, columns = departments\ntab\n#>             dept\n#> satisfaction Finance HR Sales\n#>       Low         28 34    19\n#>       Medium      17 19    21\n#>       High        21 15    26\nbarplot(tab,\n        beside = TRUE,                    # bars next to each other, not stacked\n        col = c(\"tomato\", \"gold\", \"seagreen3\"),\n        legend.text = TRUE,               # legend from the row names\n        args.legend = list(x = \"topright\", title = \"Satisfaction\"),\n        main = \"Job Satisfaction by Department\",\n        xlab = \"Department\", ylab = \"Number of Employees\",\n        ylim = c(0, 45))                  # extra room on top for the legend",
+    "comment": "[![Side-by-side (grouped) barplot with a legend](files/plots/core-bar2.png)](files/plots/core-bar2.png)\n\n**Two categorical variables → `table(A, B)` → `barplot(tab, beside = TRUE)`.**\n- The table's **columns** become the groups along the x-axis (departments).\n- The **rows** become the bars inside each group (satisfaction levels), colored by `col` in row order.\n- `beside = TRUE` puts bars next to each other. Without it they're **stacked**, which is also a valid plot if the question asks for stacked.\n\n**Legend:** `legend.text = TRUE` uses the row names. `args.legend = list(x = \"topright\")` moves it out of the way.\n\n**Swap which variable is on the axis:** `barplot(t(tab), beside = TRUE)`. `t()` transposes the table.",
+    "key": true
+   },
+   {
+    "id": "core-04-c04",
+    "label": "Boxplot by group (notch, horizontal, outliers)",
+    "question": "Compare simulated salaries across three departments with a boxplot. Add notches and colors, and check for outliers.",
+    "code": "options(scipen = 999)                    # show 100000, not 1e+05, on the axis\nset.seed(1)\ndf <- data.frame(\n  dept = rep(c(\"Sales\", \"HR\", \"Finance\"), each = 60),\n  salary = c(rnorm(60, 60000, 8000), rnorm(60, 55000, 6000), rnorm(60, 75000, 12000)))\ndf$salary[5] <- 100000                   # plant one unusual value\n\nb <- boxplot(salary ~ dept, data = df,\n        notch = TRUE,\n        col = c(\"lightsteelblue1\", \"wheat1\", \"thistle2\"),\n        main = \"Salary by Department\",\n        xlab = \"Department\", ylab = \"Salary (USD)\")\nb$out                                    # the outlier values (the dots)\n#> [1] 101473.2 102695.7 100000.0  42282.4\ntapply(df$salary, df$dept, median)       # the thick middle lines\n#>  Finance       HR    Sales \n#> 73532.46 55210.35 61032.83 ",
+    "comment": "[![Boxplot by group (notch, horizontal, outliers)](files/plots/core-box.png)](files/plots/core-box.png)\n\n**`boxplot(y ~ group, data = df)`** draws one box per group. A single variable is just `boxplot(df$salary)`.\n\n**Reading a box**\n- **Thick line** = median. **Box** = middle 50% (25th to 75th percentile). Its height is the IQR.\n- **Whiskers** reach the furthest points within 1.5 × IQR of the box.\n- **Dots** beyond the whiskers = **outliers**: the planted 100,000 in Sales, plus a few that random data produces by chance.\n\n**Axis showing 1e+05?** Run `options(scipen = 999)` once to turn off scientific notation.\n\n**Key arguments:** `notch = TRUE` (if two notches don't overlap, the medians likely differ); `horizontal = TRUE` (sideways, and then **swap** xlab/ylab); `col =` (one color per box); `names =` (rename the boxes).\n\n**\"Are there outliers?\"** Look for dots, or use code: save the plot (`b <- boxplot(...)`), then `b$out` lists them. `numeric(0)` means none.",
+    "key": true
+   },
+   {
+    "id": "core-04-c05",
+    "label": "Scatterplot: two numeric variables, colors by group, trend line",
+    "question": "Plot study hours against exam score, color the points by group, add a regression line and a legend.",
+    "code": "set.seed(1)\nhours <- runif(80, 0, 10)\ngroup <- sample(c(\"Online\", \"In person\"), 80, replace = TRUE)\nscore <- 55 + 4 * hours + ifelse(group == \"In person\", 5, 0) + rnorm(80, 0, 6)\n\nplot(hours, score,\n     col = ifelse(group == \"Online\", \"steelblue\", \"darkorange\"),\n     pch = 19,                                # solid dots\n     main = \"Exam Score vs Study Hours\",\n     xlab = \"Hours studied\", ylab = \"Exam score\")\nabline(lm(score ~ hours), lwd = 2)            # best-fit line\nlegend(\"topleft\", legend = c(\"Online\", \"In person\"),\n       col = c(\"steelblue\", \"darkorange\"), pch = 19)\ncor(hours, score)                             # strength of the linear relationship\n#> [1] 0.8731183",
+    "comment": "[![Scatterplot: two numeric variables, colors by group, trend line](files/plots/core-scatter.png)](files/plots/core-scatter.png)\n\n**`plot(x, y)`:** x goes along the bottom, y up the side. Put the variable that \"explains\" on x.\n\n**Customizing points**\n- `pch =` point shape: 19 = solid dot, 17 = triangle, 1 = open circle (default).\n- `cex =` point size (1 = normal).\n- `col =` color. A **vector** of colors colors each point separately: `ifelse(group == \"A\", \"blue\", \"orange\")`.\n\n**Adding to the plot**\n- `abline(lm(y ~ x))`: the regression (best-fit) line.\n- `abline(h = 70)` / `abline(v = 5)`: horizontal / vertical reference lines.\n- `legend(\"topleft\", legend = labels, col = colors, pch = 19)`: **must match** the colors you used.\n\n**Describing a scatterplot:** direction (positive/negative), form (linear or curved), strength (`cor()`: near ±1 strong, near 0 weak), and outliers.",
+    "key": true
+   },
+   {
+    "id": "core-04-c06",
+    "label": "Line plot: running proportion of heads (law of large numbers)",
+    "question": "Flip a coin 1,000 times and plot the proportion of heads after each flip, with a reference line at 0.5.",
+    "code": "set.seed(1)\nflips <- sample(c(1, 0), 1000, replace = TRUE)       # 1 = heads\nrunning_prop <- cumsum(flips) / (1:1000)             # proportion after each flip\n\nplot(1:1000, running_prop,\n     type = \"l\",                                    # line instead of points\n     lwd = 2, col = \"purple\",\n     ylim = c(0, 1),\n     main = \"Running Proportion of Heads\",\n     xlab = \"Number of flips\", ylab = \"Proportion of heads\")\nabline(h = 0.5, lty = 2, col = \"red\")\ntail(running_prop, 1)\n#> [1] 0.502",
+    "comment": "[![Line plot: running proportion of heads (law of large numbers)](files/plots/core-line.png)](files/plots/core-line.png)\n\n**`type = \"l\"`** draws a line instead of dots. Use it for anything that changes over steps/time: running averages, random walks, stock prices. `type = \"b\"` draws both points and lines.\n\n**`cumsum(x) / (1:n)`** gives the **running average**: `cumsum` adds up as it goes (number of heads so far), divided by how many flips so far.\n\n**What it shows:** the proportion swings wildly at first and then settles near 0.5. That's the **law of large numbers**.\n\n**Same plot for other simulations**\n- Random walk position: `plot(cumsum(sample(c(-1, 1), 500, TRUE)), type = \"l\")`.\n- Stock prices: `plot(sim$Day, sim$Price, type = \"l\")` (Recitation 4, Problem 11).",
+    "key": true
+   },
+   {
+    "id": "core-04-c07",
+    "label": "Distribution curves: compare normals with curve() and lines()",
+    "question": "Draw the normal curves for N(0, 1), N(0, 2) and N(2, 1) on one plot with a legend. Shade nothing, just compare shapes.",
+    "code": "curve(dnorm(x, mean = 0, sd = 1), from = -6, to = 8,\n      lwd = 2, col = \"black\",\n      main = \"Normal Distributions\", xlab = \"x\", ylab = \"Density\")\ncurve(dnorm(x, mean = 0, sd = 2), add = TRUE, lwd = 2, col = \"blue\")\ncurve(dnorm(x, mean = 2, sd = 1), add = TRUE, lwd = 2, col = \"red\", lty = 2)\nlegend(\"topright\", legend = c(\"N(0, 1)\", \"N(0, 2)\", \"N(2, 1)\"),\n       col = c(\"black\", \"blue\", \"red\"), lty = c(1, 1, 2), lwd = 2)\n\n# The Lecture 9 way: make x values, compute heights, plot\nx <- seq(-4, 4, by = 0.1)\ny <- dnorm(x)\nmax(y)                 # peak height of N(0, 1): 0.399\n#> [1] 0.3989423",
+    "comment": "[![Distribution curves: compare normals with curve() and lines()](files/plots/core-curves.png)](files/plots/core-curves.png)\n\n**`curve(f(x), from, to)`** draws a function. Write `x` literally inside, and `add = TRUE` draws on top of the existing plot. It's the quickest way to draw a distribution.\n\n**The Lecture 9 way:** `x <- seq(from, to, by = 0.1)`, `y <- dnorm(x, m, s)`, then `plot(x, y, type = \"l\")`. Add more curves with `lines(x, dnorm(x, m2, s2))`.\n\n**What the parameters do:** the **mean** slides the curve left/right (red); a bigger **sd** makes it wider and flatter (blue). The area under each curve is always 1.\n\n**Discrete distributions (binomial):** use bars, not a curve: `barplot(dbinom(0:10, 10, 0.7), names.arg = 0:10)`, or `plot(0:10, dbinom(0:10, 10, 0.7), type = \"h\", lwd = 4)`.",
+    "key": true
+   },
+   {
+    "id": "core-04-c08",
+    "label": "Several plots in one window: par(mfrow)",
+    "question": "Show four plots of the same simulated data in a 2 x 2 grid: histogram, boxplot, barplot of rounded values and a normal Q-Q plot.",
+    "code": "set.seed(1)\nx <- rnorm(200, mean = 50, sd = 8)\n\npar(mfrow = c(2, 2))                  # 2 rows, 2 columns\nhist(x, col = \"lightblue\", main = \"Histogram\", xlab = \"x\")\nboxplot(x, horizontal = TRUE, col = \"wheat1\", main = \"Boxplot\", xlab = \"x\")\nbarplot(table(cut(x, breaks = c(-Inf, 40, 50, 60, Inf))),\n        col = \"thistle2\", main = \"Counts by range\", ylab = \"Count\")\nqqnorm(x, main = \"Normal Q-Q plot\"); qqline(x, col = \"red\")\npar(mfrow = c(1, 1))                  # reset to one plot",
+    "comment": "[![Several plots in one window: par(mfrow)](files/plots/core-grid.png)](files/plots/core-grid.png)\n\n**`par(mfrow = c(rows, cols))`** splits the plot window. The next plots fill it **row by row**: `c(1, 2)` = side by side, `c(2, 1)` = stacked, `c(2, 2)` = a 2×2 grid.\n\n**Always reset** with `par(mfrow = c(1, 1))` afterwards, or later plots keep shrinking into the grid.\n\n**Comparing before and after** (as in Recitation 3): use `c(1, 2)` and give both plots the **same** `xlim`, `ylim` and `breaks`, so differences are real and not just axis scaling.\n\n**Q-Q plot (`qqnorm` + `qqline`):** points on the line mean the data looks normal.",
+    "key": true
+   },
+   {
+    "id": "core-04-c09",
+    "label": "Plot options cheat sheet",
+    "question": "Which argument changes the title, labels, colors, bins, axis limits, point shapes, line types and legend?",
+    "code": "# Works in hist(), barplot(), boxplot(), plot():\n#   main = \"Title\"            xlab = \"x label\"        ylab = \"y label\"\n#   col = \"steelblue\"         (or a vector: one color per bar/box/point)\n#   xlim = c(0, 100)          ylim = c(0, 50)         las = 1  (horizontal axis numbers)\n#\n# hist():    breaks = 10 | breaks = seq(a, b, by = w)   freq = FALSE   border = \"white\"\n# barplot(): names.arg = c(...)   horiz = TRUE   beside = TRUE   legend.text = TRUE\n# boxplot(): notch = TRUE   horizontal = TRUE   names = c(...)   outline = FALSE (hide dots)\n# plot():    type = \"p\" points | \"l\" line | \"b\" both | \"h\" spikes\n#            pch = 19 solid dot | 17 triangle | 1 open circle;   cex = 1.5 (size)\n#            lty = 1 solid | 2 dashed | 3 dotted;   lwd = 2 (line width)\n#\n# Add on top of an existing plot:\n#   abline(h = y) | abline(v = x) | abline(lm(y ~ x)) | abline(a = intercept, b = slope)\n#   lines(x, y)   points(x, y)   text(x, y, \"label\")   curve(f(x), add = TRUE)\n#   legend(\"topright\", legend = c(\"A\", \"B\"), col = c(\"red\", \"blue\"), pch = 19 / lty = 1)\n#\n# Layout:  par(mfrow = c(1, 2)) ... par(mfrow = c(1, 1))\ncolors()[1:8]                         # a few of R's 657 named colors\n#> [1] \"white\"         \"aliceblue\"     \"antiquewhite\"  \"antiquewhite1\"\n#> [5] \"antiquewhite2\" \"antiquewhite3\" \"antiquewhite4\" \"aquamarine\"   ",
+    "comment": "**Reading a plot question:** underline every customization it lists, find its argument here, and tick it off. Typical list: title, axis labels, colors, borders, number of bins, bar names, notch, horizontal, side by side.\n\n**Common slips**\n- `names.arg` is for **barplot**, `names` is for **boxplot**.\n- With `horizontal = TRUE`, the numeric axis is x, so **swap** `xlab` and `ylab`.\n- A legend's `col`/`pch`/`lty` must **match** what you drew, in the same order.\n- `abline`, `lines`, `points`, `legend` and `curve(add = TRUE)` only work **after** a plot has been drawn.\n- Colors: names like `\"steelblue\"`, `\"tomato\"` or `\"lightblue\"`, or hex codes like `\"#1f77b4\"`.",
+    "key": true
+   }
+  ]
  }
 };

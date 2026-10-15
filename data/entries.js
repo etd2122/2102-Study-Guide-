@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-15T17:30:00Z";
+window.ENTRIES_SAVED = "2026-10-15T18:30:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",

@@ -248,8 +248,10 @@ const TYPE_ORDER=['core','kit','prac','hw','rec','lec'];
 const EXAMS=['Midterm 1','Midterm 2','Final'];
 
 let canWrite=true; const localUrls={};
-const LS_KEY='s2102.entries', LS_PENDING='s2102.pending', LS_DELETED='s2102.deleted';
+const LS_KEY='s2102.entries', LS_PENDING='s2102.pending', LS_DELETED='s2102.deleted', LS_EDITED='s2102.edited';
 function deletedIds(){try{return JSON.parse(localStorage.getItem(LS_DELETED)||'[]')||[]}catch(e){return []}}
+function editedIds(){try{return JSON.parse(localStorage.getItem(LS_EDITED)||'[]')||[]}catch(e){return []}}
+function markEdited(id){try{const d=editedIds(); if(!d.includes(id)){d.push(id); localStorage.setItem(LS_EDITED,JSON.stringify(d));}}catch(e){}}
 let pendingFiles=[];
 let entries={}, loaded=false, dbError='';
 let view='entry', curId=null, editing=false, isNew=false, draft=null;
@@ -774,6 +776,7 @@ function saveEdit(){
     notes:draft.notes,takeaways:draft.takeaways,updatedAt:new Date().toISOString()};
   const id=isNew?slug(draft):curId;
   entries={...entries,[id]:body};
+  markEdited(id);
   curId=id; store('s2102.cur',curId);
   editing=false; draft=null; isNew=false; view='entry';
   persist(); renderSide(); renderMain(); window.scrollTo(0,0);
@@ -844,7 +847,7 @@ document.addEventListener('click',async ev=>{
   else if(act==='rm-file'){readForm();const fid=b.dataset.fid;draft.pdfs=draft.pdfs.filter(f=>f.name!==fid);renderMain();}
   else if(act==='export')exportData();
   else if(act==='discard'){const c=$('#discardConfirm');c.innerHTML='<span class="confirm">Undo every change made in this browser?<button class="btn sm danger solid" type="button" data-act="discard-yes">Discard</button></span>';}
-  else if(act==='discard-yes'){try{localStorage.removeItem(LS_KEY);localStorage.removeItem(LS_PENDING);localStorage.removeItem(LS_DELETED)}catch(e){} entries=JSON.parse(JSON.stringify(window.ENTRIES||{}));pendingFiles=[];curId=null;renderSavebox();renderSide();renderMain();}
+  else if(act==='discard-yes'){try{localStorage.removeItem(LS_KEY);localStorage.removeItem(LS_PENDING);localStorage.removeItem(LS_DELETED);localStorage.removeItem(LS_EDITED)}catch(e){} entries=JSON.parse(JSON.stringify(window.ENTRIES||{}));pendingFiles=[];curId=null;renderSavebox();renderSide();renderMain();}
 });
 $('#btnNew').addEventListener('click',()=>{ if(!editing)startEdit(null); });
 $('#btnMatch').addEventListener('click',()=>{ if(editing)return; view=view==='match'?'entry':'match'; renderSide(); renderMain(); window.scrollTo(0,0); const t=$('#matchQ'); if(t)t.focus(); });
@@ -877,18 +880,28 @@ renderSide();
   let local=null;
   try{local=JSON.parse(localStorage.getItem(LS_KEY)||'null')}catch(e){}
   try{pendingFiles=JSON.parse(localStorage.getItem(LS_PENDING)||'[]')||[]}catch(e){}
-  if(local&&local.entries&&(!window.ENTRIES_SAVED||!local.base||local.base>=window.ENTRIES_SAVED)){
-    entries=local.entries;
+  if(local&&local.entries&&local.base===(window.ENTRIES_SAVED||'')){
+    entries=local.entries;                       // same data file as last visit: keep this browser's copy
   }else if(local&&local.entries){
-    // A newer data file arrived: take it, but keep entries edited or added in this browser since the last file.
+    // A different data file arrived: take it, and keep only what was really edited or added in this browser.
     const merged=JSON.parse(JSON.stringify(base));
+    const edited=new Set(editedIds());
+    const isEdited=(id,le)=>edited.has(id)||(/\.\d{3}Z$/.test(le.updatedAt||'')&&(le.updatedAt||'')>(local.base||''));
     for(const [id,le] of Object.entries(local.entries)){
       const fe=base[id];
-      if(!fe){ merged[id]=le; continue; }
-      if((le.updatedAt||'')>(local.base||'')){
-        const fq={}; (fe.chunks||[]).forEach(c=>{ if(c.question) fq[c.id]=c.question; });
-        merged[id]={...le,chunks:(le.chunks||[]).map(c=>c.question||!fq[c.id]?c:{...c,question:fq[c.id]})};
-      }
+      if(!fe){ if(isEdited(id,le)) merged[id]=le; continue; }
+      if(!isEdited(id,le)) continue;
+      // Keep the browser's edited version, but add any chunks the new file has that it doesn't.
+      const fq={}; (fe.chunks||[]).forEach(c=>{ if(c.question) fq[c.id]=c.question; });
+      const chunks=(le.chunks||[]).map(c=>c.question||!fq[c.id]?c:{...c,question:fq[c.id]});
+      const have=new Set(chunks.map(c=>c.id));
+      (fe.chunks||[]).forEach((c,k)=>{
+        if(have.has(c.id)) return;
+        const prev=k>0?fe.chunks[k-1].id:null;
+        const at=prev?chunks.findIndex(x=>x.id===prev):-1;
+        chunks.splice(at+1,0,c); have.add(c.id);
+      });
+      merged[id]={...le,chunks};
     }
     for(const id of deletedIds()){ delete merged[id]; }   // only entries deleted in this browser
     entries=merged;

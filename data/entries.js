@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-16T01:10:00Z";
+window.ENTRIES_SAVED = "2026-10-16T17:50:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -4013,6 +4013,356 @@ window.ENTRIES = {
     "question": "A test has 10 questions, each answered correctly with probability 0.7, and scores are normal with mean 70 and sd 10. Turn each phrase into code.",
     "code": "dbinom(7, 10, 0.7)            # \"exactly 7 correct\"\n#> [1] 0.2668279\npbinom(7, 10, 0.7)            # \"at most 7\"\n#> [1] 0.6172172\n1 - pbinom(7, 10, 0.7)        # \"more than 7\" (8 or more)\n#> [1] 0.3827828\n1 - pbinom(6, 10, 0.7)        # \"at least 7\"\n#> [1] 0.6496107\npnorm(85, 70, 10)             # \"a score below 85\"\n#> [1] 0.9331928\n1 - pnorm(85, 70, 10)         # \"above 85\"\n#> [1] 0.0668072\nqnorm(0.90, 70, 10)           # \"the score that separates the top 10%\"\n#> [1] 82.81552\nset.seed(1); rbinom(3, 10, 0.7); round(rnorm(3, 70, 10), 1)   # \"simulate\" -> r\n#> [1] 8 8 7\n#> [1] 83.3 82.7 74.1",
     "comment": "**Pick the letter from the wording:** exactly → **d** (discrete only); at most / below / less than → **p**; above / at least → **1 − p** (watch `k − 1` for discrete); percentile / cut-off → **q**; simulate / generate → **r**.\n\n**Pick the distribution from the story:** fixed number of yes/no trials, count the successes → **binom**. Waiting for the first success → **geom** (trial t → `t − 1`). A continuous measurement given a mean and sd → **norm**. Equally likely anywhere in a range → **unif**.",
+    "key": true
+   }
+  ]
+ },
+ "test-01": {
+  "type": "test",
+  "num": "01",
+  "title": "Practice Midterm 1: Coffee shops (with answer key)",
+  "date": "2026-10-16",
+  "exams": [
+   "Midterm 1"
+  ],
+  "topics": [
+   "practice test",
+   "answer key",
+   "functions",
+   "aggregate",
+   "tapply",
+   "quantile",
+   "quartiles",
+   "boxplot",
+   "barplot",
+   "scatterplot",
+   "par mfrow"
+  ],
+  "pdfs": [
+   {
+    "name": "Practice Midterm 1 - Coffee Shops.pdf",
+    "size": 69410,
+    "type": "application/pdf"
+   },
+   {
+    "name": "Practice Midterm 1 - Answer Key.pdf",
+    "size": 286081,
+    "type": "application/pdf"
+   },
+   {
+    "name": "coffee_shops.csv",
+    "size": 19598,
+    "type": "text/csv"
+   }
+  ],
+  "notes": "Unofficial practice test in the style of Homework 2: four short functions (20 pts) and ten questions on a 400-shop coffee data set (30 pts), including a **quartiles** question.\n\n**How to use it:** open the test PDF under Files and do it in RStudio (75 minutes) **before** scrolling down. Every solution below was run in R; lines starting with `#>` are R's output.\n\n**The data:**\n\n| Variable | Type | Description |\n|---|---|---|\n| `Shop_ID` | Numeric | Unique identifier of the shop |\n| `Revenue` | Numeric | Monthly revenue (in thousands of USD) |\n| `Price` | Numeric | Average drink price (USD) |\n| `Staff` | Numeric | Number of employees |\n| `Age` | Numeric | Median age of the shop's customers (years) |\n| `Location` | Categorical | Campus, Downtown, Suburb |\n| `DriveThru` | Categorical | Whether the shop has a drive-thru (No, Yes) |\n| `Chain` | Categorical | Whether the shop belongs to a chain (No, Yes) |\n| `Rating` | Categorical | Customer rating (Poor, Average, Excellent) |",
+  "takeaways": [
+   "Expected wait for an event with probability p is 1/p (doubles: 1/(1/6) = 6 rolls).",
+   "table(factor(x, levels = ...)) keeps categories that never came up.",
+   "Boundaries: \"90 and above\" is >= 90; 89.5 is not an A.",
+   "cut(x, breaks = c(-Inf, Q1, Q3, Inf)) includes each right end (\"at or below Q1\").",
+   "Horizontal barplot names cut off? par(mar = c(5, 8, 4, 2)) then reset."
+  ],
+  "updatedAt": "2026-10-16T17:50:00Z",
+  "remember": [],
+  "chunks": [
+   {
+    "id": "test-01-c00",
+    "label": "Setup · create (or import) the data",
+    "question": "Create coffee_shops.csv with the code below if you don't have the file, then import it.",
+    "code": "set.seed(2102)\nn <- 400\nLocation  <- sample(c(\"Downtown\", \"Suburb\", \"Campus\"), n, replace = TRUE,\n                    prob = c(0.35, 0.40, 0.25))\nDriveThru <- sample(c(\"Yes\", \"No\"), n, replace = TRUE, prob = c(0.4, 0.6))\nChain     <- sample(c(\"Yes\", \"No\"), n, replace = TRUE, prob = c(0.45, 0.55))\nStaff     <- sample(3:15, n, replace = TRUE)\nPrice     <- round(4.5 + 0.6 * (Location == \"Downtown\") - 0.4 * (Chain == \"Yes\") +\n                   rnorm(n, 0, 0.5), 2)\nAge       <- round(ifelse(Location == \"Campus\", rnorm(n, 22, 2.5), rnorm(n, 38, 7)))\nRevenue   <- round(20 + 2.5 * Staff - 3 * Price + 6 * (Location == \"Downtown\") +\n                   5 * (DriveThru == \"Yes\") + rnorm(n, 0, 5), 1)\nscore     <- Revenue + rnorm(n, 0, 6)\nRating    <- ifelse(score < quantile(score, 0.3), \"Poor\",\n                    ifelse(score < quantile(score, 0.8), \"Average\", \"Excellent\"))\ncoffee <- data.frame(Shop_ID = 1:n, Revenue, Price, Staff, Age,\n                     Location, DriveThru, Chain, Rating)\nwrite.csv(coffee, \"coffee_shops.csv\", row.names = FALSE)",
+    "comment": "Running this once makes the exact same data every time (because of `set.seed`) and saves `coffee_shops.csv` in your working directory. Or download the CSV from **Files** above and put it next to your .qmd.",
+    "key": false
+   },
+   {
+    "id": "test-01-q1_1",
+    "label": "Problem 1.1 (5 pts)",
+    "question": "Write a function named roll_until_doubles that takes no arguments. It should roll two fair six-sided dice repeatedly until both dice show the same number (doubles), and return how many rolls it took. Run your function once after set.seed(1). Then use replicate() to estimate the average number of rolls over 10,000 runs. What value would you expect, and why?",
+    "code": "roll_until_doubles <- function() {\n  rolls <- 0\n  repeat {\n    rolls <- rolls + 1\n    dice <- sample(1:6, 2, replace = TRUE)\n    if (dice[1] == dice[2]) break\n  }\n  rolls\n}\nset.seed(1)\nroll_until_doubles()\n#> [1] 5\nmean(replicate(10000, roll_until_doubles()))   # theory: 1 / (1/6) = 6\n#> [1] 5.9949",
+    "comment": "**Answer:** One run took **5** rolls. The average over 10,000 runs is **5.99**, close to the expected **6**: P(doubles) = 6/36 = 1/6 on each roll, and the average wait for an event with probability p is 1/p. **Key ideas:** a counter starting at 0, `repeat` + `break` (or `while`), and `replace = TRUE` so both dice can show the same number.\n\n*On your site:* Core 02 · Roll until something happens (while loop); Rec 4 Problems 1 and 5",
+    "key": true
+   },
+   {
+    "id": "test-01-q1_2",
+    "label": "Problem 1.2 (5 pts)",
+    "question": "Write a function named spin with one argument, n, that simulates n spins of a spinner with these probabilities: Red 0.50, Blue 0.30, Green 0.15, Gold 0.05. The function should return a list containing (a) a frequency table of the outcomes that shows all four colors, even a color that never came up, and (b) the proportion of spins that landed on Red. Test it with set.seed(2) and n = 12.",
+    "code": "spin <- function(n) {\n  colors <- c(\"Red\", \"Blue\", \"Green\", \"Gold\")\n  spins <- sample(colors, n, replace = TRUE, prob = c(0.50, 0.30, 0.15, 0.05))\n  list(counts = table(factor(spins, levels = colors)),\n       prop_red = mean(spins == \"Red\"))\n}\nset.seed(2)\nspin(12)\n#> $counts\n#>   Red  Blue Green  Gold \n#>     5     4     3     0 \n#> $prop_red\n#> [1] 0.4166667",
+    "comment": "**Answer:** Gold never came up in 12 spins, but it still appears with a 0 because of `factor(spins, levels = colors)`; plain `table(spins)` would leave it out. Red came up 5 of 12 times (0.417). The list is returned because the two outputs are different kinds of objects.\n\n*On your site:* Core 01 · Unfair (weighted) dice; Core 05 · table() leaves out categories; HW 2 Problem 1 Part 2 practice",
+    "key": true
+   },
+   {
+    "id": "test-01-q1_3",
+    "label": "Problem 1.3 (5 pts)",
+    "question": "Write a function named letter_grade that takes a numeric vector of scores and returns a vector of letter grades without using a loop: \"A\" for 90 and above, \"B\" for 80 up to (but not including) 90, \"C\" for 70 up to 80, and \"F\" below 70. Test it with c(95, 83, 70, 64, 89.5).",
+    "code": "letter_grade <- function(scores) {\n  ifelse(scores >= 90, \"A\",\n         ifelse(scores >= 80, \"B\",\n                ifelse(scores >= 70, \"C\", \"F\")))\n}\nletter_grade(c(95, 83, 70, 64, 89.5))\n#> [1] \"A\" \"B\" \"C\" \"F\" \"B\"",
+    "comment": "**Answer:** `\"A\" \"B\" \"C\" \"F\" \"B\"`. Watch the boundaries: 70 gets a C (70 or above), and 89.5 is a B, not rounded up to an A. Nested `ifelse()` labels the whole vector at once (or use `cut(scores, breaks = c(-Inf, 70, 80, 90, Inf), right = FALSE, labels = c(\"F\", \"C\", \"B\", \"A\"))`).\n\n*On your site:* Rec 3 Problem 1 Question 3 (tenure groups); Core 05 · if() on a whole vector → ifelse()",
+    "key": true
+   },
+   {
+    "id": "test-01-q1_4",
+    "label": "Problem 1.4 (5 pts)",
+    "question": "Write a function named mean_quartiles with arguments n, mu, sigma and reps (default 1000). It should generate reps samples, each of n observations from a normal distribution with mean mu and standard deviation sigma, compute the mean of each sample, and return a named vector with the first quartile, median, third quartile and interquartile range (IQR) of the simulated sample means. Test it with set.seed(3), n = 25, mu = 70, sigma = 10. Without running more code, how would you expect the IQR to change if n were 100 instead of 25?",
+    "code": "mean_quartiles <- function(n, mu, sigma, reps = 1000) {\n  means <- replicate(reps, mean(rnorm(n, mean = mu, sd = sigma)))\n  q <- quantile(means, c(0.25, 0.50, 0.75))\n  c(Q1 = q[[1]], Median = q[[2]], Q3 = q[[3]], IQR = q[[3]] - q[[1]])\n}\nset.seed(3)\nmean_quartiles(n = 25, mu = 70, sigma = 10)\n#>        Q1    Median        Q3       IQR \n#> 68.524308 69.893487 71.220695  2.696387 ",
+    "comment": "**Answer:** Q1 ≈ 68.52, median ≈ 69.89, Q3 ≈ 71.22, IQR ≈ **2.70**. With n = 100 the IQR should be about **half** as large: the spread of sample means is σ/√n, so quadrupling n divides the spread by √4 = 2. (Running it with set.seed(3) and n = 100 gives an IQR of 1.40.) `q[[1]]` takes the plain number out of `quantile()`'s named result, so the names in the output are clean.\n\n*On your site:* Core 03 · Sample means (CLT); Rec 3 Problem 1 Question 2 (quantile)",
+    "key": true
+   },
+   {
+    "id": "test-01-q2_1",
+    "label": "Problem 2.1 (1 pts)",
+    "question": "Import coffee_shops.csv into R, converting all character variables into factors, and display the structure of the data.",
+    "code": "coffee <- read.csv(\"coffee_shops.csv\", stringsAsFactors = TRUE)\nstr(coffee)\n#> 'data.frame':\t400 obs. of  9 variables:\n#>  $ Shop_ID  : int  1 2 3 4 5 6 7 8 9 10 ...\n#>  $ Revenue  : num  36.2 23.7 37.7 35.1 56.4 36.1 30.5 45 36.1 12.2 ...\n#>  $ Price    : num  5.89 4.47 4.6 4.92 4.51 4.21 5.8 3.83 5.12 4.42 ...\n#>  $ Staff    : int  9 7 9 10 15 7 7 13 12 3 ...\n#>  $ Age      : int  35 25 32 37 45 24 32 51 42 46 ...\n#>  $ Location : Factor w/ 3 levels \"Campus\",\"Downtown\",..: 2 1 3 2 2 1 2 3 2 3 ...\n#>  $ DriveThru: Factor w/ 2 levels \"No\",\"Yes\": 2 2 2 1 1 2 1 1 1 1 ...\n#>  $ Chain    : Factor w/ 2 levels \"No\",\"Yes\": 1 1 1 2 1 2 1 2 1 1 ...\n#>  $ Rating   : Factor w/ 3 levels \"Average\",\"Excellent\",..: 1 1 1 1 2 1 1 1 1 3 ...",
+    "comment": "**Answer:** 400 shops and 9 variables. Location, DriveThru, Chain and Rating are factors, which aggregate(), tapply(), table() and boxplot(y ~ g) need. Rating's levels are alphabetical (Average, Excellent, Poor) until you reorder them (Question 2.7).\n\n*On your site:* Everyday code · Import data; HW 2 Problem 2 setup",
+    "key": true
+   },
+   {
+    "id": "test-01-q2_2",
+    "label": "Problem 2.2 (3 pts)",
+    "question": "What is the average monthly revenue of the shops? How does the average revenue of chain shops compare to that of independent shops? Additionally, among Campus shops only, how does the average revenue of chain shops compare to that of independent shops?",
+    "code": "mean(coffee$Revenue)\n#> [1] 31.59325\naggregate(Revenue ~ Chain, data = coffee, FUN = mean)\n#>   Chain  Revenue\n#> 1    No 30.93575\n#> 2   Yes 32.40503\ncampus <- coffee[coffee$Location == \"Campus\", ]\naggregate(Revenue ~ Chain, data = campus, FUN = mean)\n#>   Chain  Revenue\n#> 1    No 29.99400\n#> 2   Yes 32.56667",
+    "comment": "**Answer:** The average shop makes **31.59** thousand USD a month. Chain shops average slightly more than independents (**32.41 vs 30.94**), and the gap is larger among Campus shops (**32.57 vs 29.99**).\n\n*On your site:* HW 2 Problem 2 Part 1 (and its practice problem)",
+    "key": true
+   },
+   {
+    "id": "test-01-q2_3",
+    "label": "Problem 2.3 (2 pts)",
+    "question": "Which shop charges the highest average drink price (give its index in the data set)? Conversely, which shop has the lowest revenue?",
+    "code": "which.max(coffee$Price)\n#> [1] 96\ncoffee[which.max(coffee$Price), c(\"Shop_ID\", \"Price\", \"Location\", \"Chain\")]\n#>    Shop_ID Price Location Chain\n#> 96      96  6.58 Downtown    No\nwhich.min(coffee$Revenue)\n#> [1] 43\ncoffee[which.min(coffee$Revenue), c(\"Shop_ID\", \"Revenue\", \"Staff\", \"Location\")]\n#>    Shop_ID Revenue Staff Location\n#> 43      43     7.5     3   Campus",
+    "comment": "**Answer:** Shop **96** charges the highest average price ($6.58; an independent Downtown shop). Shop **43** has the lowest revenue (7.5 thousand USD; a Campus shop with only 3 staff). `which.max()` / `which.min()` return the row index; use `which(x == max(x))` if ties are possible.\n\n*On your site:* HW 2 Problem 2 Part 2",
+    "key": true
+   },
+   {
+    "id": "test-01-q2_4",
+    "label": "Problem 2.4 (3 pts)",
+    "question": "What is the median revenue for each level of customer Rating? Answer the same question again, now also taking DriveThru into account, which gives six combinations.",
+    "code": "aggregate(Revenue ~ Rating, data = coffee, FUN = median)\n#>      Rating Revenue\n#> 1   Average   33.75\n#> 2 Excellent   45.05\n#> 3      Poor   19.75\naggregate(Revenue ~ Rating + DriveThru, data = coffee, FUN = median)\n#>      Rating DriveThru Revenue\n#> 1   Average        No   32.90\n#> 2 Excellent        No   44.10\n#> 3      Poor        No   19.45\n#> 4   Average       Yes   34.70\n#> 5 Excellent       Yes   46.30\n#> 6      Poor       Yes   21.35\ntapply(coffee$Revenue, list(coffee$Rating, coffee$DriveThru), median)\n#>              No   Yes\n#> Average   32.90 34.70\n#> Excellent 44.10 46.30\n#> Poor      19.45 21.35",
+    "comment": "**Answer:** Median revenue rises with the rating: Poor **19.75**, Average **33.75**, Excellent **45.05**. Within every rating, shops with a drive-thru have a higher median (by about 1.8 to 2.2 thousand USD). The `tapply` grid shows the same six numbers as the `aggregate` data frame in an easier-to-compare layout.\n\n*On your site:* HW 2 Problem 2 Part 3; Core 06 · Which summary tool?",
+    "key": true
+   },
+   {
+    "id": "test-01-q2_5",
+    "label": "Problem 2.5 (4 pts)",
+    "question": "Quartiles. Find the first, second and third quartiles of Price. Compare the average revenue of shops priced above the third quartile with that of shops priced below the first quartile. Then add a new factor variable named Price_Group with levels Low (Price at or below Q1), Middle (above Q1, up to Q3) and High (above Q3), without modifying Price, and report how many shops fall in each group.",
+    "code": "q <- quantile(coffee$Price, c(0.25, 0.50, 0.75))\nq\n#>    25%    50%    75% \n#> 4.1100 4.4900 4.9425 \nmean(coffee$Revenue[coffee$Price > q[3]])     # most expensive quarter\n#> [1] 30.063\nmean(coffee$Revenue[coffee$Price < q[1]])     # cheapest quarter\n#> [1] 34.01134\ncoffee$Price_Group <- cut(coffee$Price, breaks = c(-Inf, q[1], q[3], Inf),\n                          labels = c(\"Low\", \"Middle\", \"High\"))\ntable(coffee$Price_Group)\n#>    Low Middle   High \n#>    103    197    100 ",
+    "comment": "**Answer:** Quartiles of Price: Q1 = **4.11**, median = **4.49**, Q3 = **4.94**. Shops priced above Q3 average **30.06** in revenue, versus **34.01** for shops priced below Q1, so the most expensive quarter of shops earns about 4 thousand USD less. Groups: **Low 103, Middle 197, High 100**. Low has more than 100 because 6 shops are priced exactly at Q1, and \"at or below Q1\" counts them. `cut()` intervals include their right end, which matches \"at or below\" exactly.\n\n*On your site:* Rec 3 Problem 1 Question 2 (25th / 75th percentiles); Rec 3 Question 3 and Lecture 3 (cut)",
+    "key": true
+   },
+   {
+    "id": "test-01-q2_6",
+    "label": "Problem 2.6 (3 pts)",
+    "question": "Compare monthly revenue across the three locations using boxplots. Customize the boxplots by adding labels, changing the colors and adding notches. Are there any outliers?",
+    "code": "b <- boxplot(Revenue ~ Location, data = coffee,\n             notch = TRUE,\n             col = c(\"lightsteelblue1\", \"wheat1\", \"thistle2\"),\n             main = \"Monthly Revenue by Location\",\n             xlab = \"Location\", ylab = \"Revenue (thousands of USD)\")\nb$out                                    # outliers (the dots)\n#> [1] 62.3",
+    "comment": "[![2.6 plot](files/plots/ex-box.png)](files/plots/ex-box.png)\n\n**Answer:** There is one outlier: a Downtown shop with revenue **62.3** (the dot above the Downtown box; `b$out` lists it). The medians are similar (Campus 30.65, Downtown 31.30, Suburb 32.20) and the notches overlap, so there is no clear difference in median revenue by location. Campus revenue is the most spread out.\n\n*On your site:* HW 2 Problem 2 Part 4; Core 04 · Boxplot by group",
+    "key": true
+   },
+   {
+    "id": "test-01-q2_7",
+    "label": "Problem 2.7 (3 pts)",
+    "question": "Provide an overview of customer ratings using a barplot. Display the bars in the order Poor, Average, Excellent, make the bars horizontal, and customize the plot with labels and colors.",
+    "code": "coffee$Rating <- factor(coffee$Rating, levels = c(\"Poor\", \"Average\", \"Excellent\"))\npar(mar = c(5, 8, 4, 2))                 # wider left margin so the bar names fit\nbarplot(table(coffee$Rating),\n        horiz = TRUE,\n        col = c(\"tomato\", \"gold\", \"seagreen3\"),\n        las = 1,                         # bar names written horizontally\n        xlab = \"Number of Shops\",\n        main = \"Number of Shops by Customer Rating\")\ntitle(ylab = \"Customer Rating\", line = 6)\npar(mar = c(5, 4, 4, 2))                 # reset the margins",
+    "comment": "[![2.7 plot](files/plots/ex-bar.png)](files/plots/ex-bar.png)\n\n**Answer:** Average is by far the most common rating (200 shops), then Poor (120) and Excellent (80). Setting the factor levels puts the bars in the requested order. With `horiz = TRUE` the first level is at the bottom. **Tip:** long bar names get cut off on horizontal barplots, so widen the left margin with `par(mar = ...)` and reset it afterwards.\n\n*On your site:* HW 2 Problem 2 Part 5; Core 04 · Barplot",
+    "key": true
+   },
+   {
+    "id": "test-01-q2_8",
+    "label": "Problem 2.8 (3 pts)",
+    "question": "Create side-by-side barplots showing the frequency of each customer Rating for shops with and without a drive-thru. Include a legend, and customize the plot as in the previous question.",
+    "code": "barplot(table(coffee$Rating, coffee$DriveThru),\n        beside = TRUE,\n        col = c(\"tomato\", \"gold\", \"seagreen3\"),\n        legend.text = TRUE,\n        args.legend = list(x = \"topright\", title = \"Rating\"),\n        names.arg = c(\"No Drive-Thru\", \"Drive-Thru\"),\n        ylim = c(0, 150),\n        xlab = \"Drive-Thru\", ylab = \"Number of Shops\",\n        main = \"Customer Rating by Drive-Thru\")",
+    "comment": "[![2.8 plot](files/plots/ex-bar2.png)](files/plots/ex-bar2.png)\n\n**Answer:** Shops with a drive-thru are more often rated Excellent: 43 of 158 (27%) versus 37 of 242 (15%) without one. Shops without a drive-thru are more often Poor (36% vs 22%). In `table(Rating, DriveThru)` the rows (ratings) become the bars and the columns become the groups.\n\n*On your site:* HW 2 Problem 2 Part 6; Core 04 · Side-by-side barplot",
+    "key": true
+   },
+   {
+    "id": "test-01-q2_9",
+    "label": "Problem 2.9 (4 pts)",
+    "question": "Plot Revenue against Price. Label the plot and axes properly. Use triangular points of size 0.9, colored by Location (one color for each of the three locations), and include a legend. Describe the relationship you see.",
+    "code": "loc_cols <- c(Campus = \"seagreen\", Downtown = \"darkorange\", Suburb = \"steelblue\")\nplot(coffee$Price, coffee$Revenue,\n     pch = 17, cex = 0.9,\n     col = loc_cols[as.character(coffee$Location)],\n     xlab = \"Average Drink Price (USD)\", ylab = \"Revenue (thousands of USD)\",\n     main = \"Revenue vs Price by Location\")\nlegend(\"topright\", legend = names(loc_cols), col = loc_cols, pch = 17, cex = 0.9)\ncor(coffee$Price, coffee$Revenue)\n#> [1] -0.1514744",
+    "comment": "[![2.9 plot](files/plots/ex-scatter.png)](files/plots/ex-scatter.png)\n\n**Answer:** There is a weak negative relationship (correlation **-0.15**): more expensive shops tend to earn slightly less, but the points are widely scattered. Downtown shops (orange) charge the highest prices. Coloring through a named vector (`loc_cols[as.character(Location)]`) guarantees each location gets the color listed in the legend.\n\n*On your site:* HW 2 Problem 2 Part 7; Core 04 · Scatterplot colored by group",
+    "key": true
+   },
+   {
+    "id": "test-01-q2_10",
+    "label": "Problem 2.10 (4 pts)",
+    "question": "Combine a histogram of Revenue (about 10 bins) and a boxplot of Staff into a single image. Customize both plots as in Question 2.6 (no notch on the histogram).",
+    "code": "par(mfrow = c(1, 2))\nhist(coffee$Revenue, breaks = 10,\n     col = \"lightsteelblue1\", border = \"white\",\n     xlab = \"Revenue (thousands of USD)\", ylab = \"Number of Shops\",\n     main = \"Histogram of Revenue\")\nboxplot(coffee$Staff, col = \"wheat1\", notch = TRUE,\n        ylab = \"Number of Staff\", main = \"Boxplot of Staff\")\npar(mfrow = c(1, 1))",
+    "comment": "[![2.10 plot](files/plots/ex-two.png)](files/plots/ex-two.png)\n\n**Answer:** Revenue is roughly symmetric and bell-shaped, centered near 32 thousand USD (median 31.65). Staff ranges from 3 to 15 with a median of 8 and no outliers. `par(mfrow = c(1, 2))` puts the two plots side by side, and resetting to `c(1, 1)` afterwards keeps later plots full size.\n\n*On your site:* HW 2 Problem 2 Part 8; Core 04 · Several plots in one window",
+    "key": true
+   }
+  ]
+ },
+ "test-02": {
+  "type": "test",
+  "num": "02",
+  "title": "Practice Midterm 2: Food delivery (with answer key)",
+  "date": "2026-10-16",
+  "exams": [
+   "Midterm 1"
+  ],
+  "topics": [
+   "practice test",
+   "answer key",
+   "functions",
+   "aggregate",
+   "tapply",
+   "quantile",
+   "quartiles",
+   "boxplot",
+   "barplot",
+   "scatterplot",
+   "par mfrow"
+  ],
+  "pdfs": [
+   {
+    "name": "Practice Midterm 2 - Food Delivery.pdf",
+    "size": 69815,
+    "type": "application/pdf"
+   },
+   {
+    "name": "Practice Midterm 2 - Answer Key.pdf",
+    "size": 289401,
+    "type": "application/pdf"
+   },
+   {
+    "name": "food_delivery.csv",
+    "size": 25195,
+    "type": "text/csv"
+   }
+  ],
+  "notes": "Unofficial practice test in the style of Homework 2 on **simulated** food delivery data (not the course's data set): four short functions (20 pts) and eleven data questions (30 pts), with **missing values** and a **quartiles** question.\n\n**How to use it:** open the test PDF under Files and do it in RStudio (75 minutes) **before** scrolling down. Every solution below was run in R; lines starting with `#>` are R's output.\n\n**The data:**\n\n| Variable | Type | Description |\n|---|---|---|\n| `Order_ID` | Numeric | Unique identifier of the order |\n| `Distance_km` | Numeric | Delivery distance (km) |\n| `Weather` | Categorical | Clear, Foggy, Rainy, Snowy, Windy (some missing) |\n| `Traffic_Level` | Categorical | Low, Medium, High (some missing) |\n| `Time_of_Day` | Categorical | Morning, Afternoon, Evening, Night |\n| `Vehicle_Type` | Categorical | Bike, Scooter, Car |\n| `Preparation_Time_min` | Numeric | Time the restaurant took to prepare the order (minutes) |\n| `Courier_Experience_yrs` | Numeric | Courier's experience (years; some missing) |\n| `Delivery_Time_min` | Numeric | Total delivery time (minutes) |",
+  "takeaways": [
+   "\"Exact probability\" means pnorm / dbinom, not the simulated share.",
+   "colSums(is.na(df)) counts missing values in every column.",
+   "mean(x, na.rm = TRUE); in tapply the na.rm goes after the function.",
+   "aggregate / tapply / barplot silently drop NA groups; table(x, useNA = \"ifany\") shows them.",
+   "Never overwrite a function argument; use a new variable for counters."
+  ],
+  "updatedAt": "2026-10-16T17:50:00Z",
+  "remember": [],
+  "chunks": [
+   {
+    "id": "test-02-c00",
+    "label": "Setup · create (or import) the data",
+    "question": "Create food_delivery.csv with the code below if you don't have the file, then import it.",
+    "code": "set.seed(2102)\nn <- 500\nDistance_km  <- round(runif(n, 0.5, 20), 2)\nWeather      <- sample(c(\"Clear\", \"Rainy\", \"Snowy\", \"Foggy\", \"Windy\"), n, replace = TRUE,\n                       prob = c(0.45, 0.20, 0.10, 0.10, 0.15))\nTraffic_Level <- sample(c(\"Low\", \"Medium\", \"High\"), n, replace = TRUE, prob = c(0.35, 0.40, 0.25))\nTime_of_Day  <- sample(c(\"Morning\", \"Afternoon\", \"Evening\", \"Night\"), n, replace = TRUE,\n                       prob = c(0.20, 0.30, 0.35, 0.15))\nVehicle_Type <- sample(c(\"Bike\", \"Scooter\", \"Car\"), n, replace = TRUE, prob = c(0.45, 0.30, 0.25))\nPreparation_Time_min   <- sample(5:29, n, replace = TRUE)\nCourier_Experience_yrs <- sample(0:9, n, replace = TRUE)\nDelivery_Time_min <- pmax(10, round(10 + 2.8 * Distance_km + 0.9 * Preparation_Time_min +\n                     6 * (Traffic_Level == \"Medium\") + 14 * (Traffic_Level == \"High\") +\n                     5 * (Weather %in% c(\"Rainy\", \"Foggy\")) + 9 * (Weather == \"Snowy\") -\n                     0.6 * Courier_Experience_yrs + rnorm(n, 0, 8)))\n# some values are missing, like in real delivery data\nWeather[sample(n, 15)] <- NA\nTraffic_Level[sample(n, 15)] <- NA\nCourier_Experience_yrs[sample(n, 15)] <- NA\ndelivery <- data.frame(Order_ID = 1:n, Distance_km, Weather, Traffic_Level, Time_of_Day,\n                       Vehicle_Type, Preparation_Time_min, Courier_Experience_yrs,\n                       Delivery_Time_min)\nwrite.csv(delivery, \"food_delivery.csv\", row.names = FALSE)",
+    "comment": "Running this once makes the exact same data every time (because of `set.seed`) and saves `food_delivery.csv` in your working directory. Or download the CSV from **Files** above and put it next to your .qmd.",
+    "key": false
+   },
+   {
+    "id": "test-02-q1_1",
+    "label": "Problem 1.1 (5 pts)",
+    "question": "Each order is late with probability p_late, independently of the others. Write a function named orders_until_late with one argument, p_late, that simulates orders one at a time until the first late order and returns how many orders that took. Run it once with p_late = 0.2 after set.seed(1), then use replicate() to estimate the average over 10,000 runs. What value would you expect?",
+    "code": "orders_until_late <- function(p_late) {\n  orders <- 0\n  repeat {\n    orders <- orders + 1\n    if (runif(1) < p_late) break       # TRUE with probability p_late\n  }\n  orders\n}\nset.seed(1)\norders_until_late(0.2)\n#> [1] 10\nmean(replicate(10000, orders_until_late(0.2)))   # theory: 1 / 0.2 = 5\n#> [1] 5.0115",
+    "comment": "**Answer:** One run took **10** orders; the average over 10,000 runs is **5.01**, close to the expected **1/p = 1/0.2 = 5**. `runif(1) < p_late` is TRUE with probability p_late (`sample(c(TRUE, FALSE), 1, prob = c(p_late, 1 - p_late))` works too).\n\n*On your site:* Core 02 · Roll until something happens; Core 03 · Geometric; Rec 4 Problem 5",
+    "key": true
+   },
+   {
+    "id": "test-02-q1_2",
+    "label": "Problem 1.2 (5 pts)",
+    "question": "A delivery app charges a fee based on distance: $2.99 for trips of 3 km or less, $4.99 for more than 3 km up to 7 km, and $6.99 for longer trips. Write a function named delivery_fee that takes a vector of distances and returns the fee for each one, without using a loop. Test it with c(1.5, 3, 3.01, 7, 12).",
+    "code": "delivery_fee <- function(distance) {\n  ifelse(distance <= 3, 2.99,\n         ifelse(distance <= 7, 4.99, 6.99))\n}\ndelivery_fee(c(1.5, 3, 3.01, 7, 12))\n#> [1] 2.99 2.99 4.99 4.99 6.99",
+    "comment": "**Answer:** `2.99 2.99 4.99 4.99 6.99`. Check the boundaries: exactly 3 km is still $2.99 (`<=`), 3.01 km is $4.99, and exactly 7 km is $4.99. Nested `ifelse()` handles the whole vector at once.\n\n*On your site:* Rec 3 Problem 1 Question 3 (nested ifelse); Core 05 · if() on a whole vector",
+    "key": true
+   },
+   {
+    "id": "test-02-q1_3",
+    "label": "Problem 1.3 (5 pts)",
+    "question": "Orders arrive in the Morning, Afternoon, Evening or Night with probabilities 0.20, 0.30, 0.35 and 0.15. Write a function named shift_orders with one argument, n, that simulates the time slot of n orders and returns a list with (a) a frequency table that shows all four time slots in that order, and (b) the name of the busiest time slot. Test it with set.seed(2) and n = 15.",
+    "code": "shift_orders <- function(n) {\n  slots <- c(\"Morning\", \"Afternoon\", \"Evening\", \"Night\")\n  orders <- sample(slots, n, replace = TRUE, prob = c(0.20, 0.30, 0.35, 0.15))\n  counts <- table(factor(orders, levels = slots))\n  list(counts = counts, busiest = names(which.max(counts)))\n}\nset.seed(2)\nshift_orders(15)\n#> $counts\n#>   Morning Afternoon   Evening     Night \n#>         3         5         5         2 \n#> $busiest\n#> [1] \"Afternoon\"",
+    "comment": "**Answer:** Morning 3, Afternoon 5, Evening 5, Night 2. The busiest slot is **\"Afternoon\"**: there is a tie with Evening, and `which.max()` returns the **first** maximum. Mention ties when you see them. `factor(..., levels = slots)` keeps the four slots in the requested order and shows a 0 for any slot that never came up.\n\n*On your site:* Core 01 · Unfair dice; Core 05 · table() leaves out categories; Core 06 · Which condition tool? (which.max)",
+    "key": true
+   },
+   {
+    "id": "test-02-q1_4",
+    "label": "Problem 1.4 (5 pts)",
+    "question": "Write a function named late_summary with arguments n, mean_time, sd_time and limit (default 45). It should simulate n delivery times from a normal distribution, and return a named vector with the proportion of deliveries longer than limit and the first quartile, median and third quartile of the simulated times. Test it with set.seed(3), n = 200, mean_time = 38, sd_time = 9. What is the exact probability that one delivery is late?",
+    "code": "late_summary <- function(n, mean_time, sd_time, limit = 45) {\n  times <- rnorm(n, mean = mean_time, sd = sd_time)\n  q <- quantile(times, c(0.25, 0.50, 0.75))\n  c(prop_late = mean(times > limit), Q1 = q[[1]], Median = q[[2]], Q3 = q[[3]])\n}\nset.seed(3)\nround(late_summary(n = 200, mean_time = 38, sd_time = 9), 3)\n#> prop_late        Q1    Median        Q3 \n#>     0.230    31.465    38.567    44.544 \n1 - pnorm(45, mean = 38, sd = 9)                 # exact probability of a late delivery\n#> [1] 0.21835",
+    "comment": "**Answer:** About **23%** of the 200 simulated deliveries were late; the exact probability is 1 - pnorm(45, 38, 9) = **0.218**. Simulated quartiles: Q1 ≈ 31.5, median ≈ 38.6, Q3 ≈ 44.5 minutes (close to the true median of 38). `mean(times > limit)` gives the proportion late.\n\n*On your site:* Core 03 · Normal probabilities and rnorm; Rec 3 Problem 1 Question 2 (quantile)",
+    "key": true
+   },
+   {
+    "id": "test-02-q2_1",
+    "label": "Problem 2.1 (2 pts)",
+    "question": "Import food_delivery.csv into R, converting all character variables into factors. Display the structure of the data, and report how many values are missing in each column.",
+    "code": "delivery <- read.csv(\"food_delivery.csv\", stringsAsFactors = TRUE)\nstr(delivery)\n#> 'data.frame':\t500 obs. of  9 variables:\n#>  $ Order_ID              : int  1 2 3 4 5 6 7 8 9 10 ...\n#>  $ Distance_km           : num  9.31 16.35 5.39 8.85 10.41 ...\n#>  $ Weather               : Factor w/ 5 levels \"Clear\",\"Foggy\",..: 2 1 1 4 1 1 5 1 1 5 ...\n#>  $ Traffic_Level         : Factor w/ 3 levels \"High\",\"Low\",\"Medium\": 3 2 3 1 2 3 3 3 1 3 ...\n#>  $ Time_of_Day           : Factor w/ 4 levels \"Afternoon\",\"Evening\",..: 2 3 1 1 4 1 1 2 1 1 ...\n#>  $ Vehicle_Type          : Factor w/ 3 levels \"Bike\",\"Car\",\"Scooter\": 3 3 1 1 2 2 3 3 1 1 ...\n#>  $ Preparation_Time_min  : int  28 11 29 15 21 18 9 26 8 29 ...\n#>  $ Courier_Experience_yrs: int  4 6 1 7 5 4 0 5 8 5 ...\n#>  $ Delivery_Time_min     : int  66 65 61 67 64 90 53 50 65 60 ...\ncolSums(is.na(delivery))                         # missing values in each column\n#>               Order_ID            Distance_km                Weather \n#>                      0                      0                     15 \n#>          Traffic_Level            Time_of_Day           Vehicle_Type \n#>                     15                      0                      0 \n#>   Preparation_Time_min Courier_Experience_yrs      Delivery_Time_min \n#>                      0                     15                      0 ",
+    "comment": "**Answer:** 500 orders and 9 variables. Weather, Traffic_Level, Time_of_Day and Vehicle_Type are factors (levels in **alphabetical** order until you change them). **Missing values:** 15 each in Weather, Traffic_Level and Courier_Experience_yrs. `colSums(is.na(df))` counts them for every column at once.\n\n*On your site:* Everyday code · Import data, Missing values (NA)",
+    "key": true
+   },
+   {
+    "id": "test-02-q2_2",
+    "label": "Problem 2.2 (3 pts)",
+    "question": "What is the average delivery time of all orders? How does the average delivery time compare across vehicle types? Additionally, among Evening orders only, how does the average delivery time compare across vehicle types?",
+    "code": "mean(delivery$Delivery_Time_min)\n#> [1] 58.452\naggregate(Delivery_Time_min ~ Vehicle_Type, data = delivery, FUN = mean)\n#>   Vehicle_Type Delivery_Time_min\n#> 1         Bike          58.82126\n#> 2          Car          59.60284\n#> 3      Scooter          56.88158\nevening <- delivery[delivery$Time_of_Day == \"Evening\", ]\naggregate(Delivery_Time_min ~ Vehicle_Type, data = evening, FUN = mean)\n#>   Vehicle_Type Delivery_Time_min\n#> 1         Bike          58.33333\n#> 2          Car          61.39130\n#> 3      Scooter          55.59184",
+    "comment": "**Answer:** The average delivery takes **58.45** minutes. Cars are slowest on average (**59.60**), then bikes (**58.82**), then scooters (**56.88**). Among Evening orders the gap widens: cars **61.39**, bikes **58.33**, scooters **55.59**.\n\n*On your site:* HW 2 Problem 2 Part 1 and its practice problem",
+    "key": true
+   },
+   {
+    "id": "test-02-q2_3",
+    "label": "Problem 2.3 (2 pts)",
+    "question": "Which order took the longest to deliver (give its index)? Display that whole row. Conversely, which order was delivered the fastest?",
+    "code": "which.max(delivery$Delivery_Time_min)\n#> [1] 169\ndelivery[which.max(delivery$Delivery_Time_min), ]\n#>     Order_ID Distance_km Weather Traffic_Level Time_of_Day Vehicle_Type\n#> 169      169       19.06   Rainy          High   Afternoon         Bike\n#>     Preparation_Time_min Courier_Experience_yrs Delivery_Time_min\n#> 169                   19                      1               104\nwhich.min(delivery$Delivery_Time_min)\n#> [1] 171\ndelivery[which.min(delivery$Delivery_Time_min), c(\"Order_ID\", \"Distance_km\", \"Delivery_Time_min\")]\n#>     Order_ID Distance_km Delivery_Time_min\n#> 171      171        1.92                10",
+    "comment": "**Answer:** Order **169** took the longest: **104** minutes (19.06 km, Rainy, High traffic, by bike, a courier with 1 year of experience). Order **171** was the fastest: 10 minutes for 1.92 km. Printing the whole row (`df[i, ]`) explains why it was so slow.\n\n*On your site:* HW 2 Problem 2 Part 2",
+    "key": true
+   },
+   {
+    "id": "test-02-q2_4",
+    "label": "Problem 2.4 (3 pts)",
+    "question": "What is the median delivery time for each traffic level? Answer the same question again, now also taking Weather into account (every combination of traffic level and weather). How many orders are left out of this table, and why?",
+    "code": "aggregate(Delivery_Time_min ~ Traffic_Level, data = delivery, FUN = median)\n#>   Traffic_Level Delivery_Time_min\n#> 1          High                65\n#> 2           Low                55\n#> 3        Medium                60\ntapply(delivery$Delivery_Time_min, list(delivery$Traffic_Level, delivery$Weather), median)\n#>        Clear Foggy Rainy Snowy Windy\n#> High    63.0  80.0  65.5  67.0  65.5\n#> Low     52.5  43.5  55.0  62.0  56.0\n#> Medium  57.0  66.0  58.5  62.5  61.0\nsum(is.na(delivery$Traffic_Level) | is.na(delivery$Weather))   # orders left out\n#> [1] 30",
+    "comment": "**Answer:** Median delivery time rises with traffic: Low **55**, Medium **60**, High **65** minutes. In the traffic × weather table, the slowest combination is High traffic in Fog (80). **30 orders** are left out because their Traffic_Level or Weather is missing. `aggregate()` and `tapply()` silently drop NA groups, so say so in your answer.\n\n*On your site:* HW 2 Problem 2 Part 3; Core 06 · Which summary tool?",
+    "key": true
+   },
+   {
+    "id": "test-02-q2_5",
+    "label": "Problem 2.5 (2 pts)",
+    "question": "What is the average courier experience? (Watch out for missing values.) What is the average courier experience for each vehicle type?",
+    "code": "mean(delivery$Courier_Experience_yrs)                   # NA because of missing values\n#> [1] NA\nmean(delivery$Courier_Experience_yrs, na.rm = TRUE)\n#> [1] 4.531959\ntapply(delivery$Courier_Experience_yrs, delivery$Vehicle_Type, mean, na.rm = TRUE)\n#>     Bike      Car  Scooter \n#> 4.325000 4.459854 4.878378 ",
+    "comment": "**Answer:** Without `na.rm = TRUE` the mean is **NA**, because 15 values are missing. With it, the average courier has **4.53** years of experience (Bike 4.33, Car 4.46, Scooter 4.88). In `tapply()`, extra arguments like `na.rm = TRUE` go after the function.\n\n*On your site:* Core 05 · NA spreads: use na.rm = TRUE; Everyday code · Missing values",
+    "key": true
+   },
+   {
+    "id": "test-02-q2_6",
+    "label": "Problem 2.6 (4 pts)",
+    "question": "Quartiles. Find the first, second and third quartiles of Distance_km. Compare the average delivery time of orders longer than the third quartile with that of orders shorter than the first quartile. Then add a new factor variable named Distance_Group with levels Short (at or below Q1), Medium (above Q1, up to Q3) and Long (above Q3), without modifying Distance_km, and report how many orders fall in each group.",
+    "code": "q <- quantile(delivery$Distance_km, c(0.25, 0.50, 0.75))\nq\n#>    25%    50%    75% \n#>  5.150  9.680 15.165 \nmean(delivery$Delivery_Time_min[delivery$Distance_km > q[3]])   # longest quarter of trips\n#> [1] 78.976\nmean(delivery$Delivery_Time_min[delivery$Distance_km < q[1]])   # shortest quarter of trips\n#> [1] 38.19355\ndelivery$Distance_Group <- cut(delivery$Distance_km, breaks = c(-Inf, q[1], q[3], Inf),\n                               labels = c(\"Short\", \"Medium\", \"Long\"))\ntable(delivery$Distance_Group)\n#>  Short Medium   Long \n#>    126    249    125 ",
+    "comment": "**Answer:** Quartiles of distance: Q1 = **5.15** km, median = **9.68** km, Q3 = **15.17** km. Orders longer than Q3 average **78.98** minutes, versus **38.19** for orders shorter than Q1, so the longest quarter of trips takes about twice as long. Groups: **Short 126, Medium 249, Long 125**. `cut()` with `breaks = c(-Inf, Q1, Q3, Inf)` includes each right end, matching \"at or below Q1\".\n\n*On your site:* Rec 3 Problem 1 Question 2 (percentiles); Rec 3 Question 3 and Lecture 3 (cut)",
+    "key": true
+   },
+   {
+    "id": "test-02-q2_7",
+    "label": "Problem 2.7 (3 pts)",
+    "question": "Compare delivery times across weather conditions using boxplots. Customize the boxplots by adding labels, changing the colors and adding notches. Are there any outliers?",
+    "code": "b <- boxplot(Delivery_Time_min ~ Weather, data = delivery,\n             notch = TRUE,\n             col = c(\"lightyellow\", \"grey80\", \"lightblue\", \"steelblue1\", \"white\"),\n             main = \"Delivery Time by Weather\",\n             xlab = \"Weather\", ylab = \"Delivery time (minutes)\")\nb$out\n#> [1] 10",
+    "comment": "[![2.7 plot](files/plots/fd-box.png)](files/plots/fd-box.png)\n\n**Answer:** One outlier: a **10**-minute Windy delivery (order 171, a short trip). Clear weather has the lowest median (57) and Foggy the highest (65.5); Rainy, Snowy and Windy are around 60 to 63. The Foggy box is the widest (only 40 orders), so its notch is wide too. The 15 orders with missing Weather are not plotted.\n\n*On your site:* HW 2 Problem 2 Part 4; Core 04 · Boxplot by group",
+    "key": true
+   },
+   {
+    "id": "test-02-q2_8",
+    "label": "Problem 2.8 (3 pts)",
+    "question": "Provide an overview of traffic levels using a barplot. Display the bars in the order Low, Medium, High, make them horizontal, and customize the plot with labels and colors. Are the missing traffic values shown?",
+    "code": "delivery$Traffic_Level <- factor(delivery$Traffic_Level, levels = c(\"Low\", \"Medium\", \"High\"))\npar(mar = c(5, 7, 4, 2))\nbarplot(table(delivery$Traffic_Level),\n        horiz = TRUE, las = 1,\n        col = c(\"seagreen3\", \"gold\", \"tomato\"),\n        xlab = \"Number of Orders\",\n        main = \"Orders by Traffic Level\")\ntitle(ylab = \"Traffic Level\", line = 5)\npar(mar = c(5, 4, 4, 2))\ntable(delivery$Traffic_Level, useNA = \"ifany\")          # NAs are not drawn\n#>    Low Medium   High   <NA> \n#>    166    191    128     15 ",
+    "comment": "[![2.8 plot](files/plots/fd-bar.png)](files/plots/fd-bar.png)\n\n**Answer:** Medium traffic is the most common (191 orders), then Low (166) and High (128). The **15 missing values are not drawn**; `table(x, useNA = \"ifany\")` shows them. Reorder the levels first so the bars follow Low, Medium, High (the first level is drawn at the bottom), and widen the left margin so the names fit.\n\n*On your site:* HW 2 Problem 2 Part 5; Core 04 · Barplot",
+    "key": true
+   },
+   {
+    "id": "test-02-q2_9",
+    "label": "Problem 2.9 (3 pts)",
+    "question": "Create side-by-side barplots showing the number of orders of each vehicle type for each time of day (in the order Morning, Afternoon, Evening, Night). Include a legend, and customize the plot as in the previous question.",
+    "code": "delivery$Time_of_Day <- factor(delivery$Time_of_Day,\n                               levels = c(\"Morning\", \"Afternoon\", \"Evening\", \"Night\"))\nbarplot(table(delivery$Vehicle_Type, delivery$Time_of_Day),\n        beside = TRUE,\n        col = c(\"tan\", \"lightsteelblue\", \"plum\"),\n        legend.text = TRUE,\n        args.legend = list(x = \"topleft\", title = \"Vehicle\"),\n        ylim = c(0, 90),\n        xlab = \"Time of Day\", ylab = \"Number of Orders\",\n        main = \"Vehicle Type by Time of Day\")",
+    "comment": "[![2.9 plot](files/plots/fd-bar2.png)](files/plots/fd-bar2.png)\n\n**Answer:** Bikes are the most used vehicle at every time of day, and the Evening is the busiest time (72 bike, 46 car, 49 scooter orders). Night has the fewest orders. Setting the Time_of_Day levels puts the groups in clock order instead of alphabetical.\n\n*On your site:* HW 2 Problem 2 Part 6; Core 04 · Side-by-side barplot",
+    "key": true
+   },
+   {
+    "id": "test-02-q2_10",
+    "label": "Problem 2.10 (3 pts)",
+    "question": "Plot delivery time against distance. Label the plot and axes properly. Use triangular points of size 0.9, colored by traffic level (three colors), add a legend and a regression line. Describe the relationship you see.",
+    "code": "traffic_cols <- c(Low = \"seagreen\", Medium = \"darkorange\", High = \"firebrick\")\nplot(delivery$Distance_km, delivery$Delivery_Time_min,\n     pch = 17, cex = 0.9,\n     col = traffic_cols[as.character(delivery$Traffic_Level)],   # NA traffic -> not drawn\n     xlab = \"Distance (km)\", ylab = \"Delivery time (minutes)\",\n     main = \"Delivery Time vs Distance by Traffic Level\")\nabline(lm(Delivery_Time_min ~ Distance_km, data = delivery), lwd = 2)\nlegend(\"topleft\", legend = names(traffic_cols), col = traffic_cols, pch = 17, cex = 0.9)\ncor(delivery$Distance_km, delivery$Delivery_Time_min)\n#> [1] 0.7976197",
+    "comment": "[![2.10 plot](files/plots/fd-scatter.png)](files/plots/fd-scatter.png)\n\n**Answer:** A **strong positive** relationship (correlation **0.80**): longer trips take longer, about 2.7 more minutes per km (the slope of the regression line). At the same distance, High-traffic orders (red) sit above Low-traffic ones (green). Orders with missing traffic get no color and are not drawn; the regression line uses all orders.\n\n*On your site:* HW 2 Problem 2 Part 7; Core 04 · Scatterplot with a trend line",
+    "key": true
+   },
+   {
+    "id": "test-02-q2_11",
+    "label": "Problem 2.11 (2 pts)",
+    "question": "Combine a histogram of delivery time (about 10 bins) and a boxplot of preparation time into a single image. Customize both plots as in Question 2.7 (no notch on the histogram).",
+    "code": "par(mfrow = c(1, 2))\nhist(delivery$Delivery_Time_min, breaks = 10,\n     col = \"lightsteelblue1\", border = \"white\",\n     xlab = \"Delivery time (minutes)\", ylab = \"Number of Orders\",\n     main = \"Histogram of Delivery Time\")\nboxplot(delivery$Preparation_Time_min, col = \"wheat1\", notch = TRUE,\n        ylab = \"Preparation time (minutes)\", main = \"Boxplot of Prep Time\")\npar(mfrow = c(1, 1))",
+    "comment": "[![2.11 plot](files/plots/fd-two.png)](files/plots/fd-two.png)\n\n**Answer:** Delivery time is roughly bell-shaped, centered near 60 minutes (median 60), ranging from 10 to 104. Preparation time is spread evenly between 5 and 29 minutes (median 17) with no outliers.\n\n*On your site:* HW 2 Problem 2 Part 8; Core 04 · Several plots in one window",
     "key": true
    }
   ]

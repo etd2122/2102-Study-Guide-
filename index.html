@@ -13,7 +13,7 @@
   --paper:#f4f7fb; --panel:#ffffff; --ink:#152033; --muted:#5a6677; --line:#d9e0ea;
   --accent:#1f5fae; --accent-ink:#ffffff; --accent-soft:#e2ecf8; --mark:#f6dc5c; --mark-ink:#3a2f00;
   --code-bg:#eef2f8; --danger:#b3261e; --danger-soft:#fbe7e5;
-  --t-hw:#1f5fae; --t-rec:#257a5c; --t-lec:#55617a; --t-prac:#a5610f; --t-kit:#7a3fa0; --t-core:#b3332b;
+  --t-hw:#1f5fae; --t-rec:#257a5c; --t-lec:#55617a; --t-prac:#a5610f; --t-kit:#7a3fa0; --t-core:#b3332b; --t-test:#0f7c86;
   --hl-kw:#8a2f9e; --hl-str:#2b7a2b; --hl-num:#b3541e; --hl-com:#7a8496; --hl-fn:#1f5fae;
   color-scheme:light;
   --display:"Familjen Grotesk","Helvetica Neue",Arial,sans-serif;
@@ -58,7 +58,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .item .tag{font-family:var(--mono);font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
 .item .t{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .item .meta{grid-column:2;font-size:12px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap}
-.tc-core{color:var(--t-core)}.tc-kit{color:var(--t-kit)}.tc-hw{color:var(--t-hw)}.tc-rec{color:var(--t-rec)}.tc-lec{color:var(--t-lec)}.tc-prac{color:var(--t-prac)}
+.tc-core{color:var(--t-core)}.tc-test{color:var(--t-test)}.tc-kit{color:var(--t-kit)}.tc-hw{color:var(--t-hw)}.tc-rec{color:var(--t-rec)}.tc-lec{color:var(--t-lec)}.tc-prac{color:var(--t-prac)}
 .side-foot{margin-top:auto;font-size:12px;color:var(--muted)}
 .savebox{border:1px solid var(--mark);background:var(--panel);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px;font-size:13px}
 .savebox b{font-family:var(--display);font-size:15px}
@@ -284,8 +284,8 @@ textarea.mono{font-family:var(--mono);font-size:13px;background:var(--code-bg)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
 <script>
 (function(){
-const TYPES={core:{label:'Must-know',short:'Core'},kit:{label:'Everyday code',short:'Kit'},hw:{label:'Homework',short:'HW'},rec:{label:'Recitation',short:'Rec'},lec:{label:'Lecture',short:'Lec'},prac:{label:'Exam review',short:'Rev'}};
-const TYPE_ORDER=['core','kit','prac','hw','rec','lec'];
+const TYPES={core:{label:'Must-know',short:'Core'},test:{label:'Practice tests',short:'Test'},kit:{label:'Everyday code',short:'Kit'},hw:{label:'Homework',short:'HW'},rec:{label:'Recitation',short:'Rec'},lec:{label:'Lecture',short:'Lec'},prac:{label:'Exam review',short:'Rev'}};
+const TYPE_ORDER=['core','kit','prac','test','hw','rec','lec'];
 const EXAMS=['Midterm 1','Midterm 2','Final'];
 
 let canWrite=true; const localUrls={};
@@ -473,6 +473,12 @@ function entryHTML(id,e){
 function fileHTML(f){
   const isImg=(f.type||'').startsWith('image/');
   const url=fileUrl(f), open=openPreviews.has(f.name);
+  if(/\.csv$/i.test(f.name)||f.type==='text/csv') return `<div class="file"><div class="file-row">
+    <span class="file-ic">CSV</span>
+    <span class="file-name" title="${esc(f.name)}">${esc(f.name)}</span>
+    <span class="file-size">${f.size?fmtSize(f.size):''}</span>
+    <a class="btn sm" href="${url}" download="${esc(f.name)}">Download</a>
+  </div></div>`;
   return `<div class="file"><div class="file-row">
     <span class="file-ic ${isImg?'img':''}">${isImg?'IMG':'PDF'}</span>
     <span class="file-name" title="${esc(f.name)}">${esc(f.name)}</span>

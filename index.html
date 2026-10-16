@@ -529,7 +529,7 @@ const CONCEPTS=[
  [/group|each (department|category|level|group)|by (department|category|group)|per |across/,['tapply','aggregate','group_by','summarise']],
  [/simulat|random|roll|dice|die\b|coin|flip|trial/,['sample','set.seed','rnorm','runif']],
  [/dice|\bdie\b|\broll/,['die','die_1','die_2','die1','die2','roll']],
- [/normal distribution|normally distributed|rnorm/,['rnorm']],[/uniform/,['runif']],
+ [/normal distribution|normally distributed|rnorm/,['rnorm']],[/binomial|successes|dbinom|pbinom|rbinom/,['dbinom','pbinom','rbinom']],[/geometric|first success|dgeom|pgeom/,['dgeom','pgeom']],[/pnorm|qnorm|greater than|less than|between|percentile|cut-?off/,['pnorm','qnorm']],[/uniform/,['runif']],
  [/probabilit|unfair|weighted|chance/,['prob','sample']],
  [/matrix|matrices|row-?wise|column-?wise/,['matrix','nrow','ncol','byrow']],
  [/\brows?\b/,['nrow','rbind']],[/\bcolumns?\b/,['ncol','cbind']],
@@ -538,16 +538,16 @@ const CONCEPTS=[
  [/\blists?\b|sublist|element/,['list','lapply','unlist']],[/unlist|flatten/,['unlist']],
  [/vector/,['c','seq','rep']],[/sequence|spaced|increments?/,['seq']],[/repeat/,['rep']],
  [/append|insert|after the|position/,['append']],
- [/factor|categor|levels?/,['factor','levels','cut']],[/bin|interval|tenure group|cut/,['cut']],
+ [/factor|categor|levels?/,['factor','levels','cut']],[/\bbins?\b|interval|tenure|\bcut\b|into (\w+ )?(groups|categories|bins)/,['cut','ifelse','factor']],
  [/sort|order|rank|arrange|top \d|highest paid|ascending|descending/,['order','sort','arrange','head']],
  [/filter|subset|extract|select|only (the )?(rows|those|employees|observations)|where/,['subset','filter','select','which']],
  [/histogram/,['hist','breaks']],[/bar ?plot|bar ?chart|bar graph/,['barplot']],[/box ?plot/,['boxplot']],
  [/scatter|plot .* against|versus|vs\.?/,['plot']],[/legend/,['legend']],[/colou?r/,['col']],
- [/label|title|axis/,['main','xlab','ylab']],[/side by side|single image|combine.*plot/,['par','mfrow']],[/notch/,['notch']],
+ [/label|title|axis/,['main','xlab','ylab']],[/side by side|single image|combine.*plot|mfrow/,['par','mfrow']],[/line (plot|graph|chart)|over time|trend/,['type','cumsum','plot']],[/in a row|consecutive|streak/,['streak','heads_streak','tails_streak','consecutive_rain']],[/density|bell curve|curve/,['curve','dnorm','freq']],[/notch/,['notch']],
  [/apply|without (using )?loops?|vectori[sz]ed/,['apply','sapply','lapply','mapply']],
- [/merge|combine|join/,['c','rbind','cbind','merge']],
+ [/\bjoin|look ?up|merge (the )?(two |both )?(tables|data)|match(ing)? (rows|records)|two tables/,['inner_join','left_join','full_join','by','anti_join']],[/combine|\bbind\b|stack/,['c','rbind','cbind']],[/\brbind\b|add (a |another |new )?row/,['rbind']],[/\bcbind\b/,['cbind']],
  [/new (column|variable)|add (a )?(column|variable)/,['mutate','transmute']],
- [/rename/,['rename']],[/tidyverse|dplyr|tibble|pipe/,['tidyverse','dplyr','filter','mutate','summarise']],
+ [/rename/,['rename','colnames']],[/\bseq\b|sequence/,['seq']],[/\brep\b/,['rep']],[/\bwhich\b/,['which','which.max']],[/\bstr\b|structure/,['str']],[/\bhead\b|first (few|\d+) rows/,['head']],[/error|bug|wrong|debug|fix/,['error']],[/tidyverse|dplyr|tibble|pipe/,['tidyverse','dplyr','filter','mutate','summarise']],
  [/break|stop/,['break']],[/skip/,['next']],[/missing|\bna\b/,['is.na','na.rm']],
  [/divisible|even|odd|remainder/,['%%']],[/membership|contains|present in|presence/,['%in%']],
  [/round/,['round']],[/unique|distinct/,['unique']],[/string|character|paste/,['paste','character']],
@@ -582,7 +582,9 @@ function buildIndex(){
 }
 function queryTerms(q){
   const w=new Map();
-  for(const t of toks(q)) w.set(t,Math.max(w.get(t)||0,1));
+  let base=toks(q);
+  if(!base.length) base=(String(q||'').toLowerCase().match(/%[a-z]+%|[a-z_][a-z0-9_.]*/g)||[]).map(stem);
+  for(const t of base) w.set(t,Math.max(w.get(t)||0,1));
   const low=q.toLowerCase();
   for(const [re,terms] of CONCEPTS){ if(re.test(low)) for(const t of terms){ const s=stem(t.toLowerCase()); w.set(s,Math.max(w.get(s)||0,1.3)); } }
   // explicit R function names typed in the question count extra
@@ -604,6 +606,29 @@ function findMatches(q){
   return res.sort((a,b)=>b.score-a.score).slice(0,10);
 }
 const SKILLS=[
+ [/cumulative|running (sum|total)|\bcumsum\b/,'Running total (cumsum, or a loop)','lec-05','FOR Loops'],
+ [/standard deviation|variance|\bspread\b|\biqr\b|\brange\b/,'Spread: sd, var, IQR, range','lec-07','Basic Statistics Built-in Functions'],
+ [/^\s*plots?\s*$|\b(which|what|kind of|type of) (plot|graph|chart)|\bvisuali[sz]|\bgraph\b|\bplot (the|a|this|it)\b/,'Which plot fits the data','core-06','Which plot? decide from the variables'],
+ [/\bproportion|percent|fraction|\bshare of|\brate\b|\bratio\b/,'Count vs proportion vs average','core-06','Count vs proportion vs average'],
+ [/\bfilter\b|\bsubset\b|\bwhere\b/,'Filter rows (df[condition, ])','rev-03','Subset columns and rows'],
+ [/\bsample\(|set\.?seed|^\s*sample\s*$|\brandom(ly)?\b|simulat|coin|dice|\bdie\b|\broll|\bflip(s|ped|ping)?\b|draw .* from (a |the )?(vector|set|bag|urn)/,'Simulate with sample() and set.seed()','core-01','sample() and set.seed(): the basics'],
+ [/\breplicate\b|estimate .*probabilit|simulat.*probabilit|probabilit.*simulat|proportion of (times|simulations|trials|games|runs)|\d{3,} (times|simulations|trials|repetitions|runs)|on average.*(simulat|repeat)/,'Estimate a probability by simulation (replicate)','core-02','Template: estimate any probability with replicate()'],
+ [/\bwhile\b|repeat until|\brepeat\b/,'Repeat until something happens (while / break)','core-02','Roll until something happens (while loop)'],
+ [/in a row|consecutive|streak/,'k in a row (streak counter)','rec-04','Problem 4'],
+ [/\bcut\b|into (\w+ )?(groups|categories|bins|intervals)|tenure|short.*medium.*long|low.*medium.*high|categori[sz]e[sd]?\b.*\binto\b|\binto\b.*\(.*\d.*\)/,'Numbers into groups (ifelse / cut)','rec-03','Problem 1 · Question 3 · Add a new factor variable named tenure_groups with levels…'],
+ [/\btable\(|frequency table|frequenc|counts? (of|for|in) each|how often|^\s*table\s*$/,'Counts with table()','core-06','Which summary tool? table vs tapply vs aggregate vs group_by'],
+ [/\brbind\b|\bcbind\b|add (a |another |new )?row|remove (a |the )?(row|column)|delete (a |the )?(row|column)|drop (a |the )?(row|column)/,'Add / remove rows and columns','lec-03','Data Frames › Adding/Removing Columns/Rows'],
+ [/rename|column names?|colnames/,'Rename columns','lec-03','Data Frames › Column names'],
+ [/\bseq\b|\brep\b|sequence|spaced|vector of (numbers|values)/,'Make vectors (c, :, seq, rep)','lec-02','Data Structures › Vectors'],
+ [/\bwhich\b(?! (store|one|car|employee|department|group|state|city|person|is|has|are))|which\.max|which\.min|%in%/,'which(), any(), all(), %in%','core-06','Which condition tool? if vs ifelse vs any / all vs which'],
+ [/\bmutate\b|transmute/,'mutate(): new columns (dplyr)','lec-10','mutate() Function'],
+ [/\bselect\b|keep (only )?(the )?columns|choose columns/,'select(): choose columns','lec-10','select() Function'],
+ [/\barrange\b|\bdesc\(/,'arrange(): sort rows (dplyr)','lec-10','arrange() Function'],
+ [/\bslice/,'slice(): rows by position','lec-10','slice() Function'],
+ [/\bjoin\b|merge (the )?(two |both )?(tables|data)|two tables|look ?up/,'Which join?','core-06','Which join? inner / left / full / semi / anti'],
+ [/\berror\b|\bbug\b|\bdebug|doesn'?t work|not working|\bwrong\b|\bfix\b/,'Common mistakes (or use Check code / error)','core-05','Capital letters: "YES" is not "Yes"'],
+ [/geometric|first (success|six|head|girl|time)/,'Geometric: wait for the first success','core-03','Geometric: waiting for the first success (watch the off-by-one)'],
+ [/\bloops?\b|for loop|while loop|\biterat/,'Which loop?','core-06','Which loop? for vs while vs repeat vs sapply / replicate'],
  [/\bfunction\b|write a function|create a function|construct a function|define a function/,'Write a function','rev-01','Function anatomy'],
  [/return(s|ing)? (a |the )?list|list (with|containing|of) .*(mean|median|sum|max|min|count|range|value)|several (results|outputs|values)|multiple (results|outputs|values)/,'Return several results in a list','rev-01','Return several results in a list'],
  [/simulat|random|coin|dice|\bdie\b|\broll|\bflip(s|ped|ping)?\b|sample\(|draw .* from (a |the )?(vector|set|bag|urn)/,'Simulate with sample() and set.seed()','core-01','sample() and set.seed(): the basics'],
@@ -613,28 +638,29 @@ const SKILLS=[
  [/how many|count|number of/,'Count with a loop or sum()','rev-01','Count things with a for loop (counters, next)'],
  [/matrix|matrices/,'Work with a matrix','rev-02','Matrices: create, access, logical replace'],
  [/(each|every|per) (row|column)|row ?sums?|column ?means?|rows? of (a|the) matrix/,'apply() on rows / columns','rev-05','apply on rows and columns'],
- [/(each|every|(?<!column )per|by|for each|across|within) (group|species|team|department|category|level|island|class|region|type|gender|sex|store|country|year)|across .*(group|categor|level)|broken down by|grouped by/,'Group summary with tapply()','rev-03','Group summaries: tapply, table, proportions'],
- [/import|read (in|the)|\.csv|load the (data|file)|dataset available|read\.table|\.txt/,'Import the data (read.csv / read.table)','kit-01','Import data: read.csv() and read.table()'],
- [/structure|summary statistics|first (\d+|few|five|three) rows|dimensions|str\(|summary\(/,'Look at the data (str, summary, head)','rev-03','Look at the data'],
+ [/(each|every|(?<!column )per|by|for each|across|within) (group|species|team|department|category|level|island|class|region|type|gender|sex|store|country|year)|across .*(group|categor|level)|broken down by|grouped by|\btapply\b|\baggregate\b|(mean|median|average|sum|count|total|max|min)s? (from|of|for|by) (indexed |different |the )?(groups?|categor)|by groups?\b|indexed groups?|which (department|group|category|species|state|team|store|region|class|city|country)\b.*(highest|lowest|most|least|largest|smallest|average|mean|median)|by (two|2|both) (groups|variables|factors)|two groupings/,'Group summary with tapply()','rev-03','Group summaries: tapply, table, proportions'],
+ [/\bread\.?csv|\bread\.?table|import|read (in|the)|\.csv|load the (data|file)|dataset available|read\.table|\.txt/,'Import the data (read.csv / read.table)','kit-01','Import data: read.csv() and read.table()'],
+ [/structure|summary statistics|first (\d+|few|five|three) rows|dimensions|\bstr\b|\bsummary\b|\bhead\b|\bdim\b/,'Look at the data (str, summary, head)','rev-03','Look at the data'],
  [/(keep|extract|select|filter|subset|only|remove|drop|exclude|eliminate).*(rows?|observations|employees|passengers|students|stores|records|those|where)|(rows?|observations) (where|with|whose|in which)|older than|younger than/,'Filter rows (df[condition, ])','rev-03','Subset columns and rows'],
  [/new (column|variable)|add (a |another )?(column|variable)|create (a )?(column|variable)/,'Add a column','rev-03','Add and change columns and rows'],
  [/factor|levels?\b/,'Factors and levels','rev-02','Factors: levels, counts, groups'],
- [/top \d|highest|lowest|largest|smallest|sort|order|rank|percentile|quantile|quartile|variance/,'Sort, top n, percentiles','rev-03','Sort, top n, percentiles, spread'],
+ [/top \d+(?!\d| ?%)|highest|lowest|largest|smallest|\bsort|\border(ed)?\b|\brank|percentile|quantile|quartile/,'Sort, top n, percentiles','rev-03','Sort, top n, percentiles, spread'],
  [/\blists?\b|sublist|\[\[/,'Lists: [ ] vs [[ ]]','rev-02','Lists: [ ] vs [[ ]] and $'],
  [/vector/,'Vectors: create and subset','rev-02','Vectors: subsetting and changing values'],
  [/otherwise|\belse\b|\bif\b(?! x is)(?! it is)(?! (a|the) (random|normal))|condition/,'if / else if / else','rev-04','Nested if-else'],
  [/ifelse/,'ifelse() on a vector','rev-04','ifelse() on a vector'],
  [/\bloop\b|iterate/,'for loop with next / break','rev-04','for loop with next and break'],
- [/sapply|lapply|apply|without (using )?(a )?loop/,'lapply / sapply','rev-05','lapply and sapply on a list'],
+ [/\bsapply\b|\blapply\b|without (using )?(a )?loop/,'lapply / sapply','rev-05','lapply and sapply on a list'],
+ [/\bapply\b/,'apply() on matrix rows / columns','rev-05','apply on rows and columns'],
  [/mapply|pair(s|wise)?|element by element|compare two/,'mapply on pairs','rev-05','mapply on pairs (dice comparison)'],
  [/\bjoin|merge|combine .*(table|data ?set|data frame|list)|(table|data ?set|data frame)s? .*(with|and|to) (the |a |another )?\w* ?(table|data ?set|data frame|list)|match(ing)? (rows|records|observations) (in|from|between)|from (the )?(other|second) table|look ?up .* (in|from) (another|the other)/,'Join two tables','lec-11','inner_join(): only matching rows'],
  [/keep (all|every) .*(rows|observations|people|records)|keeps? (their|its|all|every) rows?|every \w+ keeps|without losing|add .* (from|using) (another|the other|a second)|left.?join/,'Keep all rows of the main table (left_join)','lec-11','left_join(): keep everything from x'],
- [/no match|(do|does|did) not appear|don't appear|not (in|present in|found in|listed in) the (other|\w+ (list|table|data))|missing from (the )?other|anti.?join|semi.?join|appear in both/,'Rows with / without a match (semi / anti join)','lec-11','Filtering joins: semi_join() and anti_join()'],
+ [/no match|(do|does|did) not appear|don't appear|not (in|present in|found in|listed in) the (other|\w+ (list|table|data))|missing from (the )?other|anti.?join|semi.?join|appear in both|with no \w+|without (any |a )?\w+ (in|from) the/,'Rows with / without a match (semi / anti join)','lec-11','Filtering joins: semi_join() and anti_join()'],
  [/different (column |variable )?names|named differently/,'Join keys with different names','lec-11','Practice 6 · Keys with different names'],
  [/pivot|reshape|one column (per|for each)|long(er)? format|wide(r)? format|column names (are|that are) (values|years)|tidy/,'Reshape with pivot_longer / pivot_wider','lec-12','pivot_longer(): column names that are really values'],
  [/separate\(|separate (the|a|one|it|this|that) |split (the |a |one )?column|\bunite\b|combine (the )?columns/,'Split or combine columns (separate / unite)','lec-12','separate(): split one column into several'],
- [/binomial|successes|trials? .*probabilit|dbinom|pbinom|(at most|at least|exactly|fewer than|more than) \d+ (of|out of) \d+/,'Binomial probability (dbinom / pbinom)','core-03','Binomial: exactly, at most, at least, between'],
- [/percentile|quantile .*normal|normal .*(percentile|cutoff)|qnorm/,'Normal percentile (qnorm)','core-03','Normal probabilities: less than, greater than, between, percentiles'],
+ [/binomial|successes|\bdbinom|\bpbinom|(at most|at least|exactly|fewer than|more than|no more than) \d+ (of|out of) \d+|(probabilit|chance).*(at most|at least|exactly|fewer than|more than|no more than) \d+|(at most|at least|exactly|fewer than|more than|no more than) \d+.*(probabilit|chance)/,'Binomial probability (dbinom / pbinom)','core-03','Binomial: exactly, at most, at least, between'],
+ [/qnorm|percentile|quantile .*normal|normal .*(cutoff|cut-off)|(top|bottom|highest|lowest) \d+ ?%|cut-?off|(score|value|height|weight) (that )?(marks|separates)/,'Normal percentile (qnorm)','core-03','Normal probabilities: less than, greater than, between, percentiles'],
  [/probability (that|of) .*(less|more|greater|between|below|above)|pnorm|normally distributed .* probability/,'Normal probability (pnorm)','core-03','Normal probabilities: less than, greater than, between, percentiles'],
  [/group_by|summari[sz]e|across\(|dplyr/,'group_by() + summarise()','lec-11','summarise(): one row per group'],
  [/missing|\bna\b|\bnas\b|na\.rm|is\.na/,'Missing values (is.na, na.rm, na.omit)','kit-01','Missing values (NA)'],
@@ -645,7 +671,7 @@ const SKILLS=[
  [/bar ?(plot|chart|graph)/,'Barplot','core-04','Barplot: counts of a categorical variable (die rolls)'],
  [/scatter|against|versus|\bvs\.?\b|relationship between/,'Scatterplot','core-04','Scatterplot: two numeric variables, colors by group, trend line'],
  [/side.by.side (plots|histograms|graphs)|single (image|figure)|two plots|both histograms|next to each other/,'Two plots side by side','core-04','Several plots in one window: par(mfrow)'],
- [/line (plot|graph|chart)|over time|running (proportion|average|mean|total)|cumulative|random walk|stock price|law of large numbers/,'Line plot (type = "l")','core-04','Line plot: running proportion of heads (law of large numbers)'],
+ [/line (plot|graph|chart)|over time|running (proportion|average|mean)|random walk|stock price|law of large numbers/,'Line plot (type = "l")','core-04','Line plot: running proportion of heads (law of large numbers)'],
  [/density curve|bell curve|normal curve|dnorm|plot (the|a|two|three) (normal|distribution|density)|curve\(/,'Draw a distribution curve','core-04','Distribution curves: compare normals with curve() and lines()'],
  [/legend|colou?r(s|ed)?\b|label (the )?(axes|plot|graph)|title|customi[sz]e/,'Plot options (title, labels, colors, legend)','core-04','Plot options cheat sheet'],
  [/\btwo dice|pair of dice|both dice|sum of (the )?(two |both )?dice|doubles/,'Two dice: sums and doubles','core-01','Two dice: sums, doubles and comparisons'],
@@ -655,7 +681,7 @@ const SKILLS=[
  [/\bcards?\b|\bdeck\b|\bpoker\b|\baces?\b|\bsuits?\b|\bhearts\b|\bspades\b|\bdeal(t|s|ing)?\b/,'Deck of cards: build, deal, count','core-01','Build a deck of cards and deal a hand'],
  [/\burn\b|\bbag\b|marbles?|\bballs?\b|without replacement|with replacement/,'Draw from an urn / bag','core-01','Draw from an urn / bag (without replacement)'],
  [/shuffle|permutation|random (rows|order|winner|team|group)|split .* (randomly|into (two |random )?(teams|groups))|randomly (select|choose|pick)/,'Random rows / shuffle','core-01','Random rows, random people and shuffling'],
- [/estimate .*probabilit|probability (that|of)|chance (that|of)|proportion of (times|simulations|trials|games|runs)|on average|expected (number|value)|\d{3,} (times|simulations|trials|repetitions)/,'Estimate a probability by simulation (replicate)','core-02','Template: estimate any probability with replicate()'],
+ [/\breplicate\b|estimate .*probabilit|simulat.*probabilit|probabilit.*simulat|proportion of (times|simulations|trials|games|runs)|\d{3,} (times|simulations|trials|repetitions|runs)|on average.*(simulat|repeat)/,'Estimate a probability by simulation (replicate)','core-02','Template: estimate any probability with replicate()'],
  [/at least one|at least once/,'"At least one" (any + complement)','core-02','"At least one": dice and complement rule'],
  [/birthday|share (a|the same)|duplicate|same (value|number|birthday) (twice|more than once)/,'Any duplicates (birthday problem)','core-02','Birthday problem (any duplicates)'],
  [/store|save (the |each |all )?(result|outcome|value)s?|record (the |each )|vector of (results|outcomes|sums|values)/,'Store results from a loop','core-02','Store results from a loop (for loop vs sapply)'],
@@ -812,7 +838,7 @@ function matchHTML(){
 function renderMatches(){
   const box=$('#matchResults'); if(!box)return;
   const needs=$('#matchNeeds');
-  if(matchQuery.trim().length<4){box.innerHTML='<p class="empty-line">Results show up here as you type.</p>'; if(needs)needs.innerHTML=''; return;}
+  if(matchQuery.trim().length<2){box.innerHTML='<p class="empty-line">Results show up here as you type.</p>'; if(needs)needs.innerHTML=''; return;}
   if(needs){
     const sk=detectSkills(matchQuery);
     needs.innerHTML=sk.length?`<span class="label">This question needs</span><div class="need-list">${sk.map((k,n)=>`<button class="need" type="button" data-act="goto" data-eid="${esc(k.eid)}" data-i="${k.i}"><span class="need-n">${n+1}</span>${esc(k.label)}<span class="need-go">${esc(tagOf(entries[k.eid]))} →</span></button>`).join('')}</div><span class="hint">Steps in the order the question mentions them. Each opens a review template. Below: the most similar code you've already seen.</span>`:'';

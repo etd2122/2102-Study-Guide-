@@ -169,6 +169,27 @@ textarea.mono{font-family:var(--mono);font-size:13px;background:var(--code-bg)}
 .empty h3{font-family:var(--display);margin:0;font-size:20px}
 .empty p{margin:0;color:var(--muted);max-width:60ch}
 .menu-btn{display:none}
+.tool-row .btn{font-size:13px}
+.err-list{display:flex;flex-direction:column;gap:12px}
+.err-card{border:1px solid var(--line);border-left:4px solid var(--danger);border-radius:8px;background:var(--panel);padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.err-card.k-Warning{border-left-color:var(--t-prac)}
+.err-card.k-Symptom{border-left-color:var(--t-hw)}
+.err-title{font-family:var(--mono);font-size:14px;font-weight:600;overflow-wrap:anywhere}
+.err-kind{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.err-card ul{margin:0;padding-left:20px}
+.err-card li{margin:2px 0}
+.err-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.err-pair pre{margin:0}
+.err-pair .lab{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;display:block}
+.err-pair .bad .lab{color:var(--danger)} .err-pair .good .lab{color:var(--t-rec)}
+@media (max-width:820px){.err-pair{grid-template-columns:1fr}}
+.err-browse summary{cursor:pointer;font-weight:600;margin:6px 0}
+.quiz-card{border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:16px;display:flex;flex-direction:column;gap:12px}
+.quiz-q{font-size:16px;white-space:pre-line;line-height:1.5}
+.quiz-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.quiz-stats{font-size:13px;color:var(--muted)}
+.quiz-stats b{color:var(--ink)}
+.quiz-from{font-size:13px}
 .match-btn{width:100%;justify-content:center;border-color:var(--accent);color:var(--accent)}
 .match-btn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
 .match-box{display:flex;flex-direction:column;gap:8px}
@@ -222,6 +243,10 @@ textarea.mono{font-family:var(--mono);font-size:13px;background:var(--code-bg)}
       <button class="btn ghost menu-btn" id="btnMenu" type="button" aria-expanded="true">List</button>
     </div>
     <button class="btn match-btn" id="btnMatch" type="button" aria-pressed="false">Find code for a question</button>
+    <div class="side-actions tool-row">
+      <button class="btn" id="btnErr" type="button" aria-pressed="false">Error decoder</button>
+      <button class="btn" id="btnQuiz" type="button" aria-pressed="false">Self-test</button>
+    </div>
     <div class="collapsible" style="display:flex;flex-direction:column;gap:12px">
       <input class="search" id="search" type="search" placeholder="Search titles, code, notes…" aria-label="Search entries">
       <div class="chips" id="typeChips" role="group" aria-label="Filter by type"></div>
@@ -235,6 +260,7 @@ textarea.mono{font-family:var(--mono);font-size:13px;background:var(--code-bg)}
 </div>
 
 <script src="data/entries.js"></script>
+<script src="data/errors.js"></script>
 </body>
 </html>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
@@ -362,7 +388,7 @@ function renderList(){
   }
   list.innerHTML=html;
 }
-function renderSide(){ renderChips(); renderList(); $('#btnGuide').setAttribute('aria-pressed',view==='guide'); $('#btnMatch').setAttribute('aria-pressed',view==='match'); $('#btnNew').hidden=!canWrite; }
+function renderSide(){ renderChips(); renderList(); $('#btnGuide').setAttribute('aria-pressed',view==='guide'); $('#btnMatch').setAttribute('aria-pressed',view==='match'); $('#btnErr').setAttribute('aria-pressed',view==='errors'); $('#btnQuiz').setAttribute('aria-pressed',view==='quiz'); $('#btnNew').hidden=!canWrite; }
 
 /* ---------- Main ---------- */
 function renderMain(){
@@ -373,6 +399,8 @@ function renderMain(){
   if(editing) html+=editorHTML();
   else if(view==='guide') html+=guideHTML();
   else if(view==='match') html+=matchHTML();
+  else if(view==='errors') html+=errorsHTML();
+  else if(view==='quiz') html+=quizHTML();
   else{
     const ids=sorted().map(e=>e.id);
     if(!curId||!entries[curId]) curId=ids[0]||null;
@@ -380,6 +408,7 @@ function renderMain(){
   }
   main.innerHTML=`<div class="wrap">${html}</div>`;
   if(view==='match'&&!editing){ renderMatches(); }
+  if(view==='errors'&&!editing){ renderErrors(); }
   highlight(main);
   if(!editing) main.scrollIntoView && null;
 }
@@ -629,6 +658,116 @@ function detectSkills(q){
   }
   return found.sort((a,b)=>a.pos-b.pos).slice(0,7);
 }
+
+/* ---------- Error decoder ---------- */
+let errQuery='';
+function errChunkIndex(see){ if(!see)return -1; const e=entries[see[0]]; if(!e)return -1; return (e.chunks||[]).findIndex(c=>c.label===see[1]); }
+function errCard(x){
+  const i=errChunkIndex(x.see);
+  return `<div class="err-card k-${esc(x.kind)}">
+    <span class="err-kind">${esc(x.kind)}</span>
+    <span class="err-title">${esc(x.title)}</span>
+    <div class="prose"><p><b>What it means:</b> ${mdInline(esc(x.means))}</p>
+    <p><b>Usual causes:</b></p><ul>${x.causes.map(c=>'<li>'+mdInline(esc(c))+'</li>').join('')}</ul>
+    <p><b>Fix:</b> ${mdInline(esc(x.fix))}</p></div>
+    ${x.wrong||x.right?`<div class="err-pair"><div class="bad"><span class="lab">Causes it</span><pre><code class="language-r">${esc(x.wrong||'')}</code></pre></div><div class="good"><span class="lab">Fixed</span><pre><code class="language-r">${esc(x.right||'')}</code></pre></div></div>`:''}
+    ${i>=0?`<div><button class="btn sm" type="button" data-act="goto" data-eid="${esc(x.see[0])}" data-i="${i}">See it in ${esc(tagOf(entries[x.see[0]]))}: ${esc(x.see[1])} →</button></div>`:''}
+  </div>`;
+}
+function errorsHTML(){
+  return `<header class="head"><div class="eyebrow"><span>Error decoder</span></div>
+    <h2>What does this error mean?</h2></header>
+    <div class="match-box">
+      <label class="label" for="errQ">Paste the error or warning from the Console (or describe what went wrong)</label>
+      <textarea class="inp" id="errQ" placeholder="e.g. Error in sample.int(length(x), size, replace, prob) : cannot take a sample larger than the population when 'replace = FALSE'">${esc(errQuery)}</textarea>
+      <span class="hint">Matches R's exact wording. No error but a strange result? Try "answer is NA", "returns 0", "never stops" or "wrong order".</span>
+    </div>
+    <div id="errResults" class="err-list"></div>`;
+}
+function renderErrors(){
+  const box=$('#errResults'); if(!box)return; const all=window.R_ERRORS||[];
+  const q=errQuery.trim();
+  const groups=k=>all.filter(x=>x.kind===k);
+  const browse=`<details class="err-browse" ${q?'':'open'}><summary>Browse all ${all.length} (errors, warnings and no-error symptoms)</summary><div class="err-list">${['Error','Warning','Symptom'].map(k=>groups(k).map(errCard).join('')).join('')}</div></details>`;
+  if(q.length<3){ box.innerHTML=browse; highlight(box); return; }
+  const hits=all.filter(x=>{try{return new RegExp(x.match,'i').test(q)}catch(e){return false}});
+  box.innerHTML=(hits.length?`<span class="label">Best match${hits.length>1?'es':''}</span>`+hits.map(errCard).join('')
+    :`<p class="empty-line">No exact match. Paste just the part after "Error in …:" (the message itself), or browse the list below.</p>`)+browse;
+  highlight(box);
+}
+
+/* ---------- Self-test ---------- */
+const LS_QUIZ='s2102.quiz';
+let quizType='all', quizMode='new', quizCur=null, quizShow={hint:false,code:false,note:false};
+function quizStats(){try{return JSON.parse(localStorage.getItem(LS_QUIZ)||'null')||{got:[],missed:[]}}catch(e){return {got:[],missed:[]}}}
+function quizSave(st){try{localStorage.setItem(LS_QUIZ,JSON.stringify(st))}catch(e){}}
+function quizPool(){
+  const out=[];
+  for(const [eid,e] of Object.entries(entries)){
+    if(quizType!=='all'&&e.type!==quizType)continue;
+    (e.chunks||[]).forEach((c,i)=>{
+      const q=(c.question||'').trim();
+      if(q.length<25||!(c.code||'').trim())return;
+      if(/Solution #2|cheat sheet|Practice setup|Setup ·|· Setup/i.test(c.label||''))return;
+      out.push({eid,i,key:eid+'#'+c.id});
+    });
+  }
+  return out;
+}
+function quizPick(){
+  const pool=quizPool(), st=quizStats();
+  let cand=pool;
+  if(quizMode==='new') cand=pool.filter(p=>!st.got.includes(p.key)&&!st.missed.includes(p.key));
+  if(quizMode==='missed') cand=pool.filter(p=>st.missed.includes(p.key));
+  if(!cand.length) cand=quizMode==='missed'?[]:pool.filter(p=>!st.got.includes(p.key));
+  if(!cand.length&&quizMode!=='missed') cand=pool;
+  quizCur=cand.length?cand[Math.floor(Math.random()*cand.length)]:null;
+  quizShow={hint:false,code:false,note:false};
+}
+function quizHTML(){
+  if(!quizCur||!entries[quizCur.eid]) quizPick();
+  const st=quizStats(), pool=quizPool();
+  const inPool=k=>pool.some(p=>p.key===k);
+  const got=st.got.filter(inPool).length, missed=st.missed.filter(inPool).length;
+  const typeChips=[['all','All'],...TYPE_ORDER.map(t=>[t,TYPES[t].label])].map(([v,l])=>`<button class="chip" type="button" data-qtype="${v}" aria-pressed="${quizType===v}">${l}</button>`).join('');
+  const modeChips=[['new','New questions first'],['missed','Only ones I missed'],['any','Anything']].map(([v,l])=>`<button class="chip" type="button" data-qmode="${v}" aria-pressed="${quizMode===v}">${l}</button>`).join('');
+  let body='';
+  if(!quizCur){ body=`<p class="empty-line">${quizMode==='missed'?'Nothing marked "Need practice" here yet.':'No questions in this filter.'}</p>`; }
+  else{
+    const e=entries[quizCur.eid], c=e.chunks[quizCur.i];
+    const sk=detectSkills(c.question||'');
+    body=`<div class="quiz-card">
+      <span class="label">Question</span>
+      <div class="quiz-q">${esc(c.question)}</div>
+      <div class="quiz-bar">
+        <button class="btn sm" type="button" data-act="q-hint">${quizShow.hint?'Hide hint':'Hint: what does it need?'}</button>
+        <button class="btn sm" type="button" data-act="q-code">${quizShow.code?'Hide code':'Show the code'}</button>
+        <button class="btn sm" type="button" data-act="q-note">${quizShow.note?'Hide explanation':'Show the explanation'}</button>
+      </div>
+      ${quizShow.hint?`<div class="needs"><span class="label">This question needs</span><div class="need-list">${sk.length?sk.map((k,n)=>`<span class="need"><span class="need-n">${n+1}</span>${esc(k.label)}</span>`).join(''):'<span class="hint">No standard pattern detected. Think: what goes in, what comes out, loop or not?</span>'}</div></div>`:''}
+      ${quizShow.code?`<span class="quiz-from tc-${esc(e.type)}">From ${esc(tagOf(e))} · ${esc(e.title)} · ${esc(c.label||'')}</span><pre><code class="language-r">${esc(c.code)}</code></pre>`:''}
+      ${quizShow.note?`<div class="prose">${c.comment?md(c.comment):'<p class="empty-line">No explanation on this one.</p>'}</div>`:''}
+      <div class="quiz-bar">
+        <button class="btn sm primary" type="button" data-act="q-got">I got it</button>
+        <button class="btn sm" type="button" data-act="q-missed">Need practice</button>
+        <button class="btn sm ghost" type="button" data-act="q-skip">Skip</button>
+        <button class="btn sm ghost" type="button" data-act="goto" data-eid="${esc(quizCur.eid)}" data-i="${quizCur.i}">Open in its entry →</button>
+      </div>
+    </div>`;
+  }
+  return `<header class="head"><div class="eyebrow"><span>Self-test</span></div><h2>Can I solve it without looking?</h2></header>
+    <p class="hint">Write your answer in RStudio first, then reveal the code. Mark it so "Only ones I missed" brings it back later. Progress is saved in this browser.</p>
+    <div class="chips">${typeChips}</div>
+    <div class="chips">${modeChips}</div>
+    <div class="quiz-stats">${pool.length} questions in this filter · <b>${got}</b> got · <b>${missed}</b> need practice · <button class="btn sm ghost" type="button" data-act="q-reset">Reset progress</button></div>
+    ${body}`;
+}
+function quizMark(kind){
+  if(!quizCur)return; const st=quizStats(), k=quizCur.key;
+  st.got=st.got.filter(x=>x!==k); st.missed=st.missed.filter(x=>x!==k);
+  if(kind==='got') st.got.push(k); if(kind==='missed') st.missed.push(k);
+  quizSave(st); quizPick(); renderMain(); window.scrollTo(0,0);
+}
 function matchHTML(){
   return `<header class="head"><div class="eyebrow"><span>Find code for a question</span></div>
     <h2>Where have I done this before?</h2></header>
@@ -820,7 +959,14 @@ document.addEventListener('click',async ev=>{
     if(window.innerWidth<820){$('#side').classList.add('collapsed');$('#btnMenu').setAttribute('aria-expanded','false');}
     return;
   }
+  if(b.dataset.qtype){quizType=b.dataset.qtype;quizPick();renderMain();return;}
+  if(b.dataset.qmode){quizMode=b.dataset.qmode;quizPick();renderMain();return;}
   const act=b.dataset.act; if(!act)return;
+  if(act==='q-hint'||act==='q-code'||act==='q-note'){const k=act.slice(2);quizShow[k]=!quizShow[k];renderMain();return;}
+  if(act==='q-got'){quizMark('got');return;}
+  if(act==='q-missed'){quizMark('missed');return;}
+  if(act==='q-skip'){quizPick();renderMain();return;}
+  if(act==='q-reset'){quizSave({got:[],missed:[]});quizPick();renderMain();return;}
   if(act==='goto'){
     curId=b.dataset.eid; view='entry'; store('s2102.cur',curId); renderSide(); renderMain();
     const el=document.getElementById('ch-'+b.dataset.i);
@@ -851,10 +997,13 @@ document.addEventListener('click',async ev=>{
 });
 $('#btnNew').addEventListener('click',()=>{ if(!editing)startEdit(null); });
 $('#btnMatch').addEventListener('click',()=>{ if(editing)return; view=view==='match'?'entry':'match'; renderSide(); renderMain(); window.scrollTo(0,0); const t=$('#matchQ'); if(t)t.focus(); });
+$('#btnErr').addEventListener('click',()=>{ if(editing)return; view=view==='errors'?'entry':'errors'; renderSide(); renderMain(); window.scrollTo(0,0); const t=$('#errQ'); if(t)t.focus(); });
+$('#btnQuiz').addEventListener('click',()=>{ if(editing)return; view=view==='quiz'?'entry':'quiz'; if(view==='quiz')quizPick(); renderSide(); renderMain(); window.scrollTo(0,0); });
 $('#btnGuide').addEventListener('click',()=>{ if(editing)return; view=view==='guide'?'entry':'guide'; renderSide(); renderMain(); window.scrollTo(0,0); });
 $('#btnMenu').addEventListener('click',()=>{const s=$('#side');const c=s.classList.toggle('collapsed');$('#btnMenu').setAttribute('aria-expanded',String(!c));});
 let qt; $('#search').addEventListener('input',e=>{clearTimeout(qt);qt=setTimeout(()=>{query=e.target.value.trim();renderList();},150);});
 document.addEventListener('submit',e=>{ if(e.target.id==='edForm'){e.preventDefault();saveEdit();} });
+let et; document.addEventListener('input',e=>{ if(e.target.id==='errQ'){ errQuery=e.target.value; clearTimeout(et); et=setTimeout(renderErrors,200); } });
 let mt; document.addEventListener('input',e=>{ if(e.target.id==='matchQ'){ matchQuery=e.target.value; clearTimeout(mt); mt=setTimeout(renderMatches,200); } });
 document.addEventListener('input',e=>{ if(e.target.id==='f-title'&&draft){ const h=document.querySelector('.head h2'); if(h)h.textContent=e.target.value||'Untitled'; } });
 document.addEventListener('change',async e=>{

@@ -44,3 +44,13 @@ Your changes save in your browser right away. A yellow box in the sidebar then s
 On GitHub, do steps 2–3 by opening the `data` or `files` folder in your repository, clicking **Add file → Upload files**, and committing. The website updates within a minute or two.
 
 Changes you haven't downloaded only exist in that one browser. Download `entries.js` after each study session so nothing gets lost.
+
+## Offline backup
+
+If the exam Wi-Fi is slow or blocked: on the repository page click **Code → Download ZIP**, unzip it, and double-click `index.html`. Search, the Error decoder, Self-test and all notes and plots work without internet (only code colors need it). Download a fresh copy after each update.
+
+## Tools on the site
+
+- **Find code for a question**: paste an exam question; it lists the steps it needs and the most similar code on the site.
+- **Error decoder**: paste an R error or warning (or describe a strange result like "answer is NA"); it explains the cause and the fix.
+- **Self-test**: random practice questions with the code hidden; mark each one "I got it" or "Need practice" and review the missed ones.

@@ -47,10 +47,10 @@ Changes you haven't downloaded only exist in that one browser. Download `entries
 
 ## Offline backup
 
-If the exam Wi-Fi is slow or blocked: on the repository page click **Code → Download ZIP**, unzip it, and double-click `index.html`. Search, the Error decoder, Self-test and all notes and plots work without internet (only code colors need it). Download a fresh copy after each update.
+If the exam Wi-Fi is slow or blocked: on the repository page click **Code → Download ZIP**, unzip it, and double-click `index.html`. Search, the code & error checker, Self-test and all notes and plots work without internet (only code colors need it). Download a fresh copy after each update.
 
 ## Tools on the site
 
 - **Find code for a question**: paste an exam question; it lists the steps it needs and the most similar code on the site.
-- **Error decoder**: paste an R error or warning (or describe a strange result like "answer is NA"); it explains the cause and the fix.
+- **Check code / error**: paste your R code and it points out common mistakes by line (missing brackets or commas, `replace = TRUE`, `==` vs `=`, `if` on a vector, loops that overwrite or never stop, functions that return nothing, capitalized levels…) with the fix. Or paste an R error / warning (or describe a strange result like "answer is NA") and it explains the cause and the fix. It does not run the code.
 - **Self-test**: random practice questions with the code hidden; mark each one "I got it" or "Need practice" and review the missed ones.

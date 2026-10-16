@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-16T00:40:00Z";
+window.ENTRIES_SAVED = "2026-10-16T01:10:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -1004,7 +1004,7 @@ window.ENTRIES = {
     "id": "c049",
     "label": "Calling a function with multiple arguments",
     "code": " \nfun_2(x = 5, y = 7)\n\nfun_2(y = 7, x = 5)\n\nfun_2(5, 7)  \n\nfun_2(7, 5)\n\nfun_2(7)    ## ERROR! Wrong number of arguments.\n\nfun_2(7, 5, 3)  ## ERROR! Wrong number of arguments.",
-    "comment": "**Named arguments can go in any order:** `fun_2(x = 5, y = 7)` and `fun_2(y = 7, x = 5)` both give −2.\n\n**By position, order matters:** `fun_2(5, 7)` = −2 but `fun_2(7, 5)` = 2.\n\n**Errors:**\n- `fun_2(7)`: 'argument \"y\" is missing, with no default'.\n- `fun_2(7, 5, 3)`: \"unused argument (3)\".\n\nLook these up in the **Error decoder**.",
+    "comment": "**Named arguments can go in any order:** `fun_2(x = 5, y = 7)` and `fun_2(y = 7, x = 5)` both give −2.\n\n**By position, order matters:** `fun_2(5, 7)` = −2 but `fun_2(7, 5)` = 2.\n\n**Errors:**\n- `fun_2(7)`: 'argument \"y\" is missing, with no default'.\n- `fun_2(7, 5, 3)`: \"unused argument (3)\".\n\nLook these up in the **Check code / error** tool.",
     "key": false,
     "question": "Call a two-argument function in different ways. Which calls fail, and why?"
    },
@@ -1059,7 +1059,7 @@ window.ENTRIES = {
   ],
   "notes": "Code from `Lecture_06.R`. Course notes for this lecture: https://ap4347.github.io/2102/lecture-06.html",
   "takeaways": [],
-  "updatedAt": "2026-10-16T00:40:00Z"
+  "updatedAt": "2026-10-16T01:10:00Z"
  },
  "lec-07": {
   "type": "lec",
@@ -3793,7 +3793,7 @@ window.ENTRIES = {
    "na.rm"
   ],
   "pdfs": [],
-  "notes": "The slip-ups that cost points, most of them ones I've actually made. Each chunk shows the mistake, what R does, and the fix.\n\n**Before you submit any answer**\n1. **Restart and run everything:** Session → Restart R, then Run All (or Render). It catches objects that only exist because of something you ran earlier.\n2. **Spelling and capitals** of every level you compare to (`levels(df$col)`).\n3. **Count brackets** on long lines.\n4. **Answer the question in words** below the output, e.g. \"US stores charge more on average (116.8 vs 114.0)\".\n5. **Every plot:** title, axis labels, and each customization the question names.\n6. **`set.seed()`** if the question asks for reproducible results.\n\nGot an error? Use the **Error decoder** button in the sidebar.",
+  "notes": "The slip-ups that cost points, most of them ones I've actually made. Each chunk shows the mistake, what R does, and the fix.\n\n**Before you submit any answer**\n1. **Restart and run everything:** Session → Restart R, then Run All (or Render). It catches objects that only exist because of something you ran earlier.\n2. **Spelling and capitals** of every level you compare to (`levels(df$col)`).\n3. **Count brackets** on long lines.\n4. **Answer the question in words** below the output, e.g. \"US stores charge more on average (116.8 vs 114.0)\".\n5. **Every plot:** title, axis labels, and each customization the question names.\n6. **`set.seed()`** if the question asks for reproducible results.\n\nGot an error? Use the **Check code / error** button in the sidebar (paste your code or the error).",
   "takeaways": [
    "Restart R and run everything from the top before submitting.",
    "Copy levels from levels(df$col): capitals, spaces and apostrophes must match exactly.",
@@ -3802,7 +3802,7 @@ window.ENTRIES = {
    "Dice and coins need replace = TRUE; table(factor(x, levels = ...)) keeps every category.",
    "A function returns its LAST line; ending with an assignment returns nothing visible."
   ],
-  "updatedAt": "2026-10-16T00:20:00Z",
+  "updatedAt": "2026-10-16T01:10:00Z",
   "remember": [],
   "chunks": [
    {

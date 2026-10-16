@@ -186,6 +186,16 @@ textarea.mono{font-family:var(--mono);font-size:13px;background:var(--code-bg)}
 .err-pair .lab{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;display:block}
 .err-pair .bad .lab{color:var(--danger)} .err-pair .good .lab{color:var(--t-rec)}
 @media (max-width:820px){.err-pair{grid-template-columns:1fr}}
+.chk-list{display:flex;flex-direction:column;gap:10px}
+.chk{border:1px solid var(--line);border-left:4px solid var(--danger);border-radius:8px;background:var(--panel);padding:10px 14px;display:flex;flex-direction:column;gap:6px}
+.chk.s-bug{border-left-color:var(--t-prac)} .chk.s-check{border-left-color:var(--t-hw)}
+.chk-top{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.chk-sev{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.chk.s-error .chk-sev{color:var(--danger)} .chk.s-bug .chk-sev{color:var(--t-prac)} .chk.s-check .chk-sev{color:var(--t-hw)}
+.chk-line{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.chk-title{font-weight:600}
+.chk pre{margin:0}
+.chk-ok{border:1px solid var(--line);border-left:4px solid var(--t-rec);border-radius:8px;background:var(--panel);padding:10px 14px}
 .err-browse summary{cursor:pointer;font-weight:600;margin:6px 0}
 .quiz-card{border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:16px;display:flex;flex-direction:column;gap:12px}
 .quiz-q{font-size:16px;white-space:pre-line;line-height:1.5}
@@ -247,7 +257,7 @@ textarea.mono{font-family:var(--mono);font-size:13px;background:var(--code-bg)}
     </div>
     <button class="btn match-btn" id="btnMatch" type="button" aria-pressed="false">Find code for a question</button>
     <div class="side-actions tool-row">
-      <button class="btn" id="btnErr" type="button" aria-pressed="false">Error decoder</button>
+      <button class="btn" id="btnErr" type="button" aria-pressed="false">Check code / error</button>
       <button class="btn" id="btnQuiz" type="button" aria-pressed="false">Self-test</button>
     </div>
     <div class="collapsible" style="display:flex;flex-direction:column;gap:12px">
@@ -265,6 +275,7 @@ textarea.mono{font-family:var(--mono);font-size:13px;background:var(--code-bg)}
 
 <script src="data/entries.js"></script>
 <script src="data/errors.js"></script>
+<script src="data/checker.js"></script>
 </body>
 </html>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
@@ -679,12 +690,12 @@ function errCard(x){
   </div>`;
 }
 function errorsHTML(){
-  return `<header class="head"><div class="eyebrow"><span>Error decoder</span></div>
-    <h2>What does this error mean?</h2></header>
+  return `<header class="head"><div class="eyebrow"><span>Code & error checker</span></div>
+    <h2>What's wrong with my code?</h2></header>
     <div class="match-box">
-      <label class="label" for="errQ">Paste the error or warning from the Console (or describe what went wrong)</label>
-      <textarea class="inp" id="errQ" placeholder="e.g. Error in sample.int(length(x), size, replace, prob) : cannot take a sample larger than the population when 'replace = FALSE'">${esc(errQuery)}</textarea>
-      <span class="hint">Matches R's exact wording. No error but a strange result? Try "answer is NA", "returns 0", "never stops" or "wrong order".</span>
+      <label class="label" for="errQ">Paste your R code, an error message from the Console, or both</label>
+      <textarea class="inp" id="errQ" spellcheck="false" style="font-family:var(--mono);font-size:13px;min-height:170px" placeholder="Paste code, e.g.\nrolls <- sample(1:6, 10)\nhigh <- employees[employees$Salary > 80000]\n\nor an error, e.g.\nError in sample.int(...) : cannot take a sample larger than the population">${esc(errQuery)}</textarea>
+      <span class="hint"><b>Code:</b> scans for the mistakes behind most errors in this course (brackets, quotes, missing comma, replace = TRUE, == vs =, if on a vector, loops, functions…) and gives the line and the fix. It doesn't run the code, so if RStudio still shows an error, paste that message too. <b>Errors:</b> matches R's exact wording. No error but a strange result? Try "answer is NA", "returns 0", "never stops".</span>
     </div>
     <div id="errResults" class="err-list"></div>`;
 }
@@ -694,8 +705,23 @@ function renderErrors(){
   const groups=k=>all.filter(x=>x.kind===k);
   const browse=`<details class="err-browse" ${q?'':'open'}><summary>Browse all ${all.length} (errors, warnings and no-error symptoms)</summary><div class="err-list">${['Error','Warning','Symptom'].map(k=>groups(k).map(errCard).join('')).join('')}</div></details>`;
   if(q.length<3){ box.innerHTML=browse; highlight(box); return; }
-  const hits=all.filter(x=>{try{return new RegExp(x.match,'i').test(q)}catch(e){return false}});
-  box.innerHTML=(hits.length?`<span class="label">Best match${hits.length>1?'es':''}</span>`+hits.map(errCard).join('')
+  const isCode=window.looksLikeRCode&&window.looksLikeRCode(q);
+  const hasMsg=/(^|\n)\s*(Error|Warning)|Warning message|In addition:/i.test(q)||!isCode;
+  let chk='';
+  if(isCode&&window.checkRCode){
+    const F=window.checkRCode(q);
+    const sevName={error:'Will fail',bug:'Likely bug',check:'Check this'};
+    chk=`<span class="label">Code check</span>`+(F.length?`<div class="chk-list">${F.map(f=>{
+      const i=f.see?errChunkIndex(f.see):-1;
+      return `<div class="chk s-${f.sev}"><div class="chk-top"><span class="chk-sev">${sevName[f.sev]}</span><span class="chk-line">line ${f.line}</span><span class="chk-title">${esc(f.title)}</span></div>
+        ${f.code?`<pre><code class="language-r">${esc(f.code)}</code></pre>`:''}
+        <div class="prose"><p>${mdInline(esc(f.why))}</p><p><b>Fix:</b> ${mdInline(esc(f.fix))}</p></div>
+        ${i>=0?`<div><button class="btn sm" type="button" data-act="goto" data-eid="${esc(f.see[0])}" data-i="${i}">See the example →</button></div>`:''}</div>`;}).join('')}</div>`
+      :`<div class="chk-ok"><b>No common mistakes found.</b> The brackets, quotes, filters, loops and functions look right. If RStudio still gives an error, paste the error message here too; if the result looks wrong, check the values you compare against with <code>levels()</code> and test each condition with <code>sum()</code>.</div>`);
+  }
+  const hits=hasMsg?all.filter(x=>{try{return new RegExp(x.match,'i').test(q)}catch(e){return false}}):[];
+  if(isCode&&!hasMsg){ box.innerHTML=chk+browse; highlight(box); return; }
+  box.innerHTML=chk+(hits.length?`<span class="label">Best match${hits.length>1?'es':''}</span>`+hits.map(errCard).join('')
     :`<p class="empty-line">No exact match. Paste just the part after "Error in …:" (the message itself), or browse the list below.</p>`)+browse;
   highlight(box);
 }

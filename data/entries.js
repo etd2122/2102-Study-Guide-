@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-16T00:10:00Z";
+window.ENTRIES_SAVED = "2026-10-16T00:20:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -3693,6 +3693,252 @@ window.ENTRIES = {
     "question": "Which argument changes the title, labels, colors, bins, axis limits, point shapes, line types and legend?",
     "code": "# Works in hist(), barplot(), boxplot(), plot():\n#   main = \"Title\"            xlab = \"x label\"        ylab = \"y label\"\n#   col = \"steelblue\"         (or a vector: one color per bar/box/point)\n#   xlim = c(0, 100)          ylim = c(0, 50)         las = 1  (horizontal axis numbers)\n#\n# hist():    breaks = 10 | breaks = seq(a, b, by = w)   freq = FALSE   border = \"white\"\n# barplot(): names.arg = c(...)   horiz = TRUE   beside = TRUE   legend.text = TRUE\n# boxplot(): notch = TRUE   horizontal = TRUE   names = c(...)   outline = FALSE (hide dots)\n# plot():    type = \"p\" points | \"l\" line | \"b\" both | \"h\" spikes\n#            pch = 19 solid dot | 17 triangle | 1 open circle;   cex = 1.5 (size)\n#            lty = 1 solid | 2 dashed | 3 dotted;   lwd = 2 (line width)\n#\n# Add on top of an existing plot:\n#   abline(h = y) | abline(v = x) | abline(lm(y ~ x)) | abline(a = intercept, b = slope)\n#   lines(x, y)   points(x, y)   text(x, y, \"label\")   curve(f(x), add = TRUE)\n#   legend(\"topright\", legend = c(\"A\", \"B\"), col = c(\"red\", \"blue\"), pch = 19 / lty = 1)\n#\n# Layout:  par(mfrow = c(1, 2)) ... par(mfrow = c(1, 1))\ncolors()[1:8]                         # a few of R's 657 named colors\n#> [1] \"white\"         \"aliceblue\"     \"antiquewhite\"  \"antiquewhite1\"\n#> [5] \"antiquewhite2\" \"antiquewhite3\" \"antiquewhite4\" \"aquamarine\"   \n\n# ---- As a function ----\nmy_hist <- function(x, title, xlab, ...) {\n  hist(x, main = title, xlab = xlab, ylab = \"Frequency\",\n       col = \"lightblue\", border = \"white\", ...)     # ... passes any extra options to hist()\n}\nset.seed(1)\nv <- rnorm(100)\nmy_hist(v, title = \"Default bins\", xlab = \"x\")\nmy_hist(v, title = \"20 bins, wider axis\", xlab = \"x\", breaks = 20, xlim = c(-4, 4))",
     "comment": "**Reading a plot question:** underline every customization it lists, find its argument here, and tick it off. Typical list: title, axis labels, colors, borders, number of bins, bar names, notch, horizontal, side by side.\n\n**Common slips**\n- `names.arg` is for **barplot**, `names` is for **boxplot**.\n- With `horizontal = TRUE`, the numeric axis is x, so **swap** `xlab` and `ylab`.\n- A legend's `col`/`pch`/`lty` must **match** what you drew, in the same order.\n- `abline`, `lines`, `points`, `legend` and `curve(add = TRUE)` only work **after** a plot has been drawn.\n- Colors: names like `\"steelblue\"`, `\"tomato\"` or `\"lightblue\"`, or hex codes like `\"#1f77b4\"`.\n\n**As a function (bottom of the code):** **`...` (\"dots\")** collects any extra arguments and hands them to `hist()`. Your function has the settings you always use, and you can still add `breaks`, `xlim` and so on when a question asks for them. This works for any plot wrapper.",
+    "key": true
+   }
+  ]
+ },
+ "core-05": {
+  "type": "core",
+  "num": "05",
+  "title": "My mistakes checklist: check these before you submit",
+  "date": "",
+  "exams": [],
+  "topics": [
+   "mistakes",
+   "checklist",
+   "errors",
+   "capital letters",
+   "brackets",
+   "apostrophe",
+   "nrow",
+   "replace",
+   "table",
+   "comma",
+   "ifelse",
+   "return",
+   "na.rm"
+  ],
+  "pdfs": [],
+  "notes": "The slip-ups that cost points, most of them ones I've actually made. Each chunk shows the mistake, what R does, and the fix.\n\n**Before you submit any answer**\n1. **Restart and run everything:** Session → Restart R, then Run All (or Render). It catches objects that only exist because of something you ran earlier.\n2. **Spelling and capitals** of every level you compare to (`levels(df$col)`).\n3. **Count brackets** on long lines.\n4. **Answer the question in words** below the output, e.g. \"US stores charge more on average (116.8 vs 114.0)\".\n5. **Every plot:** title, axis labels, and each customization the question names.\n6. **`set.seed()`** if the question asks for reproducible results.\n\nGot an error? Use the **Error decoder** button in the sidebar.",
+  "takeaways": [
+   "Restart R and run everything from the top before submitting.",
+   "Copy levels from levels(df$col): capitals, spaces and apostrophes must match exactly.",
+   "Rows go BEFORE the comma: df[condition, ].",
+   "length(df) counts columns; nrow(df) counts rows.",
+   "Dice and coins need replace = TRUE; table(factor(x, levels = ...)) keeps every category.",
+   "A function returns its LAST line; ending with an assignment returns nothing visible."
+  ],
+  "updatedAt": "2026-10-16T00:20:00Z",
+  "remember": [],
+  "chunks": [
+   {
+    "id": "core-05-c01",
+    "label": "Capital letters: \"YES\" is not \"Yes\"",
+    "question": "Count the urban stores. Why does comparing to \"YES\" give 0?",
+    "code": "urban <- factor(c(\"No\", \"Yes\", \"Yes\", \"No\", \"Yes\"))\nsum(urban == \"YES\")          # WRONG: R is case-sensitive, nothing matches\n#> [1] 0\nsum(urban == \"Yes\")          # right\n#> [1] 3\nlevels(urban)                # copy the exact spelling from here\n#> [1] \"No\"  \"Yes\"\nunique(c(\"yes\", \"Yes \"))     # trailing spaces count too\n#> [1] \"yes\"  \"Yes \"",
+    "comment": "**What happened (Homework 2, Problem 2 Part 3):** `carseats$Urban == \"YES\"` was FALSE for every store, so the filter kept nothing and `tapply()` returned NA.\n\n**Fix:** never type a level from memory. Run `levels(df$col)` (factors) or `unique(df$col)` (text) and copy it.\n\n**Symptoms that point here:** a count of 0, `integer(0)`, `<0 rows>`, `NA` from a mean or median, `-Inf` from max.",
+    "key": true
+   },
+   {
+    "id": "core-05-c02",
+    "label": "A missing ) on a long line",
+    "question": "Why does the Console show + and wait instead of giving an answer?",
+    "code": "x <- c(40, 45, 50); y <- c(42, 47)\n# print(c(mean(x), mean(y))      <- one ) short: R waits with \"+\"\nprint(c(mean(x), mean(y)))        # 4 opens, 4 closes\n#> [1] 45.0 44.5",
+    "comment": "**What happened (Recitation 3):** a line ended one `)` short, so R kept waiting for more input.\n\n**Fix:** press **Esc** in the Console, then count: every `(` needs a `)`. In RStudio, click just after a bracket and its partner lights up.\n\n**Habit:** for nested calls, build from the inside out and run each piece: `mean(x)` → `c(mean(x), mean(y))` → `print(...)`. Or save pieces in variables first.",
+    "key": true
+   },
+   {
+    "id": "core-05-c03",
+    "label": "Curly vs straight apostrophe (Master’s vs Master's)",
+    "question": "Why does == \"Master's\" match nothing even though the data shows Master's?",
+    "code": "edu <- c(\"Master’s\", \"PhD\", \"Master’s\")       # data typed with a curly apostrophe\nsum(edu == \"Master's\")                          # straight apostrophe: 0 matches\n#> [1] 0\nsum(grepl(\"Master\", edu))                       # matches part of the text: 2\n#> [1] 2\nlv <- unique(edu); lv\n#> [1] \"Master’s\" \"PhD\"     \nsum(edu == lv[1])                               # copy the level itself: 2\n#> [1] 2",
+    "comment": "**What happened (Recitation 3, Problem 1 Question 1):** `’` (curly, from Word/PDFs) and `'` (straight, from your keyboard) are different characters, and they look almost identical in RStudio.\n\n**Fixes that avoid typing it:**\n- `grepl(\"Master\", x)` is TRUE when \"Master\" appears anywhere in the value.\n- Copy the level from the data: `levels(df$col)[3]` or `unique(df$col)[i]`.\n\n**When a 0 looks suspicious, test each condition alone** with `sum(...)` to find the one that matches nothing.",
+    "key": true
+   },
+   {
+    "id": "core-05-c04",
+    "label": "length() counts columns, nrow() counts rows",
+    "question": "How many employees are in the data frame? Why does length() give the wrong answer?",
+    "code": "df <- data.frame(name = c(\"Ana\", \"Ben\", \"Cal\", \"Dee\"),\n                 salary = c(50, 60, 55, 70),\n                 dept = c(\"HR\", \"IT\", \"IT\", \"HR\"))\nlength(df)        # WRONG for \"how many rows\": a data frame is a list of columns\n#> [1] 3\nnrow(df)          # number of rows (employees)\n#> [1] 4\nncol(df)          # number of columns\n#> [1] 3\nlength(df$salary) # length() is right for a single column (a vector)\n#> [1] 4\ndim(df)           # rows and columns\n#> [1] 4 3",
+    "comment": "**Rule:** \"how many observations / rows / people\" → `nrow(df)`; \"how many values in a vector\" → `length(x)`.\n\n**After filtering:** `nrow(df[df$dept == \"IT\", ])` or `sum(df$dept == \"IT\")`. Both count the matching rows.",
+    "key": true
+   },
+   {
+    "id": "core-05-c05",
+    "label": "Dice and coins need replace = TRUE",
+    "question": "Roll a die 10 times. Why does sample(1:6, 10) fail?",
+    "code": "tryCatch(sample(1:6, 10), error = function(e) conditionMessage(e))   # the error message\n#> [1] \"cannot take a sample larger than the population when 'replace = FALSE'\"\nset.seed(1)\nsample(1:6, 10, replace = TRUE)                                     # right\n#>  [1] 1 4 1 2 5 3 6 2 3 3",
+    "comment": "**`replace = FALSE` is the default**, which means no repeats. That's right for dealing cards or picking people, and wrong for anything you **do again** (dice, coins, days, trials).\n\n**Quiet version of the same bug:** `sample(1:6, 6)` doesn't error. It just shuffles 1–6, so every face appears exactly once. That isn't 6 rolls.",
+    "key": true
+   },
+   {
+    "id": "core-05-c06",
+    "label": "table() leaves out categories that never happened",
+    "question": "Roll an unfair die 8 times and report how often each face came up. Why are some faces missing?",
+    "code": "set.seed(3)\nrolls <- sample(1:6, 8, replace = TRUE, prob = c(0.1, 0.3, 0.2, 0.05, 0.3, 0.05))\ntable(rolls)                          # only the faces that appeared\n#> rolls\n#> 1 2 3 5 \n#> 1 2 2 3 \ntable(factor(rolls, levels = 1:6))    # all six faces, 0 where needed\n#> 1 2 3 4 5 6 \n#> 1 2 2 0 3 0 ",
+    "comment": "**What happened (Homework 2 fun2, posted solution):** with a small n, rare faces may never come up. `table()` then has fewer columns, and pairing it with `1:6` puts counts under the **wrong** faces.\n\n**Fix:** `table(factor(x, levels = all_possible_values))`. The same applies to categories in barplots and side-by-side comparisons.",
+    "key": true
+   },
+   {
+    "id": "core-05-c07",
+    "label": "Forgetting the comma when filtering rows",
+    "question": "Keep only the employees with salary above 55. Why does df[df$salary > 55] fail?",
+    "code": "df <- data.frame(name = c(\"Ana\", \"Ben\", \"Cal\", \"Dee\"), salary = c(50, 60, 55, 70))\ntryCatch(df[df$salary > 55], error = function(e) conditionMessage(e))\n#> [1] \"undefined columns selected\"\ndf[df$salary > 55, ]                  # rows BEFORE the comma, columns after\n#>   name salary\n#> 2  Ben     60\n#> 4  Dee     70\ndf[df$salary > 55, \"name\"]            # just the names\n#> [1] \"Ben\" \"Dee\"\ndf$name[df$salary > 55]               # same, vector style (no comma: it's a vector)\n#> [1] \"Ben\" \"Dee\"",
+    "comment": "**Data frames have two dimensions:** `df[rows, columns]`. A condition about rows goes **before** the comma. Leave the spot after the comma empty to keep all columns.\n\n**Vectors have one dimension:** `df$name[condition]` takes no comma. Mixing these up is the #1 subsetting error.",
+    "key": true
+   },
+   {
+    "id": "core-05-c08",
+    "label": "= vs == and & vs | (read the question's \"and\" / \"or\")",
+    "question": "Find employees in IT AND earning over 55, and employees in IT OR earning over 55.",
+    "code": "df <- data.frame(name = c(\"Ana\", \"Ben\", \"Cal\", \"Dee\"),\n                 salary = c(50, 60, 55, 70), dept = c(\"HR\", \"IT\", \"IT\", \"HR\"))\ndf$name[df$dept == \"IT\" & df$salary > 55]     # both must be true\n#> [1] \"Ben\"\ndf$name[df$dept == \"IT\" | df$salary > 55]     # at least one true\n#> [1] \"Ben\" \"Cal\" \"Dee\"\nx <- 5\nx == 5                                        # == compares\n#> [1] TRUE\n# if (x = 5) ...                              # = assigns: a syntax error inside if()",
+    "comment": "**`==` asks \"is it equal?\"; `=` (or `<-`) assigns.** Inside `if ( )` and filters, you almost always want `==`.\n\n**Match the question's words:** \"and\", \"both\", \"who are … and …\" → `&`. \"Or\", \"either\", \"at least one of\" → `|`. The Recitation 2 posted solution used `|` where the question said \"and\". Check each condition alone if a count looks too big.\n\n**`&&` / `||`** are for a **single** TRUE/FALSE inside `if()`. Use `&` / `|` for vectors (filters).",
+    "key": true
+   },
+   {
+    "id": "core-05-c09",
+    "label": "if() on a whole vector → use ifelse()",
+    "question": "Label each score \"pass\" (≥ 60) or \"fail\". Why does if (scores >= 60) fail?",
+    "code": "scores <- c(55, 72, 60, 48)\ntryCatch(if (scores >= 60) \"pass\" else \"fail\", error = function(e) conditionMessage(e))\n#> [1] \"the condition has length > 1\"\nifelse(scores >= 60, \"pass\", \"fail\")          # one label per score\n#> [1] \"fail\" \"pass\" \"pass\" \"fail\"\nif (all(scores >= 60)) \"everyone passed\" else \"someone failed\"   # one answer for the vector\n#> [1] \"someone failed\"",
+    "comment": "**`if` takes ONE TRUE/FALSE.** For a vector of answers use `ifelse(test, yes, no)`, or a `for` loop with `if` inside.\n\n**One answer about the whole vector?** Wrap the test: `all(...)` (every one), `any(...)` (at least one).",
+    "key": true
+   },
+   {
+    "id": "core-05-c10",
+    "label": "A function that returns nothing (ends with an assignment)",
+    "question": "Why does calling my function print nothing?",
+    "code": "double_it <- function(x) {\n  result <- x * 2                 # last line is an assignment: returns invisibly\n}\ndouble_it(4)                      # prints nothing\nsaved <- double_it(4); saved      # the value was there, just not printed\n#> [1] 8\n\ndouble_it <- function(x) {\n  result <- x * 2\n  result                          # last line = the value to return\n}\ndouble_it(4)\n#> [1] 8",
+    "comment": "**A function returns its last evaluated line.** If that line is an assignment, the value comes back **invisibly**: nothing prints, which looks like the function failed.\n\n**Fix:** end with the object's name (`result`) or `return(result)`. For several results, end with `list(a = ..., b = ...)`.\n\n**Also:** `print()` inside a function shows the value but doesn't make it the return value if it isn't the last line.",
+    "key": true
+   },
+   {
+    "id": "core-05-c11",
+    "label": "Loops: forgetting [i] overwrites the result each time",
+    "question": "Store the square of each number 1 to 5 in a vector. Why do I only get one number?",
+    "code": "squares <- numeric(5)\nfor (i in 1:5) {\n  squares <- i^2                 # WRONG: replaces the whole vector every pass\n}\nsquares\n#> [1] 25\n\nsquares <- numeric(5)\nfor (i in 1:5) {\n  squares[i] <- i^2              # right: fills slot i\n}\nsquares\n#> [1]  1  4  9 16 25\nsapply(1:5, function(i) i^2)     # or let sapply build the vector\n#> [1]  1  4  9 16 25",
+    "comment": "**Inside a loop, save into position `[i]`.** Without it, each pass throws away the previous one and you end with only the last value.\n\n**Also check:** create the empty vector **before** the loop, not inside it (inside, it gets reset each pass).",
+    "key": true
+   },
+   {
+    "id": "core-05-c12",
+    "label": "rnorm takes the standard deviation, not the variance",
+    "question": "Generate 5 values from a normal distribution with mean 10 and variance 25.",
+    "code": "set.seed(1)\nrnorm(5, mean = 10, sd = 25)        # WRONG: sd 25 means variance 625\n#> [1]  -5.661345  14.591083 -10.890715  49.882020  18.237694\nset.seed(1)\nrnorm(5, mean = 10, sd = sqrt(25))  # right: sd = 5\n#> [1]  6.867731 10.918217  5.821857 17.976404 11.647539\npnorm(15, mean = 10, sd = 5)        # the same applies to pnorm, qnorm, dnorm\n#> [1] 0.8413447",
+    "comment": "**Every `*norm` function uses `sd =`.** If a question gives the **variance** σ², pass `sd = sqrt(variance)`.\n\n**Related off-by-ones to remember:** binomial \"at least k\" → `1 - pbinom(k - 1, n, p)`; geometric \"first success on trial t\" → `dgeom(t - 1, p)` (see Core 03).",
+    "key": true
+   },
+   {
+    "id": "core-05-c13",
+    "label": "NA spreads: use na.rm = TRUE",
+    "question": "Find the average salary when one value is missing.",
+    "code": "salary <- c(50, NA, 70, 65)\nmean(salary)                    # NA\n#> [1] NA\nmean(salary, na.rm = TRUE)      # ignore the missing one\n#> [1] 61.66667\nsum(is.na(salary))              # how many are missing\n#> [1] 1\nsalary == NA                    # never works: comparing with NA gives NA\n#> [1] NA NA NA NA",
+    "comment": "**One NA makes `mean`, `sum`, `max`, `sd` return NA.** Add `na.rm = TRUE`. In `aggregate()`/`tapply()`, pass it after the function: `tapply(x, g, mean, na.rm = TRUE)`.\n\n**Test for missing values with `is.na(x)`,** never `x == NA`.",
+    "key": true
+   }
+  ]
+ },
+ "core-06": {
+  "type": "core",
+  "num": "06",
+  "title": "Question words → R, and \"which one do I use?\" guides",
+  "date": "",
+  "exams": [],
+  "topics": [
+   "translator",
+   "which function",
+   "loops",
+   "apply",
+   "brackets",
+   "table",
+   "tapply",
+   "aggregate",
+   "joins",
+   "plots",
+   "distributions",
+   "if",
+   "ifelse"
+  ],
+  "pdfs": [],
+  "notes": "Turn the words in a question into R functions, then pick the right tool.\n\n| The question says… | Reach for |\n|---|---|\n| how many / count / number of | `sum(condition)`, `nrow(df[cond, ])`, `table(x)`, `length(x)` |\n| proportion / percentage / fraction / rate | `mean(condition)`, `prop.table(table(x))` |\n| average / typical / median | `mean()`, `median()` (add `na.rm = TRUE`) |\n| for each / per / by group / across | `tapply(y, g, f)`, `aggregate(y ~ g, data, f)`, `group_by() + summarise()` |\n| for each row / column of a matrix | `apply(m, 1, f)` / `apply(m, 2, f)` |\n| for each element of a list / vector | `sapply(x, f)`, `lapply(x, f)` |\n| compare pairs element by element | `mapply(f, x, y)` or vectorized `ifelse(x > y, ...)` |\n| highest / lowest / which one | `which.max()`, `which.min()`, `names(which.max(...))`, `order()` |\n| top 5 / sort / rank | `df[order(df$x, decreasing = TRUE), ]`, `head(..., 5)` |\n| only / among / where / with | filter rows: `df[condition, ]`, `subset()`, `filter()` |\n| new column / variable | `df$new <- ...`, `mutate()` |\n| groups from a number (short/medium/long) | nested `ifelse()` or `cut()` |\n| label each value | `ifelse()` (2–3 labels) or loop + `if` |\n| until / keep going / stop when | `while (not done)` or `repeat { ... if (done) break }` |\n| n times / for each n from 1 to K | `for`, `sapply(1:K, ...)`, `replicate(n, ...)` |\n| simulate / random / roll / flip / draw | `sample()`, `rnorm()`, `runif()`, `rbinom()` + `set.seed()` |\n| probability (by simulation) | `mean(replicate(10000, <TRUE/FALSE>))` |\n| at least one / any | `any()`; exact: `1 - P(none)` |\n| all / every / none | `all()`, `!any()` |\n| exactly k successes in n trials | `dbinom(k, n, p)` |\n| at most / at least k successes | `pbinom(k, n, p)` / `1 - pbinom(k - 1, n, p)` |\n| normal: less than / more than / between | `pnorm(x)`, `1 - pnorm(x)`, `pnorm(b) - pnorm(a)` |\n| percentile / cut-off / top 10% | `qnorm(p)`, `quantile(x, p)` |\n| first success on trial t | `dgeom(t - 1, p)` |\n| function that returns several things | `list(a = ..., b = ...)` |\n| combine two tables / look up | `left_join()`, `inner_join()` |\n| rows with no match | `anti_join()` |\n| reshape wide ↔ long | `pivot_longer()`, `pivot_wider()` |\n\nThe **Find code for a question** search uses the same word patterns to point you to templates.",
+  "takeaways": [
+   "how many → sum(cond); proportion → mean(cond); for each group → tapply / aggregate.",
+   "Unknown number of repeats → while; known number → for / sapply / replicate.",
+   "[ ] keeps the type (list stays a list); [[ ]] and $ pull one element out.",
+   "Two variables to compare → table(a, b); one numeric by group → tapply / boxplot(y ~ g)."
+  ],
+  "updatedAt": "2026-10-16T00:20:00Z",
+  "remember": [],
+  "chunks": [
+   {
+    "id": "core-06-c01",
+    "label": "Count vs proportion vs average",
+    "question": "In a small class, how many scored above 80, what proportion did, and what was the average score?",
+    "code": "scores <- c(72, 85, 91, 64, 88, 79)\nsum(scores > 80)              # HOW MANY: TRUE counts as 1\n#> [1] 3\nmean(scores > 80)             # PROPORTION: share of TRUEs\n#> [1] 0.5\nmean(scores)                  # AVERAGE of the values themselves\n#> [1] 79.83333\nlength(scores)                # how many values in total\n#> [1] 6\ntable(scores > 80)            # both counts at once\n#> FALSE  TRUE \n#>     3     3 \nprop.table(table(scores > 80))\n#> FALSE  TRUE \n#>   0.5   0.5 ",
+    "comment": "**The same condition answers two questions:** `sum(cond)` = how many, `mean(cond)` = what fraction. Multiply by 100 for a percentage.\n\n**Don't mix them up:** `mean(scores > 80)` is a **proportion** (0.5), while `mean(scores[scores > 80])` is the **average score of those above 80** (88).",
+    "key": true
+   },
+   {
+    "id": "core-06-c02",
+    "label": "Which loop? for vs while vs repeat vs sapply / replicate",
+    "question": "When do I use for, while, repeat, sapply or replicate?",
+    "code": "# Known number of repetitions -> for\ntotal <- 0\nfor (i in 1:5) total <- total + i\ntotal\n#> [1] 15\n\n# Unknown number, stop on a condition -> while (condition = keep going)\nset.seed(1); rolls <- 0; face <- 0\nwhile (face != 6) { face <- sample(1:6, 1); rolls <- rolls + 1 }\nrolls\n#> [1] 7\n\n# Same thing with repeat + break (condition = stop)\nset.seed(1); rolls <- 0\nrepeat { rolls <- rolls + 1; if (sample(1:6, 1) == 6) break }\nrolls\n#> [1] 7\n\n# Collect one result per input -> sapply;  same experiment k times -> replicate\nsapply(1:5, function(n) n^2)\n#> [1]  1  4  9 16 25\nset.seed(1); replicate(5, sum(sample(1:6, 2, replace = TRUE)))\n#> [1] 5 3 8 8 6",
+    "comment": "| Situation | Use |\n|---|---|\n| repeat a **known** number of times, with steps that depend on each other | `for (i in 1:n)` |\n| repeat **until** something happens | `while (keep going)` or `repeat { if (stop) break }` |\n| one result per input value (1 to K, each element) | `sapply(inputs, function(x) ...)` |\n| the same random experiment k times | `replicate(k, experiment)` |\n| stop a `for` early | `break`; skip one pass → `next` |\n\n**`while` vs `repeat`:** the `while` condition is the **opposite** of the stopping rule. `repeat` + `break` lets you write the stopping rule as it is. Both give the same answer here.",
+    "key": true
+   },
+   {
+    "id": "core-06-c03",
+    "label": "Which apply? apply vs sapply vs lapply vs tapply vs mapply",
+    "question": "Which apply-family function fits a matrix, a list, groups, or pairs of values?",
+    "code": "m <- matrix(1:6, nrow = 2)\napply(m, 1, sum)                         # matrix ROWS (1) -> a vector\n#> [1]  9 12\napply(m, 2, max)                         # matrix COLUMNS (2)\n#> [1] 2 4 6\n\nlst <- list(a = c(1, 2, 3), b = c(10, 20))\nsapply(lst, mean)                        # each list element -> simplified vector\n#>  a  b \n#>  2 15 \nlapply(lst, range)                       # each element -> always a list\n#> $a\n#> [1] 1 3\n#> $b\n#> [1] 10 20\n\nsalary <- c(50, 60, 55, 70); dept <- c(\"HR\", \"IT\", \"IT\", \"HR\")\ntapply(salary, dept, mean)               # a vector split BY GROUP\n#>   HR   IT \n#> 60.0 57.5 \n\nmapply(function(a, b) a + b, 1:3, 4:6)   # pairs: (1,4), (2,5), (3,6)\n#> [1] 5 7 9",
+    "comment": "| You have | You want | Use |\n|---|---|---|\n| a matrix | something per row / column | `apply(m, 1 or 2, f)` |\n| a list or vector | something per element, as a vector | `sapply(x, f)` |\n| a list or vector | something per element, kept as a list | `lapply(x, f)` |\n| values + a grouping variable | something per group | `tapply(values, groups, f)` (or `aggregate`) |\n| two (or more) vectors | something per pair | `mapply(f, x, y)` |\n\n**Memory trick:** **t**apply = **t**able of groups, **s**apply = **s**implify, **l**apply = **l**ist, **m**apply = **m**ultiple inputs.",
+    "key": true
+   },
+   {
+    "id": "core-06-c04",
+    "label": "Which bracket? [ ] vs [[ ]] vs $ vs [row, col]",
+    "question": "How do I get one element out of a list, part of a vector, or a cell of a data frame?",
+    "code": "v <- c(a = 10, b = 20, c = 30)\nv[2]; v[\"b\"]; v[v > 15]            # vectors: one index, positions / names / conditions\n#>  b \n#> 20 \n#>  b \n#> 20 \n#>  b  c \n#> 20 30 \n\nlst <- list(term = \"Fall\", years = c(2025, 2026))\nlst[\"years\"]                       # [ ]  -> still a LIST (a smaller list)\n#> $years\n#> [1] 2025 2026\nlst[[\"years\"]]                     # [[ ]] -> the ELEMENT itself (a vector)\n#> [1] 2025 2026\nlst$years                          # $    -> same as [[ ]] with a name\n#> [1] 2025 2026\nlst[[\"years\"]][2]                  # then index inside it\n#> [1] 2026\n\ndf <- data.frame(name = c(\"Ana\", \"Ben\"), age = c(20, 22))\ndf[2, \"age\"]; df$age[2]            # one cell, two ways\n#> [1] 22\n#> [1] 22\ndf[df$age > 20, ]                  # rows by condition, all columns\n#>   name age\n#> 2  Ben  22",
+    "comment": "**`[ ]` keeps the container; `[[ ]]` and `$` open it.** `lst[\"years\"]` is a list holding the vector. `lst[[\"years\"]]` is the vector itself, so you can do math on it.\n\n**Nested lists:** go one level per `[[ ]]`, e.g. `course[[\"Fall 2026\"]][[\"instructor\"]]` (why \"Fall 2026\" needed double brackets in Rec 1).\n\n**Data frames:** `df[rows, cols]` with a comma; `df$col` for a column (a vector), then `[i]` for one value.",
+    "key": true
+   },
+   {
+    "id": "core-06-c05",
+    "label": "Which summary tool? table vs tapply vs aggregate vs group_by",
+    "question": "Which function gives counts or statistics by group?",
+    "code": "df <- data.frame(dept = c(\"HR\", \"IT\", \"IT\", \"HR\", \"IT\"),\n                 remote = c(\"Yes\", \"No\", \"Yes\", \"Yes\", \"No\"),\n                 salary = c(50, 60, 55, 70, 65))\ntable(df$dept)                                     # COUNTS of one category\n#> HR IT \n#>  2  3 \ntable(df$dept, df$remote)                          # counts of two categories (a grid)\n#>      No Yes\n#>   HR  0   2\n#>   IT  2   1\nprop.table(table(df$dept, df$remote), 1)           # proportions within each row\n#>             No       Yes\n#>   HR 0.0000000 1.0000000\n#>   IT 0.6666667 0.3333333\ntapply(df$salary, df$dept, mean)                   # a STATISTIC by group (named vector)\n#> HR IT \n#> 60 60 \ntapply(df$salary, list(df$dept, df$remote), mean)  # two groupings (a grid)\n#>      No Yes\n#> HR   NA  60\n#> IT 62.5  55\naggregate(salary ~ dept + remote, data = df, FUN = mean)   # same, as a data frame\n#>   dept remote salary\n#> 1   IT     No   62.5\n#> 2   HR    Yes   60.0\n#> 3   IT    Yes   55.0",
+    "comment": "| Question | Tool |\n|---|---|\n| how many in each category | `table(x)` |\n| how many in each combination | `table(a, b)` |\n| what share within each group | `prop.table(table(a, b), 1)` (rows) or `2` (columns) |\n| mean/median/… of y for each group | `tapply(y, g, f)` or `aggregate(y ~ g, data, f)` |\n| … for each combination of two groups | `tapply(y, list(g1, g2), f)` or `aggregate(y ~ g1 + g2, ...)` |\n| several statistics at once (dplyr) | `df %>% group_by(g) %>% summarise(m = mean(y), n = n())` |\n\n**`tapply` gives a vector or grid** (easy to read and to index by name). **`aggregate` gives a data frame** (easy to use further). Both are correct answers.",
+    "key": true
+   },
+   {
+    "id": "core-06-c06",
+    "label": "Which condition tool? if vs ifelse vs any / all vs which",
+    "question": "When do I use if, ifelse, any, all or which?",
+    "code": "x <- c(3, 8, 12, 5)\nif (x[1] > 5) \"big\" else \"small\"      # ONE value -> if / else\n#> [1] \"small\"\nifelse(x > 5, \"big\", \"small\")         # EVERY value -> ifelse\n#> [1] \"small\" \"big\"   \"big\"   \"small\"\nany(x > 10); all(x > 2)               # one answer about the whole vector\n#> [1] TRUE\n#> [1] TRUE\nwhich(x > 5)                          # POSITIONS where TRUE\n#> [1] 2 3\nx[x > 5]                              # the VALUES where TRUE\n#> [1]  8 12\nwhich.max(x)                          # position of the largest\n#> [1] 3",
+    "comment": "| You want | Use |\n|---|---|\n| decide one thing (inside a function, one value) | `if (...) ... else ...` |\n| a label for each element | `ifelse(test, yes, no)` (nest for 3 labels) |\n| \"is there at least one?\" / \"are they all?\" | `any()` / `all()` |\n| where are they (index numbers) | `which()` |\n| the matching values | `x[condition]` |\n\n**Error \"the condition has length > 1\"** means you gave `if` a whole vector: switch to `ifelse`, or wrap the test in `any()`/`all()`.",
+    "key": true
+   },
+   {
+    "id": "core-06-c07",
+    "label": "Which join? inner / left / full / semi / anti",
+    "question": "Combine people with their city information. Which join keeps which rows?",
+    "code": "library(dplyr)\npeople <- data.frame(name = c(\"Ana\", \"Ben\", \"Cal\"), city = c(\"NYC\", \"LA\", \"Austin\"))\ncities <- data.frame(city = c(\"NYC\", \"LA\", \"Boston\"), avg_rent = c(3500, 2800, 3000))\ninner_join(people, cities, by = \"city\")    # only people whose city is in both\n#>   name city avg_rent\n#> 1  Ana  NYC     3500\n#> 2  Ben   LA     2800\nleft_join(people, cities, by = \"city\")     # every person; NA rent if no match\n#>   name   city avg_rent\n#> 1  Ana    NYC     3500\n#> 2  Ben     LA     2800\n#> 3  Cal Austin       NA\nfull_join(people, cities, by = \"city\")     # everything from both\n#>   name   city avg_rent\n#> 1  Ana    NYC     3500\n#> 2  Ben     LA     2800\n#> 3  Cal Austin       NA\n#> 4 <NA> Boston     3000\nsemi_join(people, cities, by = \"city\")     # people WITH a match (no new columns)\n#>   name city\n#> 1  Ana  NYC\n#> 2  Ben   LA\nanti_join(people, cities, by = \"city\")     # people WITHOUT a match\n#>   name   city\n#> 1  Cal Austin",
+    "comment": "| Question says | Join |\n|---|---|\n| \"add info from the other table, keep everyone\" | `left_join(main, other)` |\n| \"only those that appear in both\" | `inner_join()` |\n| \"everything from both tables\" | `full_join()` |\n| \"which X have a match\" (no new columns) | `semi_join()` |\n| \"which X have **no** match / are missing\" | `anti_join()` |\n\n**The key:** `by = \"col\"` must identify one row in the other table. If the names differ, use `by = c(\"name_in_x\" = \"name_in_y\")`. A many-to-many warning means the key isn't unique (see Lecture 11 practice).",
+    "key": true
+   },
+   {
+    "id": "core-06-c08",
+    "label": "Which plot? decide from the variables",
+    "question": "Which plot fits one categorical variable, one numeric variable, a numeric variable by group, or two numeric variables?",
+    "code": "# one numeric           -> hist(x) or boxplot(x)\n# one categorical       -> barplot(table(x))\n# numeric by a category -> boxplot(y ~ g, data = df)\n# two categorical       -> barplot(table(a, b), beside = TRUE, legend.text = TRUE)\n# two numeric           -> plot(x, y)   (+ abline(lm(y ~ x)))\n# over time / steps     -> plot(t, y, type = \"l\")\n# a distribution curve  -> curve(dnorm(x, m, s), from, to)\nstr(iris[, c(\"Sepal.Length\", \"Species\")])     # check: num vs Factor decides the plot\n#> 'data.frame':\t150 obs. of  2 variables:\n#>  $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...\n#>  $ Species     : Factor w/ 3 levels \"setosa\",\"versicolor\",..: 1 1 1 1 1 1 1 1 1 1 ...",
+    "comment": "**Decide from `str(df)`:** is each variable `num`/`int` (numeric) or `Factor`/`chr` (categorical)?\n\n| Variables | Plot |\n|---|---|\n| 1 numeric | histogram (shape), boxplot (spread, outliers) |\n| 1 categorical | barplot of `table()` |\n| numeric + categorical | `boxplot(y ~ g)` (or side-by-side histograms with `par(mfrow)`) |\n| 2 categorical | grouped barplot of `table(a, b)` |\n| 2 numeric | scatterplot `plot(x, y)` |\n\nFull templates with pictures: **Core 04 · Visualizations**.",
+    "key": true
+   },
+   {
+    "id": "core-06-c09",
+    "label": "Which distribution function? d / p / q / r from the wording",
+    "question": "A test has 10 questions, each answered correctly with probability 0.7, and scores are normal with mean 70 and sd 10. Turn each phrase into code.",
+    "code": "dbinom(7, 10, 0.7)            # \"exactly 7 correct\"\n#> [1] 0.2668279\npbinom(7, 10, 0.7)            # \"at most 7\"\n#> [1] 0.6172172\n1 - pbinom(7, 10, 0.7)        # \"more than 7\" (8 or more)\n#> [1] 0.3827828\n1 - pbinom(6, 10, 0.7)        # \"at least 7\"\n#> [1] 0.6496107\npnorm(85, 70, 10)             # \"a score below 85\"\n#> [1] 0.9331928\n1 - pnorm(85, 70, 10)         # \"above 85\"\n#> [1] 0.0668072\nqnorm(0.90, 70, 10)           # \"the score that separates the top 10%\"\n#> [1] 82.81552\nset.seed(1); rbinom(3, 10, 0.7); round(rnorm(3, 70, 10), 1)   # \"simulate\" -> r\n#> [1] 8 8 7\n#> [1] 83.3 82.7 74.1",
+    "comment": "**Pick the letter from the wording:** exactly → **d** (discrete only); at most / below / less than → **p**; above / at least → **1 − p** (watch `k − 1` for discrete); percentile / cut-off → **q**; simulate / generate → **r**.\n\n**Pick the distribution from the story:** fixed number of yes/no trials, count the successes → **binom**. Waiting for the first success → **geom** (trial t → `t − 1`). A continuous measurement given a mean and sd → **norm**. Equally likely anywhere in a range → **unif**.",
     "key": true
    }
   ]

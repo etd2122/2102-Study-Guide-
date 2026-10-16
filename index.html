@@ -361,8 +361,9 @@ function highlight(root){
   root.querySelectorAll('pre code').forEach(el=>{ if(!el.className) el.className='language-r'; try{hljs.highlightElement(el)}catch(e){} });
 }
 function sorted(){
+  const rank=t=>(query&&t==='hw')?-1:TYPE_ORDER.indexOf(t);   // while searching, Homework comes first
   return Object.entries(entries).map(([id,e])=>({id,...e})).sort((a,b)=>{
-    const ta=TYPE_ORDER.indexOf(a.type), tb=TYPE_ORDER.indexOf(b.type);
+    const ta=rank(a.type), tb=rank(b.type);
     if(ta!==tb)return ta-tb;
     return (Number(a.num)||0)-(Number(b.num)||0) || String(a.title).localeCompare(String(b.title));
   });
@@ -603,7 +604,12 @@ function findMatches(q){
     }
     if(score>0)res.push({d,score,hits:hits.sort((a,b)=>b[1]-a[1]).map(h=>h[0])});
   }
-  return res.sort((a,b)=>b.score-a.score).slice(0,10);
+  res.sort((a,b)=>b.score-a.score);
+  // Homework first: any homework chunk that is relevant (at least half the best score) goes to the top,
+  // ordered by score; then everything else by score.
+  const top=res.length?res[0].score:0, rel=r=>r.score>=0.5*top;
+  const hw=res.filter(r=>r.d.e.type==='hw'&&rel(r)), rest=res.filter(r=>!(r.d.e.type==='hw'&&rel(r)));
+  return hw.slice(0,3).concat(rest).slice(0,10);
 }
 const SKILLS=[
  [/cumulative|running (sum|total)|\bcumsum\b/,'Running total (cumsum, or a loop)','lec-05','FOR Loops'],

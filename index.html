@@ -669,7 +669,7 @@ const SKILLS=[
  [/keep (all|every) .*(rows|observations|people|records)|keeps? (their|its|all|every) rows?|every \w+ keeps|without losing|add .* (from|using) (another|the other|a second)|left.?join/,'Keep all rows of the main table (left_join)','lec-11','left_join(): keep everything from x'],
  [/no match|(do|does|did) not appear|don't appear|not (in|present in|found in|listed in) the (other|\w+ (list|table|data))|missing from (the )?other|anti.?join|semi.?join|appear in both|with no \w+|without (any |a )?\w+ (in|from) the/,'Rows with / without a match (semi / anti join)','lec-11','Filtering joins: semi_join() and anti_join()'],
  [/different (column |variable )?names|named differently/,'Join keys with different names','lec-11','Practice 6 · Keys with different names'],
- [/pivot|reshape|one column (per|for each)|long(er)? format|wide(r)? format|column names (are|that are) (values|years)|tidy/,'Reshape with pivot_longer / pivot_wider','lec-12','pivot_longer(): column names that are really values'],
+ [/pivot|reshape|one column (per|for each)|long(er)? format|wide(r)? format|column names (are|that are|represent) (the )?(values|years)|spread across (multiple|several) columns|tidy/,'Reshape with pivot_longer / pivot_wider','lec-12','pivot_longer(): column names that are really values'],
  [/separate\(|separate (the|a|one|it|this|that) |split (the |a |one )?column|\bunite\b|combine (the )?columns/,'Split or combine columns (separate / unite)','lec-12','separate(): split one column into several'],
  [/binomial|successes|\bdbinom|\bpbinom|(at most|at least|exactly|fewer than|more than|no more than) \d+ (of|out of) \d+|(probabilit|chance).*(at most|at least|exactly|fewer than|more than|no more than) \d+|(at most|at least|exactly|fewer than|more than|no more than) \d+.*(probabilit|chance)/,'Binomial probability (dbinom / pbinom)','core-03','Binomial: exactly, at most, at least, between'],
  [/qnorm|percentile|quantile .*normal|normal .*(cutoff|cut-off)|(top|bottom|highest|lowest) \d+ ?%|cut-?off|(score|value|height|weight) (that )?(marks|separates)/,'Normal percentile (qnorm)','core-03','Normal probabilities: less than, greater than, between, percentiles'],
@@ -700,6 +700,13 @@ const SKILLS=[
  [/geometric|first (success|six|head|time)|until the first|number of (trials|tries|attempts) (until|before)/,'Geometric: wait for the first success','core-03','Geometric: waiting for the first success (watch the off-by-one)'],
  [/uniform|runif|between 0 and 1/,'Uniform random numbers (runif)','core-03','Uniform: runif for random numbers between a and b'],
  [/sample means?|sampling distribution|central limit|clt|means? of (many|each|the) samples?|average of each sample/,'Sample means (CLT)','core-03','Sample means: how the average behaves (CLT)'],
+ [/\bdistinct\b|(remove|drop|delete) (all )?(the )?duplicate|duplicate (rows|records|observations)/,'Remove duplicate rows (select + distinct)','hw-03','Problem 1 [42pt] · Part 7 · drop PID and category, then distinct()'],
+ [/relocate|move (the )?\w+ (variable|column)|rearrange|to the end of the (data|table)|column order|(comes|come|follow|follows) (right )?after/,'Reorder columns (relocate)','hw-03','Problem 1 [42pt] · Part 11 · relocate columns'],
+ [/dimensions of the output|how many missing values|missing values does it contain/,'Report a join: dim() and NA count','hw-03','Problem 1 [42pt] · Part 3 · left_join: by state, then by state + county'],
+ [/actual number|number of (people|adults|children)|from (a |the )?percent/,'Percent → actual count','hw-03','Problem 1 [42pt] · Part 10 · percent → actual number of people'],
+ [/ggplot|geom_|theme_minimal|minimal theme|\bzoom|vertical line|angle of (the )?ticks|tick angle|subtitle/,'ggplot histogram: labels, zoom, theme, mean line','hw-03','Problem 1 [42pt] · Part 15 · ggplot histogram of poptotal (zoom, angle, theme, mean line)'],
+ [/stat_summary|transparen|\balpha\b|(dots?|points?) (that )?(represent|show|for|at) the (average|mean)/,'ggplot boxplot: colors, mean dots, alpha','hw-03','Problem 1 [42pt] · Part 16 · ggplot boxplot of area by inmetro (colors, mean dots, alpha)'],
+ [/\bnon-?metro\b|\bmetro (areas?|counties)|compare .* (to|with|vs) .* in each|in each \w+,? compare/,'Compare two groups within each group (group_by two columns)','hw-03','Problem 1 [42pt] · Part 12 · biggest / smallest state, density by state and metro'],
 ];
 function detectSkills(q){
   const low=q.toLowerCase(), found=[], seen=new Set();

@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-18T19:40:00Z";
+window.ENTRIES_SAVED = "2026-10-19T15:30:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -3639,7 +3639,7 @@ window.ENTRIES = {
     "key": false
    }
   ],
-  "notes": "Continues the `flights` data from Lecture 10, then covers combining two tables. Course notes: https://ap4347.github.io/2102/lecture-11.html\n\n**Join cheat sheet**\n\n| Function | Keeps | Adds columns? |\n|---|---|---|\n| `inner_join(x, y)` | rows with a match in both | yes |\n| `left_join(x, y)` | all of x | yes (NA where no match) |\n| `right_join(x, y)` | all of y | yes |\n| `full_join(x, y)` | everything | yes |\n| `semi_join(x, y)` | x rows **with** a match | no |\n| `anti_join(x, y)` | x rows **without** a match | no |\n\nThe **Practice** chunks at the bottom walk through the lecture's practice data sets (`data1`, `data2`) step by step.\n\n*Note: the practice outputs were generated with a base-R stand-in for the join functions, checked to reproduce all 25 join outputs printed in this lecture exactly. Your RStudio output should match.*",
+  "notes": "Your class file: `Lecture_11.R` (October 14) covers the joins on this page **and** the tidyr material in Lec 12 (pivoting, separate/unite, missing values, relig_income / who / billboard). The site follows the course-notes numbering.\n\nContinues the `flights` data from Lecture 10, then covers combining two tables. Course notes: https://ap4347.github.io/2102/lecture-11.html\n\n**Join cheat sheet**\n\n| Function | Keeps | Adds columns? |\n|---|---|---|\n| `inner_join(x, y)` | rows with a match in both | yes |\n| `left_join(x, y)` | all of x | yes (NA where no match) |\n| `right_join(x, y)` | all of y | yes |\n| `full_join(x, y)` | everything | yes |\n| `semi_join(x, y)` | x rows **with** a match | no |\n| `anti_join(x, y)` | x rows **without** a match | no |\n\nThe **Practice** chunks at the bottom walk through the lecture's practice data sets (`data1`, `data2`) step by step.\n\n*Note: the practice outputs were generated with a base-R stand-in for the join functions, checked to reproduce all 25 join outputs printed in this lecture exactly. Your RStudio output should match.*",
   "takeaways": [
    "group_by() + summarise() = one row per group; add n() for counts and na.rm = TRUE for missing values.",
    "across(columns, ~ mean(.x, na.rm = TRUE)) applies the same summary to many columns.",
@@ -3648,7 +3648,7 @@ window.ENTRIES = {
    "left_join keeps every row of the first table; anti_join finds rows with no match.",
    "Non-key columns with the same name get .x (first table) and .y (second table)."
   ],
-  "updatedAt": "2026-10-14T16:30:00Z"
+  "updatedAt": "2026-10-19T15:30:00Z"
  },
  "lec-12": {
   "type": "lec",
@@ -3743,7 +3743,7 @@ window.ENTRIES = {
     "key": false
    }
   ],
-  "notes": "Reshaping data so each variable is a column and each observation is a row. Course notes: https://ap4347.github.io/2102/lecture-12.html\n\n**Which function?**\n\n| Problem in the data | Function |\n|---|---|\n| column **names** are values (`1999`, `2000`) | `pivot_longer()` |\n| one observation spread over several **rows** | `pivot_wider()` |\n| two values in one cell (`\"745/19987071\"`) | `separate()` |\n| one value split across columns | `unite()` |\n| missing combinations / `NA`s | `complete()`, `fill()`, `replace_na()`, `drop_na()` |",
+  "notes": "From your class file `Lecture_11.R` (October 14), second half. The site follows the course-notes numbering; your `Lecture_12.R` (ggplot2) is Lec 13.\n\nReshaping data so each variable is a column and each observation is a row. Course notes: https://ap4347.github.io/2102/lecture-12.html\n\n**Which function?**\n\n| Problem in the data | Function |\n|---|---|\n| column **names** are values (`1999`, `2000`) | `pivot_longer()` |\n| one observation spread over several **rows** | `pivot_wider()` |\n| two values in one cell (`\"745/19987071\"`) | `separate()` |\n| one value split across columns | `unite()` |\n| missing combinations / `NA`s | `complete()`, `fill()`, `replace_na()`, `drop_na()` |",
   "takeaways": [
    "Tidy: each variable a column, each observation a row, each value a cell.",
    "pivot_longer(cols, names_to = \"new name col\", values_to = \"new value col\") makes data longer.",
@@ -3751,7 +3751,259 @@ window.ENTRIES = {
    "separate(col, into = c(...), sep = \"/\") splits; convert = TRUE turns text numbers into numbers.",
    "complete() makes implicit missing values explicit; fill(), replace_na(), drop_na() handle NAs."
   ],
-  "updatedAt": "2026-10-14T16:30:00Z"
+  "updatedAt": "2026-10-19T15:30:00Z"
+ },
+ "lec-13": {
+  "type": "lec",
+  "num": "13",
+  "title": "ggplot2: data visualization (points, colors, labels, zoom, themes, facets)",
+  "date": "2026-10-19",
+  "exams": [],
+  "topics": [
+   "ggplot2",
+   "geom_point",
+   "aes",
+   "scale_colour_manual",
+   "labs",
+   "coord_cartesian",
+   "themes",
+   "facets",
+   "geom_histogram",
+   "geom_boxplot",
+   "geom_bar"
+  ],
+  "pdfs": [],
+  "notes": "Your class file: `Lecture_12.R` (October 19). The course notes number it Lecture 13: https://ap4347.github.io/2102/lecture-13.html\n\n**The one rule:** columns go **inside** `aes()` (color/size/shape depend on the data), fixed values go **outside** (`color = \"steelblue\"`).\n\n| Want | Code |\n|---|---|\n| scatterplot | `geom_point(aes(x, y))` |\n| color by group | `aes(color = group)` + `scale_colour_manual()` |\n| labels | `labs(title, subtitle, x, y, color)` |\n| zoom (keeps data) | `coord_cartesian(xlim, ylim)` |\n| limits (deletes data) | `xlim()`, `ylim()` |\n| tick marks | `scale_x_continuous(breaks = seq(...))` |\n| look | `theme_bw()` etc., **then** `theme(...)` |\n| one panel per group | `facet_wrap(~ g)`, `facet_grid(r ~ c)` |\n\nEvery chunk was run in R; the plots are the real output. After the lecture code there are **beyond the lecture** chunks (histogram, boxplot, bar charts, trend line, bar of a mean) because HW 3 and the exam use those, and three **practice** problems that combine everything.",
+  "takeaways": [
+   "Inside aes() = mapped to data (gets a legend); outside = one fixed value.",
+   "Make number-coded groups (cyl, inmetro) factors before using them as color, fill or x categories.",
+   "color → scale_colour_manual; fill → scale_fill_manual.",
+   "Only 6 default shapes: a 7-level variable on shape silently drops rows (read the warning).",
+   "xlim()/ylim() delete data; coord_cartesian() only zooms.",
+   "Complete theme (theme_bw/minimal) first, then theme() tweaks.",
+   "theme(axis.text.x = element_text(angle = 60, hjust = 1)) to angle tick labels.",
+   "facet_wrap(~ g, nrow = ...) for one panel per group; facet_grid(rows ~ cols) for two variables.",
+   "geom_bar counts rows; geom_col draws a value you summarised first."
+  ],
+  "updatedAt": "2026-10-19T15:30:00Z",
+  "chunks": [
+   {
+    "id": "lec-13-setup",
+    "label": "Setup: load tidyverse, make cyl a factor",
+    "question": "",
+    "code": "library(tidyverse)\n#> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──\n#> ✔ dplyr     1.1.4     ✔ readr     2.1.5\n#> ✔ forcats   1.0.0     ✔ stringr   1.5.1\n#> ✔ ggplot2   3.4.4     ✔ tibble    3.2.1\n#> ✔ lubridate 1.9.3     ✔ tidyr     1.3.1\n#> ✔ purrr     1.0.2     \n#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──\n#> ✖ dplyr::filter()  masks stats::filter()\n#> ✖ dplyr::lag()     masks stats::lag()\n#> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors\n\nmpg <- mpg\nmpg$cyl <- as.factor(mpg$cyl)   # 4, 5, 6, 8 become categories, not numbers\nprint(mpg, n = 3)\n#> # A tibble: 234 × 11\n#>   manufacturer model displ  year cyl   trans      drv     cty   hwy fl    class \n#>   <chr>        <chr> <dbl> <int> <fct> <chr>      <chr> <int> <int> <chr> <chr> \n#> 1 audi         a4      1.8  1999 4     auto(l5)   f        18    29 p     compa…\n#> 2 audi         a4      1.8  1999 4     manual(m5) f        21    29 p     compa…\n#> 3 audi         a4      2    2008 4     manual(m6) f        20    31 p     compa…\n#> # ℹ 231 more rows\nprint(levels(mpg$cyl))\n#> [1] \"4\" \"5\" \"6\" \"8\"",
+    "comment": "**Why `as.factor(cyl)`:** `cyl` is stored as a number (4, 5, 6, 8). Mapped to `color`, a number gives a **continuous** blue gradient legend; a factor gives **4 separate colors**, one per category. Rule: if a number is really a group label (cylinders, `inmetro` 0/1, year), make it a factor before plotting it as color, fill, shape, or an x-axis category.\n\n**`mpg <- mpg`** just copies the built-in data into your environment so you can change it.\n\n**The grammar of every ggplot:** `ggplot(data) + geom_xxx(aes(x, y, ...)) + labs() + scale_xxx() + coord_xxx() + theme_xxx() + theme() + facet_xxx()`. Each `+` adds one layer or setting.",
+    "key": false
+   },
+   {
+    "id": "lec-13-object",
+    "label": "Creating a plot object: ggplot(data = mpg)",
+    "question": "",
+    "code": "ggplot(data = mpg)     # an empty canvas: data is attached, nothing drawn yet",
+    "comment": "`ggplot(data = mpg)` only sets up the canvas: it knows the data, but there's no geom yet, so you see a blank gray panel. Nothing appears until you `+` a `geom_`.\n\n![empty ggplot](files/plots/lec13-object.png)",
+    "key": false
+   },
+   {
+    "id": "lec-13-points",
+    "label": "Adding a layer of points: geom_point()",
+    "question": "",
+    "code": "ggplot(data = mpg) +\n  geom_point(mapping = aes(x = displ, y = hwy))",
+    "comment": "**`aes()` = which columns go where.** `x = displ` (engine size) and `y = hwy` (highway mpg). Columns go **inside** `aes()`, unquoted.\n\n![scatterplot](files/plots/lec13-points.png)\n\n**Reading it:** bigger engines → lower highway mpg. That's the scatterplot's job: the relationship between two numeric variables.\n\n**Base R equivalent:** `plot(mpg$displ, mpg$hwy)`.",
+    "key": false
+   },
+   {
+    "id": "lec-13-static",
+    "label": "Static color, size and shape (outside aes)",
+    "question": "",
+    "code": "ggplot(data = mpg) +\n  geom_point(mapping = aes(x = displ, y = hwy),\n             color = \"steelblue\",\n             size = 3,\n             shape = 20)",
+    "comment": "**Outside `aes()` = one fixed value for every point.** `color = \"steelblue\"`, `size = 3`, `shape = 20` (a solid dot; shapes are numbered 0–25 like base R's `pch`).\n\n![blue points](files/plots/lec13-static.png)\n\n**The #1 ggplot mistake:** `aes(color = \"steelblue\")` puts the *text* \"steelblue\" in as a data value, so the points come out **salmon-red** with a legend saying \"steelblue\". Fixed colors go **outside** `aes()`.",
+    "key": false
+   },
+   {
+    "id": "lec-13-bycyl",
+    "label": "Color by a category: aes(color = cyl)",
+    "question": "",
+    "code": "ggplot(data = mpg) +\n  geom_point(mapping = aes(x = displ, y = hwy, color = cyl),\n             size = 3)",
+    "comment": "**Inside `aes()` = color depends on the data.** Each cylinder group gets its own color and ggplot builds the legend automatically.\n\n![points colored by cyl](files/plots/lec13-bycyl.png)\n\nCompare with base R, where you'd need `col = as.numeric(mpg$cyl)` and a manual `legend()`.",
+    "key": true
+   },
+   {
+    "id": "lec-13-manual",
+    "label": "Choose the colors yourself: scale_colour_manual()",
+    "question": "",
+    "code": "ggplot(data = mpg) +\n  geom_point(mapping = aes(x = displ, y = hwy, color = cyl),\n             size = 3) +\n  scale_colour_manual(values = c(`4` = \"red\",\n                                 `5` = \"blue\",\n                                 `6` = \"orange\",\n                                 `8` = \"yellow\"))",
+    "comment": "**`values = c(level = \"color\", ...)`** names each level. The backticks around `` `4` `` are needed because a name can't start with a number; `\"4\" = \"red\"` works too.\n\n![manual colors](files/plots/lec13-manual.png)\n\n**Match the function to the aesthetic:** `color =` in aes → `scale_colour_manual` / `scale_color_manual` (same function); `fill =` (bars, boxes, histograms) → `scale_fill_manual`. Using the wrong one does nothing, silently. That's what HW 3 Part 16 needs (`scale_fill_manual`).",
+    "key": true
+   },
+   {
+    "id": "lec-13-shape",
+    "label": "Two categories at once: color = cyl, shape = class (watch the warning)",
+    "question": "",
+    "code": "ggplot(data = mpg) +\n  geom_point(mapping = aes(x = displ, y = hwy, color = cyl, shape = class),\n             size = 3)\n#> Warning: The shape palette can deal with a maximum of 6 discrete values because more\n#> than 6 becomes difficult to discriminate\n#> ℹ you have requested 7 values. Consider specifying shapes manually if you need\n#>   that many have them.\n#> Warning: Removed 62 rows containing missing values (`geom_point()`).",
+    "comment": "**Two aesthetics, two legends:** color shows `cyl`, shape shows `class`.\n\n![color and shape](files/plots/lec13-shape.png)\n\n**Read the warnings:** ggplot only has **6** default shapes, but `class` has **7** levels, so the 7th (`suv`) gets no shape and **62 SUVs are silently dropped** (\"Removed 62 rows\"). The suv entry in the legend is blank. Fix: `scale_shape_manual(values = 0:6)`, or use shape for a variable with ≤ 6 levels (like `drv`).",
+    "key": false
+   },
+   {
+    "id": "lec-13-alpha",
+    "label": "Transparency mapped to a variable: aes(alpha = cyl)",
+    "question": "",
+    "code": "ggplot(data = mpg) +\n  geom_point(mapping = aes(x = displ, y = hwy, alpha = cyl),\n             size = 3)\n#> Warning: Using alpha for a discrete variable is not advised.",
+    "comment": "`alpha` = transparency, from 0 (invisible) to 1 (solid). Mapped to `cyl`, each group gets a different transparency.\n\n![alpha by cyl](files/plots/lec13-alpha.png)\n\n**The warning** (\"Using alpha for a discrete variable is not advised\") is ggplot saying this is hard to read. The common use is a **fixed** alpha outside `aes()`: `geom_point(alpha = 0.4)` for overlapping points, `geom_boxplot(alpha = 0.45)` in HW 3 Part 16.",
+    "key": false
+   },
+   {
+    "id": "lec-13-legend",
+    "label": "Change the legend title: labs(color = ...)",
+    "question": "",
+    "code": "ggplot(data = mpg) +\n  geom_point(mapping = aes(x = displ, y = hwy, color = cyl),\n             size = 3) +\n  labs(color = \"Number of Cylinders\")",
+    "comment": "The legend title is named after the **aesthetic**: `labs(color = \"...\")` for a color legend, `labs(fill = \"...\")` for fill, `labs(shape = \"...\")` for shape.\n\n![legend title](files/plots/lec13-legend.png)\n\n**Remove a legend:** `theme(legend.position = \"none\")`.",
+    "key": false
+   },
+   {
+    "id": "lec-13-save",
+    "label": "Saving a plot in a variable (gg <- ...)",
+    "question": "",
+    "code": "gg <- ggplot(data = mpg) +\n  geom_point(mapping = aes(x = displ, y = hwy, color = cyl),\n             size = 3) +\n  labs(color = \"Number of Cylinders\")\n# nothing is drawn: the plot is stored in gg. Type gg to see it.\nclass(gg)\n#> [1] \"gg\"     \"ggplot\"",
+    "comment": "**`gg <- ggplot(...) + ...`** stores the plot instead of drawing it (like any `x <- ...`). Type `gg` to see it, and add more later: `gg + labs(...)`. The rest of the lecture keeps building on `gg`.\n\n**To save as an image file:** `ggsave(\"myplot.png\", gg, width = 7, height = 5)`.",
+    "key": false
+   },
+   {
+    "id": "lec-13-labels",
+    "label": "Adding labels: title, subtitle, x, y",
+    "question": "",
+    "code": "gg <- gg +\n  labs(title = \"Highway Miles per Galon vs Engine Displacement\",\n       subtitle = \"From mpg dataset\",\n       x = \"Engine Displacement\",\n       y = \"Highway Miles per Galon\")\ngg",
+    "comment": "**`labs()` does every label**: `title`, `subtitle`, `caption`, `x`, `y`, and legend titles (`color`, `fill`). Base R uses `main`, `xlab`, `ylab` instead.\n\n![labels](files/plots/lec13-labels.png)\n\n*(The lecture spells it \"Galon\"; on your own plots, \"Gallon\".)*",
+    "key": true
+   },
+   {
+    "id": "lec-13-xlim",
+    "label": "Axis limits with xlim() / ylim(): deletes points outside",
+    "question": "",
+    "code": "gg +\n  xlim(c(0, 4)) +\n  ylim(c(0, 25))\n#> Warning: Removed 170 rows containing missing values (`geom_point()`).",
+    "comment": "**`xlim()` and `ylim()` remove the data outside the range before drawing**: \"Removed 170 rows\" means 170 of 234 cars are gone.\n\n![xlim](files/plots/lec13-xlim.png)\n\nThat matters for anything computed from the data (boxplots, histograms, smooth lines, means): they're recalculated **without** the removed points. Use `coord_cartesian()` (next chunk) when you only want to zoom.",
+    "key": false
+   },
+   {
+    "id": "lec-13-zoom",
+    "label": "Zooming in with coord_cartesian(): keeps all the data",
+    "question": "",
+    "code": "gg +\n  coord_cartesian(xlim = c(0, 4),\n                  ylim = c(0, 25))",
+    "comment": "**Same window, nothing deleted, no warning.** The points outside are just off-screen.\n\n![zoom](files/plots/lec13-zoom.png)\n\n**When a question says \"zoom in on the interval [a, b]\"** (HW 3 Part 15), use `coord_cartesian(xlim = c(a, b))`.",
+    "key": true
+   },
+   {
+    "id": "lec-13-breaks",
+    "label": "Axis tick marks: scale_x_continuous(breaks = ...)",
+    "question": "",
+    "code": "gg <- gg +\n  scale_x_continuous(breaks = seq(0, 8, 0.5)) +\n  scale_y_continuous(breaks = seq(15, 50, 10))\ngg",
+    "comment": "**`breaks = seq(0, 8, 0.5)`** puts a tick every 0.5 on x; `seq(15, 50, 10)` puts ticks at 15, 25, 35, 45 on y.\n\n![breaks](files/plots/lec13-breaks.png)\n\n**The `scale_x_continuous()` family also does:** `limits = c(0, 8)` (like `xlim`, deletes data), `labels = scales::comma` (100,000 instead of 1e+05), and `scale_x_log10()` for a log axis. For a category axis use `scale_x_discrete()`.",
+    "key": false
+   },
+   {
+    "id": "lec-13-themes",
+    "label": "Themes: gray, bw, light, classic, void (and minimal)",
+    "question": "",
+    "code": "gg + theme_gray()      # the default\ngg + theme_bw()        # white background, grid and border\ngg + theme_light()     # light gray lines\ngg + theme_classic()   # axes only, no grid\ngg + theme_void()      # nothing but the data\ngg + theme_minimal()   # (not in the lecture, used in HW 3) grid, no border",
+    "comment": "**A theme changes the look, not the data.**\n\n![six themes](files/plots/lec13-themes.png)\n\n**Order rule:** a complete theme (`theme_bw()`, `theme_minimal()`, …) resets every setting, so it goes **before** `theme(...)` tweaks. Put it after and it erases your custom angle, sizes and legend position.",
+    "key": false
+   },
+   {
+    "id": "lec-13-custom",
+    "label": "Customizing with theme(): text sizes, colors, angles, legend position",
+    "question": "",
+    "code": "gg <- gg +\n  theme_bw() +\n  theme(plot.title   = element_text(size = 15, face = \"bold\", color = \"red\"),\n        axis.text.x  = element_text(size = 10, angle = 45),\n        axis.text.y  = element_text(size = 10, angle = 45),\n        axis.title.x = element_text(size = 12, color = \"blue\"),\n        axis.title.y = element_text(size = 12, color = \"blue\"),\n        legend.position = \"top\")\ngg",
+    "comment": "**`theme(part = element_text(...))`** styles text: `size`, `face = \"bold\"`, `color`, `angle`. The common parts: `plot.title`, `axis.text.x` (tick labels), `axis.title.x` (axis name), `legend.position` (`\"top\"`, `\"bottom\"`, `\"none\"`).\n\n![custom theme](files/plots/lec13-custom.png)\n\n**Angled tick labels** look tidier with `hjust = 1` (right-aligns them to the tick): `element_text(angle = 60, hjust = 1)`. That's HW 3 Part 15's \"changing the angle of ticks to 60\".",
+    "key": true
+   },
+   {
+    "id": "lec-13-wrap",
+    "label": "Facets: facet_wrap(~ class)",
+    "question": "",
+    "code": "ggplot(data = mpg) +\n  geom_point(mapping = aes(x = displ, y = hwy)) +\n  facet_wrap(~ class)",
+    "comment": "**Facets = one small plot per group**, same axes, so you can compare groups side by side. `~ class` reads \"split by class\".\n\n![facet_wrap](files/plots/lec13-wrap.png)\n\n**Base R equivalent** is a loop over groups inside `par(mfrow = ...)`; facets do it in one line.",
+    "key": true
+   },
+   {
+    "id": "lec-13-wrap2",
+    "label": "facet_wrap(~ class, nrow = 2): control the layout",
+    "question": "",
+    "code": "ggplot(data = mpg) +\n  geom_point(mapping = aes(x = displ, y = hwy)) +\n  facet_wrap(~ class, nrow = 2)",
+    "comment": "`nrow =` / `ncol =` set the grid. 7 classes in 2 rows → 4 + 3 panels.\n\n![facet_wrap nrow 2](files/plots/lec13-wrap2.png)\n\n**Other options:** `scales = \"free_y\"` lets each panel have its own y axis (useful when groups have very different ranges).",
+    "key": false
+   },
+   {
+    "id": "lec-13-grid",
+    "label": "facet_grid(drv ~ class): rows by one variable, columns by another",
+    "question": "",
+    "code": "ggplot(data = mpg) +\n  geom_point(mapping = aes(x = displ, y = hwy)) +\n  facet_grid(drv ~ class)",
+    "comment": "**`rows ~ columns`**: rows are `drv` (4, f, r), columns are `class`. Empty panels mean that combination doesn't exist (no front-wheel-drive pickups).\n\n![facet_grid](files/plots/lec13-grid.png)\n\n`facet_grid(. ~ class)` = one row; `facet_grid(drv ~ .)` = one column.",
+    "key": false
+   },
+   {
+    "id": "lec-13-hist",
+    "label": "Beyond the lecture: histogram with a mean line (geom_histogram)",
+    "question": "",
+    "code": "ggplot(mpg, aes(x = hwy)) +\n  geom_histogram(binwidth = 2, fill = \"steelblue\", color = \"white\") +\n  geom_vline(xintercept = mean(mpg$hwy), color = \"red\", linetype = \"dashed\") +\n  labs(title = \"Highway mpg\", x = \"Highway mpg\", y = \"Number of cars\") +\n  theme_minimal()",
+    "comment": "The lecture only drew points, but HW 3 and the exam need other plot types. Same grammar, different `geom_`.\n\n![histogram](files/plots/lec13-hist.png)\n\n- **Only `x`** in `aes()`: ggplot counts for you.\n- `binwidth =` (or `bins =`) sets the bar width. `fill` = inside, `color` = outline.\n- `geom_vline(xintercept = ...)` for a vertical line; `geom_hline(yintercept = ...)` for horizontal.\n\n**Base R:** `hist(mpg$hwy); abline(v = mean(mpg$hwy))`. Full exam version: HW 3 Part 15.",
+    "key": true
+   },
+   {
+    "id": "lec-13-box",
+    "label": "Beyond the lecture: boxplot by group with mean dots",
+    "question": "",
+    "code": "ggplot(mpg, aes(x = cyl, y = hwy, fill = cyl)) +\n  geom_boxplot(alpha = 0.5) +\n  stat_summary(fun = mean, geom = \"point\", color = \"black\", size = 3) +\n  labs(title = \"Highway mpg by cylinders\", x = \"Cylinders\", y = \"Highway mpg\") +\n  theme_minimal() +\n  theme(legend.position = \"none\")",
+    "comment": "**x = the group (a factor), y = the number.** `fill = cyl` colors each box; `stat_summary(fun = mean, geom = \"point\")` adds the averages; `alpha` (fixed, outside aes) makes boxes transparent.\n\n![boxplot](files/plots/lec13-box.png)\n\n**Base R:** `boxplot(hwy ~ cyl, data = mpg)`. Full exam version: HW 3 Part 16.",
+    "key": true
+   },
+   {
+    "id": "lec-13-bar",
+    "label": "Beyond the lecture: bar charts with geom_bar()",
+    "question": "",
+    "code": "# counts of a category: geom_bar() counts for you\nggplot(mpg, aes(x = class)) +\n  geom_bar(fill = \"darkorange\") +\n  labs(title = \"Cars per class\", x = NULL, y = \"Count\")\n\n# side-by-side bars for two categories\nggplot(mpg, aes(x = class, fill = drv)) +\n  geom_bar(position = \"dodge\") +\n  labs(title = \"Cars per class and drive\", x = NULL, y = \"Count\", fill = \"Drive\")",
+    "comment": "**`geom_bar()` counts rows for you** (like `barplot(table(x))` in base R): give it only `x`.\n\n![barplot](files/plots/lec13-bar1.png)\n\n**Two categories:** `fill = drv` + `position = \"dodge\"` puts the bars side by side (default is stacked).\n\n![dodged barplot](files/plots/lec13-bar.png)\n\n**Base R equivalent:** `barplot(table(mpg$drv, mpg$class), beside = TRUE, legend = TRUE)`.",
+    "key": true
+   },
+   {
+    "id": "lec-13-smooth",
+    "label": "Beyond the lecture: scatterplot with a trend line (geom_smooth)",
+    "question": "",
+    "code": "ggplot(mpg, aes(x = displ, y = hwy)) +\n  geom_point(aes(color = cyl)) +\n  geom_smooth(method = \"lm\", se = FALSE, color = \"black\") +\n  labs(title = \"Bigger engines, lower mpg\", x = \"Engine displacement (L)\",\n       y = \"Highway mpg\", color = \"Cylinders\")\n#> `geom_smooth()` using formula = 'y ~ x'",
+    "comment": "**`geom_smooth(method = \"lm\", se = FALSE)`** adds a straight regression line (like `abline(lm(hwy ~ displ))`). Without `method = \"lm\"` you get a curvy loess line; `se = TRUE` adds a gray confidence band.\n\n![trend line](files/plots/lec13-smooth.png)\n\n**Why `aes(color = cyl)` is inside `geom_point()`:** aesthetics in `ggplot()` apply to every layer. If `color = cyl` were there, `geom_smooth` would draw **4** lines, one per group. Put it in the layer you want it to affect.",
+    "key": false
+   },
+   {
+    "id": "lec-13-summary_bar",
+    "label": "Beyond the lecture: bar of a summary (mean per group) with geom_col()",
+    "question": "",
+    "code": "# a bar for a computed number (e.g. a mean per group): summarise first, then geom_col()\nmpg %>%\n  group_by(class) %>%\n  summarise(avg_hwy = mean(hwy)) %>%\n  ggplot(aes(x = reorder(class, avg_hwy), y = avg_hwy)) +\n  geom_col(fill = \"seagreen\") +\n  coord_flip() +\n  labs(title = \"Average highway mpg by class\", x = NULL, y = \"Average highway mpg\")",
+    "comment": "**`geom_bar()` counts; `geom_col()` draws a number you already computed.** So: `group_by()` + `summarise()` first, then pipe into `ggplot()` (note `%>%` before ggplot, `+` after).\n\n![geom_col](files/plots/lec13-col.png)\n\n`reorder(class, avg_hwy)` sorts the bars by their value; `coord_flip()` makes them horizontal so long names fit.",
+    "key": false
+   },
+   {
+    "id": "lec-13-prac1",
+    "label": "Practice 1 · Scatterplot with color groups, zoom, breaks, theme",
+    "question": "Using diamonds, plot price against carat with points colored by cut (size 1, transparency 0.4). Zoom in on carats 0 to 3 without deleting data, put a y tick every 2,500, add a title, subtitle, axis and legend labels, use theme_bw with a bold title, tick labels at 45 degrees and the legend at the bottom.",
+    "code": "ggplot(data = diamonds) +\n  geom_point(mapping = aes(x = carat, y = price, color = cut),\n             size = 1, alpha = 0.4) +\n  coord_cartesian(xlim = c(0, 3)) +\n  scale_y_continuous(breaks = seq(0, 20000, 2500)) +\n  labs(title = \"Diamond price vs carat\", subtitle = \"Zoomed in on 0 to 3 carats\",\n       x = \"Carat\", y = \"Price (USD)\", color = \"Cut\") +\n  theme_bw() +\n  theme(plot.title = element_text(face = \"bold\"),\n        axis.text.x = element_text(angle = 45),\n        legend.position = \"bottom\") +\n  guides(color = guide_legend(override.aes = list(size = 3, alpha = 1)))",
+    "comment": "| Step in the question | Lecture tool |\n|---|---|\n| points colored by cut | `aes(color = cut)` |\n| size 1, transparency 0.4 | fixed, **outside** `aes()` |\n| zoom without deleting | `coord_cartesian(xlim = c(0, 3))` |\n| y tick every 2,500 | `scale_y_continuous(breaks = seq(0, 20000, 2500))` |\n| labels + legend title | `labs(..., color = \"Cut\")` |\n| theme_bw, bold title, 45°, legend bottom | `theme_bw()` **then** `theme(...)` |\n\n![practice 1](files/plots/lec13-prac1.png)\n\n**Extra:** `guides(color = guide_legend(override.aes = list(size = 3, alpha = 1)))` makes the legend dots solid and big even though the plotted points are faint.",
+    "key": false
+   },
+   {
+    "id": "lec-13-prac2",
+    "label": "Practice 2 · Manual colors, log axis and facets",
+    "question": "Using msleep, plot total sleep against body weight, colored by vore with colors you choose (missing vore in gray). Use a log scale for body weight, one panel per vore in a single row, labels, theme_light, and no legend.",
+    "code": "ggplot(data = msleep) +\n  geom_point(mapping = aes(x = bodywt, y = sleep_total, color = vore), size = 2) +\n  scale_x_log10(labels = scales::label_number(drop0trailing = TRUE)) +\n  scale_colour_manual(values = c(carni = \"red\", herbi = \"forestgreen\",\n                                 insecti = \"purple\", omni = \"orange\"),\n                      na.value = \"gray60\") +\n  facet_wrap(~ vore, nrow = 1) +\n  labs(title = \"Sleep vs body weight, by diet\", x = \"Body weight (kg, log scale)\",\n       y = \"Total sleep (hours)\", color = \"Diet\") +\n  theme_light() +\n  theme(legend.position = \"none\")",
+    "comment": "| Step | Tool |\n|---|---|\n| colors you choose | `scale_colour_manual(values = c(carni = \"red\", ...))` |\n| missing group in gray | `na.value = \"gray60\"` |\n| log scale | `scale_x_log10()` |\n| one panel per vore, one row | `facet_wrap(~ vore, nrow = 1)` |\n| no legend (the panel titles already say it) | `theme(legend.position = \"none\")` |\n\n![practice 2](files/plots/lec13-prac2.png)\n\n**Why log:** body weights run from 0.005 kg to 6,600 kg; on a normal axis almost every point would pile up at 0. Herbivores show the clearest pattern: heavier → less sleep.",
+    "key": false
+   },
+   {
+    "id": "lec-13-prac3",
+    "label": "Practice 3 · Boxplots with mean dots, facets and transparency (HW 3 style)",
+    "question": "Using mpg, keep only compact, midsize and suv cars. Draw boxplots of city mpg by class, separately for 1999 and 2008. Choose the box colors, add black dots at each group's average, make the boxes transparent (0.45), add title, subtitle and axis labels, and use the minimal theme with no legend.",
+    "code": "mpg %>%\n  filter(class %in% c(\"compact\", \"midsize\", \"suv\")) %>%\n  ggplot(aes(x = class, y = cty, fill = class)) +\n  geom_boxplot(alpha = 0.45) +\n  stat_summary(fun = mean, geom = \"point\", color = \"black\", size = 3) +\n  facet_wrap(~ year) +\n  scale_fill_manual(values = c(compact = \"skyblue\", midsize = \"gold\", suv = \"tomato\")) +\n  labs(title = \"City mpg by class, 1999 vs 2008\", subtitle = \"Black dots = averages\",\n       x = \"Class\", y = \"City mpg\") +\n  theme_minimal() +\n  theme(legend.position = \"none\")",
+    "comment": "| Step | Tool |\n|---|---|\n| keep 3 classes | `filter(class %in% c(...))` then `%>% ggplot()` |\n| boxplots by class | `aes(x = class, y = cty, fill = class)` + `geom_boxplot()` |\n| separately per year | `facet_wrap(~ year)` |\n| your colors | `scale_fill_manual()` (fill, not colour) |\n| mean dots | `stat_summary(fun = mean, geom = \"point\", color = \"black\")` |\n| transparent | `geom_boxplot(alpha = 0.45)` |\n\n![practice 3](files/plots/lec13-prac3.png)\n\nThis is HW 3 Part 16 plus a facet: a good one to redo from scratch without looking.",
+    "key": true
+   }
+  ]
  },
  "kit-01": {
   "type": "kit",

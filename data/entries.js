@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-19T15:30:00Z";
+window.ENTRIES_SAVED = "2026-10-19T15:50:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -3773,7 +3773,7 @@ window.ENTRIES = {
    "geom_bar"
   ],
   "pdfs": [],
-  "notes": "Your class file: `Lecture_12.R` (October 19). The course notes number it Lecture 13: https://ap4347.github.io/2102/lecture-13.html\n\n**The one rule:** columns go **inside** `aes()` (color/size/shape depend on the data), fixed values go **outside** (`color = \"steelblue\"`).\n\n| Want | Code |\n|---|---|\n| scatterplot | `geom_point(aes(x, y))` |\n| color by group | `aes(color = group)` + `scale_colour_manual()` |\n| labels | `labs(title, subtitle, x, y, color)` |\n| zoom (keeps data) | `coord_cartesian(xlim, ylim)` |\n| limits (deletes data) | `xlim()`, `ylim()` |\n| tick marks | `scale_x_continuous(breaks = seq(...))` |\n| look | `theme_bw()` etc., **then** `theme(...)` |\n| one panel per group | `facet_wrap(~ g)`, `facet_grid(r ~ c)` |\n\nEvery chunk was run in R; the plots are the real output. After the lecture code there are **beyond the lecture** chunks (histogram, boxplot, bar charts, trend line, bar of a mean) because HW 3 and the exam use those, and three **practice** problems that combine everything.",
+  "notes": "Your class file `Lecture_12.R` (October 19), merged with the course notes posted October 18 (they number it Lecture 13): https://ap4347.github.io/2102/lecture-13.html. The explanations from the notes (the three parts of every ggplot, the mpg variables, facets as formulas, all eight themes) are in the comments.\n\n**The one rule:** columns go **inside** `aes()` (color/size/shape depend on the data), fixed values go **outside** (`color = \"steelblue\"`).\n\n| Want | Code |\n|---|---|\n| scatterplot | `geom_point(aes(x, y))` |\n| color by group | `aes(color = group)` + `scale_colour_manual()` |\n| labels | `labs(title, subtitle, x, y, color)` |\n| zoom (keeps data) | `coord_cartesian(xlim, ylim)` |\n| limits (deletes data) | `xlim()`, `ylim()` |\n| tick marks | `scale_x_continuous(breaks = seq(...))` |\n| look | `theme_bw()` etc., **then** `theme(...)` |\n| one panel per group | `facet_wrap(~ g)`, `facet_grid(r ~ c)` |\n\nEvery chunk was run in R; the plots are the real output. After the lecture code there are **beyond the lecture** chunks (histogram, boxplot, bar charts, trend line, bar of a mean) because HW 3 and the exam use those, and three **practice** problems that combine everything.",
   "takeaways": [
    "Inside aes() = mapped to data (gets a legend); outside = one fixed value.",
    "Make number-coded groups (cyl, inmetro) factors before using them as color, fill or x categories.",
@@ -3785,14 +3785,14 @@ window.ENTRIES = {
    "facet_wrap(~ g, nrow = ...) for one panel per group; facet_grid(rows ~ cols) for two variables.",
    "geom_bar counts rows; geom_col draws a value you summarised first."
   ],
-  "updatedAt": "2026-10-19T15:30:00Z",
+  "updatedAt": "2026-10-19T15:50:00Z",
   "chunks": [
    {
     "id": "lec-13-setup",
     "label": "Setup: load tidyverse, make cyl a factor",
     "question": "",
     "code": "library(tidyverse)\n#> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──\n#> ✔ dplyr     1.1.4     ✔ readr     2.1.5\n#> ✔ forcats   1.0.0     ✔ stringr   1.5.1\n#> ✔ ggplot2   3.4.4     ✔ tibble    3.2.1\n#> ✔ lubridate 1.9.3     ✔ tidyr     1.3.1\n#> ✔ purrr     1.0.2     \n#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──\n#> ✖ dplyr::filter()  masks stats::filter()\n#> ✖ dplyr::lag()     masks stats::lag()\n#> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors\n\nmpg <- mpg\nmpg$cyl <- as.factor(mpg$cyl)   # 4, 5, 6, 8 become categories, not numbers\nprint(mpg, n = 3)\n#> # A tibble: 234 × 11\n#>   manufacturer model displ  year cyl   trans      drv     cty   hwy fl    class \n#>   <chr>        <chr> <dbl> <int> <fct> <chr>      <chr> <int> <int> <chr> <chr> \n#> 1 audi         a4      1.8  1999 4     auto(l5)   f        18    29 p     compa…\n#> 2 audi         a4      1.8  1999 4     manual(m5) f        21    29 p     compa…\n#> 3 audi         a4      2    2008 4     manual(m6) f        20    31 p     compa…\n#> # ℹ 231 more rows\nprint(levels(mpg$cyl))\n#> [1] \"4\" \"5\" \"6\" \"8\"",
-    "comment": "**Why `as.factor(cyl)`:** `cyl` is stored as a number (4, 5, 6, 8). Mapped to `color`, a number gives a **continuous** blue gradient legend; a factor gives **4 separate colors**, one per category. Rule: if a number is really a group label (cylinders, `inmetro` 0/1, year), make it a factor before plotting it as color, fill, shape, or an x-axis category.\n\n**`mpg <- mpg`** just copies the built-in data into your environment so you can change it.\n\n**The grammar of every ggplot:** `ggplot(data) + geom_xxx(aes(x, y, ...)) + labs() + scale_xxx() + coord_xxx() + theme_xxx() + theme() + facet_xxx()`. Each `+` adds one layer or setting.",
+    "comment": "**From the course notes:** R has several systems for graphs; `ggplot2` implements the *grammar of graphics*, so you learn one system and apply it everywhere. `mpg` is EPA fuel-economy data for models released every year 1999–2008. The variables used:\n\n| Variable | Meaning |\n|---|---|\n| `displ` | engine size, in liters |\n| `hwy` | highway fuel efficiency, miles per gallon |\n| `cyl` | number of cylinders |\n| `class` | type of car |\n| `drv` | drive train (f = front, r = rear, 4 = 4WD) |\n\n**Every ggplot has three key components:** (1) **data**, (2) **aesthetic mappings** from variables to visual properties (`aes()`), and (3) at least one **layer** that says how to draw each observation, usually a `geom_` function.\n\n**Why `as.factor(cyl)`:** `cyl` is stored as a number (4, 5, 6, 8). Mapped to `color`, a number gives a **continuous** blue gradient legend; a factor gives **4 separate colors**, one per category. Rule: if a number is really a group label (cylinders, `inmetro` 0/1, year), make it a factor before plotting it as color, fill, shape, or an x-axis category.\n\n**`mpg <- mpg`** just copies the built-in data into your environment so you can change it.\n\n**The grammar of every ggplot:** `ggplot(data) + geom_xxx(aes(x, y, ...)) + labs() + scale_xxx() + coord_xxx() + theme_xxx() + theme() + facet_xxx()`. Each `+` adds one layer or setting.",
     "key": false
    },
    {
@@ -3808,7 +3808,7 @@ window.ENTRIES = {
     "label": "Adding a layer of points: geom_point()",
     "question": "",
     "code": "ggplot(data = mpg) +\n  geom_point(mapping = aes(x = displ, y = hwy))",
-    "comment": "**`aes()` = which columns go where.** `x = displ` (engine size) and `y = hwy` (highway mpg). Columns go **inside** `aes()`, unquoted.\n\n![scatterplot](files/plots/lec13-points.png)\n\n**Reading it:** bigger engines → lower highway mpg. That's the scatterplot's job: the relationship between two numeric variables.\n\n**Base R equivalent:** `plot(mpg$displ, mpg$hwy)`.",
+    "comment": "**`aes()` = which columns go where.** `x = displ` (engine size) and `y = hwy` (highway mpg). Columns go **inside** `aes()`, unquoted.\n\n![scatterplot](files/plots/lec13-points.png)\n\n**Reading it:** bigger engines → lower highway mpg. That's the scatterplot's job: the relationship between two numeric variables.\n\n**Style tip from the notes:** put each `+` layer on its own line so you can scan exactly what's in the plot.\n\n**Base R equivalent:** `plot(mpg$displ, mpg$hwy)`.",
     "key": false
    },
    {
@@ -3816,7 +3816,7 @@ window.ENTRIES = {
     "label": "Static color, size and shape (outside aes)",
     "question": "",
     "code": "ggplot(data = mpg) +\n  geom_point(mapping = aes(x = displ, y = hwy),\n             color = \"steelblue\",\n             size = 3,\n             shape = 20)",
-    "comment": "**Outside `aes()` = one fixed value for every point.** `color = \"steelblue\"`, `size = 3`, `shape = 20` (a solid dot; shapes are numbered 0–25 like base R's `pch`).\n\n![blue points](files/plots/lec13-static.png)\n\n**The #1 ggplot mistake:** `aes(color = \"steelblue\")` puts the *text* \"steelblue\" in as a data value, so the points come out **salmon-red** with a legend saying \"steelblue\". Fixed colors go **outside** `aes()`.",
+    "comment": "**Outside `aes()` = one fixed value for every point.** `color = \"steelblue\"`, `size = 3`, `shape = 20` (a solid dot; shapes are numbered 0–25 like base R's `pch`). The course notes use `shape = 24`, an outlined triangle: for shapes 21–25, `color` is the **border** and `fill` is the inside.\n\n![blue points](files/plots/lec13-static.png)\n\n**The #1 ggplot mistake:** `aes(color = \"steelblue\")` puts the *text* \"steelblue\" in as a data value, so the points come out **salmon-red** with a legend saying \"steelblue\". Fixed colors go **outside** `aes()`.",
     "key": false
    },
    {
@@ -3901,10 +3901,10 @@ window.ENTRIES = {
    },
    {
     "id": "lec-13-themes",
-    "label": "Themes: gray, bw, light, classic, void (and minimal)",
+    "label": "Themes: gray, bw, classic, dark, light, linedraw, minimal, void",
     "question": "",
-    "code": "gg + theme_gray()      # the default\ngg + theme_bw()        # white background, grid and border\ngg + theme_light()     # light gray lines\ngg + theme_classic()   # axes only, no grid\ngg + theme_void()      # nothing but the data\ngg + theme_minimal()   # (not in the lecture, used in HW 3) grid, no border",
-    "comment": "**A theme changes the look, not the data.**\n\n![six themes](files/plots/lec13-themes.png)\n\n**Order rule:** a complete theme (`theme_bw()`, `theme_minimal()`, …) resets every setting, so it goes **before** `theme(...)` tweaks. Put it after and it erases your custom angle, sizes and legend position.",
+    "code": "gg + theme_gray()       # the default\ngg + theme_bw()         # white background, grid and border\ngg + theme_classic()    # axes only, no grid\ngg + theme_dark()       # dark gray panel\ngg + theme_light()      # light gray lines\ngg + theme_linedraw()   # black grid lines\ngg + theme_minimal()    # grid, no border (used in HW 3)\ngg + theme_void()       # nothing but the data",
+    "comment": "**A theme changes the non-data parts** (background, grid, border), not the data. The course notes show `theme_bw`, `theme_classic`, `theme_dark`, `theme_light`, `theme_linedraw`, `theme_minimal` and `theme_void`; your class file also had `theme_gray` (the default). All eight:\n\n![six themes](files/plots/lec13-themes.png)\n\n**Order rule:** a complete theme (`theme_bw()`, `theme_minimal()`, …) resets every setting, so it goes **before** `theme(...)` tweaks. Put it after and it erases your custom angle, sizes and legend position.",
     "key": false
    },
    {
@@ -3920,7 +3920,7 @@ window.ENTRIES = {
     "label": "Facets: facet_wrap(~ class)",
     "question": "",
     "code": "ggplot(data = mpg) +\n  geom_point(mapping = aes(x = displ, y = hwy)) +\n  facet_wrap(~ class)",
-    "comment": "**Facets = one small plot per group**, same axes, so you can compare groups side by side. `~ class` reads \"split by class\".\n\n![facet_wrap](files/plots/lec13-wrap.png)\n\n**Base R equivalent** is a loop over groups inside `par(mfrow = ...)`; facets do it in one line.",
+    "comment": "**From the notes:** facets are subplots that each show the subset of data for one level of a **categorical** variable. The first argument of `facet_wrap()` is a **formula**: `~` followed by the variable name (\"formula\" is an R data structure here, not an equation). The variable should be discrete; facetting by a continuous one gives a panel per unique value.\n\n**Facets = one small plot per group**, same axes, so you can compare groups side by side. `~ class` reads \"split by class\".\n\n![facet_wrap](files/plots/lec13-wrap.png)\n\n**Base R equivalent** is a loop over groups inside `par(mfrow = ...)`; facets do it in one line.",
     "key": true
    },
    {

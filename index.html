@@ -122,6 +122,30 @@ pre code{font-family:inherit;background:none}
 .hljs-comment{color:var(--hl-com);font-style:italic}
 .hljs-title,.hljs-title.function_,.hljs-function{color:var(--hl-fn)}
 .hljs-operator,.hljs-punctuation{color:var(--ink)}
+/* Answers / Practice tabs, alternatives, short comments */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
+.tab{border:0;background:transparent;font:inherit;font-family:var(--display);font-size:17px;font-weight:600;color:var(--muted);padding:8px 14px 9px;margin-bottom:-1px;border-bottom:3px solid transparent;cursor:pointer;border-radius:6px 6px 0 0}
+.tab:hover{color:var(--ink);background:var(--code-bg)}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
+.tab .count{font-family:var(--mono);font-size:12px;font-weight:400;margin-left:6px;color:var(--muted)}
+.tabpane{display:flex;flex-direction:column;gap:12px}
+.tabpane[hidden]{display:none}
+.pane-intro{margin:0;font-size:14px;color:var(--muted)}
+details.alt{margin:-6px 0 4px 18px;border-left:3px solid var(--accent-soft);padding-left:10px}
+details.alt>summary{cursor:pointer;list-style:none;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;padding:4px 0;font-size:14px;color:var(--accent);font-weight:600}
+details.alt>summary::-webkit-details-marker{display:none}
+details.alt>summary::before{content:"\25B8";display:inline-block;transition:transform .15s}
+details.alt[open]>summary::before{transform:rotate(90deg)}
+details.alt>summary .alt-t{font-weight:400;color:var(--muted)}
+details.alt>.chunk{margin-top:6px}
+.prose.is-collapsed .more-x{display:none}
+.more-btn{border:0;background:transparent;color:var(--accent);font:inherit;font-size:13px;font-weight:600;padding:2px 0;cursor:pointer}
+.more-btn:hover{text-decoration:underline}
+.group-btn{display:flex;align-items:center;gap:6px;width:100%;border:0;background:transparent;cursor:pointer;font:inherit;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;padding:10px 8px 6px;border-radius:6px;text-align:left}
+.group-btn:hover{color:var(--ink);background:var(--code-bg)}
+.group-btn .chev{display:inline-block;width:10px;transition:transform .15s}
+.group-btn[aria-expanded="true"] .chev{transform:rotate(90deg)}
+.group-btn .gcount{margin-left:auto;font-family:var(--mono);letter-spacing:0;text-transform:none;font-weight:400}
 /* Notes */
 .prose{max-width:68ch}
 .prose p{margin:0 0 10px}
@@ -299,6 +323,16 @@ let view='entry', curId=null, editing=false, isNew=false, draft=null;
 let draftUploads=[], draftRemovals=[];
 let filterType='all', filterExam='all', query='', guideExam='all', matchQuery='';
 let openPreviews=new Set(), confirmDelete=false, saveMsg='';
+let entryTab='ans', tabFor=null;
+const LS_GROUPS='s2102.groups';
+function groupState(){try{return JSON.parse(localStorage.getItem(LS_GROUPS)||'{}')||{}}catch(e){return {}}}
+function groupOpen(t){
+  if(query||filterType!=='all')return true;
+  const st=groupState(); if(st[t]!==undefined)return st[t];
+  return t==='hw' || !!(curId&&entries[curId]&&entries[curId].type===t);
+}
+const isPrac=c=>/-prac$/.test(c.id||'')||/(^|· )Practice\b/.test(c.label||'');
+const isAlt=c=>/-sol2$/.test(c.id||'')||/Solution #2/.test(c.label||'');
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -391,9 +425,12 @@ function renderList(){
   if(!loaded){list.innerHTML='';return;}
   const items=sorted().filter(matches);
   if(!items.length){list.innerHTML=`<li class="empty-line" style="padding:8px">${Object.keys(entries).length?'No entries match.':'No entries yet.'}</li>`;return;}
-  let html='',last='';
+  let html='',last='',shut=false;
+  const counts={}; items.forEach(e=>{counts[e.type]=(counts[e.type]||0)+1;});
   for(const e of items){
-    if(e.type!==last){html+=`<li class="group-h">${TYPES[e.type]?.label||'Other'}</li>`;last=e.type;}
+    if(e.type!==last){const op=groupOpen(e.type); shut=!op;
+      html+=`<li><button class="group-btn" type="button" data-group="${esc(e.type)}" aria-expanded="${op}"><span class="chev">\u25B8</span>${TYPES[e.type]?.label||'Other'}<span class="gcount">${counts[e.type]}</span></button></li>`;last=e.type;}
+    if(shut)continue;
     const meta=[];
     if((e.pdfs||[]).length)meta.push(`${e.pdfs.length} file${e.pdfs.length>1?'s':''}`);
     if((e.chunks||[]).length)meta.push(`${e.chunks.length} chunk${e.chunks.length>1?'s':''}`);
@@ -426,7 +463,7 @@ function renderMain(){
   if(view==='match'&&!editing){ renderMatches(); }
   if(view==='errors'&&!editing){ renderErrors(); }
   highlight(main);
-  if(!editing) main.scrollIntoView && null;
+  if(!editing) collapseNotes(main);
 }
 function emptyHTML(){
   return `<div class="empty"><h3>Start your study guide</h3>
@@ -455,10 +492,7 @@ function entryHTML(id,e){
     ${pdfs.length?`<div class="files">${pdfs.map(fileHTML).join('')}</div>`:`<p class="empty-line">No files yet. Use Edit to attach the assignment PDF, your solutions, or screenshots of output.</p>`}
   </section>
 
-  <section class="block" ${(e.type==='prac'||e.type==='kit'||e.type==='core')&&!chunks.length?'hidden':''}>
-    <div class="block-h"><h3>Code<span class="count">${chunks.length} chunk${chunks.length===1?'':'s'}</span></h3></div>
-    ${chunks.length?chunks.map((c,i)=>chunkHTML(c,i)).join(''):`<p class="empty-line">No code yet. Use Edit to paste chunks or import an .R / .Rmd file.</p>`}
-  </section>
+  ${codeSectionHTML(e,chunks)}
 
   <section class="block">
     <div class="block-h"><h3>Notes</h3></div>
@@ -487,13 +521,68 @@ function fileHTML(f){
     <a href="${url}" target="_blank" rel="noopener">Open in new tab</a>
   </div>${open?`<div class="preview">${isImg?`<img src="${url}" alt="${esc(f.name)}">`:`<iframe src="${url}" title="${esc(f.name)}"></iframe>`}</div>`:''}</div>`;
 }
-function chunkHTML(c,i){
+function altTitle(c){const m=(c.label||'').match(/Solution #2\s*\((.*)\)\s*$/);return m?m[1]:'';}
+function answersHTML(list){
+  let html='', hasMain=false;
+  for(const [c,i] of list){
+    if(isAlt(c)&&hasMain){
+      const t=altTitle(c);
+      html+=`<details class="alt"><summary><span>Alternative answer</span>${t?`<span class="alt-t">${esc(t)}</span>`:''}</summary>${chunkHTML(c,i,{noQ:true,label:(c.label||'').replace(/\s*·?\s*Solution #2\s*\(.*\)\s*$/,' · Alternative')})}</details>`;
+    } else { html+=chunkHTML(c,i); hasMain=true; }
+  }
+  return html;
+}
+function codeSectionHTML(e,chunks){
+  const all=chunks.map((c,i)=>[c,i]);
+  const prac=all.filter(([c])=>isPrac(c)), ans=all.filter(([c])=>!isPrac(c));
+  if(!prac.length||!ans.length){
+    const hide=(e.type==='prac'||e.type==='kit'||e.type==='core')&&!chunks.length;
+    return `<section class="block" ${hide?'hidden':''}>
+    <div class="block-h"><h3>Code<span class="count">${chunks.length} chunk${chunks.length===1?'':'s'}</span></h3></div>
+    ${chunks.length?answersHTML(all):`<p class="empty-line">No code yet. Use Edit to paste chunks or import an .R / .Rmd file.</p>`}
+  </section>`;
+  }
+  const tab=tabFor===curId?entryTab:'ans';
+  const first=e.type==='lec'?'Lecture code':e.type==='hw'?'Answers':'Code';
+  const nMain=ans.filter(([c])=>!isAlt(c)).length;
+  return `<section class="block" id="codeTabs">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" type="button" data-act="tab" data-tab="ans" aria-selected="${tab==='ans'}">${first}<span class="count">${nMain}</span></button>
+      <button class="tab" role="tab" type="button" data-act="tab" data-tab="prac" aria-selected="${tab==='prac'}">Practice problems<span class="count">${prac.length}</span></button>
+    </div>
+    <div class="tabpane" data-pane="ans" ${tab==='ans'?'':'hidden'}>
+      ${ans.some(([c])=>isAlt(c))?'<p class="pane-intro">Each answer has its walkthrough beside it. Click <b>Alternative answer</b> under a part to see another way that also works.</p>':''}
+      ${answersHTML(ans)}</div>
+    <div class="tabpane" data-pane="prac" ${tab==='prac'?'':'hidden'}>
+      <p class="pane-intro">${e.type==='hw'?'New problems built the same way as each homework part, with different data, so you can practice the same steps. Each one says which part it matches.':'Practice problems that use the same tools on new data.'}</p>
+      ${prac.map(([c,i])=>chunkHTML(c,i,{label:(c.label||'').replace(/Practice: a problem just like it\s*\((.*)\)\s*$/,'$1')})).join('')}</div>
+  </section>`;
+}
+function collapseNotes(root){
+  root.querySelectorAll('.chunk-note .prose').forEach(p=>{
+    if(p.dataset.cz)return; p.dataset.cz='1';
+    const kids=[...p.children]; if(kids.length<3)return;
+    const hasImg=el=>el.tagName==='IMG'||!!el.querySelector('img');
+    const isLabel=el=>{const st=el.querySelector('strong');return el.tagName==='P'&&st&&el.textContent.trim()===st.textContent.trim();};
+    const inPrac=!!p.closest('[data-pane="prac"]');
+    let sum=(inPrac&&kids.find(el=>el.tagName==='TABLE'))||kids.find(el=>el.tagName==='P'&&!isLabel(el)&&!hasImg(el)&&el.textContent.trim().length>=40)||kids.find(el=>!hasImg(el));
+    const hide=kids.filter(el=>el!==sum&&!hasImg(el));
+    if(!hide.length)return;
+    hide.forEach(el=>el.classList.add('more-x'));
+    p.classList.add('is-collapsed');
+    const btn=document.createElement('button'); btn.type='button'; btn.className='more-btn'; btn.dataset.act='more';
+    btn.textContent='Show full walkthrough \u25BE'; p.after(btn);
+  });
+}
+function chunkHTML(c,i,opt){
+  opt=opt||{};
+  const lbl=opt.label||c.label||('Chunk '+(i+1));
   return `<div class="chunk ${c.key?'key':''}" id="ch-${i}">
     <div class="chunk-code">
-      <div class="chunk-bar"><span class="lbl">${esc(c.label||('Chunk '+(i+1)))}</span>${c.key?'<span class="star">Exam</span>':''}<button class="btn sm ghost" type="button" data-act="copy" data-i="${i}">Copy</button></div>
+      <div class="chunk-bar"><span class="lbl" title="${esc(c.label||'')}">${esc(lbl)}</span>${c.key?'<span class="star">Exam</span>':''}<button class="btn sm ghost" type="button" data-act="copy" data-i="${i}">Copy</button></div>
       <pre><code class="language-r">${esc(c.code||'')}</code></pre>
     </div>
-    <div class="chunk-side">${c.question?`<div class="chunk-q"><span class="label">Question</span>${esc(c.question)}</div>`:''}
+    <div class="chunk-side">${c.question&&!opt.noQ?`<div class="chunk-q"><span class="label">Question</span>${esc(c.question)}</div>`:''}
     <div class="chunk-note ${c.comment?'':'none'}"><span class="label">My comment</span>${c.comment?`<div class="prose">${md(c.comment)}</div>`:'No comment on this chunk.'}</div></div>
   </div>`;
 }
@@ -1036,6 +1125,7 @@ document.addEventListener('click',async ev=>{
   if(b.dataset.type){filterType=b.dataset.type;renderSide();return;}
   if(b.dataset.exam){filterExam=b.dataset.exam;renderSide();return;}
   if(b.dataset.gexam){guideExam=b.dataset.gexam;renderMain();return;}
+  if(b.dataset.group){const st=groupState(); st[b.dataset.group]=!groupOpen(b.dataset.group); store(LS_GROUPS,JSON.stringify(st)); renderList(); return;}
   if(b.dataset.id&&!b.dataset.act){
     if(editing)return;
     curId=b.dataset.id; view='entry'; confirmDelete=false; store('s2102.cur',curId); renderSide(); renderMain(); window.scrollTo(0,0);
@@ -1050,10 +1140,23 @@ document.addEventListener('click',async ev=>{
   if(act==='q-missed'){quizMark('missed');return;}
   if(act==='q-skip'){quizPick();renderMain();return;}
   if(act==='q-reset'){quizSave({got:[],missed:[]});quizPick();renderMain();return;}
+  if(act==='tab'){
+    entryTab=b.dataset.tab; tabFor=curId;
+    document.querySelectorAll('#codeTabs .tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.tab===entryTab));
+    document.querySelectorAll('#codeTabs .tabpane').forEach(p=>{p.hidden=p.dataset.pane!==entryTab;});
+    const ct=$('#codeTabs'); if(ct&&ct.getBoundingClientRect().top<0) ct.scrollIntoView({block:'start'});
+    return;
+  }
+  if(act==='more'){
+    const p=b.previousElementSibling; const c=p.classList.toggle('is-collapsed');
+    b.textContent=c?'Show full walkthrough \u25BE':'Show less \u25B4'; return;
+  }
   if(act==='goto'){
-    curId=b.dataset.eid; view='entry'; store('s2102.cur',curId); renderSide(); renderMain();
+    curId=b.dataset.eid; view='entry'; store('s2102.cur',curId);
+    const tc=(entries[curId]?.chunks||[])[+b.dataset.i]; entryTab=tc&&isPrac(tc)?'prac':'ans'; tabFor=curId;
+    renderSide(); renderMain();
     const el=document.getElementById('ch-'+b.dataset.i);
-    if(el){ el.scrollIntoView({block:'center'}); el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'),2200); }
+    if(el){ const d=el.closest('details'); if(d)d.open=true; el.scrollIntoView({block:'center'}); el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'),2200); }
     return;
   }
   if(act==='new')startEdit(null);

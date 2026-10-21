@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-21T13:40:00Z";
+window.ENTRIES_SAVED = "2026-10-21T14:30:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -4005,6 +4005,449 @@ window.ENTRIES = {
    }
   ]
  },
+ "lec-14": {
+  "type": "lec",
+  "num": "14",
+  "title": "ggplot2 continued: bar plots, boxplots, histograms and arranging plots",
+  "date": "2026-10-21",
+  "exams": [],
+  "topics": [
+   "ggplot2",
+   "geom_bar",
+   "geom_text",
+   "position stack/fill/dodge",
+   "geom_boxplot",
+   "stat_summary",
+   "geom_histogram",
+   "geom_density",
+   "patchwork"
+  ],
+  "pdfs": [],
+  "notes": "Your class file `Lecture_13.R` (October 21), merged with the course notes posted October 20, which number it **Lecture 14**: https://ap4347.github.io/2102/lecture-14.html\n\nUses the **Lung Capacity** data (`lung_capacity.txt` on Courseworks). The plots under each chunk are the instructor's, from the course notes; a few of your class chunks are small variations without their own picture, and the comment says what changes. The **Practice problems** tab runs on the built-in `mpg` data, so you can try everything without the file.\n\n| Want | Code |\n|---|---|\n| counts on bars | `geom_text(aes(label = ..count..), stat = \"count\", vjust = -0.5)` |\n| pick / order / rename bars | `scale_x_discrete(limits = , labels = )` |\n| second category in bars | `aes(fill = Sex)` + `position = \"stack\"` / `\"fill\"` / `position_dodge()` |\n| reference line | `geom_hline(yintercept = )`, `geom_vline(xintercept = )` |\n| horizontal bars | `coord_flip()` |\n| boxplot extras | `notch = TRUE`, `outlier.colour =`, `geom_dotplot()`, `stat_summary(fun = \"mean\")` |\n| histogram extras | `binwidth`, `alpha`, `linetype`, `y = ..density..` + `geom_density()` |\n| mean line per group | summarise means, then `geom_vline(data = summary, aes(xintercept = ..., color = group))` |\n| several plots in one figure | patchwork: `g1 + g2`, `g1 | g2`, `g1 / g2`, `plot_layout(ncol = )` |",
+  "takeaways": [
+   "geom_bar() counts for you: only x in aes().",
+   "fill = inside color, color = outline; fixed values outside aes(), data-driven ones inside.",
+   "Count labels: geom_text(aes(label = ..count..), stat = \"count\"); vjust < 0 above the bar, > 0 inside.",
+   "scale_x_discrete(limits = ...) selects and orders bars; labels = renames them.",
+   "position: stack (counts), \"fill\" (proportions), position_dodge() (side by side).",
+   "hjust = 0.5 centers a title; theme_xxx() before theme().",
+   "stat_summary(fun = \"mean\", geom = \"point\") adds mean dots to boxplots.",
+   "Histograms by group stack by default; position = \"identity\" overlaps them.",
+   "Mean line per group: summarise first, then geom_vline(data = that_table, ...).",
+   "patchwork: | side by side, / stacked, plot_layout() for the grid."
+  ],
+  "updatedAt": "2026-10-21T14:30:00Z",
+  "chunks": [
+   {
+    "id": "lec-14-setup",
+    "label": "Setup: read the Lung Capacity data with read.table()",
+    "question": "",
+    "code": "library(tidyverse)\n\ndataset1 <- read.table(file = \"lung_capacity.txt\",\n                       header = T,\n                       sep = \"\",\n                       stringsAsFactors = TRUE)",
+    "comment": "**From the notes:** this lecture continues `ggplot2` with the **Lung Capacity** data from Courseworks (columns used: `Status`, `Sex`, `Age`, `LungCap`).\n\n**Reading the arguments:**\n- `header = T`: the first line holds the column names.\n- `sep = \"\"`: columns are separated by any amount of white space (a .txt file, not a .csv).\n- `stringsAsFactors = TRUE`: text columns (`Status`, `Sex`) become **factors**, so ggplot treats them as categories with levels HEALTHY, STAGE_1, … and FEMALE, MALE.\n\n**Watch out:** the file must be in your working folder, or give the full path in quotes (`\"~/Downloads/lung_capacity.txt\"`). The tidyverse version would be `read_table(\"lung_capacity.txt\")`, but then text columns stay text; that still works for these plots.\n\nThe plots on this page are the instructor's, from the course notes. To reproduce them, download `lung_capacity.txt` from Courseworks and run each chunk.",
+    "key": false
+   },
+   {
+    "id": "lec-14-bar1",
+    "label": "Bar plots · a simple bar plot: geom_bar(aes(x = Status))",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_bar(mapping = aes(x = Status))",
+    "comment": "**From the notes:** a bar plot shows the **count of cases in each category** of a categorical variable. Like a histogram, but with a discrete x-axis. `Status` has 4 levels.\n\n**Only `x` goes in `aes()`.** `geom_bar()` counts the rows in each category for you (base R: `barplot(table(dataset1$Status))`).\n\n![plot](files/plots/lec14-02.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-bar2",
+    "label": "Bar plots · bar color and width: fill =, width =",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_bar(mapping = aes(x = Status),\n           fill = \"orange\",\n           width = 0.9)",
+    "comment": "`fill` = inside color of the bars, `width` = bar width (1 = bars touch, default 0.9). Both are **fixed values**, so they go **outside** `aes()`.\n\n![plot](files/plots/lec14-03.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-bar3",
+    "label": "Bar plots · width above 1 makes bars overlap",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_bar(mapping = aes(x = Status),\n           fill = \"pink\",\n           width = 1.1)",
+    "comment": "With `width = 1.1` the bars are wider than the space for each category, so they **overlap**. R warns: *\"`position_stack()` requires non-overlapping x intervals.\"* Keep `width` at 1 or less.\n\n![plot](files/plots/lec14-04.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-bar4",
+    "label": "Bar plots · outline color: color =",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_bar(mapping = aes(x = Status),\n           fill = \"pink\",\n           color = \"blue\")",
+    "comment": "**`fill` = inside, `color` = outline.** Same rule for histograms and boxplots.\n\n![plot](files/plots/lec14-05.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-bar5",
+    "label": "Bar plots · a different color per bar: aes(fill = Status)",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_bar(mapping = aes(x = Status, fill = Status),\n           width = 0.9)",
+    "comment": "**From the notes:** to let the categories control the colors, put `fill` **inside** `aes()`. ggplot picks one color per level and adds a legend (set your own colors with `scale_fill_manual()`).\n\n![plot](files/plots/lec14-06.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-bar6",
+    "label": "Bar plots · show only some bars: scale_x_discrete(limits = ...)",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_bar(mapping = aes(x = Status, fill = Status),\n           width = 0.9) +\n  scale_x_discrete(limits = c(\"HEALTHY\", \"STAGE_3\"))",
+    "comment": "**From the notes:** `limits` lists the categories to **show**. Everything else is dropped, with a warning like *\"Removed 269 rows containing non-finite outside the scale range\"* (the 269 STAGE_1 and STAGE_2 people).\n\nBase-R equivalent: subset first, e.g. `filter(Status %in% c(\"HEALTHY\", \"STAGE_3\"))` before plotting.\n\n![plot](files/plots/lec14-07.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-bar7",
+    "label": "Bar plots · change the order of bars: limits in a new order",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_bar(mapping = aes(x = Status, fill = Status),\n           width = 0.9) +\n  scale_x_discrete(limits = c(\"STAGE_1\", \"STAGE_2\", \"STAGE_3\", \"HEALTHY\"))",
+    "comment": "Same function, all four categories, **in the order you want them**. Default order is the factor levels (alphabetical).\n\n**Other ways:** reorder the factor itself, `mutate(Status = factor(Status, levels = c(\"STAGE_1\", ...)))`, which also changes tables and legends; or sort bars by height with `fct_infreq(Status)`.\n\n![plot](files/plots/lec14-08.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-bar8",
+    "label": "Bar plots · rename the bars: scale_x_discrete(labels = ...)",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_bar(mapping = aes(x = Status, fill = Status),\n           width = 0.9) +\n  scale_x_discrete(limits = c(\"STAGE_1\", \"STAGE_2\", \"STAGE_3\", \"HEALTHY\"),\n                   labels = c(\"STAGE_1\" = \"STAGE 1\", \"STAGE_2\" = \"STAGE 2\",\n                              \"STAGE_3\" = \"STAGE 3\", \"HEALTHY\" = \"HEALTHY\"))",
+    "comment": "**`labels = c(old = \"new\")`** changes only the text under each bar; the data stays the same. Here it swaps the underscores for spaces. The plot looks like the one above with nicer tick labels.\n\nThe legend still shows the old names, because it belongs to the `fill` scale: rename it there with `scale_fill_discrete(labels = ...)` or hide it with `theme(legend.position = \"none\")`.",
+    "key": false
+   },
+   {
+    "id": "lec-14-bar9",
+    "label": "Bar plots · count labels on top of bars: geom_text(stat = \"count\")",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_bar(mapping = aes(x = Status),\n           fill = \"orange\") +\n  geom_text(aes(x = Status, label = ..count..),\n            stat = \"count\",\n            vjust = -0.5,\n            colour = \"black\")",
+    "comment": "**From the notes:** reading exact values off a bar plot is guesswork, so print the count on each bar. Keep `label = ..count..` and `stat = \"count\"` exactly as shown: they tell `geom_text()` to count rows the same way `geom_bar()` does.\n\n**`vjust` moves the text up/down:** negative (`-0.5`) = just **above** the bar.\n\n**Newer ggplot spelling:** `label = after_stat(count)`. `..count..` still works but gives a *\"dot-dot notation was deprecated\"* warning.\n\n![plot](files/plots/lec14-09.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": true
+   },
+   {
+    "id": "lec-14-bar10",
+    "label": "Bar plots · count labels inside the bars: vjust = 1.5, size = 6",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_bar(mapping = aes(x = Status),\n           fill = \"orange\") +\n  geom_text(aes(x = Status, label = ..count..),\n            stat = \"count\",\n            vjust = 1.5,\n            size = 6,\n            colour = \"black\")",
+    "comment": "**Positive `vjust` (1.5) = just inside the top of the bar.** `size` = text size.\n\n![plot](files/plots/lec14-10.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-bar11",
+    "label": "Bar plots · title, subtitle, axis labels, caption, centered title",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_bar(mapping = aes(x = Status)) +\n  labs(title = \"Disease Status\",\n       subtitle = \"From Lung Capacity Dataset\",\n       x = \"STATUS\",\n       y = \"COUNT\",\n       caption = \"STAT2102: Lecture 13\") +\n  theme_classic() +\n  theme(plot.title    = element_text(hjust = 0.5),\n        plot.subtitle = element_text(hjust = 1),\n        plot.caption  = element_text(hjust = 0.5))",
+    "comment": "**`caption =`** adds small text in the bottom corner.\n\n**`hjust` = horizontal position:** 0 = left, 0.5 = centered, 1 = right. `plot.title = element_text(hjust = 0.5)` is how you **center a title** in ggplot (it's left-aligned by default). `vjust` does the same vertically.\n\nRemember the order: `theme_classic()` **before** `theme(...)`.\n\n![plot](files/plots/lec14-11.png)\n\n*(The notes' version adds `fill = Status`.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-bar12",
+    "label": "Bar plots · stacked bars for a second variable: aes(fill = Sex)",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_bar(mapping = aes(x = Status, fill = Sex))",
+    "comment": "**From the notes:** stacked and grouped bar plots show a **second categorical variable** inside the bars. `fill = Sex` splits each Status bar into FEMALE and MALE segments, **stacked** on top of each other by default.\n\n![plot](files/plots/lec14-12.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-bar13",
+    "label": "Bar plots · choose the segment colors: scale_fill_manual()",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_bar(mapping = aes(x = Status, fill = Sex)) +\n  scale_fill_manual(values = c(FEMALE = \"tomato\",\n                               MALE = \"steelblue\"))",
+    "comment": "Names in `values = c(...)` must match the factor levels **exactly** (FEMALE, MALE in capitals here). It's `scale_fill_manual` because the colors come from `fill`.\n\n![plot](files/plots/lec14-13.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-bar14",
+    "label": "Bar plots · bars of the same height (proportions): position = \"fill\"",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_bar(mapping = aes(x = Status, fill = Sex),\n           position = \"fill\")",
+    "comment": "**From the notes:** making every bar the same height lets you compare the **proportions** of segments instead of their counts. The y-axis now runs from 0 to 1 (rename it with `labs(y = \"Proportion\")`).\n\n**When to use:** \"compare the share of males in each status group\". The three `position` options:\n\n| `position =` | Bars |\n|---|---|\n| `\"stack\"` (default) | on top of each other: counts |\n| `\"fill\"` | stacked to 100%: proportions |\n| `\"dodge\"` / `position_dodge()` | side by side |\n\n![plot](files/plots/lec14-15.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": true
+   },
+   {
+    "id": "lec-14-bar15",
+    "label": "Bar plots · count labels on stacked segments: position_stack(vjust = 0.5)",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_bar(mapping = aes(x = Status, fill = Sex)) +\n  scale_fill_manual(values = c(FEMALE = \"tomato\",\n                               MALE = \"steelblue\")) +\n  geom_text(aes(x = Status, fill = Sex, label = ..count..),\n            stat = \"count\",\n            position = position_stack(vjust = 0.5),\n            size = 4,\n            colour = \"black\")",
+    "comment": "**`position_stack(vjust = 0.5)`** stacks the labels the same way as the bars and puts each one in the **middle** of its segment.\n\n`fill = Sex` inside `geom_text()`'s `aes()` tells it to count per Sex too. R warns *\"Ignoring unknown aesthetics: fill\"*, but still uses it for grouping. `group = Sex` does the same without the warning.\n\n![plot](files/plots/lec14-14.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-bar16",
+    "label": "Bar plots · grouped (side-by-side) bars: position_dodge()",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_bar(mapping = aes(x = Status, fill = Sex),\n           position = position_dodge()) +\n  scale_fill_manual(values = c(FEMALE = \"tomato\",\n                               MALE = \"steelblue\"))",
+    "comment": "**From the notes:** grouped bar plots put the bars for the second variable **next to each other** instead of on top. `position = \"dodge\"` works too.\n\nBase R: `barplot(table(Sex, Status), beside = TRUE, legend = TRUE)` (HW 2 Part 6).\n\n![plot](files/plots/lec14-16.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": true
+   },
+   {
+    "id": "lec-14-bar17",
+    "label": "Bar plots · count labels on grouped bars: position_dodge(0.9)",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_bar(mapping = aes(x = Status, fill = Sex),\n           position = position_dodge()) +\n  scale_fill_manual(values = c(FEMALE = \"tomato\",\n                               MALE = \"steelblue\")) +\n  geom_text(aes(x = Status, fill = Sex, label = ..count..),\n            stat = \"count\",\n            position = position_dodge(0.9),\n            vjust = 1.5,\n            size = 4,\n            colour = \"black\")",
+    "comment": "The labels must be dodged **by the same amount as the bars**: bar width is 0.9 by default, so `position_dodge(0.9)` puts each label over its own bar. With a plain `position_dodge()` the labels can land between bars.\n\n![plot](files/plots/lec14-17.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-bar18",
+    "label": "Bar plots · horizontal reference line: geom_hline(yintercept = 100)",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_bar(mapping = aes(x = Status, fill = Sex),\n           position = position_dodge()) +\n  scale_fill_manual(values = c(FEMALE = \"tomato\",\n                               MALE = \"steelblue\")) +\n  geom_hline(yintercept = 100,\n             linetype = \"dashed\",\n             size = 1)",
+    "comment": "**From the notes:** a horizontal line makes it easy to see which groups are above or below a value (here: more than 100 people). `geom_vline(xintercept = ...)` is the vertical version (histograms, HW 3 Part 15).\n\n**Newer spelling:** `linewidth = 1` instead of `size = 1` for lines (the notes show a deprecation warning).\n\n![plot](files/plots/lec14-18.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-bar19",
+    "label": "Bar plots · horizontal bars: coord_flip()",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_bar(mapping = aes(x = Status, fill = Sex),\n           position = position_dodge()) +\n  scale_fill_manual(values = c(FEMALE = \"tomato\",\n                               MALE = \"steelblue\")) +\n  coord_flip()",
+    "comment": "`coord_flip()` swaps the x and y axes. Useful when category names are long. (Base R: `barplot(..., horiz = TRUE)`.)\n\n![plot](files/plots/lec14-19.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-box1",
+    "label": "Boxplots · one boxplot: geom_boxplot(aes(y = Age))",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_boxplot(aes(y = Age))",
+    "comment": "**From the notes:** a boxplot shows the **5-number summary** (min, Q1, median, Q3, max) plus outliers. With only `y`, you get one box for the whole variable.\n\n![plot](files/plots/lec14-20.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-box2",
+    "label": "Boxplots · one box per group: aes(x = Status, y = Age)",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_boxplot(aes(x = Status, y = Age))",
+    "comment": "**x = the group (categorical), y = the number.** One box per Status level, so you can compare the age distributions. Base R: `boxplot(Age ~ Status, data = dataset1)`.\n\n![plot](files/plots/lec14-22.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-box3",
+    "label": "Boxplots · color each box: aes(fill = Status)",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_boxplot(aes(x = Status, y = Age, fill = Status))",
+    "comment": "Same idea as bar plots: `fill` inside `aes()` = one color per group, with a legend.\n\n![plot](files/plots/lec14-23.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-box4",
+    "label": "Boxplots · outline color: color = \"blue\"",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_boxplot(aes(x = Status, y = Age, fill = Status),\n               color = \"blue\")",
+    "comment": "`color` outside `aes()` = one outline color (box, whiskers, median line) for every box. The plot looks like the one above with blue lines.",
+    "key": false
+   },
+   {
+    "id": "lec-14-box5",
+    "label": "Boxplots · notches: notch = TRUE",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_boxplot(aes(x = Status, y = Age, fill = Status),\n               notch = TRUE)",
+    "comment": "A **notch** is a pinch around the median. Rough rule: if two boxes' notches **don't overlap**, their medians are probably different. If a notch extends past the box, R warns *\"notch went outside hinges\"* (common with small groups).\n\n![plot](files/plots/lec14-21.png)\n\n*(The notes show the notch on a single orange box: `geom_boxplot(aes(y = Age), fill = \"orange\", notch = TRUE)`.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-box6",
+    "label": "Boxplots · boxes for two variables: aes(fill = Sex)",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_boxplot(aes(x = Status, y = Age, fill = Sex))",
+    "comment": "**From the notes:** multiple boxplots for each Status level, split by another categorical variable. `fill = Sex` puts a FEMALE box and a MALE box side by side in each group, like a grouped bar plot.\n\n![plot](files/plots/lec14-24.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-box7",
+    "label": "Boxplots · customize outliers: outlier.colour / shape / size",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_boxplot(aes(x = Status, y = Age, fill = Sex),\n               outlier.colour = \"red\",\n               outlier.shape = 8,\n               outlier.size = 4)",
+    "comment": "**From the notes:** outliers are observations that stand out from the rest. These arguments make them easy to spot: red, shape 8 (a star), bigger. `outlier.alpha = 0.45` makes them transparent (HW 3 Part 16 Solution #2); `outlier.shape = NA` hides them.\n\n![plot](files/plots/lec14-25.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-box8",
+    "label": "Boxplots · show the data points: geom_dotplot()",
+    "question": "",
+    "code": "ggplot(data = dataset1, aes(x = Status, y = Age)) +\n  geom_boxplot() +\n  geom_dotplot(binaxis = \"y\",\n               stackdir = \"center\",\n               dotsize = 0.3)",
+    "comment": "**From the notes:** boxplots only show the summary, not the observations. `geom_dotplot()` adds them: `binaxis = \"y\"` stacks along the y values, `stackdir = \"center\"` spreads dots evenly left and right, `dotsize` shrinks them.\n\n**`aes()` is in `ggplot()` here**, so both layers share x and y. Put shared mappings there; put layer-only ones in the layer. `geom_jitter(width = 0.2)` is a common alternative.\n\n![plot](files/plots/lec14-26.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-box9",
+    "label": "Boxplots · mark the mean: stat_summary(fun = \"mean\", geom = \"point\")",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_boxplot(aes(x = Status, y = Age, fill = Status)) +\n  stat_summary(aes(x = Status, y = Age, fill = Status),\n               fun = \"mean\",\n               geom = \"point\",\n               color = \"black\")",
+    "comment": "**From the notes:** the thick line is the **median**. `stat_summary()` computes any function per group and draws it, here the mean as a point. Add `size = 3` for bigger dots. This is exactly HW 3 Part 16 (\"add black dots that represent the average\").\n\n![plot](files/plots/lec14-27.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": true
+   },
+   {
+    "id": "lec-14-box10",
+    "label": "Boxplots · marginal plots on a scatterplot: ggMarginal() (ggExtra)",
+    "question": "",
+    "code": "library(ggExtra)      # install.packages(\"ggExtra\") the first time\n\ngg <- ggplot(data = dataset1) +\n  geom_point(mapping = aes(x = Age, y = LungCap, color = Sex))\n\nggMarginal(gg, type = \"histogram\")",
+    "comment": "**From the notes:** to show a scatterplot **and** each variable's distribution on its edges, use `ggMarginal()` from the **ggExtra** package (not part of ggplot2). Save the scatterplot as an object first, then pass it in.\n\n`type =` picks the edge plot: `\"histogram\"` (your class code), `\"boxplot\"` (the notes, shown below), `\"density\"`.\n\n![plot](files/plots/lec14-28.png)\n\n*(Plot from the course notes with `type = \"boxplot\"`.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-hist1",
+    "label": "Histograms · a simple histogram: geom_histogram(aes(x = LungCap))",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_histogram(aes(x = LungCap))",
+    "comment": "**From the notes:** histograms describe the distribution of a **continuous** variable. Only `x` is needed. R reminds you *\"`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.\"* — not an error.\n\n![plot](files/plots/lec14-29.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-hist2",
+    "label": "Histograms · bar color and outline: fill =, color =",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_histogram(aes(x = LungCap),\n                 fill = \"tomato\",\n                 color = \"black\")",
+    "comment": "`fill` = bars, `color` = bar outlines (HW 3 Part 15: \"change the colors of bins and bin outlines\").",
+    "key": false
+   },
+   {
+    "id": "lec-14-hist3",
+    "label": "Histograms · transparent bars: alpha = 0.1",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_histogram(aes(x = LungCap),\n                 fill = \"tomato\",\n                 alpha = 0.1,\n                 color = \"black\")",
+    "comment": "`alpha` from 0 (invisible) to 1 (solid). Transparency matters when layers overlap (two groups, a density curve on top).",
+    "key": false
+   },
+   {
+    "id": "lec-14-hist4",
+    "label": "Histograms · bin width: binwidth = 0.7",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_histogram(aes(x = LungCap),\n                 fill = \"tomato\",\n                 color = \"black\",\n                 binwidth = 0.7)",
+    "comment": "`binwidth` = width of each bar in the units of x (here 0.7 litres). Smaller = more, thinner bars. `bins = 20` sets the number of bars instead.",
+    "key": false
+   },
+   {
+    "id": "lec-14-hist5",
+    "label": "Histograms · dashed outlines: linetype = \"dashed\"",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_histogram(aes(x = LungCap),\n                 fill = \"tomato\",\n                 color = \"black\",\n                 linetype = \"dashed\")",
+    "comment": "`linetype` options: `\"solid\"`, `\"dashed\"`, `\"dotted\"`, `\"dotdash\"`, `\"longdash\"`. The notes combine this chunk and the three above into one plot:\n\n![plot](files/plots/lec14-30.png)\n\n*(Course notes: `fill = \"tomato\", color = \"black\", alpha = 0.3, binwidth = 0.9, linetype = \"dashed\"`.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-hist6",
+    "label": "Histograms · vertical line at the mean: geom_vline(aes(xintercept = mean(LungCap)))",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_histogram(aes(x = LungCap),\n                 fill = \"tomato\",\n                 alpha = 0.3,\n                 color = \"black\") +\n  geom_vline(aes(xintercept = mean(LungCap)),\n             color = \"blue\",\n             size = 1)",
+    "comment": "**Two ways to write it:** inside `aes()` (as here) you can use the column name directly; outside, write `xintercept = mean(dataset1$LungCap)`. Both draw the same line. Use `linewidth = 1` in newer ggplot.\n\n![plot](files/plots/lec14-31.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": true
+   },
+   {
+    "id": "lec-14-hist7",
+    "label": "Histograms · density curve on top: y = ..density.. + geom_density()",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_histogram(aes(x = LungCap, y = ..density..),\n                 fill = \"white\",\n                 color = \"black\") +\n  geom_density(aes(x = LungCap),\n               alpha = 0.3,\n               fill = \"tomato\")",
+    "comment": "**Why `y = ..density..`:** a density curve has area 1, but a histogram's y-axis is **counts**, so the curve would be squashed flat at the bottom. Putting the histogram on the density scale makes both match. Newer spelling: `y = after_stat(density)`.\n\nBase R equivalent: `hist(x, freq = FALSE); lines(density(x))`.\n\n![plot](files/plots/lec14-32.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-hist8",
+    "label": "Histograms · color by group: aes(fill = Sex, color = Sex)",
+    "question": "",
+    "code": "ggplot(data = dataset1) +\n  geom_histogram(aes(x = LungCap, fill = Sex, color = Sex),\n                 alpha = 0.5)",
+    "comment": "One histogram per group in different colors.\n\n**Watch out:** groups are **stacked** by default, so each MALE bar sits on top of the FEMALE bar and the top of the stack is the total. To overlap them instead (each starting at 0), add `position = \"identity\"`; the `alpha` then lets you see both.\n\n![plot](files/plots/lec14-33.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-hist9",
+    "label": "Histograms · a mean line for each group: summarise first, then geom_vline(data = ...)",
+    "question": "",
+    "code": "# Preparing inputs\ndata_summary <- dataset1 %>%\n  group_by(Sex) %>%\n  summarise(grp.mean = mean(LungCap))\n\nggplot(data = dataset1) +\n  geom_histogram(aes(x = LungCap, fill = Sex, color = Sex),\n                 alpha = 0.5) +\n  geom_vline(data = data_summary,\n             aes(xintercept = grp.mean, color = Sex),\n             linetype = \"dashed\",\n             size = 1)",
+    "comment": "**Two steps:**\n1. `group_by(Sex) %>% summarise(grp.mean = mean(LungCap))` makes a tiny table: one mean per Sex.\n2. `geom_vline(data = data_summary, aes(xintercept = grp.mean, color = Sex))` — a layer can use **its own data**. One dashed line per row, colored by Sex to match the histogram.\n\nThis combines Lecture 11 (`group_by` + `summarise`) with ggplot, a likely exam pattern: \"add a line for the mean of each group\".\n\n![plot](files/plots/lec14-34.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": true
+   },
+   {
+    "id": "lec-14-pw1",
+    "label": "Arranging plots · save plots as objects (patchwork setup)",
+    "question": "",
+    "code": "library(patchwork)    # install.packages(\"patchwork\") the first time\n\ng1 <- ggplot(data = dataset1) +\n  geom_bar(mapping = aes(x = Status, fill = Status), width = 0.9) +\n  scale_x_discrete(limits = c(\"STAGE_1\", \"STAGE_2\", \"STAGE_3\", \"HEALTHY\"))\n\ng2 <- ggplot(data = dataset1) +\n  geom_boxplot(aes(x = Status, y = Age, fill = Sex))\n\ng3 <- ggplot(data = dataset1) +\n  geom_histogram(aes(x = LungCap, fill = Sex, color = Sex, alpha = 0.5))",
+    "comment": "**From the notes:** to show several plots side by side (different views of the same story), use the **patchwork** package. Save each plot in a variable first; nothing is drawn until you combine them.\n\n**Spot the mistake in `g3`:** `alpha = 0.5` is **inside** `aes()`, so ggplot treats \"0.5\" as a data value and adds a useless **\"alpha 0.5\" legend** (visible in the plots below). Fixed values go **outside**: `geom_histogram(aes(x = LungCap, fill = Sex, color = Sex), alpha = 0.5)`.\n\nThis is the ggplot version of base R's `par(mfrow = c(1, 2))` (HW 2 Part 8).",
+    "key": false
+   },
+   {
+    "id": "lec-14-pw2",
+    "label": "Arranging plots · g1 + g2: put plots together",
+    "question": "",
+    "code": "g1 + g2",
+    "comment": "**`+` just puts plots together**; patchwork picks the grid (like `facet_wrap`).\n\n![plot](files/plots/lec14-36.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-pw3",
+    "label": "Arranging plots · g1 + g2 + g3: three in a row",
+    "question": "",
+    "code": "g1 + g2 + g3",
+    "comment": "3 plots → 1 row of 3; 4 plots → a 2 × 2 grid.\n\n![plot](files/plots/lec14-37.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-pw4",
+    "label": "Arranging plots · plot_layout(ncol = 2): control the grid",
+    "question": "",
+    "code": "g1 + g2 + g3 +\n  plot_layout(ncol = 2)",
+    "comment": "**From the notes:** `plot_layout()` sets the grid yourself: `ncol =`, `nrow =`.\n\n![plot](files/plots/lec14-38.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": true
+   },
+   {
+    "id": "lec-14-pw5",
+    "label": "Arranging plots · g1 / g2: one above the other",
+    "question": "",
+    "code": "g1 / g2",
+    "comment": "**`/` = stack vertically** (one column).\n\n![plot](files/plots/lec14-39.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-pw6",
+    "label": "Arranging plots · g1 | g2: side by side",
+    "question": "",
+    "code": "g1 | g2",
+    "comment": "**`|` = side by side** (one row).\n\n![plot](files/plots/lec14-40.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-pw7",
+    "label": "Arranging plots · g1 | (g2 / g3): nested layouts",
+    "question": "",
+    "code": "g1 | (g2 / g3)",
+    "comment": "Parentheses nest layouts: g1 on the left, g2 stacked on g3 on the right. Any layout can be built from `|` and `/`.\n\n![plot](files/plots/lec14-41.png)\n\n*(Plot from the course notes, run on the Lung Capacity data.)*",
+    "key": false
+   },
+   {
+    "id": "lec-14-prac0",
+    "label": "Practice · Setup: built-in data, no file needed",
+    "question": "The practice problems use ggplot2's built-in mpg data (234 cars), so they run without lung_capacity.txt. drv is the drive type (4, f, r) and class is the car type.",
+    "code": "library(tidyverse)\nlibrary(patchwork)\ncars <- mpg |>\n  mutate(drv = factor(drv, levels = c(\"f\", \"r\", \"4\"),\n                      labels = c(\"Front\", \"Rear\", \"4WD\")))\ncount(cars, drv)\n#> # A tibble: 3 × 2\n#>   drv       n\n#>   <fct> <int>\n#> 1 Front   106\n#> 2 Rear     25\n#> 3 4WD     103",
+    "comment": "| Lung Capacity | mpg practice |\n|---|---|\n| `Status` (4 levels) | `class` (7 levels) or `drv` (3 levels) |\n| `Sex` | `drv` |\n| `Age`, `LungCap` | `hwy`, `cty`, `displ` |\n\n`factor(..., labels = ...)` gives the drive types readable names, which flow into every legend below.",
+    "key": false
+   },
+   {
+    "id": "lec-14-prac1",
+    "label": "Practice 1 · Bar plot with your own order, colors and count labels",
+    "question": "Make a bar plot of drv with one color per bar (your choice), bars in the order 4WD, Rear, Front, the count printed just above each bar, a centered title and no legend.",
+    "code": "ggplot(cars, aes(x = drv, fill = drv)) +\n  geom_bar(width = 0.8) +\n  geom_text(aes(label = after_stat(count)), stat = \"count\", vjust = -0.5) +\n  scale_x_discrete(limits = c(\"4WD\", \"Rear\", \"Front\")) +\n  scale_fill_manual(values = c(Front = \"skyblue\", Rear = \"salmon\", `4WD` = \"forestgreen\")) +\n  labs(title = \"Cars by drive type\", x = NULL, y = \"Count\") +\n  theme_minimal() +\n  theme(plot.title = element_text(hjust = 0.5), legend.position = \"none\")",
+    "comment": "| Step | Tool from the lecture |\n|---|---|\n| one color per bar | `aes(fill = drv)` + `scale_fill_manual()` |\n| custom order | `scale_x_discrete(limits = ...)` |\n| counts above bars | `geom_text(aes(label = after_stat(count)), stat = \"count\", vjust = -0.5)` |\n| centered title | `theme(plot.title = element_text(hjust = 0.5))` |\n\n`aes()` sits in `ggplot()` so both layers share `x`. `` `4WD` `` needs backticks because the name starts with a number.\n\n![Practice 1 · Bar plot with your own order, colors and count labels](files/plots/lec14-prac1.png)",
+    "key": false
+   },
+   {
+    "id": "lec-14-prac2",
+    "label": "Practice 2 · Stacked vs proportion vs grouped bars, side by side",
+    "question": "Using cars, show class split by drv three ways in one figure: stacked counts, stacked proportions (same height), and grouped bars. Arrange them in one row with patchwork and keep a single legend.",
+    "code": "base <- ggplot(cars, aes(x = class, fill = drv)) +\n  scale_fill_manual(values = c(Front = \"skyblue\", Rear = \"salmon\", `4WD` = \"forestgreen\")) +\n  labs(x = NULL, fill = \"Drive\") +\n  theme_minimal() +\n  theme(axis.text.x = element_text(angle = 45, hjust = 1))\n\np1 <- base + geom_bar() + labs(title = \"Stacked (counts)\")\np2 <- base + geom_bar(position = \"fill\") + labs(title = \"Fill (proportions)\", y = \"Proportion\")\np3 <- base + geom_bar(position = position_dodge(preserve = \"single\")) + labs(title = \"Dodge (grouped)\")\n\ncombo <- (p1 | p2 | p3) + plot_layout(guides = \"collect\")\ncombo",
+    "comment": "| `position =` | Answers |\n|---|---|\n| default (stack) | how many cars of each class, split by drive |\n| `\"fill\"` | what **share** of each class is 4WD / Front / Rear |\n| `position_dodge()` | compare drive counts **within** each class side by side |\n\n**Saving a shared base plot** (`base <- ggplot(...)`) and adding different geoms avoids repeating the same lines three times. `plot_layout(guides = \"collect\")` merges the three identical legends into one.\n\n**`preserve = \"single\"`** keeps every dodged bar the same width. Without it, a class with only one drive type (2seater, minivan) gets one extra-wide bar.\n\n![Practice 2 · Stacked vs proportion vs grouped bars, side by side](files/plots/lec14-prac2.png)",
+    "key": true
+   },
+   {
+    "id": "lec-14-prac3",
+    "label": "Practice 3 · Histogram by group with a mean line for each group",
+    "question": "Plot overlapping histograms of hwy for each drive type (transparent, starting from 0), then add a dashed vertical line at each group's mean in the matching color.",
+    "code": "hwy_means <- cars |>\n  group_by(drv) |>\n  summarise(avg = mean(hwy))\nhwy_means\n#> # A tibble: 3 × 2\n#>   drv     avg\n#>   <fct> <dbl>\n#> 1 Front  28.2\n#> 2 Rear   21  \n#> 3 4WD    19.2\n\nggplot(cars, aes(x = hwy, fill = drv, color = drv)) +\n  geom_histogram(binwidth = 2, alpha = 0.4, position = \"identity\") +\n  geom_vline(data = hwy_means, aes(xintercept = avg, color = drv),\n             linetype = \"dashed\", linewidth = 1) +\n  labs(title = \"Highway mpg by drive type\", subtitle = \"Dashed lines = group means\",\n       x = \"Highway mpg\", y = \"Count\", fill = \"Drive\", color = \"Drive\") +\n  theme_minimal()",
+    "comment": "The lecture's two-step pattern: **summarise the group means into a small table, then give that table to `geom_vline(data = ...)`.**\n\n`position = \"identity\"` overlaps the groups instead of stacking them, so each histogram starts at 0; `alpha` keeps the overlap visible. Front-wheel cars average about 28 mpg, roughly 9 more than 4WD.\n\n![Practice 3 · Histogram by group with a mean line for each group](files/plots/lec14-prac3.png)",
+    "key": true
+   },
+   {
+    "id": "lec-14-prac4",
+    "label": "Practice 4 · Boxplots with outliers, notches, mean dots and points",
+    "question": "Boxplots of hwy by drv: red star-shaped outliers, notches, black dots at the means, and the individual cars shown as small jittered points behind the boxes.",
+    "code": "ggplot(cars, aes(x = drv, y = hwy, fill = drv)) +\n  geom_jitter(width = 0.15, alpha = 0.25, color = \"gray30\") +\n  geom_boxplot(alpha = 0.6, notch = TRUE,\n               outlier.colour = \"red\", outlier.shape = 8, outlier.size = 3) +\n  stat_summary(fun = \"mean\", geom = \"point\", color = \"black\", size = 3) +\n  scale_fill_manual(values = c(Front = \"skyblue\", Rear = \"salmon\", `4WD` = \"forestgreen\")) +\n  labs(title = \"Highway mpg by drive type\", x = NULL, y = \"Highway mpg\") +\n  theme_minimal() +\n  theme(legend.position = \"none\")",
+    "comment": "Every boxplot feature from the lecture in one plot. **Layer order matters:** the jittered points come first so the boxes are drawn on top of them.\n\n`geom_jitter()` is a simpler alternative to `geom_dotplot()` for showing the points: it spreads them sideways a little so they don't hide each other.\n\n![Practice 4 · Boxplots with outliers, notches, mean dots and points](files/plots/lec14-prac4.png)",
+    "key": false
+   }
+  ]
+ },
  "kit-01": {
   "type": "kit",
   "num": "",
@@ -4638,9 +5081,9 @@ window.ENTRIES = {
    "ggplot2"
   ],
   "pdfs": [],
-  "notes": "Every tidyverse and ggplot2 function from Lectures 10–13, one card each: **what it does, when to use it, why**, a tiny example run in R with its output (and the plot for graph functions), the usual mistake, and where it appears in your homework.\n\n**Find a function by what you want to do.** Type the goal (\"adding a new variable in tidyverse\", \"remove duplicates\", \"split a column\", \"keep all rows from the first table\") into the sidebar search or **Find code for a question**. Base-R functions are in **Everyday code 02**.\n\n**On this page:**\n\n- `library(tidyverse) / %>% and |>`: load tidyverse, chain steps with the pipe\n- `as_tibble() / tibble() / glimpse()`: tidyverse data frames\n- `read_csv()`: load a .csv (tidyverse)\n- `filter()`: keep rows that meet a condition\n- `slice() / slice_head() / slice_tail() / slice_sample()`: rows by position\n- `slice_max() / slice_min()`: rows with the largest / smallest values\n- `arrange() / desc()`: sort rows\n- `distinct()`: remove duplicate rows\n- `select()`: keep, drop or reorder columns\n- `starts_with() / ends_with() / contains() / everything() / where()`: pick columns by pattern or type\n- `rename()`: change column names\n- `relocate()`: move columns to a new position\n- `mutate()`: add a new variable / change a column\n- `transmute()`: make new columns and keep ONLY those\n- `if_else() / case_when()`: conditions inside mutate\n- `group_by() + summarise()`: one summary row per group\n- `group_by(two variables) + .groups = \"drop\"`: compare subgroups within each group\n- `n() / count()`: count rows (per group)\n- `ungroup()`: remove grouping\n- `across()`: the same function on many columns\n- `inner_join()`: combine two tables, keep only matches\n- `left_join() / right_join() / full_join()`: joins that keep unmatched rows\n- `semi_join() / anti_join()`: filter by whether a match exists\n- `intersect() / union() / setdiff()`: set operations on tables with the SAME columns\n- `pivot_longer()`: column names → values of a new variable (wide to long)\n- `pivot_wider()`: values of a variable → columns (long to wide)\n- `separate()`: split one column into several\n- `unite()`: glue columns into one\n- `drop_na() / replace_na() / complete() / fill()`: handle missing values (tidyverse)\n- `str_replace()`: find and replace inside text\n- `ggplot() + aes() + geom_point()`: scatterplot in ggplot\n- `geom_histogram() / geom_vline()`: histogram (+ reference line) in ggplot\n- `geom_boxplot() / stat_summary()`: boxplots by group, with mean dots\n- `geom_bar() / geom_col()`: bar charts in ggplot\n- `labs()`: title, subtitle, axis and legend labels\n- `scale_colour_manual() / scale_fill_manual()`: choose the colors yourself\n- `coord_cartesian() vs xlim() / ylim()`: zoom vs cut the axis range\n- `scale_x_continuous(breaks = ...)`: tick marks and axis number format\n- `theme_minimal() / theme_bw() / … and theme()`: overall look, then fine-tuning\n- `facet_wrap() / facet_grid()`: one small plot per group",
+  "notes": "Every tidyverse and ggplot2 function from Lectures 10–14, one card each: **what it does, when to use it, why**, a tiny example run in R with its output (and the plot for graph functions), the usual mistake, and where it appears in your homework.\n\n**Find a function by what you want to do.** Type the goal (\"adding a new variable in tidyverse\", \"remove duplicates\", \"split a column\", \"keep all rows from the first table\") into the sidebar search or **Find code for a question**. Base-R functions are in **Everyday code 02**.\n\n**On this page** (Lectures 10–14):\n\n- `library(tidyverse) / %>% and |>`: load tidyverse, chain steps with the pipe\n- `as_tibble() / tibble() / glimpse()`: tidyverse data frames\n- `read_csv()`: load a .csv (tidyverse)\n- `filter()`: keep rows that meet a condition\n- `slice() / slice_head() / slice_tail() / slice_sample()`: rows by position\n- `slice_max() / slice_min()`: rows with the largest / smallest values\n- `arrange() / desc()`: sort rows\n- `distinct()`: remove duplicate rows\n- `select()`: keep, drop or reorder columns\n- `starts_with() / ends_with() / contains() / everything() / where()`: pick columns by pattern or type\n- `rename()`: change column names\n- `relocate()`: move columns to a new position\n- `mutate()`: add a new variable / change a column\n- `transmute()`: make new columns and keep ONLY those\n- `if_else() / case_when()`: conditions inside mutate\n- `group_by() + summarise()`: one summary row per group\n- `group_by(two variables) + .groups = \"drop\"`: compare subgroups within each group\n- `n() / count()`: count rows (per group)\n- `ungroup()`: remove grouping\n- `across()`: the same function on many columns\n- `inner_join()`: combine two tables, keep only matches\n- `left_join() / right_join() / full_join()`: joins that keep unmatched rows\n- `semi_join() / anti_join()`: filter by whether a match exists\n- `intersect() / union() / setdiff()`: set operations on tables with the SAME columns\n- `pivot_longer()`: column names → values of a new variable (wide to long)\n- `pivot_wider()`: values of a variable → columns (long to wide)\n- `separate()`: split one column into several\n- `unite()`: glue columns into one\n- `drop_na() / replace_na() / complete() / fill()`: handle missing values (tidyverse)\n- `str_replace()`: find and replace inside text\n- `ggplot() + aes() + geom_point()`: scatterplot in ggplot\n- `geom_histogram() / geom_vline()`: histogram (+ reference line) in ggplot\n- `geom_boxplot() / stat_summary()`: boxplots by group, with mean dots\n- `geom_bar() / geom_col()`: bar charts in ggplot\n- `labs()`: title, subtitle, axis and legend labels\n- `scale_colour_manual() / scale_fill_manual()`: choose the colors yourself\n- `coord_cartesian() vs xlim() / ylim()`: zoom vs cut the axis range\n- `scale_x_continuous(breaks = ...)`: tick marks and axis number format\n- `theme_minimal() / theme_bw() / … and theme()`: overall look, then fine-tuning\n- `facet_wrap() / facet_grid()`: one small plot per group\n- `geom_text(stat = \"count\")`: print the count on each bar\n- `scale_x_discrete(limits = , labels = )`: choose, reorder or rename categories on the x-axis\n- `position = \"stack\" / \"fill\" / \"dodge\"`: stacked, 100%, or side-by-side bars\n- `coord_flip()`: horizontal bars / swap the axes\n- `geom_hline() / geom_vline()`: horizontal / vertical reference lines\n- `geom_density() / y = after_stat(density)`: smooth density curve (on a histogram)\n- `position = \"identity\" (overlapping histograms)`: overlap group histograms instead of stacking\n- `notch / outlier.colour / outlier.shape / geom_dotplot() / geom_jitter()`: boxplot extras\n- `ggMarginal() (ggExtra)`: histograms/boxplots on the edges of a scatterplot\n- `patchwork: + , | , / , plot_layout()`: combine several ggplots in one figure",
   "takeaways": [],
-  "updatedAt": "2026-10-21T13:40:00Z",
+  "updatedAt": "2026-10-21T14:30:00Z",
   "chunks": [
    {
     "id": "kit-03-b00",
@@ -4960,6 +5403,86 @@ window.ENTRIES = {
     "question": "Use it when: You want the same plot repeated for each category (or each combination of two).\n\nSearch words: separate plot for each group, one plot per category, panels, facets, small multiples, split plot by group",
     "code": "ggplot(mpg, aes(displ, hwy)) + geom_point() +\n  facet_wrap(~ drv, nrow = 1)",
     "comment": "**Why / when:** `facet_wrap(~ g)` for one variable, `facet_grid(rows ~ cols)` for two. The variable should be categorical.\n\n![facet_wrap() / facet_grid()](files/plots/ff-gg-facet.png)\n\n**From:** Lec 13",
+    "key": false
+   },
+   {
+    "id": "kit-03-c00",
+    "label": "geom_text(stat = \"count\") · print the count on each bar",
+    "question": "Use it when: A question asks to show the exact frequency / count on (or above) each bar.\n\nSearch words: count labels on bars, numbers on bars, show counts on bar chart, label bars, frequency on top of bars, add text to bars",
+    "code": "ggplot(mpg, aes(x = drv)) +\n  geom_bar(fill = \"orange\") +\n  geom_text(aes(label = after_stat(count)), stat = \"count\", vjust = -0.5)",
+    "comment": "**Why / when:** Counts the rows the same way `geom_bar()` does and writes the number. `vjust` negative = above the bar, positive = inside the top. Stacked bars: `position = position_stack(vjust = 0.5)`; grouped bars: `position = position_dodge(0.9)`.\n\n**Watch out:** The lecture writes `label = ..count..`; same thing, older spelling (gives a deprecation warning).\n\n**From:** Lec 14 · **Used in:** Lec 14 bar plots, Practice 1",
+    "key": false
+   },
+   {
+    "id": "kit-03-c01",
+    "label": "scale_x_discrete(limits = , labels = ) · choose, reorder or rename categories on the x-axis",
+    "question": "Use it when: Show only some bars, put bars in a specific order, or change the names under the bars.\n\nSearch words: order of bars, reorder bars, change bar order, show only some categories, rename bars, change category labels, select bars",
+    "code": "ggplot(mpg, aes(x = drv)) + geom_bar() +\n  scale_x_discrete(limits = c(\"r\", \"f\", \"4\"),\n                   labels = c(\"4\" = \"4WD\", \"f\" = \"Front\", \"r\" = \"Rear\"))",
+    "comment": "**Why / when:** `limits` = which categories, in which order (left out = dropped, with a warning). `labels = c(old = \"new\")` renames them on the axis only.\n\n**Watch out:** For a lasting order everywhere (tables, legends), change the factor: `factor(x, levels = ...)`.\n\n**From:** Lec 14 · **Used in:** Lec 14 bar plots",
+    "key": false
+   },
+   {
+    "id": "kit-03-c02",
+    "label": "position = \"stack\" / \"fill\" / \"dodge\" · stacked, 100%, or side-by-side bars",
+    "question": "Use it when: Bars split by a second category: stacked counts, proportions (same height), or grouped side by side.\n\nSearch words: stacked bar chart, grouped bar chart, side by side bars, proportion bar chart, percent stacked, bars same height, dodge, compare proportions",
+    "code": "p <- ggplot(mpg, aes(x = class, fill = drv))\np + geom_bar()                                   # stacked counts (default)\np + geom_bar(position = \"fill\")                  # every bar = 100%\np + geom_bar(position = position_dodge())        # side by side",
+    "comment": "**Why / when:** Stack answers \"how many, split by…\"; fill answers \"what share…\"; dodge compares the groups within each bar directly. Base R: `barplot(table(a, b), beside = TRUE)` for dodge.\n\n**Watch out:** `position_dodge(preserve = \"single\")` keeps bar widths equal when some combinations are missing.\n\n**From:** Lec 14 · **Used in:** Lec 14 Practice 2",
+    "key": false
+   },
+   {
+    "id": "kit-03-c03",
+    "label": "coord_flip() · horizontal bars / swap the axes",
+    "question": "Use it when: Long category names, or the question asks for a horizontal bar plot.\n\nSearch words: horizontal bar chart, flip axes, sideways bars, swap x and y, horizontal boxplot",
+    "code": "ggplot(mpg, aes(x = class)) + geom_bar() + coord_flip()",
+    "comment": "**Why / when:** Works on any plot (bars, boxplots). Base R: `barplot(..., horiz = TRUE)`, `boxplot(..., horizontal = TRUE)`.\n\n**From:** Lec 14",
+    "key": false
+   },
+   {
+    "id": "kit-03-c04",
+    "label": "geom_hline() / geom_vline() · horizontal / vertical reference lines",
+    "question": "Use it when: Mark a threshold (100 people), a mean, or a target value on a plot.\n\nSearch words: horizontal line, vertical line, reference line, threshold line, mean line, add a line at, cutoff line, mean line for each group, line at group means, vertical line per group",
+    "code": "ggplot(mpg, aes(x = class)) + geom_bar() +\n  geom_hline(yintercept = 30, linetype = \"dashed\", linewidth = 1)",
+    "comment": "**Why / when:** `geom_hline(yintercept =)` across, `geom_vline(xintercept =)` up and down. One line per group: summarise the values first and pass that table with `data =`.\n\n**Watch out:** `size =` for lines is the old spelling; newer ggplot uses `linewidth =`.\n\n**From:** Lec 13–14 · **Used in:** Lec 14 bar plots and histograms, HW 3 Part 15",
+    "key": false
+   },
+   {
+    "id": "kit-03-c05",
+    "label": "geom_density() / y = after_stat(density) · smooth density curve (on a histogram)",
+    "question": "Use it when: Show the shape of a distribution as a smooth curve, or overlay it on a histogram.\n\nSearch words: density curve, smooth curve, density plot, curve over histogram, kernel density, distribution curve ggplot",
+    "code": "ggplot(mpg, aes(x = hwy)) +\n  geom_histogram(aes(y = after_stat(density)), binwidth = 2, fill = \"white\", color = \"black\") +\n  geom_density(fill = \"tomato\", alpha = 0.3)",
+    "comment": "**Why / when:** Put the histogram on the density scale (`y = after_stat(density)`, written `..density..` in the lecture) so both use the same y-axis. Base R: `hist(x, freq = FALSE); lines(density(x))`.\n\n**From:** Lec 14 · **Used in:** Lec 14 histograms",
+    "key": false
+   },
+   {
+    "id": "kit-03-c06",
+    "label": "position = \"identity\" (overlapping histograms) · overlap group histograms instead of stacking",
+    "question": "Use it when: Histograms colored by group where each group should start at 0 and overlap.\n\nSearch words: overlapping histograms, histogram by group, compare distributions of groups, histograms on top of each other, stacked histogram",
+    "code": "ggplot(mpg, aes(x = hwy, fill = drv)) +\n  geom_histogram(binwidth = 2, alpha = 0.4, position = \"identity\")",
+    "comment": "**Why / when:** `fill = group` histograms are **stacked** by default (bar tops = totals). `position = \"identity\"` overlaps them; `alpha` keeps all groups visible. `facet_wrap(~ group)` is the separate-panels alternative.\n\n**From:** Lec 14 · **Used in:** Lec 14 Practice 3",
+    "key": false
+   },
+   {
+    "id": "kit-03-c07",
+    "label": "notch / outlier.colour / outlier.shape / geom_dotplot() / geom_jitter() · boxplot extras",
+    "question": "Use it when: Customize boxplot outliers, add notches, or show the individual points.\n\nSearch words: notch, outliers color, outlier shape, highlight outliers, show points on boxplot, dots on boxplot, jitter, dotplot",
+    "code": "ggplot(mpg, aes(x = drv, y = hwy)) +\n  geom_jitter(width = 0.15, alpha = 0.3) +\n  geom_boxplot(alpha = 0.6, notch = TRUE, outlier.colour = \"red\", outlier.shape = 8)",
+    "comment": "**Why / when:** Notches that don't overlap suggest different medians. `outlier.shape = NA` hides outliers (useful with jittered points so they aren't drawn twice).\n\n**From:** Lec 14 · **Used in:** Lec 14 boxplots, Practice 4",
+    "key": false
+   },
+   {
+    "id": "kit-03-c08",
+    "label": "ggMarginal() (ggExtra) · histograms/boxplots on the edges of a scatterplot",
+    "question": "Use it when: Show a scatterplot plus each variable's distribution along its margins.\n\nSearch words: marginal histogram, marginal boxplot, distribution on the edges, scatterplot with histograms, ggExtra",
+    "code": "# install.packages(\"ggExtra\")\n# library(ggExtra)\n# gg <- ggplot(mpg, aes(displ, hwy, color = drv)) + geom_point()\n# ggMarginal(gg, type = \"histogram\")     # or \"boxplot\", \"density\"",
+    "comment": "**Why / when:** Not part of ggplot2: install and load ggExtra. Save the scatterplot first, then pass it to `ggMarginal()`.\n\n**From:** Lec 14 · **Used in:** Lec 14 boxplots",
+    "key": false
+   },
+   {
+    "id": "kit-03-c09",
+    "label": "patchwork: + , | , / , plot_layout() · combine several ggplots in one figure",
+    "question": "Use it when: Two or more different ggplots side by side, stacked, or in a grid.\n\nSearch words: plots side by side ggplot, combine plots, arrange plots, multiple ggplots in one figure, patchwork, grid of plots, two plots next to each other",
+    "code": "library(patchwork)\ng1 <- ggplot(mpg, aes(drv)) + geom_bar()\ng2 <- ggplot(mpg, aes(drv, hwy)) + geom_boxplot()\ng1 | g2                                # side by side\n# g1 / g2                              # stacked\n# g1 + g2 + plot_layout(ncol = 1)      # set the grid",
+    "comment": "**Why / when:** Save each plot in a variable, then combine: `|` = one row, `/` = one column, parentheses nest. `plot_layout(guides = \"collect\")` merges duplicate legends. Base R equivalent: `par(mfrow = c(1, 2))`; same plot per group: `facet_wrap()`.\n\n**From:** Lec 14 · **Used in:** Lec 14 arranging plots",
     "key": false
    }
   ]

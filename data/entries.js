@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-19T15:50:00Z";
+window.ENTRIES_SAVED = "2026-10-21T13:40:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -4110,6 +4110,859 @@ window.ENTRIES = {
   ],
   "updatedAt": "2026-10-14T17:00:00Z",
   "remember": []
+ },
+ "kit-02": {
+  "type": "kit",
+  "num": "02",
+  "title": "Function finder: base R (what each function does, when and why)",
+  "date": "2026-10-21",
+  "exams": [],
+  "topics": [
+   "function reference",
+   "base R",
+   "vectors",
+   "data frames",
+   "loops",
+   "apply",
+   "statistics",
+   "plots",
+   "probability"
+  ],
+  "pdfs": [],
+  "notes": "Every base-R function from Lectures 1–9 (plus a few base tools the homework uses), one card each: **what it does, when to use it, why it's the right tool**, a tiny example run in R with its output, the usual mistake, and where it appears on this site.\n\n**Find a function by what you want to do.** Each card lists plain-English *search words* (\"how many rows\", \"sort descending\", \"label each value\"), so typing your goal into the sidebar search or **Find code for a question** brings up the right card. The tidyverse and ggplot2 functions are in **Everyday code 03**.\n\n**On this page:**\n\n- `getwd() / setwd()`: see or change the working folder\n- `ls() / rm()`: list or delete objects in your environment\n- `class()`: what type is this?\n- `as.numeric() / as.character() / as.integer() / as.logical()`: convert between types\n- `is.numeric() / is.character() / is.logical() / is.factor()`: TRUE/FALSE type checks\n- `c()`: combine values into a vector\n- `seq() and :`: number sequences\n- `rep()`: repeat values\n- `length()`: how many elements\n- `append()`: add values to a vector (at a position)\n- `list() / unlist()`: store mixed things together / flatten\n- `paste() / paste0()`: glue text together\n- `matrix()`: build a matrix (rows × columns of one type)\n- `cbind() / rbind()`: stick columns / rows together\n- `t()`: transpose (swap rows and columns)\n- `dim() / nrow() / ncol()`: size of a table\n- `data.frame()`: make a table by hand\n- `str()`: structure: types of every column\n- `summary()`: quick statistics for each column\n- `head() / tail()`: first or last rows\n- `colnames() / names()`: get or change column names\n- `order() / sort() / rev()`: sort values or rows\n- `factor() / as.factor() / levels()`: categories with fixed levels\n- `cut()`: turn numbers into groups\n- `table()`: count each category\n- `gl()`: generate factor levels in a pattern\n- `if / else if / else`: do one thing or another\n- `ifelse()`: label every element of a vector\n- `for loop`: repeat for each element / a fixed number of times\n- `while loop`: repeat until something happens\n- `break / next`: leave a loop / skip to the next round\n- `function() / return()`: write your own function\n- `read.csv() / read.table()`: load a data file (base R)\n- `write.csv() / write.table()`: save a table to a file\n- `View()`: spreadsheet viewer in RStudio\n- `mean() / median()`: average / middle value\n- `var() / sd()`: spread around the mean\n- `quantile() / IQR()`: percentiles, quartiles, spread of the middle 50%\n- `min() / max() / range()`: smallest / largest values\n- `which.min() / which.max() / which()`: WHERE the min / max / TRUE values are\n- `sum() / cumsum()`: total / running total\n- `round() / sqrt() / abs()`: basic math helpers\n- `is.na() / na.rm = TRUE`: find or ignore missing values\n- `unique() / duplicated()`: distinct values / spot repeats\n- `any() / all()`: is at least one / every value TRUE?\n- `apply()`: run a function on every row or column of a matrix\n- `lapply() / sapply()`: run a function on every element of a list/vector\n- `mapply()`: run a function on PAIRS of elements\n- `tapply()`: summary of a variable within each group\n- `aggregate()`: group summary as a data frame\n- `hist()`: histogram (base R)\n- `barplot()`: bar chart of counts (base R)\n- `boxplot()`: boxplots, optionally by group (base R)\n- `plot()`: scatterplot / line plot (base R)\n- `legend()`: add a legend to a base plot\n- `par(mfrow = c(r, c))`: several base plots in one image\n- `sample() / set.seed()`: random draws (dice, coins, cards)\n- `dbinom() / pbinom()`: binomial: exactly / at most k successes\n- `dgeom() / pgeom()`: geometric: failures before the first success\n- `rnorm() / dnorm() / pnorm() / qnorm()`: normal distribution\n- `runif() / rbinom()`: random uniform and binomial numbers",
+  "takeaways": [],
+  "updatedAt": "2026-10-21T13:40:00Z",
+  "chunks": [
+   {
+    "id": "kit-02-a00",
+    "label": "getwd() / setwd() · see or change the working folder",
+    "question": "Use it when: R can't find your file, or you want to know which folder read.csv() looks in.\n\nSearch words: working directory, which folder, file not found, cannot open file, change folder, set folder, where are my files, path",
+    "code": "getwd()                          # prints the folder R reads from and saves to\n# setwd(\"~/Downloads\")           # change it (on a Mac, ~ = your home folder)",
+    "comment": "**Why / when:** `read.csv(\"file.csv\")` only looks in the working folder. If you get *\"cannot open file … No such file or directory\"*, either `setwd()` to the folder with the file, or give the full path: `read_csv(\"~/Downloads/Dataset_1.csv\")`.\n\n**Watch out:** The `~` goes **inside** the quotes: `\"~/Downloads/x.csv\"`. In RStudio: Session → Set Working Directory → To Source File Location.\n\n**From:** Lec 1, 7",
+    "key": false
+   },
+   {
+    "id": "kit-02-a01",
+    "label": "ls() / rm() · list or delete objects in your environment",
+    "question": "Use it when: You want to see what objects exist, or clear them to start fresh.\n\nSearch words: list objects, remove object, delete variable, clear environment, clean workspace, start over",
+    "code": "x <- 5; y <- \"hi\"\nls()                   # what's in the environment\n#> [1] \"x\" \"y\"\nrm(x)                  # delete one object\nls()\n#> [1] \"y\"\nrm(list = ls())        # delete everything",
+    "comment": "**Why / when:** Before rendering, it's good practice to restart R (Session → Restart R) and run everything top to bottom. That's what `rm(list = ls())` approximates: it catches code that only worked because of an old object.\n\n**From:** Lec 1",
+    "key": false
+   },
+   {
+    "id": "kit-02-a02",
+    "label": "class() · what type is this?",
+    "question": "Use it when: Something behaves strangely (math fails, factor vs text) and you need to know an object's type.\n\nSearch words: data type, what type, check type, numeric or character, is it a factor, type of variable, class of object",
+    "code": "class(3.5)\n#> [1] \"numeric\"\nclass(\"3.5\")\n#> [1] \"character\"\nclass(TRUE)\n#> [1] \"logical\"\nclass(factor(\"a\"))\n#> [1] \"factor\"\nclass(mtcars)\n#> [1] \"data.frame\"",
+    "comment": "**Why / when:** Most confusing errors come from the wrong type: numbers stored as text, or a factor where you expected text. `class()` (or `str()` for a whole data frame) tells you immediately.\n\n**Watch out:** *\"non-numeric argument to binary operator\"* almost always means a column is `character`. Check with `class(df$col)`.\n\n**From:** Lec 2",
+    "key": false
+   },
+   {
+    "id": "kit-02-a03",
+    "label": "as.numeric() / as.character() / as.integer() / as.logical() · convert between types",
+    "question": "Use it when: A column of numbers was read as text, or you need numbers as text (or TRUE/FALSE as 1/0).\n\nSearch words: convert type, change type, text to number, character to numeric, string to number, number to text, convert to integer, convert column",
+    "code": "as.numeric(\"42\")\n#> [1] 42\nas.numeric(c(\"1\", \"2\", \"three\"))   # can't convert \"three\" → NA with a warning\n#> Warning: NAs introduced by coercion\n#> [1]  1  2 NA\nas.character(3.14)\n#> [1] \"3.14\"\nas.integer(7.9)                    # cuts off the decimal, doesn't round\n#> [1] 7\nas.numeric(TRUE)\n#> [1] 1\nsum(c(TRUE, FALSE, TRUE))          # TRUE counts as 1\n#> [1] 2",
+    "comment": "**Why / when:** Math needs numbers. After `separate()` or reading messy files, numbers can be text; `as.numeric()` fixes them. TRUE = 1 and FALSE = 0 is why `sum(x > 5)` counts and `mean(x > 5)` gives a proportion.\n\n**Watch out:** **Factors:** `as.numeric(factor(c(\"10\",\"20\")))` gives the level codes 1, 2, not 10, 20. Use `as.numeric(as.character(f))`.\n\n**From:** Lec 2 · **Used in:** Must-know Core 05 (common mistakes)",
+    "key": false
+   },
+   {
+    "id": "kit-02-a04",
+    "label": "is.numeric() / is.character() / is.logical() / is.factor() · TRUE/FALSE type checks",
+    "question": "Use it when: You need a TRUE/FALSE answer about type, e.g. inside an `if` in a function, or with `where()` in tidyverse.\n\nSearch words: check if numeric, is it a number, test type, validate input, check if character",
+    "code": "is.numeric(5)\n#> [1] TRUE\nis.numeric(\"5\")\n#> [1] FALSE\nx <- c(2, 4, 6)\nif (!is.numeric(x)) stop(\"x must be numeric\") else mean(x)\n#> [1] 4",
+    "comment": "**Why / when:** Use these to guard a function against bad input, or to select columns by type: `select(where(is.numeric))` / `summarise(across(where(is.numeric), mean))`.\n\n**From:** Lec 2, 3",
+    "key": false
+   },
+   {
+    "id": "kit-02-a05",
+    "label": "c() · combine values into a vector",
+    "question": "Use it when: You need a vector: a list of numbers, names, levels, colors, column names.\n\nSearch words: make a vector, create vector, combine values, list of numbers, concatenate",
+    "code": "scores <- c(88, 92, 75)\nnames  <- c(\"Ana\", \"Ben\", \"Cai\")\nscores[2]\n#> [1] 92\nc(scores, 100)          # add a value at the end\n#> [1]  88  92  75 100",
+    "comment": "**Why / when:** Almost everything in R is a vector. `c()` is how you type one in, and how you pass several values to an argument (`levels = c(...)`, `into = c(...)`, `by = c(\"state\", \"county\")`).\n\n**Watch out:** A vector holds **one type**: `c(1, \"a\")` turns the 1 into text.\n\n**From:** Lec 2",
+    "key": false
+   },
+   {
+    "id": "kit-02-a06",
+    "label": "seq() and : · number sequences",
+    "question": "Use it when: You need evenly spaced numbers: 1 to 10, every 0.5, 100 values between two numbers, axis breaks.\n\nSearch words: sequence, sequence of numbers, evenly spaced, step by, from to, count by, every other number, range of numbers",
+    "code": "1:5\n#> [1] 1 2 3 4 5\nseq(0, 10, by = 2.5)\n#> [1]  0.0  2.5  5.0  7.5 10.0\nseq(1, 2, length.out = 5)\n#> [1] 1.00 1.25 1.50 1.75 2.00\nseq(10, 1, by = -3)\n#> [1] 10  7  4  1",
+    "comment": "**Why / when:** `a:b` steps by 1. Use `seq()` for other steps (`by =`) or a set number of values (`length.out =`). Common in loops (`for (i in 1:n)`), simulations, and ggplot breaks (`scale_x_continuous(breaks = seq(0, 8, 0.5))`).\n\n**From:** Lec 2",
+    "key": false
+   },
+   {
+    "id": "kit-02-a07",
+    "label": "rep() · repeat values",
+    "question": "Use it when: You need the same value(s) many times: labels, a deck of cards, group codes.\n\nSearch words: repeat, repeat values, duplicate values, same value n times, each, times, build a deck",
+    "code": "rep(\"x\", 3)\n#> [1] \"x\" \"x\" \"x\"\nrep(c(1, 2), times = 3)     # whole vector 3 times\n#> [1] 1 2 1 2 1 2\nrep(c(1, 2), each = 3)      # each value 3 times\n#> [1] 1 1 1 2 2 2\nsuits <- rep(c(\"H\", \"D\", \"C\", \"S\"), each = 13)\ntable(suits)\n#> suits\n#>  C  D  H  S \n#> 13 13 13 13 ",
+    "comment": "**Why / when:** `times` repeats the whole pattern; `each` repeats each value in place. Building a deck of cards = `rep(ranks, times = 4)` with `rep(suits, each = 13)`.\n\n**From:** Lec 2 · **Used in:** Must-know Core 01 (deck of cards)",
+    "key": false
+   },
+   {
+    "id": "kit-02-a08",
+    "label": "length() · how many elements",
+    "question": "Use it when: You need the number of values in a vector or list (or to loop over all of them).\n\nSearch words: how many elements, number of values, count elements, size of vector, length of list",
+    "code": "x <- c(4, 8, 15, 16, 23, 42)\nlength(x)\n#> [1] 6\nlength(x[x > 10])        # how many are above 10\n#> [1] 4\nsum(x > 10)              # same count, shorter\n#> [1] 4",
+    "comment": "**Why / when:** For data frames use `nrow()` (rows) and `ncol()`; `length(df)` gives the number of **columns**.\n\n**From:** Lec 2",
+    "key": false
+   },
+   {
+    "id": "kit-02-a09",
+    "label": "append() · add values to a vector (at a position)",
+    "question": "Use it when: You need to add elements to a vector, possibly in the middle.\n\nSearch words: add element, append value, insert value, add to vector, add at position",
+    "code": "v <- c(1, 2, 3)\nappend(v, c(10, 20))            # at the end, same as c(v, 10, 20)\n#> [1]  1  2  3 10 20\nappend(v, 99, after = 1)        # insert after position 1\n#> [1]  1 99  2  3",
+    "comment": "**Why / when:** `c(v, new)` is enough for the end; `append(after = k)` is the easy way to insert in the middle.\n\n**From:** Lec 2",
+    "key": false
+   },
+   {
+    "id": "kit-02-a10",
+    "label": "list() / unlist() · store mixed things together / flatten",
+    "question": "Use it when: You need to keep different types or lengths together (a function returning several results), or turn a list back into a vector.\n\nSearch words: list, store different types, return several values, return multiple results, flatten list, list to vector",
+    "code": "res <- list(mean = 5.2, n = 10, ok = TRUE)\nres$mean\n#> [1] 5.2\nres[[\"n\"]]\n#> [1] 10\nunlist(list(a = 1, b = 2:3))\n#>  a b1 b2 \n#>  1  2  3 ",
+    "comment": "**Why / when:** A function can only `return()` one object, so to return several results you put them in a list. `[[ ]]` or `$` gets the element itself; `[ ]` gives a smaller list.\n\n**Watch out:** `sapply()` simplifies a list result to a vector automatically; `lapply()` keeps a list.\n\n**From:** Lec 2 · **Used in:** Exam review Rev 02 (lists)",
+    "key": false
+   },
+   {
+    "id": "kit-02-a11",
+    "label": "paste() / paste0() · glue text together",
+    "question": "Use it when: You need to build text: labels, messages, file names, card names like \"A of Hearts\".\n\nSearch words: combine text, glue strings, concatenate strings, join text, make label, string with number",
+    "code": "paste(\"Mean is\", round(5.6789, 2))\n#> [1] \"Mean is 5.68\"\npaste0(\"Q\", 1:4)                  # no space\n#> [1] \"Q1\" \"Q2\" \"Q3\" \"Q4\"\npaste(\"A\", \"Hearts\", sep = \" of \")\n#> [1] \"A of Hearts\"\npaste(c(\"a\", \"b\", \"c\"), collapse = \"+\")\n#> [1] \"a+b+c\"",
+    "comment": "**Why / when:** `paste()` puts a space between pieces (change with `sep =`), `paste0()` puts nothing. `collapse =` merges a whole vector into one string.\n\n**From:** Lec 5",
+    "key": false
+   },
+   {
+    "id": "kit-02-a12",
+    "label": "matrix() · build a matrix (rows × columns of one type)",
+    "question": "Use it when: You need a grid of numbers, e.g. simulation results with one row per trial.\n\nSearch words: matrix, create matrix, grid of numbers, rows and columns, nrow ncol, byrow, fill by row",
+    "code": "m <- matrix(1:6, nrow = 2)               # fills down columns\nm\n#>      [,1] [,2] [,3]\n#> [1,]    1    3    5\n#> [2,]    2    4    6\nmatrix(1:6, nrow = 2, byrow = TRUE)      # fills across rows\n#>      [,1] [,2] [,3]\n#> [1,]    1    2    3\n#> [2,]    4    5    6\nm[2, 3]                                  # row 2, column 3\n#> [1] 6",
+    "comment": "**Why / when:** All values must be one type. Default filling is **by column**; add `byrow = TRUE` if the question says fill by rows. Use `apply()` to summarize rows or columns.\n\n**From:** Lec 3",
+    "key": false
+   },
+   {
+    "id": "kit-02-a13",
+    "label": "cbind() / rbind() · stick columns / rows together",
+    "question": "Use it when: You need to add a column or row to a matrix or data frame, or stack two tables with the same columns.\n\nSearch words: add column, add row, combine columns, combine rows, stack tables, bind, append row, glue tables together",
+    "code": "a <- c(1, 2, 3); b <- c(4, 5, 6)\ncbind(a, b)\n#>      a b\n#> [1,] 1 4\n#> [2,] 2 5\n#> [3,] 3 6\nrbind(a, b)\n#>   [,1] [,2] [,3]\n#> a    1    2    3\n#> b    4    5    6\ndf <- data.frame(x = 1:2, y = c(\"p\", \"q\"))\nrbind(df, data.frame(x = 3, y = \"r\"))      # add a row\n#>   x y\n#> 1 1 p\n#> 2 2 q\n#> 3 3 r",
+    "comment": "**Why / when:** `cbind` = side by side (columns), `rbind` = on top of each other (rows). For **matching by a key** (like county), you need a join, not cbind.\n\n**Watch out:** `rbind` on data frames needs the **same column names**.\n\n**From:** Lec 3",
+    "key": false
+   },
+   {
+    "id": "kit-02-a14",
+    "label": "t() · transpose (swap rows and columns)",
+    "question": "Use it when: You want rows to become columns, e.g. to print a table the other way round.\n\nSearch words: transpose, flip rows and columns, swap rows columns, rotate table",
+    "code": "m <- matrix(1:6, nrow = 2)\nt(m)\n#>      [,1] [,2]\n#> [1,]    1    2\n#> [2,]    3    4\n#> [3,]    5    6",
+    "comment": "\n\n**From:** Lec 3",
+    "key": false
+   },
+   {
+    "id": "kit-02-a15",
+    "label": "dim() / nrow() / ncol() · size of a table",
+    "question": "Use it when: A question asks for the dimensions, the number of rows/observations, or the number of columns/variables.\n\nSearch words: dimensions, how many rows, how many columns, number of observations, number of variables, size of data, count rows",
+    "code": "dim(mtcars)          # rows, columns\n#> [1] 32 11\nnrow(mtcars)\n#> [1] 32\nncol(mtcars)\n#> [1] 11",
+    "comment": "**Why / when:** \"What are the dimensions of the output?\" (HW 3 Parts 3–5) = `dim()`. Compare `nrow()` before and after a filter, join or `distinct()` to see how many rows changed.\n\n**From:** Lec 3 · **Used in:** HW 3 Parts 3–5",
+    "key": false
+   },
+   {
+    "id": "kit-02-a16",
+    "label": "data.frame() · make a table by hand",
+    "question": "Use it when: You need a small table of your own: results of a simulation, a toy data set, a summary to print.\n\nSearch words: create data frame, make a table, build data frame, new data set, combine vectors into table",
+    "code": "df <- data.frame(name  = c(\"Ana\", \"Ben\", \"Cai\"),\n                 score = c(88, 92, 75))\ndf\n#>   name score\n#> 1  Ana    88\n#> 2  Ben    92\n#> 3  Cai    75\ndf$score\n#> [1] 88 92 75",
+    "comment": "**Why / when:** Columns must be the same length. In tidyverse, `tibble()` does the same and prints more neatly.\n\n**From:** Lec 3",
+    "key": false
+   },
+   {
+    "id": "kit-02-a17",
+    "label": "str() · structure: types of every column",
+    "question": "Use it when: You just loaded data and want to see each column's type and a few values.\n\nSearch words: structure of data, column types, look at the data, inspect data, data types of columns, overview of variables",
+    "code": "str(iris)\n#> 'data.frame':\t150 obs. of  5 variables:\n#>  $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...\n#>  $ Sepal.Width : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...\n#>  $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...\n#>  $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...\n#>  $ Species     : Factor w/ 3 levels \"setosa\",\"versicolor\",..: 1 1 1 1 1 1 1 1 1 1 ...",
+    "comment": "**Why / when:** The fastest way to spot problems: numbers stored as `chr`, columns that should be factors, unexpected NAs. tidyverse equivalent: `glimpse()`.\n\n**From:** Lec 3",
+    "key": false
+   },
+   {
+    "id": "kit-02-a18",
+    "label": "summary() · quick statistics for each column",
+    "question": "Use it when: You want min, quartiles, mean, max for numbers and counts for factors, all at once.\n\nSearch words: summary statistics, quick summary, quartiles, descriptive statistics, min max mean median, five number summary",
+    "code": "summary(mtcars$mpg)\n#>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. \n#>   10.40   15.43   19.20   20.09   22.80   33.90 \nsummary(iris$Species)\n#>     setosa versicolor  virginica \n#>         50         50         50 ",
+    "comment": "**Why / when:** Good first look, and the NA count shows up too. For a single statistic use `mean()`, `quantile()` etc.\n\n**From:** Lec 3",
+    "key": false
+   },
+   {
+    "id": "kit-02-a19",
+    "label": "head() / tail() · first or last rows",
+    "question": "Use it when: You want to see the first or last few rows, or the top n after sorting.\n\nSearch words: first rows, first few rows, last rows, top rows, preview data, top n, first 5",
+    "code": "head(mtcars, 3)\n#>                mpg cyl disp  hp drat    wt  qsec vs am gear carb\n#> Mazda RX4     21.0   6  160 110 3.90 2.620 16.46  0  1    4    4\n#> Mazda RX4 Wag 21.0   6  160 110 3.90 2.875 17.02  0  1    4    4\n#> Datsun 710    22.8   4  108  93 3.85 2.320 18.61  1  1    4    1\ntail(mtcars, 2)\n#>                mpg cyl disp  hp drat   wt qsec vs am gear carb\n#> Maserati Bora 15.0   8  301 335 3.54 3.57 14.6  0  1    5    8\n#> Volvo 142E    21.4   4  121 109 4.11 2.78 18.6  1  1    4    2\nx <- c(9, 3, 7, 1)\nhead(sort(x, decreasing = TRUE), 2)    # top 2 values\n#> [1] 9 7",
+    "comment": "**Why / when:** `head(df[order(...), ], n)` is the base-R \"top n\". tidyverse: `slice_head()` / `slice_max()`.\n\n**From:** Lec 3",
+    "key": false
+   },
+   {
+    "id": "kit-02-a20",
+    "label": "colnames() / names() · get or change column names",
+    "question": "Use it when: You need the column names (to spell them right) or want to rename columns.\n\nSearch words: column names, variable names, rename columns, change column name, list columns",
+    "code": "df <- data.frame(a = 1:2, b = 3:4)\ncolnames(df)\n#> [1] \"a\" \"b\"\ncolnames(df) <- c(\"first\", \"second\")\nnames(df)\n#> [1] \"first\"  \"second\"",
+    "comment": "**Why / when:** tidyverse: `rename(new = old)`.\n\n**From:** Lec 3",
+    "key": false
+   },
+   {
+    "id": "kit-02-a21",
+    "label": "order() / sort() / rev() · sort values or rows",
+    "question": "Use it when: You need values in order, rows sorted by a column, or the top/bottom n.\n\nSearch words: sort, order, sort rows, sort descending, arrange, rank, highest to lowest, top n, reorder rows",
+    "code": "x <- c(30, 10, 20)\nsort(x)\n#> [1] 10 20 30\nsort(x, decreasing = TRUE)\n#> [1] 30 20 10\norder(x)                                  # positions that would sort x\n#> [1] 2 3 1\nmtcars[order(mtcars$mpg, decreasing = TRUE), ][1:3, 1:3]    # top 3 rows by mpg\n#>                 mpg cyl disp\n#> Toyota Corolla 33.9   4 71.1\n#> Fiat 128       32.4   4 78.7\n#> Honda Civic    30.4   4 75.7",
+    "comment": "**Why / when:** `sort()` returns the sorted **values**; `order()` returns **positions**, which is what you need to sort **rows** of a data frame (`df[order(df$col), ]`). tidyverse: `arrange()`.\n\n**Watch out:** Don't forget the comma in `df[order(...), ]` — rows go before the comma.\n\n**From:** Lec 3, 7",
+    "key": false
+   },
+   {
+    "id": "kit-02-a22",
+    "label": "factor() / as.factor() / levels() · categories with fixed levels",
+    "question": "Use it when: A variable is a category (group, label, 0/1 code), or you need categories in a specific order or with zero counts shown.\n\nSearch words: factor, categorical variable, categories, levels, order of categories, convert to factor, labels for codes, category order",
+    "code": "x <- c(\"low\", \"high\", \"low\", \"medium\")\nf <- factor(x, levels = c(\"low\", \"medium\", \"high\"))\nlevels(f)\n#> [1] \"low\"    \"medium\" \"high\"  \ntable(f)\n#> f\n#>    low medium   high \n#>      2      1      1 \nfactor(c(0, 1, 1), levels = c(0, 1), labels = c(\"No\", \"Yes\"))\n#> [1] No  Yes Yes\n#> Levels: No Yes",
+    "comment": "**Why / when:** Factors control the **order** of groups in tables and plots, keep levels with 0 counts in `table()`, and turn number codes (0/1, 4/6/8 cylinders) into categories for plots.\n\n**Watch out:** Levels default to **alphabetical**; set `levels =` for a custom order.\n\n**From:** Lec 3 · **Used in:** Exam review Rev 02, Lec 13 setup",
+    "key": false
+   },
+   {
+    "id": "kit-02-a23",
+    "label": "cut() · turn numbers into groups",
+    "question": "Use it when: You need to bin a numeric variable into ranges (low/medium/high, age groups).\n\nSearch words: bin numbers, numbers into groups, categorize numeric, ranges, intervals, age groups, low medium high, buckets",
+    "code": "ages <- c(15, 22, 37, 45, 63)\ncut(ages, breaks = c(0, 18, 40, Inf), labels = c(\"teen\", \"adult\", \"older\"))\n#> [1] teen  adult adult older older\n#> Levels: teen adult older\ncut(ages, breaks = c(0, 18, 40, Inf), right = FALSE)   # [a, b) instead of (a, b]\n#> [1] [0,18)   [18,40)  [18,40)  [40,Inf) [40,Inf)\n#> Levels: [0,18) [18,40) [40,Inf)",
+    "comment": "**Why / when:** Cleaner than nested `ifelse()` when there are 3+ ranges. Intervals are `(a, b]` by default: the right end is included.\n\n**Watch out:** Number of labels = number of breaks − 1.\n\n**From:** Lec 3",
+    "key": false
+   },
+   {
+    "id": "kit-02-a24",
+    "label": "table() · count each category",
+    "question": "Use it when: You need how many times each value/category occurs, or a two-way count table.\n\nSearch words: count, frequency, frequency table, how many of each, counts per category, two-way table, cross tab",
+    "code": "rolls <- c(1, 3, 3, 6, 1, 3)\ntable(rolls)\n#> rolls\n#> 1 3 6 \n#> 2 3 1 \ntable(mtcars$cyl, mtcars$am)                  # two-way table\n#>    \n#>      0  1\n#>   4  3  8\n#>   6  4  3\n#>   8 12  2\nprop.table(table(rolls))                       # proportions\n#> rolls\n#>         1         3         6 \n#> 0.3333333 0.5000000 0.1666667 ",
+    "comment": "**Why / when:** The basic counting tool; `barplot(table(x))` plots it. To include values that never happened, make it a factor first: `table(factor(x, levels = 1:6))`.\n\n**From:** Lec 3 · **Used in:** HW 2 Part 1.2",
+    "key": false
+   },
+   {
+    "id": "kit-02-a25",
+    "label": "gl() · generate factor levels in a pattern",
+    "question": "Use it when: You need a factor with a repeating pattern of levels (e.g. 3 groups of 4).\n\nSearch words: generate levels, pattern of groups, repeating factor",
+    "code": "gl(3, 2, labels = c(\"A\", \"B\", \"C\"))\n#> [1] A A B B C C\n#> Levels: A B C",
+    "comment": "**Why / when:** Rarely needed; `factor(rep(..., each = k))` does the same.\n\n**From:** Lec 3",
+    "key": false
+   },
+   {
+    "id": "kit-02-a26",
+    "label": "if / else if / else · do one thing or another",
+    "question": "Use it when: Your code must choose between actions based on ONE condition (inside a function or loop).\n\nSearch words: if statement, condition, otherwise, if else, choose, decision, check condition, branch",
+    "code": "grade <- function(score) {\n  if (score >= 90) {\n    \"A\"\n  } else if (score >= 80) {\n    \"B\"\n  } else {\n    \"C\"\n  }\n}\ngrade(85)\n#> [1] \"B\"",
+    "comment": "**Why / when:** `if` checks **one** TRUE/FALSE. Put the most specific condition first (e.g. divisible by 2 **and** 3 before divisible by 2).\n\n**Watch out:** `if (x > 5)` with a vector x errors (*\"the condition has length > 1\"*). For a whole vector use `ifelse()`.\n\n**From:** Lec 5 · **Used in:** Exam review Rev 04",
+    "key": false
+   },
+   {
+    "id": "kit-02-a27",
+    "label": "ifelse() · label every element of a vector",
+    "question": "Use it when: You need a new value for EVERY element based on a condition (pass/fail, high/low, a new column).\n\nSearch words: label each value, condition on vector, vectorized if, new column based on condition, classify values, if else for vector, recode",
+    "code": "scores <- c(95, 62, 78)\nifelse(scores >= 70, \"pass\", \"fail\")\n#> [1] \"pass\" \"fail\" \"pass\"\nifelse(scores >= 90, \"A\", ifelse(scores >= 80, \"B\", \"C\"))   # nested\n#> [1] \"A\" \"C\" \"C\"",
+    "comment": "**Why / when:** Vectorized: works on all elements at once, no loop needed. Inside `mutate()` too: `mutate(status = ifelse(score >= 70, \"pass\", \"fail\"))`.\n\n**Watch out:** For 3+ ranges, `cut()` is cleaner.\n\n**From:** Lec 5",
+    "key": false
+   },
+   {
+    "id": "kit-02-a28",
+    "label": "for loop · repeat for each element / a fixed number of times",
+    "question": "Use it when: You know how many times to repeat (n simulations, each element of a vector).\n\nSearch words: loop, for loop, repeat n times, iterate, each element, go through each, simulation loop",
+    "code": "results <- numeric(5)              # make room first\nfor (i in 1:5) {\n  results[i] <- i^2\n}\nresults\n#> [1]  1  4  9 16 25",
+    "comment": "**Why / when:** Create the storage vector **before** the loop and fill `results[i]`. If you don't know how many repeats you need, use `while`.\n\n**Watch out:** `1:length(x)` breaks when x is empty; `seq_along(x)` is safer.\n\n**From:** Lec 5 · **Used in:** Must-know Core 02",
+    "key": false
+   },
+   {
+    "id": "kit-02-a29",
+    "label": "while loop · repeat until something happens",
+    "question": "Use it when: You DON'T know how many repeats you need: roll until a 6, keep going until the total passes 100.\n\nSearch words: while loop, repeat until, until something happens, keep going until, stop when, how many tries",
+    "code": "set.seed(1)\nrolls <- 0\nroll <- 0\nwhile (roll != 6) {\n  roll <- sample(1:6, 1)\n  rolls <- rolls + 1\n}\nrolls\n#> [1] 7",
+    "comment": "**Why / when:** The condition is checked **before** each repeat; make sure something inside the loop changes it, or it runs forever (press Esc).\n\n**From:** Lec 5 · **Used in:** Must-know Core 02",
+    "key": false
+   },
+   {
+    "id": "kit-02-a30",
+    "label": "break / next · leave a loop / skip to the next round",
+    "question": "Use it when: Inside a loop you want to stop early (break) or skip some elements (next).\n\nSearch words: stop loop, exit loop, skip iteration, skip element, break out, continue",
+    "code": "for (i in 1:10) {\n  if (i %% 2 == 0) next      # skip even numbers\n  if (i > 7) break           # stop completely\n  print(i)\n}\n#> [1] 1\n#> [1] 3\n#> [1] 5\n#> [1] 7",
+    "comment": "**Why / when:** `%%` is the remainder: `i %% 2 == 0` means \"i is even\".\n\n**From:** Lec 5",
+    "key": false
+   },
+   {
+    "id": "kit-02-a31",
+    "label": "function() / return() · write your own function",
+    "question": "Use it when: A question says \"write / create / construct a function\", or you repeat the same code with different inputs.\n\nSearch words: write a function, create function, define function, own function, arguments, return value, reusable code",
+    "code": "summarize_vec <- function(x, digits = 2) {\n  out <- list(mean = round(mean(x), digits),\n              sd   = round(sd(x), digits))\n  return(out)\n}\nsummarize_vec(c(3, 5, 9))\n#> $mean\n#> [1] 5.67\n#> \n#> $sd\n#> [1] 3.06",
+    "comment": "**Why / when:** Arguments go in `function(...)`, defaults with `=`. The last value (or `return()`) is the output. To return several things, return a `list()`.\n\n**Watch out:** Test the function on the input the question gives (e.g. `fun1(30)`) and print the result.\n\n**From:** Lec 6 · **Used in:** Exam review Rev 01",
+    "key": false
+   },
+   {
+    "id": "kit-02-a32",
+    "label": "read.csv() / read.table() · load a data file (base R)",
+    "question": "Use it when: You need to bring a .csv or .txt file into R.\n\nSearch words: import data, read file, load data, read csv, open data set, read text file, load dataset",
+    "code": "# df <- read.csv(\"carseats.csv\")\n# df <- read.table(\"data.txt\", header = TRUE, sep = \"\\t\")\n# tidyverse version:  df <- read_csv(\"carseats.csv\")",
+    "comment": "**Why / when:** `read.csv` assumes commas and a header row. `read.table` needs you to say `header = TRUE` and the `sep`. In tidyverse homework use `read_csv()`.\n\n**Watch out:** File-not-found errors = wrong folder or wrong name; see `getwd()`.\n\n**From:** Lec 7",
+    "key": false
+   },
+   {
+    "id": "kit-02-a33",
+    "label": "write.csv() / write.table() · save a table to a file",
+    "question": "Use it when: You need to export results to a .csv/.txt file.\n\nSearch words: save data, export csv, write file, save results to file",
+    "code": "# write.csv(df, \"results.csv\", row.names = FALSE)",
+    "comment": "**Why / when:** `row.names = FALSE` stops R from adding a column of row numbers.\n\n**From:** Lec 7",
+    "key": false
+   },
+   {
+    "id": "kit-02-a34",
+    "label": "View() · spreadsheet viewer in RStudio",
+    "question": "Use it when: You want to scroll through the data like a spreadsheet.\n\nSearch words: view data, open data viewer, spreadsheet view, look at whole data set",
+    "code": "# View(mtcars)    # opens a tab in RStudio; don't leave it in a rendered file",
+    "comment": "**Why / when:** Useful while working; remove it before rendering (it does nothing useful in HTML).\n\n**From:** Lec 7",
+    "key": false
+   },
+   {
+    "id": "kit-02-a35",
+    "label": "mean() / median() · average / middle value",
+    "question": "Use it when: You need the average or the middle value of a numeric vector or column.\n\nSearch words: average, mean, median, middle value, typical value, center",
+    "code": "x <- c(2, 4, 4, 5, 100)\nmean(x)\n#> [1] 23\nmedian(x)                    # not pulled up by the 100\n#> [1] 4\nmean(c(1, NA, 3), na.rm = TRUE)\n#> [1] 2",
+    "comment": "**Why / when:** The mean is pulled by outliers; the median isn't. With NAs, add `na.rm = TRUE` or you get NA.\n\n**Watch out:** `mean(x > 5)` = **proportion** of values above 5 (TRUE = 1).\n\n**From:** Lec 7",
+    "key": false
+   },
+   {
+    "id": "kit-02-a36",
+    "label": "var() / sd() · spread around the mean",
+    "question": "Use it when: You need the variance or standard deviation.\n\nSearch words: standard deviation, variance, spread, variability, how spread out",
+    "code": "x <- c(2, 4, 4, 5, 10)\nvar(x)\n#> [1] 9\nsd(x)\n#> [1] 3\nsqrt(var(x))\n#> [1] 3",
+    "comment": "**Why / when:** `sd` = square root of `var`, in the same units as the data. Both use n − 1 (sample versions).\n\n**From:** Lec 7",
+    "key": false
+   },
+   {
+    "id": "kit-02-a37",
+    "label": "quantile() / IQR() · percentiles, quartiles, spread of the middle 50%",
+    "question": "Use it when: A question asks for quartiles, percentiles (e.g. 90th), top 25%, or the IQR.\n\nSearch words: quartiles, percentile, 25th percentile, 75th percentile, top 25 percent, bottom 10 percent, IQR, interquartile range, cutoff",
+    "code": "x <- mtcars$mpg\nquantile(x)                          # min, Q1, median, Q3, max\n#>     0%    25%    50%    75%   100% \n#> 10.400 15.425 19.200 22.800 33.900 \nquantile(x, c(0.25, 0.75))\n#>    25%    75% \n#> 15.425 22.800 \nq75 <- quantile(x, 0.75)\nmean(x[x > q75])                     # average of the top 25%\n#> [1] 29.25714\nIQR(x)\n#> [1] 7.375",
+    "comment": "**Why / when:** Use the quantile as a **cutoff** to subset: values above the 75th percentile = top 25%.\n\n**Watch out:** `quantile()` returns a named number; it still works in comparisons.\n\n**From:** Lec 7 · **Used in:** Practice Midterm 1 (quartiles)",
+    "key": false
+   },
+   {
+    "id": "kit-02-a38",
+    "label": "min() / max() / range() · smallest / largest values",
+    "question": "Use it when: You need the smallest or largest value (not where it is).\n\nSearch words: minimum, maximum, smallest value, largest value, highest, lowest, range",
+    "code": "x <- c(7, 2, 9, 4)\nmin(x); max(x)\n#> [1] 2\n#> [1] 9\nrange(x)\n#> [1] 2 9",
+    "comment": "**Why / when:** To find **which** row/element has the max, use `which.max()`.\n\n**From:** Lec 7",
+    "key": false
+   },
+   {
+    "id": "kit-02-a39",
+    "label": "which.min() / which.max() / which() · WHERE the min / max / TRUE values are",
+    "question": "Use it when: You need the position (row) of the largest/smallest value, e.g. \"which store has the highest price?\"\n\nSearch words: which row, position of maximum, index of max, which one has the highest, find location, which element, find positions",
+    "code": "price <- c(120, 95, 140, 88)\nstore <- c(\"A\", \"B\", \"C\", \"D\")\nwhich.max(price)\n#> [1] 3\nstore[which.max(price)]            # name of the most expensive\n#> [1] \"C\"\nwhich(price > 100)                 # all positions meeting a condition\n#> [1] 1 3\nstore[price == max(price)]         # handles ties\n#> [1] \"C\"",
+    "comment": "**Why / when:** `which.max` returns only the **first** max; `x == max(x)` returns all ties.\n\n**From:** Lec 7 · **Used in:** HW 2 Problem 2 Part 2",
+    "key": false
+   },
+   {
+    "id": "kit-02-a40",
+    "label": "sum() / cumsum() · total / running total",
+    "question": "Use it when: You need a total, a count of TRUE values, or a running (cumulative) total.\n\nSearch words: total, sum, add up, count how many, running total, cumulative sum, running sum",
+    "code": "x <- c(3, 1, 4, 1, 5)\nsum(x)\n#> [1] 14\nsum(x > 2)                  # how many values above 2\n#> [1] 3\ncumsum(x)                   # running total\n#> [1]  3  4  8  9 14",
+    "comment": "**Why / when:** `sum(condition)` counts; `mean(condition)` gives the proportion. `cumsum(x) / seq_along(x)` = running average (law of large numbers plots).\n\n**From:** Lec 7",
+    "key": false
+   },
+   {
+    "id": "kit-02-a41",
+    "label": "round() / sqrt() / abs() · basic math helpers",
+    "question": "Use it when: You need rounding, square roots, or absolute values.\n\nSearch words: round, decimals, decimal places, square root, absolute value",
+    "code": "round(3.14159, 2)\n#> [1] 3.14\nsqrt(16)\n#> [1] 4\nabs(-4)\n#> [1] 4",
+    "comment": "\n\n**From:** base R",
+    "key": false
+   },
+   {
+    "id": "kit-02-a42",
+    "label": "is.na() / na.rm = TRUE · find or ignore missing values",
+    "question": "Use it when: Data has NAs: you want to count them, remove them, or compute without them.\n\nSearch words: missing values, NA, count missing, how many missing values, remove NA, ignore missing, na.rm",
+    "code": "x <- c(4, NA, 7, NA)\nis.na(x)\n#> [1] FALSE  TRUE FALSE  TRUE\nsum(is.na(x))                 # how many missing\n#> [1] 2\nmean(x, na.rm = TRUE)\n#> [1] 5.5\nx[!is.na(x)]                  # drop them\n#> [1] 4 7",
+    "comment": "**Why / when:** \"How many missing values does it contain?\" (HW 3) = `sum(is.na(df))`. tidyverse: `drop_na()`, `replace_na()`.\n\n**From:** base R · **Used in:** HW 3 Parts 3–5",
+    "key": false
+   },
+   {
+    "id": "kit-02-a43",
+    "label": "unique() / duplicated() · distinct values / spot repeats",
+    "question": "Use it when: You need the distinct values, or to detect/count duplicate rows.\n\nSearch words: unique values, distinct values, duplicates, duplicate rows, repeated values, remove duplicates",
+    "code": "x <- c(\"IL\", \"OH\", \"IL\", \"WI\")\nunique(x)\n#> [1] \"IL\" \"OH\" \"WI\"\nduplicated(x)\n#> [1] FALSE FALSE  TRUE FALSE\nsum(duplicated(x))\n#> [1] 1",
+    "comment": "**Why / when:** tidyverse for whole rows: `distinct()`.\n\n**From:** base R",
+    "key": false
+   },
+   {
+    "id": "kit-02-a44",
+    "label": "any() / all() · is at least one / every value TRUE?",
+    "question": "Use it when: You need one TRUE/FALSE about a whole vector: \"any doubles?\", \"all values positive?\"\n\nSearch words: any, all, at least one, every value, none, check whole vector",
+    "code": "x <- c(3, -1, 5)\nany(x < 0)\n#> [1] TRUE\nall(x > 0)\n#> [1] FALSE",
+    "comment": "**Why / when:** Turns a vector of TRUE/FALSE into a single TRUE/FALSE, which is what `if` needs.\n\n**From:** base R",
+    "key": false
+   },
+   {
+    "id": "kit-02-a45",
+    "label": "apply() · run a function on every row or column of a matrix",
+    "question": "Use it when: You need a summary per row or per column of a matrix (row means, column max).\n\nSearch words: each row, each column, row means, column means, per row, per column, apply function to rows",
+    "code": "m <- matrix(1:6, nrow = 2)\napply(m, 1, sum)     # 1 = rows\n#> [1]  9 12\napply(m, 2, max)     # 2 = columns\n#> [1] 2 4 6",
+    "comment": "**Why / when:** MARGIN 1 = rows, 2 = columns. Shortcuts: `rowSums`, `colMeans`.\n\n**From:** Lec 7 · **Used in:** Exam review Rev 05",
+    "key": false
+   },
+   {
+    "id": "kit-02-a46",
+    "label": "lapply() / sapply() · run a function on every element of a list/vector",
+    "question": "Use it when: You'd otherwise write a for loop over elements; sapply returns a vector, lapply a list.\n\nSearch words: apply function to each element, without loop, each element of list, loop replacement, sapply, lapply",
+    "code": "lst <- list(a = c(1, 2, 3), b = c(10, 20))\nsapply(lst, mean)          # vector\n#>  a  b \n#>  2 15 \nlapply(lst, length)        # list\n#> $a\n#> [1] 3\n#> \n#> $b\n#> [1] 2\nsapply(1:5, function(i) i^2)\n#> [1]  1  4  9 16 25",
+    "comment": "**Why / when:** Homework often says \"use apply functions instead of loops\". `sapply(1:n, function(i) ...)` replaces most `for (i in 1:n)` loops.\n\n**From:** Lec 7",
+    "key": false
+   },
+   {
+    "id": "kit-02-a47",
+    "label": "mapply() · run a function on PAIRS of elements",
+    "question": "Use it when: You need to combine two vectors element by element with your own function.\n\nSearch words: pairs, element by element, compare two vectors, two inputs, pairwise, mapply",
+    "code": "mapply(function(a, b) max(a, b), c(1, 5, 3), c(4, 2, 6))\n#> [1] 4 5 6",
+    "comment": "**Why / when:** Function first, then the vectors. Element 1 with element 1, 2 with 2, …\n\n**From:** Lec 7 · **Used in:** HW 2 Part 1.1",
+    "key": false
+   },
+   {
+    "id": "kit-02-a48",
+    "label": "tapply() · summary of a variable within each group",
+    "question": "Use it when: You need a statistic per group: mean price by region, median sales by shelf location.\n\nSearch words: by group, per group, group mean, average by category, mean for each group, grouped summary base R",
+    "code": "tapply(mtcars$mpg, mtcars$cyl, mean)\n#>        4        6        8 \n#> 26.66364 19.74286 15.10000 \ntapply(mtcars$mpg, list(mtcars$cyl, mtcars$am), mean)    # two groupings\n#>        0        1\n#> 4 22.900 28.07500\n#> 6 19.125 20.56667\n#> 8 15.050 15.40000",
+    "comment": "**Why / when:** Order: `tapply(values, groups, function)`. Returns a named vector or table. tidyverse: `group_by() + summarise()`.\n\n**From:** Lec 8 · **Used in:** HW 2 Part 2.3",
+    "key": false
+   },
+   {
+    "id": "kit-02-a49",
+    "label": "aggregate() · group summary as a data frame",
+    "question": "Use it when: Same as tapply, but you want a data frame back (easy to print or join).\n\nSearch words: aggregate, group summary, formula by group, mean by group data frame",
+    "code": "aggregate(mpg ~ cyl, data = mtcars, FUN = mean)\n#>   cyl      mpg\n#> 1   4 26.66364\n#> 2   6 19.74286\n#> 3   8 15.10000\naggregate(mpg ~ cyl + am, data = mtcars, FUN = mean)\n#>   cyl am      mpg\n#> 1   4  0 22.90000\n#> 2   6  0 19.12500\n#> 3   8  0 15.05000\n#> 4   4  1 28.07500\n#> 5   6  1 20.56667\n#> 6   8  1 15.40000",
+    "comment": "**Why / when:** Formula `y ~ group` reads \"y by group\".\n\n**From:** Lec 8",
+    "key": false
+   },
+   {
+    "id": "kit-02-a50",
+    "label": "hist() · histogram (base R)",
+    "question": "Use it when: You want the distribution of ONE numeric variable.\n\nSearch words: histogram, distribution, shape of data, frequency of numeric values, skewed",
+    "code": "hist(mtcars$mpg, main = \"MPG\", xlab = \"Miles per gallon\", col = \"lightblue\", breaks = 8)\nabline(v = mean(mtcars$mpg), col = \"red\", lwd = 2)",
+    "comment": "**Why / when:** `breaks` controls the number of bars; `abline(v = ...)` adds a vertical line. ggplot: `geom_histogram()`.\n\n![hist()](files/plots/ff-hist.png)\n\n**From:** Lec 8",
+    "key": false
+   },
+   {
+    "id": "kit-02-a51",
+    "label": "barplot() · bar chart of counts (base R)",
+    "question": "Use it when: You want counts of a CATEGORICAL variable (or side-by-side counts for two).\n\nSearch words: bar chart, barplot, counts of categories, frequency bar chart, side by side bars",
+    "code": "barplot(table(mtcars$cyl), main = \"Cars by cylinders\", col = \"orange\",\n        xlab = \"Cylinders\", ylab = \"Count\")",
+    "comment": "**Why / when:** Give it `table(x)`, not the raw vector. Two categories: `barplot(table(a, b), beside = TRUE, legend = TRUE)`. ggplot: `geom_bar()`.\n\n![barplot()](files/plots/ff-bar.png)\n\n**From:** Lec 8",
+    "key": false
+   },
+   {
+    "id": "kit-02-a52",
+    "label": "boxplot() · boxplots, optionally by group (base R)",
+    "question": "Use it when: You want to compare a numeric variable across groups, or show its spread and outliers.\n\nSearch words: boxplot, box plot, compare groups, spread by group, outliers, distribution by category",
+    "code": "boxplot(mpg ~ cyl, data = mtcars, col = c(\"skyblue\", \"gold\", \"salmon\"),\n        main = \"MPG by cylinders\", xlab = \"Cylinders\", ylab = \"MPG\")",
+    "comment": "**Why / when:** `y ~ group` gives one box per group. ggplot: `geom_boxplot()`.\n\n![boxplot()](files/plots/ff-box.png)\n\n**From:** Lec 8",
+    "key": false
+   },
+   {
+    "id": "kit-02-a53",
+    "label": "plot() · scatterplot / line plot (base R)",
+    "question": "Use it when: You want the relationship between TWO numeric variables, or a line over time.\n\nSearch words: scatterplot, scatter plot, relationship between two variables, x vs y, line plot, plot over time",
+    "code": "plot(mtcars$wt, mtcars$mpg, pch = 19, col = ifelse(mtcars$am == 1, \"red\", \"blue\"),\n     main = \"MPG vs weight\", xlab = \"Weight\", ylab = \"MPG\")\nlegend(\"topright\", legend = c(\"manual\", \"automatic\"), col = c(\"red\", \"blue\"), pch = 19)",
+    "comment": "**Why / when:** `pch` = point shape, `type = \"l\"` = line. Color by group with `ifelse()`. ggplot: `geom_point()`.\n\n![plot()](files/plots/ff-scatter.png)\n\n**From:** Lec 8",
+    "key": false
+   },
+   {
+    "id": "kit-02-a54",
+    "label": "legend() · add a legend to a base plot",
+    "question": "Use it when: Your base-R plot uses colors for groups and needs a key.\n\nSearch words: legend, add legend, color key, explain colors",
+    "code": "# legend(\"topright\", legend = c(\"A\", \"B\"), fill = c(\"red\", \"blue\"))",
+    "comment": "**Why / when:** Colors in the legend must match the order you used in the plot. ggplot makes legends automatically.\n\n**From:** Lec 8",
+    "key": false
+   },
+   {
+    "id": "kit-02-a55",
+    "label": "par(mfrow = c(r, c)) · several base plots in one image",
+    "question": "Use it when: You need two or more plots side by side or stacked in one figure.\n\nSearch words: two plots side by side, multiple plots, plots in one image, grid of plots, panels",
+    "code": "par(mfrow = c(1, 2))\nhist(mtcars$mpg, main = \"Histogram\")\nboxplot(mtcars$mpg, main = \"Boxplot\")\npar(mfrow = c(1, 1))     # reset",
+    "comment": "**Why / when:** Reset to `c(1, 1)` afterwards. ggplot: `facet_wrap()` (same plot by group).\n\n![par(mfrow = c(r, c))](files/plots/ff-par.png)\n\n**From:** Lec 8",
+    "key": false
+   },
+   {
+    "id": "kit-02-a56",
+    "label": "sample() / set.seed() · random draws (dice, coins, cards)",
+    "question": "Use it when: You need to simulate random outcomes: roll dice, flip coins, draw cards, shuffle.\n\nSearch words: random, simulate, roll a die, flip a coin, draw cards, sample, shuffle, random draw, reproducible, seed",
+    "code": "set.seed(1)\nsample(1:6, 5, replace = TRUE)                       # 5 die rolls\n#> [1] 1 4 1 2 5\nsample(c(\"H\", \"T\"), 3, replace = TRUE, prob = c(0.7, 0.3))   # unfair coin\n#> [1] \"T\" \"H\" \"H\"\nsample(1:52, 5)                                      # 5 cards, no replacement\n#> [1] 18 51 33 21 49",
+    "comment": "**Why / when:** `replace = TRUE` for repeated events (dice), FALSE for drawing without putting back (cards). `set.seed()` makes random results repeatable.\n\n**From:** Lec 9 · **Used in:** Must-know Core 01",
+    "key": false
+   },
+   {
+    "id": "kit-02-a57",
+    "label": "dbinom() / pbinom() · binomial: exactly / at most k successes",
+    "question": "Use it when: Fixed number of trials, each success with the same probability: P(exactly k), P(at most k).\n\nSearch words: binomial, exactly k successes, at most, at least, number of successes, probability of k heads",
+    "code": "dbinom(3, size = 10, prob = 0.5)        # P(X = 3)\n#> [1] 0.1171875\npbinom(3, size = 10, prob = 0.5)        # P(X <= 3)\n#> [1] 0.171875\n1 - pbinom(3, size = 10, prob = 0.5)    # P(X >= 4)\n#> [1] 0.828125",
+    "comment": "**Why / when:** `d` = exactly, `p` = at most (≤). \"At least k\" = `1 - pbinom(k - 1, ...)`.\n\n**From:** Lec 9",
+    "key": false
+   },
+   {
+    "id": "kit-02-a58",
+    "label": "dgeom() / pgeom() · geometric: failures before the first success",
+    "question": "Use it when: Waiting for the first success: P(first six on roll k).\n\nSearch words: geometric, first success, wait until first, number of failures before",
+    "code": "dgeom(2, prob = 1/6)       # 2 failures, then success = first six on roll 3\n#> [1] 0.1157407\npgeom(2, prob = 1/6)       # first six within 3 rolls\n#> [1] 0.4212963",
+    "comment": "**Why / when:** R counts **failures before** the success: \"on roll k\" → use `k - 1`.\n\n**From:** Lec 9",
+    "key": false
+   },
+   {
+    "id": "kit-02-a59",
+    "label": "rnorm() / dnorm() / pnorm() / qnorm() · normal distribution",
+    "question": "Use it when: Normally distributed values: simulate (r), probability below a value (p), cutoff for a percentile (q).\n\nSearch words: normal distribution, bell curve, generate normal data, probability less than, percentile of normal, z score, cutoff",
+    "code": "set.seed(2)\nrnorm(3, mean = 70, sd = 10)        # simulate\n#> [1] 61.03085 71.84849 85.87845\npnorm(80, mean = 70, sd = 10)       # P(X < 80)\n#> [1] 0.8413447\nqnorm(0.90, mean = 70, sd = 10)     # 90th percentile\n#> [1] 82.81552\ndnorm(70, mean = 70, sd = 10)       # height of the curve\n#> [1] 0.03989423",
+    "comment": "**Why / when:** Memory trick: **r**andom, **p**robability (area to the left), **q**uantile (value for an area), **d**ensity (curve height). \"Greater than\" = `1 - pnorm(...)`.\n\n**From:** Lec 9 · **Used in:** Must-know Core 03",
+    "key": false
+   },
+   {
+    "id": "kit-02-a60",
+    "label": "runif() / rbinom() · random uniform and binomial numbers",
+    "question": "Use it when: You need random numbers between a and b, or simulated counts of successes.\n\nSearch words: uniform, random number between, random decimal, simulate binomial, number of heads in n flips",
+    "code": "set.seed(3)\nrunif(3, min = 0, max = 10)\n#> [1] 1.680415 8.075164 3.849424\nrbinom(5, size = 10, prob = 0.5)    # heads in 10 flips, 5 times\n#> [1] 4 5 5 3 4",
+    "comment": "\n\n**From:** base R",
+    "key": false
+   }
+  ]
+ },
+ "kit-03": {
+  "type": "kit",
+  "num": "03",
+  "title": "Function finder: tidyverse and ggplot2 (what each function does, when and why)",
+  "date": "2026-10-21",
+  "exams": [],
+  "topics": [
+   "function reference",
+   "tidyverse",
+   "dplyr",
+   "tidyr",
+   "joins",
+   "ggplot2"
+  ],
+  "pdfs": [],
+  "notes": "Every tidyverse and ggplot2 function from Lectures 10–13, one card each: **what it does, when to use it, why**, a tiny example run in R with its output (and the plot for graph functions), the usual mistake, and where it appears in your homework.\n\n**Find a function by what you want to do.** Type the goal (\"adding a new variable in tidyverse\", \"remove duplicates\", \"split a column\", \"keep all rows from the first table\") into the sidebar search or **Find code for a question**. Base-R functions are in **Everyday code 02**.\n\n**On this page:**\n\n- `library(tidyverse) / %>% and |>`: load tidyverse, chain steps with the pipe\n- `as_tibble() / tibble() / glimpse()`: tidyverse data frames\n- `read_csv()`: load a .csv (tidyverse)\n- `filter()`: keep rows that meet a condition\n- `slice() / slice_head() / slice_tail() / slice_sample()`: rows by position\n- `slice_max() / slice_min()`: rows with the largest / smallest values\n- `arrange() / desc()`: sort rows\n- `distinct()`: remove duplicate rows\n- `select()`: keep, drop or reorder columns\n- `starts_with() / ends_with() / contains() / everything() / where()`: pick columns by pattern or type\n- `rename()`: change column names\n- `relocate()`: move columns to a new position\n- `mutate()`: add a new variable / change a column\n- `transmute()`: make new columns and keep ONLY those\n- `if_else() / case_when()`: conditions inside mutate\n- `group_by() + summarise()`: one summary row per group\n- `group_by(two variables) + .groups = \"drop\"`: compare subgroups within each group\n- `n() / count()`: count rows (per group)\n- `ungroup()`: remove grouping\n- `across()`: the same function on many columns\n- `inner_join()`: combine two tables, keep only matches\n- `left_join() / right_join() / full_join()`: joins that keep unmatched rows\n- `semi_join() / anti_join()`: filter by whether a match exists\n- `intersect() / union() / setdiff()`: set operations on tables with the SAME columns\n- `pivot_longer()`: column names → values of a new variable (wide to long)\n- `pivot_wider()`: values of a variable → columns (long to wide)\n- `separate()`: split one column into several\n- `unite()`: glue columns into one\n- `drop_na() / replace_na() / complete() / fill()`: handle missing values (tidyverse)\n- `str_replace()`: find and replace inside text\n- `ggplot() + aes() + geom_point()`: scatterplot in ggplot\n- `geom_histogram() / geom_vline()`: histogram (+ reference line) in ggplot\n- `geom_boxplot() / stat_summary()`: boxplots by group, with mean dots\n- `geom_bar() / geom_col()`: bar charts in ggplot\n- `labs()`: title, subtitle, axis and legend labels\n- `scale_colour_manual() / scale_fill_manual()`: choose the colors yourself\n- `coord_cartesian() vs xlim() / ylim()`: zoom vs cut the axis range\n- `scale_x_continuous(breaks = ...)`: tick marks and axis number format\n- `theme_minimal() / theme_bw() / … and theme()`: overall look, then fine-tuning\n- `facet_wrap() / facet_grid()`: one small plot per group",
+  "takeaways": [],
+  "updatedAt": "2026-10-21T13:40:00Z",
+  "chunks": [
+   {
+    "id": "kit-03-b00",
+    "label": "library(tidyverse) / %>% and |> · load tidyverse, chain steps with the pipe",
+    "question": "Use it when: Any tidyverse homework: load it once at the top, then chain steps with a pipe.\n\nSearch words: load tidyverse, pipe, chain steps, and then, %>%, |>, tidyverse setup, library",
+    "code": "library(tidyverse)\nmtcars |> filter(cyl == 4) |> nrow()\n#> [1] 11\n# same as: nrow(filter(mtcars, cyl == 4))",
+    "comment": "**Why / when:** The pipe passes the result on the left in as the **first argument** of the next function, so you read code top to bottom: \"take the data, then filter, then …\". `%>%` and `|>` are interchangeable in this course.\n\n**Watch out:** Don't repeat the data name inside the piped function: `df |> relocate(df, ...)` is wrong (that was the Part 1 error).\n\n**From:** Lec 10",
+    "key": false
+   },
+   {
+    "id": "kit-03-b01",
+    "label": "as_tibble() / tibble() / glimpse() · tidyverse data frames",
+    "question": "Use it when: You want neat printing (first 10 rows, types shown) or a compact overview of columns.\n\nSearch words: tibble, convert to tibble, nicer print, glimpse, overview of columns, look at data tidyverse",
+    "code": "cars <- as_tibble(mtcars)\ncars\n#> # A tibble: 32 × 11\n#>      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb\n#>    <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>\n#>  1  21       6  160    110  3.9   2.62  16.5     0     1     4     4\n#>  2  21       6  160    110  3.9   2.88  17.0     0     1     4     4\n#>  3  22.8     4  108     93  3.85  2.32  18.6     1     1     4     1\n#>  4  21.4     6  258    110  3.08  3.22  19.4     1     0     3     1\n#>  5  18.7     8  360    175  3.15  3.44  17.0     0     0     3     2\n#>  6  18.1     6  225    105  2.76  3.46  20.2     1     0     3     1\n#>  7  14.3     8  360    245  3.21  3.57  15.8     0     0     3     4\n#>  8  24.4     4  147.    62  3.69  3.19  20       1     0     4     2\n#>  9  22.8     4  141.    95  3.92  3.15  22.9     1     0     4     2\n#> 10  19.2     6  168.   123  3.92  3.44  18.3     1     0     4     4\n#> # ℹ 22 more rows\nglimpse(cars)\n#> Rows: 32\n#> Columns: 11\n#> $ mpg  <dbl> 21.0, 21.0, 22.8, 21.4, 18.7, 18.1, 14.3, 24.4, 22.8, 19.2, 17.8,…\n#> $ cyl  <dbl> 6, 6, 4, 6, 8, 6, 8, 4, 4, 6, 6, 8, 8, 8, 8, 8, 8, 4, 4, 4, 4, 8,…\n#> $ disp <dbl> 160.0, 160.0, 108.0, 258.0, 360.0, 225.0, 360.0, 146.7, 140.8, 16…\n#> $ hp   <dbl> 110, 110, 93, 110, 175, 105, 245, 62, 95, 123, 123, 180, 180, 180…\n#> $ drat <dbl> 3.90, 3.90, 3.85, 3.08, 3.15, 2.76, 3.21, 3.69, 3.92, 3.92, 3.92,…\n#> $ wt   <dbl> 2.620, 2.875, 2.320, 3.215, 3.440, 3.460, 3.570, 3.190, 3.150, 3.…\n#> $ qsec <dbl> 16.46, 17.02, 18.61, 19.44, 17.02, 20.22, 15.84, 20.00, 22.90, 18…\n#> $ vs   <dbl> 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0,…\n#> $ am   <dbl> 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0,…\n#> $ gear <dbl> 4, 4, 4, 3, 3, 3, 3, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 4, 4, 4, 3, 3,…\n#> $ carb <dbl> 4, 4, 1, 1, 2, 1, 4, 2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2, 1, 1, 2,…",
+    "comment": "**Why / when:** `read_csv()` already returns a tibble. `print(df, n = 20)` shows more rows; `glimpse()` = tidyverse `str()`.\n\n**From:** Lec 10",
+    "key": false
+   },
+   {
+    "id": "kit-03-b02",
+    "label": "read_csv() · load a .csv (tidyverse)",
+    "question": "Use it when: Importing data in a tidyverse homework.\n\nSearch words: import data tidyverse, read csv tidyverse, load csv, read file tidyverse",
+    "code": "# df <- read_csv(\"~/Downloads/Dataset_1.csv\")\n# df <- read_csv(\"Dataset_1.csv\", show_col_types = FALSE)   # hide the column message",
+    "comment": "**Why / when:** Underscore version (`read_csv`) = tidyverse; dot version (`read.csv`) = base R. Returns a tibble and guesses column types.\n\n**Watch out:** Path in quotes, `~` inside the quotes.\n\n**From:** Lec 10–12",
+    "key": false
+   },
+   {
+    "id": "kit-03-b03",
+    "label": "filter() · keep rows that meet a condition",
+    "question": "Use it when: You need only some rows: a state, values above a cutoff, non-missing, several conditions.\n\nSearch words: filter rows, keep rows, subset rows, select rows where, only rows with, remove rows, condition on rows, filter out",
+    "code": "mpg |> filter(class == \"suv\", hwy > 20)              # AND\n#> # A tibble: 7 × 11\n#>   manufacturer model       displ  year   cyl trans drv     cty   hwy fl    class\n#>   <chr>        <chr>       <dbl> <int> <int> <chr> <chr> <int> <int> <chr> <chr>\n#> 1 jeep         grand cher…   3    2008     6 auto… 4        17    22 d     suv  \n#> 2 subaru       forester a…   2.5  1999     4 manu… 4        18    25 r     suv  \n#> 3 subaru       forester a…   2.5  1999     4 auto… 4        18    24 r     suv  \n#> 4 subaru       forester a…   2.5  2008     4 manu… 4        20    27 r     suv  \n#> 5 subaru       forester a…   2.5  2008     4 manu… 4        19    25 p     suv  \n#> 6 subaru       forester a…   2.5  2008     4 auto… 4        20    26 r     suv  \n#> 7 subaru       forester a…   2.5  2008     4 auto… 4        18    23 p     suv  \nmpg |> filter(class %in% c(\"compact\", \"midsize\")) |> nrow()\n#> [1] 88\nmpg |> filter(year == 2008 | cyl == 4) |> nrow()     # OR\n#> [1] 162",
+    "comment": "**Why / when:** Commas mean AND, `|` means OR, `%in%` matches a list of values. Base R: `df[df$x > 5, ]`.\n\n**Watch out:** \"**Filter out** counties with less than 50000\" means **remove** them → keep `poptotal >= 50000`. Use `==` (two equals) to compare.\n\n**From:** Lec 10 · **Used in:** HW 3 Part 14",
+    "key": false
+   },
+   {
+    "id": "kit-03-b04",
+    "label": "slice() / slice_head() / slice_tail() / slice_sample() · rows by position",
+    "question": "Use it when: You need rows by number: first n, last n, rows 5–10, or a random sample of rows.\n\nSearch words: first n rows, last n rows, rows by position, random rows, sample rows, slice",
+    "code": "mpg |> slice(1:3)\n#> # A tibble: 3 × 11\n#>   manufacturer model displ  year   cyl trans      drv     cty   hwy fl    class \n#>   <chr>        <chr> <dbl> <int> <int> <chr>      <chr> <int> <int> <chr> <chr> \n#> 1 audi         a4      1.8  1999     4 auto(l5)   f        18    29 p     compa…\n#> 2 audi         a4      1.8  1999     4 manual(m5) f        21    29 p     compa…\n#> 3 audi         a4      2    2008     4 manual(m6) f        20    31 p     compa…\nmpg |> slice_head(n = 2)\n#> # A tibble: 2 × 11\n#>   manufacturer model displ  year   cyl trans      drv     cty   hwy fl    class \n#>   <chr>        <chr> <dbl> <int> <int> <chr>      <chr> <int> <int> <chr> <chr> \n#> 1 audi         a4      1.8  1999     4 auto(l5)   f        18    29 p     compa…\n#> 2 audi         a4      1.8  1999     4 manual(m5) f        21    29 p     compa…\nset.seed(1); mpg |> slice_sample(n = 2)\n#> # A tibble: 2 × 11\n#>   manufacturer model       displ  year   cyl trans drv     cty   hwy fl    class\n#>   <chr>        <chr>       <dbl> <int> <int> <chr> <chr> <int> <int> <chr> <chr>\n#> 1 dodge        ram 1500 p…   4.7  2008     8 auto… 4        13    17 r     pick…\n#> 2 subaru       impreza awd   2.2  1999     4 manu… 4        19    26 r     subc…",
+    "comment": "\n\n**From:** Lec 10",
+    "key": false
+   },
+   {
+    "id": "kit-03-b05",
+    "label": "slice_max() / slice_min() · rows with the largest / smallest values",
+    "question": "Use it when: \"Which has the highest/lowest …?\", top 5, bottom 3.\n\nSearch words: highest, lowest, biggest, smallest, largest, top n, bottom n, maximum row, which has the most, top 5",
+    "code": "mpg |> slice_max(hwy, n = 3) |> select(manufacturer, model, hwy)\n#> # A tibble: 3 × 3\n#>   manufacturer model        hwy\n#>   <chr>        <chr>      <int>\n#> 1 volkswagen   jetta         44\n#> 2 volkswagen   new beetle    44\n#> 3 volkswagen   new beetle    41\nmpg |> slice_min(hwy, n = 1) |> select(manufacturer, model, hwy)\n#> # A tibble: 5 × 3\n#>   manufacturer model                 hwy\n#>   <chr>        <chr>               <int>\n#> 1 dodge        dakota pickup 4wd      12\n#> 2 dodge        durango 4wd            12\n#> 3 dodge        ram 1500 pickup 4wd    12\n#> 4 dodge        ram 1500 pickup 4wd    12\n#> 5 jeep         grand cherokee 4wd     12",
+    "comment": "**Why / when:** Returns the whole row(s), so you see which one it is. Ties can return more than n rows (`with_ties = FALSE` to stop that).\n\n**From:** Lec 10 · **Used in:** HW 3 Part 12",
+    "key": false
+   },
+   {
+    "id": "kit-03-b06",
+    "label": "arrange() / desc() · sort rows",
+    "question": "Use it when: You need rows sorted by a column (ascending or descending).\n\nSearch words: sort rows, order rows, sort by column, descending, highest first, lowest first, rank rows",
+    "code": "mpg |> arrange(desc(hwy)) |> select(model, hwy) |> head(3)\n#> # A tibble: 3 × 2\n#>   model        hwy\n#>   <chr>      <int>\n#> 1 jetta         44\n#> 2 new beetle    44\n#> 3 new beetle    41\nmpg |> arrange(class, desc(hwy)) |> select(class, model, hwy) |> head(3)\n#> # A tibble: 3 × 3\n#>   class   model      hwy\n#>   <chr>   <chr>    <int>\n#> 1 2seater corvette    26\n#> 2 2seater corvette    26\n#> 3 2seater corvette    25",
+    "comment": "**Why / when:** `desc()` = largest first. Several columns: sort by the first, ties broken by the next. Base R: `df[order(...), ]`.\n\n**From:** Lec 10",
+    "key": false
+   },
+   {
+    "id": "kit-03-b07",
+    "label": "distinct() · remove duplicate rows",
+    "question": "Use it when: Duplicates exist and the question says remove them, or you want each unique combination once.\n\nSearch words: remove duplicates, duplicate rows, distinct, unique rows, drop duplicates, deduplicate",
+    "code": "df <- tibble(id = c(1, 2, 2, 3), x = c(\"a\", \"b\", \"b\", \"c\"))\ndf |> distinct()\n#> # A tibble: 3 × 2\n#>      id x    \n#>   <dbl> <chr>\n#> 1     1 a    \n#> 2     2 b    \n#> 3     3 c    \ndf |> distinct(id, .keep_all = TRUE)     # one row per id\n#> # A tibble: 3 × 2\n#>      id x    \n#>   <dbl> <chr>\n#> 1     1 a    \n#> 2     2 b    \n#> 3     3 c    ",
+    "comment": "**Why / when:** Rows count as duplicates only if **every** column matches, so drop ID-like columns first (HW 3 Part 7: `select(-PID, -category) |> distinct()`).\n\n**From:** HW 3 · **Used in:** HW 3 Part 7",
+    "key": false
+   },
+   {
+    "id": "kit-03-b08",
+    "label": "select() · keep, drop or reorder columns",
+    "question": "Use it when: You need only some columns, or all except some.\n\nSearch words: select columns, keep columns, drop columns, remove columns, all except, choose variables, remove variable",
+    "code": "mpg |> select(model, year, hwy) |> head(2)\n#> # A tibble: 2 × 3\n#>   model  year   hwy\n#>   <chr> <int> <int>\n#> 1 a4     1999    29\n#> 2 a4     1999    29\nmpg |> select(-model, -trans) |> names()\n#> [1] \"manufacturer\" \"displ\"        \"year\"         \"cyl\"          \"drv\"         \n#> [6] \"cty\"          \"hwy\"          \"fl\"           \"class\"       \nmpg |> select(starts_with(\"c\")) |> names()\n#> [1] \"cyl\"   \"cty\"   \"class\"",
+    "comment": "**Why / when:** `-col` drops a column. Helpers: `starts_with()`, `ends_with()`, `contains()`, `everything()`, `where(is.numeric)`.\n\n**From:** Lec 10 · **Used in:** HW 3 Part 7",
+    "key": false
+   },
+   {
+    "id": "kit-03-b09",
+    "label": "starts_with() / ends_with() / contains() / everything() / where() · pick columns by pattern or type",
+    "question": "Use it when: Many columns share a prefix (wk1, wk2 …, perc…) or you want all numeric columns.\n\nSearch words: columns starting with, columns that contain, all numeric columns, select by name pattern, select by type",
+    "code": "names(select(mpg, contains(\"y\")))\n#> [1] \"year\" \"cyl\"  \"cty\"  \"hwy\" \nnames(select(mpg, where(is.numeric)))\n#> [1] \"displ\" \"year\"  \"cyl\"   \"cty\"   \"hwy\"  ",
+    "comment": "**Why / when:** Work inside `select()`, `relocate()`, `across()`, `pivot_longer(cols = ...)`.\n\n**From:** Lec 10–11",
+    "key": false
+   },
+   {
+    "id": "kit-03-b10",
+    "label": "rename() · change column names",
+    "question": "Use it when: A column has an awkward name or the question asks for specific names.\n\nSearch words: rename column, change column name, new name for variable, rename variable",
+    "code": "mpg |> rename(highway = hwy, city = cty) |> names()\n#>  [1] \"manufacturer\" \"model\"        \"displ\"        \"year\"         \"cyl\"         \n#>  [6] \"trans\"        \"drv\"          \"city\"         \"highway\"      \"fl\"          \n#> [11] \"class\"       ",
+    "comment": "**Why / when:** Order is `new_name = old_name`.\n\n**From:** Lec 10",
+    "key": false
+   },
+   {
+    "id": "kit-03-b11",
+    "label": "relocate() · move columns to a new position",
+    "question": "Use it when: \"Move X to the end\", \"put X after Y\", \"rearrange columns\".\n\nSearch words: move column, reorder columns, rearrange columns, column order, put column after, move to the end, move to front",
+    "code": "mpg |> relocate(hwy, .after = model) |> names()\n#>  [1] \"manufacturer\" \"model\"        \"hwy\"          \"displ\"        \"year\"        \n#>  [6] \"cyl\"          \"trans\"        \"drv\"          \"cty\"          \"fl\"          \n#> [11] \"class\"       \nmpg |> relocate(manufacturer, .after = last_col()) |> names()\n#>  [1] \"model\"        \"displ\"        \"year\"         \"cyl\"          \"trans\"       \n#>  [6] \"drv\"          \"cty\"          \"hwy\"          \"fl\"           \"class\"       \n#> [11] \"manufacturer\"",
+    "comment": "**Why / when:** Only changes **position**; never changes the data's shape. `.before =` / `.after =` take a column that already exists.\n\n**Watch out:** `relocate()` can't create columns. Turning column names into a variable is `pivot_longer()`.\n\n**From:** Lec 10 · **Used in:** HW 3 Part 11",
+    "key": false
+   },
+   {
+    "id": "kit-03-b12",
+    "label": "mutate() · add a new variable / change a column",
+    "question": "Use it when: You need a new column computed from others (rates, percentages, labels), or to change an existing one.\n\nSearch words: add new variable, adding new variable, add a new variable, adding a new variable, new column, add column, create column, create new variable, calculate column, compute variable, transform column, change column, tidyverse new variable",
+    "code": "mpg |>\n  mutate(hwy_kpl  = hwy * 0.425,                    # new column from another\n         efficient = ifelse(hwy >= 30, \"yes\", \"no\"),  # label with a condition\n         cyl = factor(cyl)) |>                        # change an existing column\n  select(model, hwy, hwy_kpl, efficient, cyl) |> head(3)\n#> # A tibble: 3 × 5\n#>   model   hwy hwy_kpl efficient cyl  \n#>   <chr> <int>   <dbl> <chr>     <fct>\n#> 1 a4       29    12.3 no        4    \n#> 2 a4       29    12.3 no        4    \n#> 3 a4       31    13.2 yes       4    ",
+    "comment": "**Why / when:** The tidyverse way to add or change columns: several in one call, separated by commas, and later ones can use earlier ones. Save it back (`df <- df |> mutate(...)`) or the column disappears. Base R: `df$new <- ...`.\n\n**Watch out:** Percent = `part / total * 100`; count from a percent = `total * percent / 100`.\n\n**From:** Lec 10 · **Used in:** HW 3 Parts 8 and 10",
+    "key": false
+   },
+   {
+    "id": "kit-03-b13",
+    "label": "transmute() · make new columns and keep ONLY those",
+    "question": "Use it when: You want just the computed columns, not the original table.\n\nSearch words: keep only new columns, transmute, compute and keep only",
+    "code": "mpg |> transmute(model, ratio = hwy / cty) |> head(3)\n#> # A tibble: 3 × 2\n#>   model ratio\n#>   <chr> <dbl>\n#> 1 a4     1.61\n#> 2 a4     1.38\n#> 3 a4     1.55",
+    "comment": "**Why / when:** Like `mutate()` + `select()` in one step.\n\n**From:** Lec 10",
+    "key": false
+   },
+   {
+    "id": "kit-03-b14",
+    "label": "if_else() / case_when() · conditions inside mutate",
+    "question": "Use it when: A new column depends on conditions: two outcomes (if_else) or several ranges (case_when).\n\nSearch words: condition in mutate, recode values, label by range, several conditions, case when, if else tidyverse",
+    "code": "mpg |>\n  mutate(size = case_when(displ < 2.5 ~ \"small\",\n                          displ < 4   ~ \"medium\",\n                          TRUE        ~ \"large\")) |>\n  count(size)\n#> # A tibble: 3 × 2\n#>   size       n\n#>   <chr>  <int>\n#> 1 large     86\n#> 2 medium    86\n#> 3 small     62",
+    "comment": "**Why / when:** `case_when()` checks top to bottom; `TRUE ~` is the \"everything else\" line. Cleaner than nested `ifelse()`.\n\n**From:** dplyr",
+    "key": false
+   },
+   {
+    "id": "kit-03-b15",
+    "label": "group_by() + summarise() · one summary row per group",
+    "question": "Use it when: Any \"for each state / class / group, find the average / total / count\" question.\n\nSearch words: by group, per group, for each group, group mean, average by category, total by state, summary by group, grouped summary, compare groups, summarize tidyverse",
+    "code": "mpg |>\n  group_by(class) |>\n  summarise(n = n(), avg_hwy = mean(hwy), max_hwy = max(hwy))\n#> # A tibble: 7 × 4\n#>   class          n avg_hwy max_hwy\n#>   <chr>      <int>   <dbl>   <int>\n#> 1 2seater        5    24.8      26\n#> 2 compact       47    28.3      44\n#> 3 midsize       41    27.3      32\n#> 4 minivan       11    22.4      24\n#> 5 pickup        33    16.9      22\n#> 6 subcompact    35    28.1      44\n#> 7 suv           62    18.1      27",
+    "comment": "**Why / when:** `group_by` sorts rows into piles, `summarise` collapses each pile to one row. Without `group_by`, summarise gives one row for everything. Base R: `tapply()` / `aggregate()`.\n\n**Watch out:** Totals for a group = `sum()` (e.g. state population), not `mean()`.\n\n**From:** Lec 11 · **Used in:** HW 3 Parts 12–14",
+    "key": false
+   },
+   {
+    "id": "kit-03-b16",
+    "label": "group_by(two variables) + .groups = \"drop\" · compare subgroups within each group",
+    "question": "Use it when: \"In each state, compare metro to non-metro\", \"by class and year\".\n\nSearch words: compare within each group, two groups, by state and metro, subgroup, compare metro and non metro, cross groups",
+    "code": "mpg |>\n  group_by(year, drv) |>\n  summarise(avg_hwy = mean(hwy), .groups = \"drop\")\n#> # A tibble: 6 × 3\n#>    year drv   avg_hwy\n#>   <int> <chr>   <dbl>\n#> 1  1999 4        18.8\n#> 2  1999 f        27.9\n#> 3  1999 r        20.6\n#> 4  2008 4        19.5\n#> 5  2008 f        28.4\n#> 6  2008 r        21.3",
+    "comment": "**Why / when:** One row per combination. `.groups = \"drop\"` removes the leftover grouping and the console message. `pivot_wider()` afterwards puts the subgroups side by side.\n\n**From:** Lec 11 · **Used in:** HW 3 Parts 12–14",
+    "key": false
+   },
+   {
+    "id": "kit-03-b17",
+    "label": "n() / count() · count rows (per group)",
+    "question": "Use it when: You need how many rows/observations are in each group.\n\nSearch words: count per group, how many in each group, number of rows per category, frequency tidyverse, count observations",
+    "code": "mpg |> count(class, sort = TRUE) |> head(3)\n#> # A tibble: 3 × 2\n#>   class       n\n#>   <chr>   <int>\n#> 1 suv        62\n#> 2 compact    47\n#> 3 midsize    41\nmpg |> group_by(drv) |> summarise(n = n())\n#> # A tibble: 3 × 2\n#>   drv       n\n#>   <chr> <int>\n#> 1 4       103\n#> 2 f       106\n#> 3 r        25",
+    "comment": "**Why / when:** `count(x)` = `group_by(x) |> summarise(n = n())`. Base R: `table()`.\n\n**From:** Lec 11",
+    "key": false
+   },
+   {
+    "id": "kit-03-b18",
+    "label": "ungroup() · remove grouping",
+    "question": "Use it when: After grouped work, the next step should treat the data as a whole again.\n\nSearch words: remove grouping, ungroup, stop grouping",
+    "code": "mpg |> group_by(class) |> mutate(rank_in_class = rank(-hwy)) |> ungroup() |> select(class, model, hwy, rank_in_class) |> head(3)\n#> # A tibble: 3 × 4\n#>   class   model   hwy rank_in_class\n#>   <chr>   <chr> <int>         <dbl>\n#> 1 compact a4       29          16.5\n#> 2 compact a4       29          16.5\n#> 3 compact a4       31           7  ",
+    "comment": "**Why / when:** Grouping sticks to the data; forgetting to ungroup makes later `summarise`/`mutate` work per group.\n\n**From:** Lec 11",
+    "key": false
+   },
+   {
+    "id": "kit-03-b19",
+    "label": "across() · the same function on many columns",
+    "question": "Use it when: You need the mean (or another function) of several columns at once.\n\nSearch words: same function on many columns, mean of several columns, multiple columns at once, across columns, average of each column",
+    "code": "mpg |> group_by(drv) |> summarise(across(c(cty, hwy), mean))\n#> # A tibble: 3 × 3\n#>   drv     cty   hwy\n#>   <chr> <dbl> <dbl>\n#> 1 4      14.3  19.2\n#> 2 f      20.0  28.2\n#> 3 r      14.1  21  \nmpg |> summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE)))\n#> # A tibble: 1 × 5\n#>   displ  year   cyl   cty   hwy\n#>   <dbl> <dbl> <dbl> <dbl> <dbl>\n#> 1  3.47 2004.  5.89  16.9  23.4",
+    "comment": "**Why / when:** Saves writing `mean()` five times (HW 3 Part 13). Use `~ mean(.x, na.rm = TRUE)` to pass extra arguments.\n\n**From:** Lec 11 · **Used in:** HW 3 Part 13",
+    "key": false
+   },
+   {
+    "id": "kit-03-b20",
+    "label": "inner_join() · combine two tables, keep only matches",
+    "question": "Use it when: \"Join … such that unmatched rows in either dataset are not included\", rows found in both.\n\nSearch words: join, merge, combine tables, match rows in both, only matching rows, unmatched rows not included, inner join",
+    "code": "a <- tibble(id = c(1, 2, 3), x = c(\"p\", \"q\", \"r\"))\nb <- tibble(id = c(2, 3, 4), y = c(TRUE, FALSE, TRUE))\ninner_join(a, b, by = \"id\")\n#> # A tibble: 2 × 3\n#>      id x     y    \n#>   <dbl> <chr> <lgl>\n#> 1     2 q     TRUE \n#> 2     3 r     FALSE",
+    "comment": "**Why / when:** Matches rows on a **key** and adds the other table's columns. Key with two columns: `by = c(\"state\", \"county\")`. Different names: `by = c(\"a\" = \"b\")`.\n\n**Watch out:** A key that isn't unique (state alone) multiplies rows → \"many-to-many\" warning.\n\n**From:** Lec 11 · **Used in:** HW 3 Parts 6 and 9",
+    "key": false
+   },
+   {
+    "id": "kit-03-b21",
+    "label": "left_join() / right_join() / full_join() · joins that keep unmatched rows",
+    "question": "Use it when: \"Contain all observations from data1 / data2 / both, regardless of whether they match\".\n\nSearch words: keep all rows, all observations from, regardless of match, left join, right join, full join, merge keep everything",
+    "code": "a <- tibble(id = c(1, 2, 3), x = c(\"p\", \"q\", \"r\"))\nb <- tibble(id = c(2, 3, 4), y = c(TRUE, FALSE, TRUE))\nleft_join(a, b, by = \"id\")      # all of a\n#> # A tibble: 3 × 3\n#>      id x     y    \n#>   <dbl> <chr> <lgl>\n#> 1     1 p     NA   \n#> 2     2 q     TRUE \n#> 3     3 r     FALSE\nfull_join(a, b, by = \"id\")      # everything\n#> # A tibble: 4 × 3\n#>      id x     y    \n#>   <dbl> <chr> <lgl>\n#> 1     1 p     NA   \n#> 2     2 q     TRUE \n#> 3     3 r     FALSE\n#> 4     4 <NA>  TRUE ",
+    "comment": "**Why / when:** left = keep all of the FIRST table, right = all of the SECOND, full = both. Unmatched rows get NA in the other table's columns.\n\n**Watch out:** Count NAs with `sum(is.na(result))`, size with `dim(result)`.\n\n**From:** Lec 11 · **Used in:** HW 3 Parts 3–5",
+    "key": false
+   },
+   {
+    "id": "kit-03-b22",
+    "label": "semi_join() / anti_join() · filter by whether a match exists",
+    "question": "Use it when: \"Which rows have a match in the other table?\" (semi) or \"which DON'T?\" (anti).\n\nSearch words: rows with no match, not in other table, missing from other table, which have a match, anti join, semi join, unmatched rows",
+    "code": "a <- tibble(id = c(1, 2, 3)); b <- tibble(id = c(2, 3, 4))\nsemi_join(a, b, by = \"id\")    # in a AND in b\n#> # A tibble: 2 × 1\n#>      id\n#>   <dbl>\n#> 1     2\n#> 2     3\nanti_join(a, b, by = \"id\")    # in a but NOT in b\n#> # A tibble: 1 × 1\n#>      id\n#>   <dbl>\n#> 1     1",
+    "comment": "**Why / when:** They never add columns; they only keep or drop rows of the first table. `anti_join` is the quickest way to see why a join produced NAs.\n\n**From:** Lec 11",
+    "key": false
+   },
+   {
+    "id": "kit-03-b23",
+    "label": "intersect() / union() / setdiff() · set operations on tables with the SAME columns",
+    "question": "Use it when: Two tables with identical columns: rows in both, in either, or in one but not the other.\n\nSearch words: rows in both tables, rows in either, difference between tables, set operations, intersect, union, setdiff",
+    "code": "x <- tibble(a = 1:3, b = c(\"p\", \"q\", \"r\"))\ny <- tibble(a = 2:4, b = c(\"q\", \"r\", \"s\"))\nintersect(x, y)\n#> # A tibble: 2 × 2\n#>       a b    \n#>   <int> <chr>\n#> 1     2 q    \n#> 2     3 r    \nsetdiff(x, y)\n#> # A tibble: 1 × 2\n#>       a b    \n#>   <int> <chr>\n#> 1     1 p    ",
+    "comment": "**Why / when:** Compare **whole identical rows**; columns must match. They don't add columns, so they can't replace a join (HW 3 Part 9 is a join).\n\n**From:** Lec 11",
+    "key": false
+   },
+   {
+    "id": "kit-03-b24",
+    "label": "pivot_longer() · column names → values of a new variable (wide to long)",
+    "question": "Use it when: Column NAMES are really data (states, years, weeks, sections) and you need them in one variable.\n\nSearch words: wide to long, column names are values, gather columns, reshape, tidy data, move column names into variable, spread across multiple columns, pivot longer",
+    "code": "wide <- tibble(county = c(\"A\", \"B\"), IL = c(0.05, NA), WI = c(NA, 0.03))\nwide |>\n  pivot_longer(cols = IL:WI, names_to = \"state\", values_to = \"area\") |>\n  drop_na()\n#> # A tibble: 2 × 3\n#>   county state  area\n#>   <chr>  <chr> <dbl>\n#> 1 A      IL     0.05\n#> 2 B      WI     0.03",
+    "comment": "**Why / when:** `names_to` names the new column holding the old column names, `values_to` the column holding the numbers. Use `values_drop_na = TRUE` or `drop_na()` for empty cells.\n\n**Watch out:** Not `relocate()` — that only moves columns.\n\n**From:** Lec 12 · **Used in:** HW 3 Part 1",
+    "key": false
+   },
+   {
+    "id": "kit-03-b25",
+    "label": "pivot_wider() · values of a variable → columns (long to wide)",
+    "question": "Use it when: One observation is spread over several rows, or you want groups side by side in a table.\n\nSearch words: long to wide, spread, values into columns, side by side table, reshape wider, pivot wider",
+    "code": "long <- tibble(state = c(\"IL\", \"IL\", \"WI\", \"WI\"), metro = c(0, 1, 0, 1), dens = c(7, 82, 6, 71))\nlong |> pivot_wider(names_from = metro, values_from = dens, names_prefix = \"metro_\")\n#> # A tibble: 2 × 3\n#>   state metro_0 metro_1\n#>   <chr>   <dbl>   <dbl>\n#> 1 IL          7      82\n#> 2 WI          6      71",
+    "comment": "**Why / when:** Opposite of `pivot_longer`. Great after a two-variable `group_by` summary to compare groups side by side.\n\n**From:** Lec 12",
+    "key": false
+   },
+   {
+    "id": "kit-03-b26",
+    "label": "separate() · split one column into several",
+    "question": "Use it when: One cell holds several values joined by a character (\"63917/1702/98\", \"745/19987071\", \"2024-10-21\").\n\nSearch words: split column, separate column, split text, pull apart column, split at separator, divide column, multiple values in one column",
+    "code": "tibble(rate = c(\"745/19987071\", \"2666/20595360\")) |>\n  separate(rate, into = c(\"cases\", \"population\"), sep = \"/\", convert = TRUE)\n#> # A tibble: 2 × 2\n#>   cases population\n#>   <int>      <int>\n#> 1   745   19987071\n#> 2  2666   20595360",
+    "comment": "**Why / when:** `into` names the pieces in order. `convert = TRUE` makes number pieces numeric (needed before math). `sep = 2` splits after 2 characters.\n\n**Watch out:** `sep` is a regular expression: `\".\"` and `\"|\"` need escaping (`\"\\\\.\"`).\n\n**From:** Lec 12 · **Used in:** HW 3 Part 2",
+    "key": false
+   },
+   {
+    "id": "kit-03-b27",
+    "label": "unite() · glue columns into one",
+    "question": "Use it when: Two or more columns should be one (century + year, first + last name).\n\nSearch words: combine columns, merge columns, join columns into one, paste columns, unite",
+    "code": "tibble(century = c(\"19\", \"20\"), year = c(\"99\", \"00\")) |>\n  unite(full_year, century, year, sep = \"\")\n#> # A tibble: 2 × 1\n#>   full_year\n#>   <chr>    \n#> 1 1999     \n#> 2 2000     ",
+    "comment": "**Why / when:** Default separator is `_`; `sep = \"\"` for none. Opposite of `separate()`.\n\n**From:** Lec 12",
+    "key": false
+   },
+   {
+    "id": "kit-03-b28",
+    "label": "drop_na() / replace_na() / complete() / fill() · handle missing values (tidyverse)",
+    "question": "Use it when: Remove rows with NAs, replace NAs with a value, make missing combinations explicit, or fill NAs from neighbours.\n\nSearch words: remove missing values, drop NA, replace NA, fill missing, missing combinations, explicit missing, remove rows with NA",
+    "code": "df <- tibble(q = 1:4, x = c(5, NA, 7, NA))\ndf |> drop_na()\n#> # A tibble: 2 × 2\n#>       q     x\n#>   <int> <dbl>\n#> 1     1     5\n#> 2     3     7\ndf |> replace_na(list(x = 0))\n#> # A tibble: 4 × 2\n#>       q     x\n#>   <int> <dbl>\n#> 1     1     5\n#> 2     2     0\n#> 3     3     7\n#> 4     4     0\ndf |> fill(x)                        # copies the value above down\n#> # A tibble: 4 × 2\n#>       q     x\n#>   <int> <dbl>\n#> 1     1     5\n#> 2     2     5\n#> 3     3     7\n#> 4     4     7",
+    "comment": "**Why / when:** `drop_na()` with no columns drops a row if **any** column is NA; `drop_na(x)` only looks at x.\n\n**From:** Lec 12",
+    "key": false
+   },
+   {
+    "id": "kit-03-b29",
+    "label": "str_replace() · find and replace inside text",
+    "question": "Use it when: Text values need fixing before splitting or matching (\"newrel\" → \"new_rel\").\n\nSearch words: replace text, find and replace, fix strings, change part of text, string replace",
+    "code": "str_replace(c(\"newrel_m14\", \"new_sp_f25\"), \"newrel\", \"new_rel\")\n#> [1] \"new_rel_m14\" \"new_sp_f25\" ",
+    "comment": "**Why / when:** From stringr (part of tidyverse). `str_replace_all()` replaces every match, not just the first.\n\n**From:** Lec 12",
+    "key": false
+   },
+   {
+    "id": "kit-03-b30",
+    "label": "ggplot() + aes() + geom_point() · scatterplot in ggplot",
+    "question": "Use it when: Relationship between two numeric variables, with ggplot (tidyverse homework).\n\nSearch words: ggplot scatterplot, scatter plot tidyverse, plot two variables, geom_point, aes, x vs y ggplot",
+    "code": "ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +\n  geom_point(size = 2)",
+    "comment": "**Why / when:** Every ggplot = data + `aes()` mappings + a `geom_`. Columns inside `aes()` (color by data); fixed values outside (`color = \"blue\"`).\n\n**Watch out:** Make number-coded groups factors first (`factor(cyl)`), or you get a gradient instead of separate colors.\n\n![ggplot() + aes() + geom_point()](files/plots/ff-gg-point.png)\n\n**From:** Lec 13 · **Used in:** Lec 13",
+    "key": false
+   },
+   {
+    "id": "kit-03-b31",
+    "label": "geom_histogram() / geom_vline() · histogram (+ reference line) in ggplot",
+    "question": "Use it when: Distribution of one numeric variable with ggplot; a vertical line at the mean/median.\n\nSearch words: ggplot histogram, histogram tidyverse, distribution ggplot, vertical line at mean, mean line, reference line",
+    "code": "ggplot(mpg, aes(x = hwy)) +\n  geom_histogram(binwidth = 2, fill = \"lightblue\", color = \"navy\") +\n  geom_vline(xintercept = mean(mpg$hwy), color = \"red\", linetype = \"dashed\")",
+    "comment": "**Why / when:** Only `x` in aes. `fill` = bars, `color` = outlines. `binwidth` or `bins` sets bar width.\n\n![geom_histogram() / geom_vline()](files/plots/ff-gg-hist.png)\n\n**From:** Lec 13 · **Used in:** HW 3 Part 15",
+    "key": false
+   },
+   {
+    "id": "kit-03-b32",
+    "label": "geom_boxplot() / stat_summary() · boxplots by group, with mean dots",
+    "question": "Use it when: Compare a numeric variable across groups with ggplot; mark the group means.\n\nSearch words: ggplot boxplot, boxplot tidyverse, compare groups ggplot, mean dots, average point, stat_summary",
+    "code": "ggplot(mpg, aes(x = drv, y = hwy, fill = drv)) +\n  geom_boxplot(alpha = 0.45) +\n  stat_summary(fun = mean, geom = \"point\", color = \"black\", size = 3)",
+    "comment": "**Why / when:** x = group (factor), y = number. `alpha` outside aes = transparency.\n\n![geom_boxplot() / stat_summary()](files/plots/ff-gg-box.png)\n\n**From:** Lec 13 · **Used in:** HW 3 Part 16",
+    "key": false
+   },
+   {
+    "id": "kit-03-b33",
+    "label": "geom_bar() / geom_col() · bar charts in ggplot",
+    "question": "Use it when: Counts of a category (geom_bar) or a value you already computed per group (geom_col).\n\nSearch words: ggplot bar chart, barplot tidyverse, counts bar chart, bar of means, geom_bar, geom_col",
+    "code": "ggplot(mpg, aes(x = class)) + geom_bar(fill = \"darkorange\")",
+    "comment": "**Why / when:** `geom_bar` counts rows for you; `geom_col` plots a y you supply (after `summarise`). `position = \"dodge\"` for side-by-side bars.\n\n![geom_bar() / geom_col()](files/plots/ff-gg-bar.png)\n\n**From:** Lec 13",
+    "key": false
+   },
+   {
+    "id": "kit-03-b34",
+    "label": "labs() · title, subtitle, axis and legend labels",
+    "question": "Use it when: Any \"add labels / title / subtitle / change the legend title\".\n\nSearch words: add title, labels, axis labels, subtitle, legend title, label the plot, x label, y label",
+    "code": "ggplot(mpg, aes(displ, hwy, color = drv)) + geom_point() +\n  labs(title = \"Highway mpg vs engine size\", subtitle = \"mpg data\",\n       x = \"Displacement (L)\", y = \"Highway mpg\", color = \"Drive\")",
+    "comment": "**Why / when:** Legend title = the aesthetic name (`color =`, `fill =`). Base R uses `main`, `xlab`, `ylab`.\n\n![labs()](files/plots/ff-gg-labs.png)\n\n**From:** Lec 13",
+    "key": false
+   },
+   {
+    "id": "kit-03-b35",
+    "label": "scale_colour_manual() / scale_fill_manual() · choose the colors yourself",
+    "question": "Use it when: \"Change the colors\" of points/lines (colour) or bars/boxes (fill).\n\nSearch words: change colors, choose colors, custom colors, manual colors, set colors ggplot",
+    "code": "ggplot(mpg, aes(drv, hwy, fill = drv)) + geom_boxplot() +\n  scale_fill_manual(values = c(\"4\" = \"forestgreen\", \"f\" = \"skyblue\", \"r\" = \"salmon\"))",
+    "comment": "**Why / when:** Match the function to the aesthetic: `color =` → `scale_colour_manual`, `fill =` → `scale_fill_manual`.\n\n![scale_colour_manual() / scale_fill_manual()](files/plots/ff-gg-fill.png)\n\n**From:** Lec 13",
+    "key": false
+   },
+   {
+    "id": "kit-03-b36",
+    "label": "coord_cartesian() vs xlim() / ylim() · zoom vs cut the axis range",
+    "question": "Use it when: \"Zoom in on [a, b]\" (coord_cartesian) or deliberately drop data outside a range (xlim).\n\nSearch words: zoom in, axis limits, change axis range, xlim, ylim, limit the axis, zoom without deleting",
+    "code": "p <- ggplot(mpg, aes(displ, hwy)) + geom_point()\np + coord_cartesian(xlim = c(2, 4))     # zoom, keeps all data\n# p + xlim(2, 4)                        # deletes points outside (warning)",
+    "comment": "**Why / when:** `xlim()` removes data before drawing, which changes histograms, boxplots and means. Zoom questions want `coord_cartesian()`.\n\n**From:** Lec 13 · **Used in:** HW 3 Part 15",
+    "key": false
+   },
+   {
+    "id": "kit-03-b37",
+    "label": "scale_x_continuous(breaks = ...) · tick marks and axis number format",
+    "question": "Use it when: You need ticks at specific values or nicer axis labels (commas).\n\nSearch words: tick marks, axis breaks, ticks every, axis labels format, comma labels, change ticks",
+    "code": "ggplot(mpg, aes(displ, hwy)) + geom_point() +\n  scale_x_continuous(breaks = seq(1, 7, 0.5))",
+    "comment": "**Why / when:** `labels = scales::comma` writes 100,000; `scale_x_log10()` for a log axis.\n\n**From:** Lec 13",
+    "key": false
+   },
+   {
+    "id": "kit-03-b38",
+    "label": "theme_minimal() / theme_bw() / … and theme() · overall look, then fine-tuning",
+    "question": "Use it when: \"Change the theme to …\", rotate tick labels, bigger/bold title, move or remove the legend.\n\nSearch words: change theme, theme minimal, theme bw, rotate axis labels, angle of ticks, bold title, legend position, remove legend",
+    "code": "ggplot(mpg, aes(displ, hwy)) + geom_point() +\n  labs(title = \"mpg\") +\n  theme_minimal() +\n  theme(axis.text.x = element_text(angle = 60, hjust = 1),\n        plot.title = element_text(face = \"bold\"),\n        legend.position = \"none\")",
+    "comment": "**Why / when:** A complete theme (`theme_minimal()` …) first, then `theme()` tweaks — otherwise the theme erases them.\n\n**From:** Lec 13 · **Used in:** HW 3 Part 15",
+    "key": false
+   },
+   {
+    "id": "kit-03-b39",
+    "label": "facet_wrap() / facet_grid() · one small plot per group",
+    "question": "Use it when: You want the same plot repeated for each category (or each combination of two).\n\nSearch words: separate plot for each group, one plot per category, panels, facets, small multiples, split plot by group",
+    "code": "ggplot(mpg, aes(displ, hwy)) + geom_point() +\n  facet_wrap(~ drv, nrow = 1)",
+    "comment": "**Why / when:** `facet_wrap(~ g)` for one variable, `facet_grid(rows ~ cols)` for two. The variable should be categorical.\n\n![facet_wrap() / facet_grid()](files/plots/ff-gg-facet.png)\n\n**From:** Lec 13",
+    "key": false
+   }
+  ]
  },
  "core-01": {
   "type": "core",

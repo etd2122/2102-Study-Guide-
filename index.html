@@ -146,6 +146,9 @@ details.alt>.chunk{margin-top:6px}
 .group-btn .chev{display:inline-block;width:10px;transition:transform .15s}
 .group-btn[aria-expanded="true"] .chev{transform:rotate(90deg)}
 .group-btn .gcount{margin-left:auto;font-family:var(--mono);letter-spacing:0;text-transform:none;font-weight:400}
+.ff-side{padding:6px 4px 8px;border-bottom:1px solid var(--line);margin-bottom:4px;display:flex;flex-direction:column;gap:4px}
+.ff-side .need-list{display:flex;flex-direction:column;gap:4px}
+.ff-side .need{font-size:13px;text-align:left}
 /* Notes */
 .prose{max-width:68ch}
 .prose p{margin:0 0 10px}
@@ -424,8 +427,9 @@ function renderList(){
   const list=$('#list');
   if(!loaded){list.innerHTML='';return;}
   const items=sorted().filter(matches);
-  if(!items.length){list.innerHTML=`<li class="empty-line" style="padding:8px">${Object.keys(entries).length?'No entries match.':'No entries yet.'}</li>`;return;}
   let html='',last='',shut=false;
+  if(query.length>=3){const ff=findFunctions(query,3); if(ff.length) html+=`<li class="ff-side">${ffHTML(ff,'sm')}</li>`;}
+  if(!items.length){list.innerHTML=html+`<li class="empty-line" style="padding:8px">${Object.keys(entries).length?(html?'No entries contain that exact text; try the function cards above or Find code for a question.':'No entries match.'):'No entries yet.'}</li>`;return;}
   const counts={}; items.forEach(e=>{counts[e.type]=(counts[e.type]||0)+1;});
   for(const e of items){
     if(e.type!==last){const op=groupOpen(e.type); shut=!op;
@@ -951,13 +955,63 @@ function matchHTML(){
     <div class="needs" id="matchNeeds"></div>
     <div class="results" id="matchResults"></div>`;
 }
+/* ---------- Function finder lookup (Everyday code 02 / 03) ---------- */
+const FF_STOP=new Set('a an the in of to for on with by and or is are be it this that i me my how do does did what which use using want need needs can could should would will get make some all from into at as so if then than when where who why way ways one thing things r code function functions'.split(' '));
+const FF_SYN={variable:'column',variabl:'column',var:'column',field:'column',col:'column',observation:'row',observ:'row',record:'row',obs:'row',
+  largest:'highest',biggest:'highest',maximum:'highest',most:'highest',smallest:'lowest',minimum:'lowest',least:'lowest',
+  average:'mean',avg:'mean',merg:'join',merge:'join',delet:'remove',delete:'remove',drop:'remove',eliminat:'remove',graph:'plot',chart:'plot',
+  per:'each',everi:'each',every:'each',percent:'percentage',percentag:'percentage',creat:'add',create:'add',new:'add',ad:'add',add:'add',make:'add',
+  dataset:'data',datafram:'data',table:'table',tabl:'table',total:'sum',sort:'sort',order:'sort',arrang:'sort',arrange:'sort'};
+function ffTok(text){
+  return (String(text||'').toLowerCase().match(/[a-z_][a-z0-9_.]*|[0-9]+/g)||[]).map(w=>{
+    let t=w.replace(/\(\)$/,'');
+    if(t.length>3) t=t.replace(/(ing|ed|es|s)$/,'');
+    return FF_SYN[t]||FF_SYN[w]||t;
+  }).filter(t=>!FF_STOP.has(t));
+}
+let ffCache=null;
+function ffCards(){
+  if(ffCache&&ffCache.v===Object.keys(entries).length)return ffCache.cards;
+  const cards=[];
+  for(const eid of ['kit-02','kit-03']){
+    const e=entries[eid]; if(!e)continue;
+    (e.chunks||[]).forEach((c,i)=>{
+      const m=(c.question||'').match(/Search words:\s*([\s\S]*)$/);
+      const lab=(c.label||'').split(' · ');
+      const phrases=[...(m?m[1].split(','):[]), lab[1]||'', (lab[0]||'').replace(/[()\/]/g,' ')].map(ffTok).filter(x=>x.length);
+      const all=new Set(phrases.flat().concat(ffTok(c.question||'')));
+      cards.push({eid,i,label:c.label,phrases,all,tidy:eid==='kit-03'});
+    });
+  }
+  ffCache={v:Object.keys(entries).length,cards}; return cards;
+}
+function findFunctions(q,max){
+  const qt=[...new Set(ffTok(q))]; if(!qt.length)return [];
+  const wantsTidy=/tidyverse|dplyr|tidyr|ggplot|pipe|%>%|\|>/.test(q.toLowerCase()), wantsBase=/base r|\bbase\b/.test(q.toLowerCase());
+  const scored=ffCards().map(c=>{
+    const cov=qt.filter(t=>c.all.has(t)).length/qt.length;
+    let best=0;
+    for(const p of c.phrases){const hit=p.filter(t=>qt.includes(t)).length; if(hit){const f=hit/p.length*(0.6+0.4*Math.min(hit,3)/3); if(f>best)best=f;}}
+    let sc=cov*2+best;
+    if(wantsTidy&&c.tidy)sc+=0.35; if(wantsBase&&!c.tidy)sc+=0.35;
+    return {...c,sc,cov,best};
+  }).filter(c=>c.cov>=0.5&&c.best>0).sort((a,b)=>b.sc-a.sc);
+  if(!scored.length)return [];
+  const top=scored[0].sc;
+  return scored.filter(c=>c.sc>=top-0.6).slice(0,max||3);
+}
+function ffHTML(list,cls){
+  if(!list.length)return '';
+  return `<span class="label">Functions for this</span><div class="need-list">${list.map(f=>`<button class="need ${cls||''}" type="button" data-act="goto" data-eid="${esc(f.eid)}" data-i="${f.i}"><span class="need-n">ƒ</span>${esc(f.label)}<span class="need-go">${esc(tagOf(entries[f.eid]))} →</span></button>`).join('')}</div>`;
+}
 function renderMatches(){
   const box=$('#matchResults'); if(!box)return;
   const needs=$('#matchNeeds');
   if(matchQuery.trim().length<2){box.innerHTML='<p class="empty-line">Results show up here as you type.</p>'; if(needs)needs.innerHTML=''; return;}
   if(needs){
     const sk=detectSkills(matchQuery);
-    needs.innerHTML=sk.length?`<span class="label">This question needs</span><div class="need-list">${sk.map((k,n)=>`<button class="need" type="button" data-act="goto" data-eid="${esc(k.eid)}" data-i="${k.i}"><span class="need-n">${n+1}</span>${esc(k.label)}<span class="need-go">${esc(tagOf(entries[k.eid]))} →</span></button>`).join('')}</div><span class="hint">Steps in the order the question mentions them. Each opens a review template. Below: the most similar code you've already seen.</span>`:'';
+    const ff=findFunctions(matchQuery,3);
+    needs.innerHTML=ffHTML(ff)+(sk.length?`<span class="label">This question needs</span><div class="need-list">${sk.map((k,n)=>`<button class="need" type="button" data-act="goto" data-eid="${esc(k.eid)}" data-i="${k.i}"><span class="need-n">${n+1}</span>${esc(k.label)}<span class="need-go">${esc(tagOf(entries[k.eid]))} →</span></button>`).join('')}</div><span class="hint">Steps in the order the question mentions them. Each opens a review template. Below: the most similar code you've already seen.</span>`:'');
   }
   const res=findMatches(matchQuery);
   if(!res.length){box.innerHTML='<p class="empty-line">No similar code found. Try describing what the code should do, like "mean salary by department".</p>';return;}

@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-21T14:30:00Z";
+window.ENTRIES_SAVED = "2026-10-22T21:40:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -2732,6 +2732,275 @@ window.ENTRIES = {
    "Check a simulation: mean(replicate(1000, my_sim(...))) and compare with what you expect."
   ],
   "updatedAt": "2026-10-15T00:40:00Z"
+ },
+ "rec-05": {
+  "type": "rec",
+  "num": "05",
+  "title": "Online retail transactions: clean, join, summarize and plot (tidyverse)",
+  "date": "2026-10-22",
+  "exams": [],
+  "topics": [
+   "data cleaning",
+   "separate",
+   "case_when",
+   "str_to_lower",
+   "parse_number",
+   "inner_join",
+   "group_by",
+   "cut",
+   "quantile",
+   "n_distinct",
+   "ggMarginal"
+  ],
+  "pdfs": [
+   {
+    "name": "Recitation 5.pdf",
+    "size": 116489,
+    "type": "application/pdf"
+   },
+   {
+    "name": "Rec5 stand-in transaction_data_1.csv",
+    "size": 27550,
+    "type": "text/csv"
+   },
+   {
+    "name": "Rec5 stand-in transaction_data_2.csv",
+    "size": 32543,
+    "type": "text/csv"
+   }
+  ],
+  "notes": "**Tidyverse only.** Two transaction files from an online store (800 purchases). **Question 1:** find and fix the introduced issues in both files, `inner_join` them into `transaction_data`, add `Total_Amount`. **Question 2:** five grouped summaries (category × payment, credit card by age group, discounts by income quartile, multi-category shoppers, repeat customers). **Question 3:** scatterplot with marginal histograms (`ggMarginal`).\n\n**No posted solutions yet, and the numbers are from stand-in data:** the CSVs weren't uploaded, so I built files with the same columns and typical cleaning problems and ran every answer in R on them. Your files may contain different issues and will give different numbers; start with the **Step 0** chunk, which shows how to find them. Send the real CSVs and I'll rerun everything with your numbers.\n\nEach part has a walkthrough and an **alternative answer**; five **practice problems** (in their own tab) use small made-up tables and `mpg`, so they run without any file.",
+  "takeaways": [
+   "Clean in this order: find issues → distinct() → separate() → fix labels/types/impossible values in mutate() → drop_na().",
+   "Labels: str_trim() + str_to_lower()/str_to_title(), or case_when() for exact spellings.",
+   "\"$4.99\" → parse_number(); impossible values → if_else(condition, x, NA).",
+   "Fix join keys (case, spaces) before distinct() and before joining.",
+   "\"Unmatched rows not included\" = inner_join().",
+   "% of rows meeting a condition per group = group_by() + summarise(mean(condition) * 100).",
+   "Ranges → cut(breaks = c(-Inf, 24, 40, 60, Inf)); quartiles → quantile() cutoffs + cut(include.lowest = TRUE), or ntile(x, 4).",
+   "Per-customer conditions: group_by(Customer_ID) |> filter(n_distinct(Category) >= 2).",
+   "Repeat customers: count(Customer_ID) |> filter(n > 1).",
+   "Marginal histograms: save the ggplot, then ggMarginal(p, type = \"histogram\")."
+  ],
+  "updatedAt": "2026-10-22T21:40:00Z",
+  "chunks": [
+   {
+    "id": "rec-05-setup",
+    "label": "Setup · load tidyverse and both data sets",
+    "question": "Use tidyverse functions only (helper functions such as mean(), median(), as.factor(), as.numeric() are allowed). transaction_data_1.csv and transaction_data_2.csv: 800 purchases at an online store over three months.",
+    "code": "library(tidyverse)\n#> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──\n#> ✔ dplyr     1.1.4     ✔ readr     2.1.5\n#> ✔ forcats   1.0.0     ✔ stringr   1.5.1\n#> ✔ ggplot2   3.4.4     ✔ tibble    3.2.1\n#> ✔ lubridate 1.9.3     ✔ tidyr     1.3.1\n#> ✔ purrr     1.0.2     \n#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──\n#> ✖ dplyr::filter()  masks stats::filter()\n#> ✖ dplyr::lag()     masks stats::lag()\n#> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors\n\ntransaction_data_1 <- read_csv(\"transaction_data_1.csv\", show_col_types = FALSE)\ntransaction_data_2 <- read_csv(\"transaction_data_2.csv\", show_col_types = FALSE)\nprint(transaction_data_1, n = 3)\n#> # A tibble: 807 × 7\n#>   Transaction_ID Customer_ID   Age Income Discount_Applied Customer_Rating\n#>   <chr>          <chr>       <dbl>  <dbl> <chr>                      <dbl>\n#> 1 T0179          C203           49  78300 No                             4\n#> 2 T0380          C150           34 163000 No                             5\n#> 3 T0668          C259           20  53100 No                             4\n#> # ℹ 804 more rows\n#> # ℹ 1 more variable: Quantity.Product_Price <chr>\nprint(transaction_data_2, n = 3)\n#> # A tibble: 805 × 6\n#>   Transaction_ID Gender Category    Payment_Method Shipping_Cost Delivery_Time\n#>   <chr>          <chr>  <chr>       <chr>          <chr>                 <dbl>\n#> 1 T0385          Female Household   Debit Card     23.91                     4\n#> 2 T0245          Other  Clothing    Credit Card    2.31                      5\n#> 3 T0169          Female Electronics Credit Card    $1.05                    10\n#> # ℹ 802 more rows",
+    "comment": "**The numbers on this page are from stand-in data.** The real `transaction_data_1.csv` / `transaction_data_2.csv` weren't uploaded, so I built files with **the same columns and typical \"introduced issues\"** (duplicates, Yes/yes/Y, typos in categories, impossible ages and ratings, `$` signs, IDs with spaces and lower case, a combined Quantity_Price column). Every output here was produced in R on those files. **Your data may have different issues and will give different numbers**; the detective chunk below shows how to find them. The stand-in CSVs are attached if you want to practice.\n\n`show_col_types = FALSE` hides the column-type message in your rendered file.",
+    "key": false
+   },
+   {
+    "id": "rec-05-issues",
+    "label": "Question 1 · Step 0 · find the issues before fixing anything",
+    "question": "Identify all the issues introduced into the datasets.",
+    "code": "# ---- Detective work: what is wrong with each data set?\n# Duplicate rows\nprint(sum(duplicated(transaction_data_1)))\n#> [1] 12\nprint(sum(duplicated(transaction_data_2)))\n#> [1] 8\n\n# Missing values per column\nprint(colSums(is.na(transaction_data_1)))\n#>         Transaction_ID            Customer_ID                    Age \n#>                      0                      0                      8 \n#>                 Income       Discount_Applied        Customer_Rating \n#>                     10                      0                      0 \n#> Quantity.Product_Price \n#>                      0 \nprint(colSums(is.na(transaction_data_2)))\n#> Transaction_ID         Gender       Category Payment_Method  Shipping_Cost \n#>              0              0              0              0              0 \n#>  Delivery_Time \n#>              6 \n\n# Categories that should match but don't (spelling / capitals / spaces)\nprint(count(transaction_data_1, Discount_Applied))\n#> # A tibble: 8 × 2\n#>   Discount_Applied     n\n#>   <chr>            <int>\n#> 1 N                   10\n#> 2 NO                   7\n#> 3 No                 434\n#> 4 Y                    8\n#> 5 YES                  5\n#> 6 Yes                332\n#> 7 no                   5\n#> 8 yes                  6\nprint(count(transaction_data_2, Gender))\n#> # A tibble: 6 × 2\n#>   Gender     n\n#>   <chr>  <int>\n#> 1 Female   313\n#> 2 M         32\n#> 3 Male     374\n#> 4 Other     56\n#> 5 female    25\n#> 6 other      5\nprint(count(transaction_data_2, Category))\n#> # A tibble: 6 × 2\n#>   Category        n\n#>   <chr>       <int>\n#> 1 CLOTHING       23\n#> 2 Clothing      255\n#> 3 Electronics   269\n#> 4 Household     220\n#> 5 electronics    24\n#> 6 household      14\nprint(count(transaction_data_2, Payment_Method))\n#> # A tibble: 7 × 2\n#>   Payment_Method     n\n#>   <chr>          <int>\n#> 1 Credit Card      363\n#> 2 Debit Card       183\n#> 3 Other             52\n#> 4 PayPal           169\n#> 5 Paypal             8\n#> 6 credit card       18\n#> 7 debit card        12\n\n# Impossible numbers\nprint(summary(transaction_data_1$Age))\n#>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's \n#>   -1.00   33.00   49.00   49.79   64.00  999.00       8 \nprint(table(transaction_data_1$Customer_Rating))\n#> \n#>  -2   0   1   2   3   4   5   6   7  10 \n#>   1   1  44  88 175 277 218   1   1   1 \nprint(summary(transaction_data_2$Delivery_Time))\n#>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's \n#>  -3.000   3.000   5.000   5.499   8.000  60.000       6 \n\n# Two values in one column, and a number stored as text\nprint(head(transaction_data_1$Quantity.Product_Price))\n#> [1] \"2_72.95\"  \"1_186.23\" \"3_150.21\" \"3_120.14\" \"1_411.09\" \"3_341.23\"\nprint(head(transaction_data_2$Shipping_Cost, 10))\n#>  [1] \"23.91\" \"2.31\"  \"$1.05\" \"17.84\" \"7.98\"  \"19.19\" \"19.81\" \"13.13\" \"20.86\"\n#> [10] \"6.46\" \n\n# IDs that won't match in a join\nprint(head(transaction_data_2$Transaction_ID[!str_detect(transaction_data_2$Transaction_ID, \"^T[0-9]{4}$\")]))\n#> [1] \"t0680\" \"t0034\" \"t0418\" \"t0257\" \"t0461\" \"t0759\"",
+    "comment": "**Do this first on any \"clean the data\" question.** You can't fix what you haven't found, and the write-up should *list* the issues. Checklist:\n\n| Check | Code | What it found (stand-in) |\n|---|---|---|\n| duplicate rows | `sum(duplicated(df))` | 12 in file 1, 8 in file 2 |\n| missing values | `colSums(is.na(df))` | Age, Income, Delivery_Time |\n| inconsistent labels | `count(df, column)` for every text column | Yes/yes/Y/YES/N/NO, M/male/female, CLOTHING/household, Paypal/credit card |\n| impossible values | `summary()` / `table()` | Age −1 and 999, ratings 0/6/7/10, delivery −3 and 60 days |\n| two values in one cell | look at the column | `Quantity.Product_Price` = `\"2_72.95\"` |\n| numbers stored as text | type shows `<chr>` | `Shipping_Cost` with `$` |\n| join keys that won't match | IDs that don't fit the pattern | `\" t0680 \"` vs `\"T0680\"` |\n\n`str_detect(x, \"^T[0-9]{4}$\")` checks the pattern \"T + 4 digits\"; anything else needs fixing.\n\n**Solve similar problems:** for every column, ask: right **type**? consistent **labels**? possible **values**? one value per cell? Then check duplicates, NAs and whether the join key matches between files.",
+    "key": true
+   },
+   {
+    "id": "rec-05-q1_1a",
+    "label": "Question 1 · Part 1 · clean transaction_data_1",
+    "question": "Clean the transaction_data_1 and transaction_data_2 datasets and make them tidy, that is, identify and fix all the issues introduced into the datasets.",
+    "code": "t1 <- transaction_data_1 |>\n  distinct() |>                                                   # 1. duplicate rows\n  separate(Quantity.Product_Price,                                # 2. two values in one column\n           into = c(\"Quantity\", \"Product_Price\"),\n           sep = \"_\", convert = TRUE) |>\n  mutate(Discount_Applied = case_when(                            # 3. Yes / yes / Y / YES ...\n           str_to_lower(Discount_Applied) %in% c(\"yes\", \"y\") ~ \"Yes\",\n           str_to_lower(Discount_Applied) %in% c(\"no\", \"n\")  ~ \"No\"),\n         Age = if_else(Age >= 18 & Age <= 100, Age, NA),          # 4. impossible ages\n         Customer_Rating = if_else(Customer_Rating %in% 1:5,      # 5. ratings outside 1-5\n                                   Customer_Rating, NA)) |>\n  drop_na()                                                       # 6. remove rows with missing values\nprint(t1)\n#> # A tibble: 766 × 8\n#>    Transaction_ID Customer_ID   Age Income Discount_Applied Customer_Rating\n#>    <chr>          <chr>       <dbl>  <dbl> <chr>                      <dbl>\n#>  1 T0179          C203           49  78300 No                             4\n#>  2 T0380          C150           34 163000 No                             5\n#>  3 T0668          C259           20  53100 No                             4\n#>  4 T0222          C217           39  83700 No                             4\n#>  5 T0755          C102           67  93800 No                             4\n#>  6 T0286          C218           66  41000 No                             3\n#>  7 T0749          C203           49  78300 Yes                            4\n#>  8 T0127          C043           39  69300 Yes                            4\n#>  9 T0105          C212           75  79800 Yes                            4\n#> 10 T0738          C161           63  65800 No                             3\n#> # ℹ 756 more rows\n#> # ℹ 2 more variables: Quantity <int>, Product_Price <dbl>\nprint(count(t1, Discount_Applied))\n#> # A tibble: 2 × 2\n#>   Discount_Applied     n\n#>   <chr>            <int>\n#> 1 No                 439\n#> 2 Yes                327",
+    "comment": "**One pipe, one fix per line** (the comments number them):\n\n| Issue | Fix |\n|---|---|\n| duplicate rows | `distinct()` |\n| `Quantity.Product_Price` holds two values | `separate(..., into = c(\"Quantity\", \"Product_Price\"), sep = \"_\", convert = TRUE)` |\n| Yes / yes / Y / YES / N / NO | `case_when(str_to_lower(x) %in% c(\"yes\", \"y\") ~ \"Yes\", ...)` |\n| ages like −1 or 999 | `if_else(Age >= 18 & Age <= 100, Age, NA)` → NA |\n| ratings outside 1–5 | `if_else(Customer_Rating %in% 1:5, Customer_Rating, NA)` |\n| missing values | `drop_na()` at the end |\n\n**Why turn bad values into NA first, then `drop_na()`?** All the \"remove bad rows\" decisions happen in one place, and you can count how many rows each rule removed.\n\n**Watch out: `sep` matters here.** The price has a decimal point, so the default separator (any non-letter/number) would split `\"2_72.95\"` into **three** pieces (2, 72, 95). Always give `sep = \"_\"` (or whatever character your file uses).\n\n**Dropping vs keeping NAs:** removing rows is the usual answer. Mention it in a sentence; an alternative is replacing missing incomes with the median (`replace_na(list(Income = median(Income, na.rm = TRUE)))`).\n\n**Solve similar problems:** `distinct()` → `separate()` for combined columns → `mutate()` with `case_when()` / `str_to_lower()` / `str_trim()` for labels and `if_else(..., NA)` for impossible values → `drop_na()`. Lecture 12 (tidyr) and the Function finder (Kit 03) have each tool.",
+    "key": true
+   },
+   {
+    "id": "rec-05-q1_1a-sol2",
+    "label": "Question 1 · Part 1 · Solution #2 (step by step, filter instead of NA)",
+    "question": "",
+    "code": "# Same cleaning, written as separate steps you can check one at a time\nt1_b <- transaction_data_1 |> distinct()\nprint(nrow(transaction_data_1) - nrow(t1_b))          # duplicates removed\n#> [1] 12\n\nt1_b <- t1_b |>\n  separate(Quantity.Product_Price, into = c(\"Quantity\", \"Product_Price\"), sep = \"_\") |>\n  mutate(Quantity = as.numeric(Quantity),\n         Product_Price = as.numeric(Product_Price),\n         Discount_Applied = if_else(str_to_lower(str_sub(Discount_Applied, 1, 1)) == \"y\", \"Yes\", \"No\")) |>\n  filter(between(Age, 18, 100), between(Customer_Rating, 1, 5), !is.na(Income))\nprint(dim(t1_b))\n#> [1] 766   8\nprint(identical(sort(t1$Transaction_ID), sort(t1_b$Transaction_ID)))\n#> [1] TRUE",
+    "comment": "**Same result, different style:** check the number of duplicates first, convert with `as.numeric()` after `separate()`, recode Yes/No by the **first letter**, and `filter(between(...))` to drop bad rows directly. `identical(...)` is `TRUE`: the same 766 transactions survive.\n\n`between(x, 18, 100)` is a tidyverse shortcut for `x >= 18 & x <= 100`, and it drops NAs too.",
+    "key": false
+   },
+   {
+    "id": "rec-05-q1_1b",
+    "label": "Question 1 · Part 1 · clean transaction_data_2",
+    "question": "Clean the transaction_data_1 and transaction_data_2 datasets and make them tidy, that is, identify and fix all the issues introduced into the datasets.",
+    "code": "t2 <- transaction_data_2 |>\n  mutate(Transaction_ID = str_to_upper(str_trim(Transaction_ID)),   # \" t0012 \" -> \"T0012\"\n         Gender   = case_when(str_to_lower(Gender) %in% c(\"male\", \"m\")   ~ \"Male\",\n                              str_to_lower(Gender) %in% c(\"female\", \"f\") ~ \"Female\",\n                              str_to_lower(Gender) == \"other\"            ~ \"Other\"),\n         Category = str_to_title(str_trim(Category)),               # \"CLOTHING \" -> \"Clothing\"\n         Payment_Method = case_when(\n           str_to_lower(Payment_Method) == \"credit card\" ~ \"Credit Card\",\n           str_to_lower(Payment_Method) == \"debit card\"  ~ \"Debit Card\",\n           str_to_lower(Payment_Method) == \"paypal\"      ~ \"PayPal\",\n           TRUE ~ Payment_Method),\n         Shipping_Cost = parse_number(Shipping_Cost),               # \"$4.99\" -> 4.99\n         Delivery_Time = if_else(Delivery_Time > 0 & Delivery_Time <= 30, Delivery_Time, NA)) |>\n  distinct() |>                                                     # after fixing IDs!\n  drop_na()\nprint(t2)\n#> # A tibble: 787 × 6\n#>    Transaction_ID Gender Category    Payment_Method Shipping_Cost Delivery_Time\n#>    <chr>          <chr>  <chr>       <chr>                  <dbl>         <dbl>\n#>  1 T0385          Female Household   Debit Card             23.9              4\n#>  2 T0245          Other  Clothing    Credit Card             2.31             5\n#>  3 T0169          Female Electronics Credit Card             1.05            10\n#>  4 T0106          Female Electronics Other                  17.8              3\n#>  5 T0289          Female Electronics Credit Card             7.98             9\n#>  6 T0710          Other  Clothing    Credit Card            19.2              7\n#>  7 T0139          Male   Clothing    Credit Card            19.8              6\n#>  8 T0684          Male   Electronics PayPal                 13.1              3\n#>  9 T0689          Male   Household   Credit Card            20.9             10\n#> 10 T0284          Female Clothing    Debit Card              6.46             3\n#> # ℹ 777 more rows\nprint(count(t2, Category))\n#> # A tibble: 3 × 2\n#>   Category        n\n#>   <chr>       <int>\n#> 1 Clothing      273\n#> 2 Electronics   286\n#> 3 Household     228\nprint(count(t2, Payment_Method))\n#> # A tibble: 4 × 2\n#>   Payment_Method     n\n#>   <chr>          <int>\n#> 1 Credit Card      371\n#> 2 Debit Card       190\n#> 3 Other             52\n#> 4 PayPal           174",
+    "comment": "| Issue | Fix |\n|---|---|\n| IDs like `\" t0012 \"` | `str_to_upper(str_trim(Transaction_ID))` |\n| M / male / female / other | `case_when()` to Male / Female / Other |\n| `\"CLOTHING \"`, `\" household\"` | `str_to_title(str_trim(Category))` |\n| credit card / Paypal / debit card | `case_when()` to the official spelling |\n| `\"$4.99\"` stored as text | `parse_number()` (readr) drops the `$` and makes it numeric |\n| delivery −3 or 60 days | NA, then `drop_na()` |\n\n**Order matters for `distinct()`:** fix the IDs and labels **first**. `\" t0012 \"` and `\"T0012\"` only look like duplicates after cleaning.\n\n**Why fixing IDs is critical:** the merge in Part 2 matches on `Transaction_ID`. Unfixed IDs silently drop those transactions from the inner join.\n\n**`str_to_title()`** capitalizes each word, which works for Category. For Payment_Method it would turn \"PayPal\" into \"Paypal\", so that column gets an explicit `case_when()`.\n\n**Solve similar problems:** for text categories: `count()` them, then `str_trim()` + a case function, or `case_when()` when the official spelling is unusual. For numbers stored as text: `parse_number()` or `as.numeric(str_remove(x, \"\\\\$\"))`.",
+    "key": true
+   },
+   {
+    "id": "rec-05-q1_1b-sol2",
+    "label": "Question 1 · Part 1 · Solution #2 (check the cleaning worked)",
+    "question": "",
+    "code": "# Check every label is clean now, and look at the numbers again\nt2 |> select(Gender, Category, Payment_Method) |>\n  pivot_longer(everything(), names_to = \"variable\", values_to = \"value\") |>\n  count(variable, value) |>\n  print(n = 20)\n#> # A tibble: 10 × 3\n#>    variable       value           n\n#>    <chr>          <chr>       <int>\n#>  1 Category       Clothing      273\n#>  2 Category       Electronics   286\n#>  3 Category       Household     228\n#>  4 Gender         Female        327\n#>  5 Gender         Male          399\n#>  6 Gender         Other          61\n#>  7 Payment_Method Credit Card   371\n#>  8 Payment_Method Debit Card    190\n#>  9 Payment_Method Other          52\n#> 10 Payment_Method PayPal        174\nprint(summary(t2$Shipping_Cost))\n#>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. \n#>    0.02    5.97   12.47   12.56   18.75   25.00 \nprint(range(t2$Delivery_Time))\n#> [1]  1 10",
+    "comment": "**Always verify:** stacking the three text columns with `pivot_longer()` and counting shows every label in one table: exactly 3 genders, 3 categories, 4 payment methods. `summary()` and `range()` confirm the numbers are now possible values. A one-line sentence in your write-up (\"after cleaning, each categorical variable has only its valid levels\") earns credit.",
+    "key": false
+   },
+   {
+    "id": "rec-05-q1_2",
+    "label": "Question 1 · Part 2 · merge with inner_join → transaction_data",
+    "question": "Merge transaction_data_1 and transaction_data_2: the unmatched rows in either input should not be included in the output. Name the output transaction_data.",
+    "code": "transaction_data <- inner_join(t1, t2, by = \"Transaction_ID\")\nprint(transaction_data)\n#> # A tibble: 754 × 13\n#>    Transaction_ID Customer_ID   Age Income Discount_Applied Customer_Rating\n#>    <chr>          <chr>       <dbl>  <dbl> <chr>                      <dbl>\n#>  1 T0179          C203           49  78300 No                             4\n#>  2 T0380          C150           34 163000 No                             5\n#>  3 T0668          C259           20  53100 No                             4\n#>  4 T0222          C217           39  83700 No                             4\n#>  5 T0755          C102           67  93800 No                             4\n#>  6 T0286          C218           66  41000 No                             3\n#>  7 T0749          C203           49  78300 Yes                            4\n#>  8 T0127          C043           39  69300 Yes                            4\n#>  9 T0105          C212           75  79800 Yes                            4\n#> 10 T0738          C161           63  65800 No                             3\n#> # ℹ 744 more rows\n#> # ℹ 7 more variables: Quantity <int>, Product_Price <dbl>, Gender <chr>,\n#> #   Category <chr>, Payment_Method <chr>, Shipping_Cost <dbl>,\n#> #   Delivery_Time <dbl>\nprint(dim(transaction_data))\n#> [1] 754  13",
+    "comment": "\"Unmatched rows in either input should not be included\" = **`inner_join`**, by the shared key `Transaction_ID`. Use the **cleaned** tables (t1, t2), not the originals.\n\nStand-in result: 754 transactions × 13 columns.\n\n**Solve similar problems:** same wording as HW 3 Part 6. Left / right / full keep unmatched rows; only inner drops them from both sides.",
+    "key": true
+   },
+   {
+    "id": "rec-05-q1_2-sol2",
+    "label": "Question 1 · Part 2 · Solution #2 (check what the join dropped)",
+    "question": "",
+    "code": "# Who got dropped? (rows without a partner in the other file)\nprint(nrow(anti_join(t1, t2, by = \"Transaction_ID\")))\n#> [1] 12\nprint(nrow(anti_join(t2, t1, by = \"Transaction_ID\")))\n#> [1] 33\n# Check: one row per transaction\nprint(n_distinct(transaction_data$Transaction_ID) == nrow(transaction_data))\n#> [1] TRUE",
+    "comment": "`anti_join()` shows the rows with no partner: 12 in t1 and 33 in t2 here (mostly rows removed during cleaning in the *other* file, plus transactions that only exist in one file). The last check confirms each transaction appears once after the join; if not, there were still duplicates.",
+    "key": false
+   },
+   {
+    "id": "rec-05-q1_3",
+    "label": "Question 1 · Part 3 · Total_Amount = Quantity × Product_Price + Shipping_Cost",
+    "question": "Add a new variable, Total_Amount, to transaction_data, which represents the total cost of each transaction.",
+    "code": "transaction_data <- transaction_data |>\n  mutate(Total_Amount = Quantity * Product_Price + Shipping_Cost)\nprint(transaction_data |> select(Transaction_ID, Quantity, Product_Price, Shipping_Cost, Total_Amount), n = 5)\n#> # A tibble: 754 × 5\n#>   Transaction_ID Quantity Product_Price Shipping_Cost Total_Amount\n#>   <chr>             <int>         <dbl>         <dbl>        <dbl>\n#> 1 T0179                 2          73.0          10.5         156.\n#> 2 T0380                 1         186.           16.3         203.\n#> 3 T0668                 3         150.           15.7         466.\n#> 4 T0222                 3         120.           16.1         377.\n#> 5 T0755                 1         411.           21.5         433.\n#> # ℹ 749 more rows",
+    "comment": "**Total cost of a transaction** = units × price per unit, plus shipping. One `mutate()`.\n\n**Say your assumption in a sentence.** \"Total cost\" could mean with or without shipping; including shipping is what the customer actually pays. Solution #2 shows the goods-only version.\n\n**Check:** first row 2 × 72.95 + 10.5 ≈ 156.\n\n**Solve similar problems:** \"total / revenue / cost\" from a unit price and a count → `mutate(total = quantity * price)`; add fees if the question's wording includes them.",
+    "key": true
+   },
+   {
+    "id": "rec-05-q1_3-sol2",
+    "label": "Question 1 · Part 3 · Solution #2 (goods only, without shipping)",
+    "question": "",
+    "code": "# If your TA counts only the goods (no shipping):\ntransaction_data |>\n  mutate(Total_Goods = Quantity * Product_Price) |>\n  select(Transaction_ID, Quantity, Product_Price, Total_Goods, Total_Amount) |>\n  print(n = 3)\n#> # A tibble: 754 × 5\n#>   Transaction_ID Quantity Product_Price Total_Goods Total_Amount\n#>   <chr>             <int>         <dbl>       <dbl>        <dbl>\n#> 1 T0179                 2          73.0        146.         156.\n#> 2 T0380                 1         186.         186.         203.\n#> 3 T0668                 3         150.         451.         466.\n#> # ℹ 751 more rows",
+    "comment": "`Total_Goods = Quantity * Product_Price`. Both versions are defensible; pick one, state it, and use it consistently in Question 2.",
+    "key": false
+   },
+   {
+    "id": "rec-05-q2_1",
+    "label": "Question 2 · Part 1 · average Total_Amount by Category × Payment_Method",
+    "question": "Compute the average Total_Amount per transaction for each product Category and Payment_Method combination. Which payment method is associated with higher spending in each category?",
+    "code": "cat_pay <- transaction_data |>\n  group_by(Category, Payment_Method) |>\n  summarise(avg_total = mean(Total_Amount), n = n(), .groups = \"drop\")\nprint(cat_pay)\n#> # A tibble: 12 × 4\n#>    Category    Payment_Method avg_total     n\n#>    <chr>       <chr>              <dbl> <int>\n#>  1 Clothing    Credit Card         171.   124\n#>  2 Clothing    Debit Card          139.    71\n#>  3 Clothing    Other               117.    12\n#>  4 Clothing    PayPal              177.    56\n#>  5 Electronics Credit Card         933.   134\n#>  6 Electronics Debit Card          826.    61\n#>  7 Electronics Other               843.    21\n#>  8 Electronics PayPal              837.    57\n#>  9 Household   Credit Card         244.    98\n#> 10 Household   Debit Card          255.    51\n#> 11 Household   Other               312.    14\n#> 12 Household   PayPal              210.    55\n\n# Which payment method has the highest average spending in each category?\ncat_pay |>\n  group_by(Category) |>\n  slice_max(avg_total, n = 1) |>\n  print()\n#> # A tibble: 3 × 4\n#> # Groups:   Category [3]\n#>   Category    Payment_Method avg_total     n\n#>   <chr>       <chr>              <dbl> <int>\n#> 1 Clothing    PayPal              177.    56\n#> 2 Electronics Credit Card         933.   134\n#> 3 Household   Other               312.    14",
+    "comment": "**\"For each A and B combination\" = `group_by(A, B)`** → one row per combination (3 × 4 = 12 here).\n\n**\"Which … is highest in each category\"**: group by Category again and `slice_max(avg_total, n = 1)`.\n\n**Stand-in answer:** Electronics → Credit Card ($933), Clothing → PayPal ($177), Household → Other ($312).\n\n**Watch out:** add `n = n()`. The Household winner \"Other\" is based on only 14 transactions, so it's a weak conclusion. Say so.\n\n**Solve similar problems:** \"average X for each A–B combination\" → `group_by(A, B) |> summarise(mean(X), n = n(), .groups = \"drop\")`; \"which is highest within each A\" → `group_by(A) |> slice_max(...)`.",
+    "key": true
+   },
+   {
+    "id": "rec-05-q2_1-sol2",
+    "label": "Question 2 · Part 1 · Solution #2 (wide comparison table)",
+    "question": "",
+    "code": "# Side-by-side table: one row per category, one column per payment method\ncat_pay |>\n  select(-n) |>\n  mutate(avg_total = round(avg_total, 1)) |>\n  pivot_wider(names_from = Payment_Method, values_from = avg_total) |>\n  print()\n#> # A tibble: 3 × 5\n#>   Category    `Credit Card` `Debit Card` Other PayPal\n#>   <chr>               <dbl>        <dbl> <dbl>  <dbl>\n#> 1 Clothing             171.         139   117    177.\n#> 2 Electronics          934.         826.  843.   837.\n#> 3 Household            244.         255.  312.   210.",
+    "comment": "`pivot_wider(names_from = Payment_Method, values_from = avg_total)` gives one row per category and one column per payment method, so the highest value in each row is easy to see.",
+    "key": false
+   },
+   {
+    "id": "rec-05-q2_2",
+    "label": "Question 2 · Part 2 · age groups and % paying by credit card",
+    "question": "Create age groups (<25, 25–40, 41–60, >60). Within each age group, calculate the percentage of customers who used Credit Card as the payment method. What does this say about payment preferences by age?",
+    "code": "age_credit <- transaction_data |>\n  mutate(age_group = cut(Age, breaks = c(-Inf, 24, 40, 60, Inf),\n                         labels = c(\"<25\", \"25-40\", \"41-60\", \">60\"))) |>\n  group_by(age_group) |>\n  summarise(n = n(),\n            pct_credit = mean(Payment_Method == \"Credit Card\") * 100)\nprint(age_credit)\n#> # A tibble: 4 × 3\n#>   age_group     n pct_credit\n#>   <fct>     <int>      <dbl>\n#> 1 <25          81       22.2\n#> 2 25-40       203       43.3\n#> 3 41-60       229       49.3\n#> 4 >60         241       56.8",
+    "comment": "**Two steps:**\n1. `cut(Age, breaks = c(-Inf, 24, 40, 60, Inf), labels = ...)`. Intervals are (a, b], so 24 ends \"<25\", 40 ends \"25–40\" and 60 ends \"41–60\" — exactly the question's groups.\n2. Percentage of TRUE = `mean(condition) * 100`. `Payment_Method == \"Credit Card\"` is TRUE/FALSE per row, and the mean of TRUE/FALSE is the share of TRUE.\n\n**Stand-in interpretation:** credit card use rises with age: about 22% of under-25s, 43% of 25–40, 49% of 41–60 and 57% of over-60s. Younger customers rely more on PayPal and other methods.\n\n*(Strictly this is % of **transactions**; for % of **customers**, first keep one row per customer with `distinct(Customer_ID, .keep_all = TRUE)`.)*\n\n**Solve similar problems:** \"percentage with X in each group\" → `group_by(group) |> summarise(pct = mean(condition) * 100)`. Numeric ranges → `cut()` or `case_when()`.",
+    "key": true
+   },
+   {
+    "id": "rec-05-q2_2-sol2",
+    "label": "Question 2 · Part 2 · Solution #2 (case_when groups + count)",
+    "question": "",
+    "code": "# case_when version of the age groups, and count() for the percentage\ntransaction_data |>\n  mutate(age_group = case_when(Age < 25  ~ \"<25\",\n                               Age <= 40 ~ \"25-40\",\n                               Age <= 60 ~ \"41-60\",\n                               TRUE      ~ \">60\"),\n         age_group = factor(age_group, levels = c(\"<25\", \"25-40\", \"41-60\", \">60\"))) |>\n  count(age_group, Payment_Method) |>\n  group_by(age_group) |>\n  mutate(pct = n / sum(n) * 100) |>\n  filter(Payment_Method == \"Credit Card\") |>\n  print()\n#> # A tibble: 4 × 4\n#> # Groups:   age_group [4]\n#>   age_group Payment_Method     n   pct\n#>   <fct>     <chr>          <int> <dbl>\n#> 1 <25       Credit Card       18  22.2\n#> 2 25-40     Credit Card       88  43.3\n#> 3 41-60     Credit Card      113  49.3\n#> 4 >60       Credit Card      137  56.8",
+    "comment": "`case_when()` makes the groups readable; `factor(..., levels = ...)` keeps them in age order instead of alphabetical. Counting every age × payment combination, then `n / sum(n)` within each age group, gives the share of **every** payment method; filtering to Credit Card gives the same percentages.",
+    "key": false
+   },
+   {
+    "id": "rec-05-q2_3",
+    "label": "Question 2 · Part 3 · income quartiles and % with a discount",
+    "question": "Split customers into income quartiles (below 25th percentile, between 25th and 50th, between 50th and 75th, and above 75th). Within each quartile, calculate the percentage of transactions with a discount applied. Interpret whether discounts tend to attract higher- or lower-income customers.",
+    "code": "qs <- quantile(transaction_data$Income, c(0, 0.25, 0.5, 0.75, 1))\nprint(qs)\n#>     0%    25%    50%    75%   100% \n#>  21700  49550  68450  95500 174200 \n\nincome_disc <- transaction_data |>\n  mutate(income_q = cut(Income, breaks = qs, include.lowest = TRUE,\n                        labels = c(\"Q1 (lowest)\", \"Q2\", \"Q3\", \"Q4 (highest)\"))) |>\n  group_by(income_q) |>\n  summarise(n = n(),\n            pct_discount = mean(Discount_Applied == \"Yes\") * 100)\nprint(income_disc)\n#> # A tibble: 4 × 3\n#>   income_q         n pct_discount\n#>   <fct>        <int>        <dbl>\n#> 1 Q1 (lowest)    189         56.1\n#> 2 Q2             188         53.7\n#> 3 Q3             190         38.4\n#> 4 Q4 (highest)   187         24.1",
+    "comment": "**Quartile cutoffs = `quantile(Income, c(0, .25, .5, .75, 1))`**, then `cut(Income, breaks = those, include.lowest = TRUE)` puts each transaction in its quartile. `include.lowest = TRUE` keeps the very lowest income (otherwise it falls outside the first interval and becomes NA).\n\n**Stand-in interpretation:** discount use falls as income rises (56% → 54% → 38% → 24%), so discounts mainly attract **lower-income** customers.\n\n**Solve similar problems:** \"split into quartiles / quintiles / deciles\" → `quantile()` cutoffs + `cut()`, or `ntile(x, 4)`. Then the same `mean(condition) * 100` per group.",
+    "key": true
+   },
+   {
+    "id": "rec-05-q2_3-sol2",
+    "label": "Question 2 · Part 3 · Solution #2 (ntile)",
+    "question": "",
+    "code": "# ntile() splits into 4 equal-sized groups directly\ntransaction_data |>\n  mutate(income_q = ntile(Income, 4)) |>\n  group_by(income_q) |>\n  summarise(min_income = min(Income), max_income = max(Income),\n            pct_discount = round(mean(Discount_Applied == \"Yes\") * 100, 1)) |>\n  print()\n#> # A tibble: 4 × 4\n#>   income_q min_income max_income pct_discount\n#>      <int>      <dbl>      <dbl>        <dbl>\n#> 1        1      21700      49500         56.1\n#> 2        2      49700      69200         53.4\n#> 3        3      69200      95500         38.3\n#> 4        4      95500     174200         24.5",
+    "comment": "`ntile(Income, 4)` splits the rows into 4 groups of (almost) equal size. Results can differ by a row or two from `cut()` when incomes tie at a cutoff. Showing min and max income per group proves the groups are in the right order.",
+    "key": false
+   },
+   {
+    "id": "rec-05-q2_4",
+    "label": "Question 2 · Part 4 · customers who bought in 2+ categories",
+    "question": "Identify all customers who made purchases in at least 2 different categories. Among these multi-category shoppers, compute the average Total_Amount per transaction and average Customer_Rating.",
+    "code": "multi_cat <- transaction_data |>\n  group_by(Customer_ID) |>\n  filter(n_distinct(Category) >= 2) |>\n  ungroup()\n\nprint(n_distinct(multi_cat$Customer_ID))              # how many such customers\n#> [1] 131\nmulti_cat |>\n  summarise(avg_total  = mean(Total_Amount),\n            avg_rating = mean(Customer_Rating)) |>\n  print()\n#> # A tibble: 1 × 2\n#>   avg_total avg_rating\n#>       <dbl>      <dbl>\n#> 1      450.       3.71",
+    "comment": "**`group_by(Customer_ID) |> filter(n_distinct(Category) >= 2)`** keeps all transactions of customers with at least two different categories. A grouped `filter()` tests a condition **per customer** but keeps the individual rows.\n\n`n_distinct()` counts different values (Electronics, Electronics, Clothing → 2).\n\nStand-in: 131 customers; average $450 per transaction, average rating 3.71.\n\n**Solve similar problems:** \"customers / ids who did X at least k times / in k different …\" → `group_by(id) |> filter(n() >= k)` or `filter(n_distinct(col) >= k)`, then `ungroup()` and summarise.",
+    "key": true
+   },
+   {
+    "id": "rec-05-q2_4-sol2",
+    "label": "Question 2 · Part 4 · Solution #2 (summarise ids, then semi_join)",
+    "question": "",
+    "code": "# Two steps: find the customers, then keep their transactions with semi_join\nmulti_ids <- transaction_data |>\n  group_by(Customer_ID) |>\n  summarise(n_cat = n_distinct(Category)) |>\n  filter(n_cat >= 2)\n\ntransaction_data |>\n  semi_join(multi_ids, by = \"Customer_ID\") |>\n  summarise(customers = n_distinct(Customer_ID),\n            avg_total = mean(Total_Amount), avg_rating = mean(Customer_Rating)) |>\n  print()\n#> # A tibble: 1 × 3\n#>   customers avg_total avg_rating\n#>       <int>     <dbl>      <dbl>\n#> 1       131      450.       3.71",
+    "comment": "Make the list of qualifying customers first (one row each), then `semi_join()` keeps their transactions. Longer, but you can print and check the customer list on its own.",
+    "key": false
+   },
+   {
+    "id": "rec-05-q2_5",
+    "label": "Question 2 · Part 5 · repeat customers and their average number of transactions",
+    "question": "Determine how many unique customers made multiple transactions. Among customers who made more than one transaction, calculate the average number of transactions per customer.",
+    "code": "per_customer <- transaction_data |>\n  count(Customer_ID, name = \"n_trans\")\n\nrepeat_customers <- per_customer |> filter(n_trans > 1)\nprint(nrow(repeat_customers))                 # unique customers with 2+ transactions\n#> [1] 159\nprint(mean(repeat_customers$n_trans))         # average transactions among them\n#> [1] 4.371069",
+    "comment": "`count(Customer_ID)` = transactions per customer. Keep `n_trans > 1`; the number of rows is the number of repeat customers, and the mean of `n_trans` is their average.\n\nStand-in: 159 repeat customers, averaging 4.37 transactions each.\n\n**Solve similar problems:** \"how many ids appear more than once\" → `count(id) |> filter(n > 1) |> nrow()`.",
+    "key": true
+   },
+   {
+    "id": "rec-05-q2_5-sol2",
+    "label": "Question 2 · Part 5 · Solution #2 (one pipe)",
+    "question": "",
+    "code": "transaction_data |>\n  group_by(Customer_ID) |>\n  summarise(n_trans = n()) |>\n  filter(n_trans > 1) |>\n  summarise(repeat_customers = n(), avg_transactions = mean(n_trans)) |>\n  print()\n#> # A tibble: 1 × 2\n#>   repeat_customers avg_transactions\n#>              <int>            <dbl>\n#> 1              159             4.37",
+    "comment": "Same numbers in one pipe: `group_by` + `summarise(n())` then a second `summarise()` on the per-customer table.",
+    "key": false
+   },
+   {
+    "id": "rec-05-q3",
+    "label": "Question 3 · scatterplot of Income vs Total_Amount with marginal histograms (ggMarginal)",
+    "question": "Create a scatter plot of Income vs Total_Amount. Add marginal histograms on x and y axes, color points by Discount_Applied, and add a title and axis labels.",
+    "code": "library(ggExtra)\n\np <- ggplot(transaction_data, aes(x = Income, y = Total_Amount, color = Discount_Applied)) +\n  geom_point(alpha = 0.6) +\n  scale_color_manual(values = c(No = \"steelblue\", Yes = \"tomato\")) +\n  labs(title = \"Income vs total amount per transaction\",\n       x = \"Annual income (USD)\", y = \"Total amount (USD)\", color = \"Discount\") +\n  theme_minimal() +\n  theme(legend.position = \"bottom\")\n\npm <- ggMarginal(p, type = \"histogram\")\npm",
+    "comment": "**Build the scatterplot, save it, then `ggMarginal(p, type = \"histogram\")`** (ggExtra package, Lecture 14). Color by group = `aes(color = Discount_Applied)`.\n\n![scatterplot with marginal histograms](files/plots/rec5-q3.png)\n\n**Reading it:** most transactions are under $1,000 at every income level (the right-hand histogram is very right-skewed), and discounted (red) points cluster at lower incomes, matching Question 2 Part 3.\n\n**Watch out:** install once with `install.packages(\"ggExtra\")`. `ggMarginal()` needs a saved ggplot object, not `+`.\n\n**Solve similar problems:** \"marginal histograms / boxplots / densities\" → `ggMarginal(p, type = ...)`; add `groupFill = TRUE` or `groupColour = TRUE` to split the margins by the color variable.",
+    "key": true
+   },
+   {
+    "id": "rec-05-q3-sol2",
+    "label": "Question 3 · Solution #2 (marginal histograms split by group)",
+    "question": "",
+    "code": "# Marginal histograms split by group, without guessing bin settings\npm2 <- ggMarginal(p, type = \"histogram\", groupFill = TRUE, bins = 25)\npm2",
+    "comment": "`groupFill = TRUE` colors the marginal histograms by `Discount_Applied` too, so you can compare the income distributions of discount and non-discount transactions directly.\n\n![grouped marginal histograms](files/plots/rec5-q3-sol2.png)",
+    "key": false
+   },
+   {
+    "id": "rec-05-prac1",
+    "label": "Practice 1 · clean a messy survey (labels, spaces, combined column, impossible value, duplicate)",
+    "question": "Clean survey: remove the duplicate row, split height_weight into height and weight, make smoker Yes/No, make state upper case without spaces, and treat a weight of 999 as missing.",
+    "code": "survey <- tibble(\n  id = c(1, 2, 2, 3, 4, 5, 6),\n  smoker = c(\"Yes\", \"no\", \"no\", \"Y\", \"NO\", \"yes\", \"N\"),\n  state = c(\" ny\", \"NY\", \"NY\", \"nj \", \"CT\", \"ny\", \"NJ\"),\n  height_weight = c(\"170/65\", \"182/80\", \"182/80\", \"158/52\", \"165/999\", \"175/70\", \"190/88\")\n)\nclean <- survey |>\n  distinct() |>\n  separate(height_weight, into = c(\"height\", \"weight\"), sep = \"/\", convert = TRUE) |>\n  mutate(smoker = if_else(str_to_lower(str_sub(smoker, 1, 1)) == \"y\", \"Yes\", \"No\"),\n         state  = str_to_upper(str_trim(state)),\n         weight = if_else(weight < 300, weight, NA)) |>\n  drop_na()\nprint(clean)\n#> # A tibble: 5 × 5\n#>      id smoker state height weight\n#>   <dbl> <chr>  <chr>  <int>  <int>\n#> 1     1 Yes    NY       170     65\n#> 2     2 No     NY       182     80\n#> 3     3 Yes    NJ       158     52\n#> 4     5 Yes    NY       175     70\n#> 5     6 No     NJ       190     88",
+    "comment": "| Recitation | Practice |\n|---|---|\n| Yes / yes / Y / NO | smoker: Yes / no / Y / NO / N |\n| `\" t0012 \"` IDs | `\" ny\"`, `\"nj \"` states |\n| `Quantity.Product_Price` | `height_weight` with `/` |\n| impossible ages/ratings | weight 999 |\n\n**Recipe:** `distinct()` → `separate()` → `mutate()` fixes → `drop_na()`.",
+    "key": false
+   },
+   {
+    "id": "rec-05-prac2",
+    "label": "Practice 2 · % of one category within bins of a number (like credit card by age)",
+    "question": "Using mpg, group cars into engine sizes (≤2L, 2–3.5L, 3.5–5L, >5L) and find the percentage with a manual transmission in each group.",
+    "code": "# Percentage in a group, by bins of a number (like credit card use by age group)\nmpg |>\n  mutate(engine = cut(displ, breaks = c(-Inf, 2, 3.5, 5, Inf),\n                      labels = c(\"<=2L\", \"2-3.5L\", \"3.5-5L\", \">5L\"))) |>\n  group_by(engine) |>\n  summarise(n = n(), pct_manual = mean(str_detect(trans, \"manual\")) * 100)\n#> # A tibble: 4 × 3\n#>   engine     n pct_manual\n#>   <fct>  <int>      <dbl>\n#> 1 <=2L      43       51.2\n#> 2 2-3.5L    89       40.4\n#> 3 3.5-5L    66       19.7\n#> 4 >5L       36       16.7",
+    "comment": "Same two steps as Question 2 Part 2: `cut()` the number into groups, then `mean(condition) * 100`. `str_detect(trans, \"manual\")` is TRUE for any manual gearbox. Smaller engines are much more often manual.",
+    "key": false
+   },
+   {
+    "id": "rec-05-prac3",
+    "label": "Practice 3 · quartiles, then a % within each (like discounts by income)",
+    "question": "Split mpg into quartiles of highway mpg and find the percentage of front-wheel-drive cars in each quartile.",
+    "code": "# Quartiles of one variable, then a percentage within each (like discounts by income quartile)\nq <- quantile(mpg$hwy, c(0, .25, .5, .75, 1))\nmpg |>\n  mutate(hwy_q = cut(hwy, breaks = q, include.lowest = TRUE, labels = c(\"Q1\", \"Q2\", \"Q3\", \"Q4\"))) |>\n  group_by(hwy_q) |>\n  summarise(n = n(), pct_front = mean(drv == \"f\") * 100)\n#> # A tibble: 4 × 3\n#>   hwy_q     n pct_front\n#>   <fct> <int>     <dbl>\n#> 1 Q1       65      1.54\n#> 2 Q2       53     30.2 \n#> 3 Q3       61     57.4 \n#> 4 Q4       55     98.2 ",
+    "comment": "`quantile()` cutoffs + `cut(..., include.lowest = TRUE)`, then a percentage per group: 2% of the least efficient quartile is front-wheel drive vs 98% of the most efficient.",
+    "key": false
+   },
+   {
+    "id": "rec-05-prac4",
+    "label": "Practice 4 · ids with 2+ categories, and repeat ids (like multi-category / repeat customers)",
+    "question": "Using the orders table, find the customers who bought from at least 2 categories and their average order amount; then count the repeat customers and their average number of orders.",
+    "code": "# \"At least 2 different categories\" and \"more than one row\" per id (like multi-category / repeat customers)\norders <- tibble(customer = c(\"A\", \"A\", \"B\", \"C\", \"C\", \"C\", \"D\", \"D\"),\n                 category = c(\"Books\", \"Toys\", \"Books\", \"Toys\", \"Toys\", \"Toys\", \"Books\", \"Games\"),\n                 amount   = c(20, 35, 12, 18, 22, 15, 30, 60))\norders |>\n  group_by(customer) |>\n  filter(n_distinct(category) >= 2) |>\n  ungroup() |>\n  summarise(customers = n_distinct(customer), avg_amount = mean(amount))\n#> # A tibble: 1 × 2\n#>   customers avg_amount\n#>       <int>      <dbl>\n#> 1         2       36.2\n\norders |>\n  count(customer) |>\n  filter(n > 1) |>\n  summarise(repeat_customers = n(), avg_orders = mean(n))\n#> # A tibble: 1 × 2\n#>   repeat_customers avg_orders\n#>              <int>      <dbl>\n#> 1                3       2.33",
+    "comment": "Small enough to check by hand: A (Books, Toys) and D (Books, Games) qualify; C bought 3 times but only Toys. Repeat customers: A, C, D → 3, averaging (2 + 3 + 2) / 3 = 2.33 orders.",
+    "key": false
+   },
+   {
+    "id": "rec-05-prac5",
+    "label": "Practice 5 · scatterplot with marginal density curves by group",
+    "question": "Plot hwy against displ in mpg colored by drv, with marginal density curves colored by drive type, a title and axis labels.",
+    "code": "library(ggExtra)\np_cars <- ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +\n  geom_point() +\n  labs(title = \"Engine size vs highway mpg\", x = \"Displacement (L)\", y = \"Highway mpg\", color = \"Drive\") +\n  theme_minimal() + theme(legend.position = \"bottom\")\npc <- ggMarginal(p_cars, type = \"density\", groupColour = TRUE)\npc",
+    "comment": "Same pattern as Question 3 with `type = \"density\"` and `groupColour = TRUE`.\n\n![marginal densities](files/plots/rec5-prac5.png)",
+    "key": false
+   }
+  ]
  },
  "rev-00": {
   "type": "prac",

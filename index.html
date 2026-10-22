@@ -547,7 +547,7 @@ function codeSectionHTML(e,chunks){
   </section>`;
   }
   const tab=tabFor===curId?entryTab:'ans';
-  const first=e.type==='lec'?'Lecture code':e.type==='hw'?'Answers':'Code';
+  const first=e.type==='lec'?'Lecture code':(e.type==='hw'||e.type==='rec')?'Answers':'Code';
   const nMain=ans.filter(([c])=>!isAlt(c)).length;
   return `<section class="block" id="codeTabs">
     <div class="tabs" role="tablist">
@@ -558,7 +558,7 @@ function codeSectionHTML(e,chunks){
       ${ans.some(([c])=>isAlt(c))?'<p class="pane-intro">Each answer has its walkthrough beside it. Click <b>Alternative answer</b> under a part to see another way that also works.</p>':''}
       ${answersHTML(ans)}</div>
     <div class="tabpane" data-pane="prac" ${tab==='prac'?'':'hidden'}>
-      <p class="pane-intro">${e.type==='hw'?'New problems built the same way as each homework part, with different data, so you can practice the same steps. Each one says which part it matches.':'Practice problems that use the same tools on new data.'}</p>
+      <p class="pane-intro">${e.type==='hw'||e.type==='rec'?'New problems built the same way as each part, with different data, so you can practice the same steps. Each one says which part it matches.':'Practice problems that use the same tools on new data.'}</p>
       ${prac.map(([c,i])=>chunkHTML(c,i,{label:(c.label||'').replace(/Practice: a problem just like it\s*\((.*)\)\s*$/,'$1')})).join('')}</div>
   </section>`;
 }
@@ -569,7 +569,7 @@ function collapseNotes(root){
     const hasImg=el=>el.tagName==='IMG'||!!el.querySelector('img');
     const isLabel=el=>{const st=el.querySelector('strong');return el.tagName==='P'&&st&&el.textContent.trim()===st.textContent.trim();};
     const inPrac=!!p.closest('[data-pane="prac"]');
-    let sum=(inPrac&&kids.find(el=>el.tagName==='TABLE'))||kids.find(el=>el.tagName==='P'&&!isLabel(el)&&!hasImg(el)&&el.textContent.trim().length>=40)||kids.find(el=>!hasImg(el));
+    let sum=(inPrac&&kids.find(el=>el.tagName==='TABLE'))||kids.find(el=>el.tagName==='P'&&!isLabel(el)&&!hasImg(el)&&el.textContent.trim().length>=40&&!/:\s*$/.test(el.textContent.trim()))||kids.find(el=>!hasImg(el));
     const hide=kids.filter(el=>el!==sum&&!hasImg(el));
     if(!hide.length)return;
     hide.forEach(el=>el.classList.add('more-x'));

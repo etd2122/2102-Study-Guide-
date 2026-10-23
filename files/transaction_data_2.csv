@@ -1,0 +1,801 @@
+"Transaction_ID","Gender","Category","Payment_Method","Shipping_Cost","Delivery_Time"
+"T0001","MALE","Electronics","Debit Card",16.64,1
+"T0002","MALE","Clothing","Credit Card",7.67,9
+"T0003","F","Clothing","PayPal",8.3,8
+"T0004","Female","Clothing","Debit",6.1,8
+"T0005","Male","Household","Credit Card",17.88,10
+"T0006","Female","Household","Credit Card",15.36,8
+"T0007","Male","Electronics","PayPal",18.22,7
+"T0008","Male","Clothing","Credit Card",11.66,4
+"T0009","M","Clothing","Other",5.65,1
+"T0010","Female","Electronics","Other",6.88,4
+"T0011","Female","Electronics","Credit",13.52,10
+"T0012","Male","Electronics","PayPal",15.47,7
+"T0013","Female","Clothing","Debit Card",10.44,8
+"T0014","Female","Electronics","PayPal",14.48,8
+"T0015","M","Electronics","Credit",13.54,4
+"T0016","Male","Clothing","PayPal",7.81,8
+"T0017","Male","Electronics","Credit Card",18.7,5
+"T0018","M","Clothing","Credit",13.15,2
+"T0019","Male","Household","Debit Card",13.62,4
+"T0020","M","Clothing","PayPal",18.68,6
+"T0021","M","Electronics","Other",14.41,1
+"T0022","Male","Electronics","Credit Card",15.64,2
+"T0023","Male","Electronics","Debit",6.8,9
+"T0024","Female","Household","Credit Card",8.75,6
+"T0025","Other","Clothing","Credit Card",15.89,1
+"T0026","F","Electronics","Credit Card",15.31,6
+"T0027","Female","Electronics","Debit Card",12.5,3
+"T0028","Male","Household","Credit Card",17.48,7
+"T0029","Female","Electronics","PayPal",8.06,5
+"T0030","MALE","Clothing","Debit Card",17.81,5
+"T0031","MALE","Electronics","PayPal",5.11,3
+"T0032","MALE","Clothing","Credit",10.88,2
+"T0033","MALE","Clothing","PayPal",17.68,2
+"T0034","Male","Electronics","Credit Card",15.35,6
+"T0035","Male","Electronics","Debit Card",12.15,6
+"T0036","Female","Electronics","Debit Card",6.89,10
+"T0037","MALE","Electronics","Credit",12,2
+"T0038","Male","Electronics","Credit",9.94,1
+"T0039","Female","Elects","PayPal",10.31,7
+"T0040","Female","Clothes","Credit Card",6.53,7
+"T0041","Other","Clothing","Credit Card",11.7,7
+"T0042","Male","Household","PayPal",15.75,9
+"T0043","Male","Clothing","Credit Card",8.35,5
+"T0044","F","Clothing","PayPal",6.89,3
+"T0045","FEMALE","Clothing","Credit",9.22,3
+"T0046","Male","Household","Credit Card",12.61,3
+"T0047","Female","Clothing","Credit Card",19.08,1
+"T0048","FEMALE","Electronics","Debit Card",14.07,3
+"T0049","Female","Clothing","Debit Card",7.82,1
+"T0050","Male","Electronics","PayPal",14.23,9
+"T0051","FEMALE","Electronics","PayPal",13.89,3
+"T0052","FEMALE","Electronics","PayPal",17.7,3
+"T0053","Male","Electronics","PayPal",12.74,9
+"T0054","Male","Electronics","Credit",12.04,8
+"T0055","M","Electronics","Credit Card",10.29,4
+"T0056","Male","Clothing","PayPal",8.01,8
+"T0057","FEMALE","Elects","Credit Card",10.75,10
+"T0058","Female","Clothing","Credit",12.33,10
+"T0059","FEMALE","Household","Credit",9,3
+"T0060","Female","Clothing","Credit Card",5.29,10
+"T0061","OTHER","Electronics","PayPal",5.58,7
+"T0062","Female","Clothing","Credit Card",10.36,10
+"T0063","Female","Clothing","Credit Card",8.78,10
+"T0064","Female","Electronics","Credit Card",16.92,3
+"T0065","FEMALE","Clothing","Debit Card",17.46,6
+"T0066","Male","Electronics","Debit",9.95,2
+"T0067","Female","Electronics","Credit Card",8.24,9
+"T0068","MALE","Household","Debit Card",6.27,9
+"T0069","FEMALE","Electronics","PayPal",14.88,2
+"T0070","Male","Electronics","Credit Card",19.04,4
+"T0071","F","Electronics","Credit Card",12.63,10
+"T0072","Male","Electronics","Credit Card",10.61,10
+"T0073","FEMALE","Clothing","PayPal",12.89,2
+"T0074","Female","Clothing","PayPal",13.64,5
+"T0075","Female","Clothing","Credit Card",18.31,6
+"T0076","Female","Clothing","Debit Card",7.58,4
+"T0077","F","Clothing","PayPal",9.14,3
+"T0078","M","Electronics","Credit Card",19.59,2
+"T0079","Female","Clothing","Credit Card",12.67,5
+"T0080","F","Electronics","Credit Card",14.37,9
+"T0081","Other","Clothing","Debit Card",13.27,6
+"T0082","Male","Electronics","PayPal",17.97,1
+"T0083","M","Elects","Credit Card",15.42,6
+"T0084","F","Electronics","Debit Card",15.47,6
+"T0085","Female","Electronics","Credit",18.2,8
+"T0086","FEMALE","Electronics","Credit Card",16.16,5
+"T0087","FEMALE","Clothing","Credit Card",9.37,5
+"T0088","Other","Clothing","Credit Card",19,9
+"T0089","Female","Electronics","Credit",14.36,6
+"T0090","M","Clothing","Credit Card",17.41,8
+"T0091","Male","Household","Credit",8.74,1
+"T0092","Female","Household","Credit",18.24,2
+"T0093","Female","Elects","Credit Card",6.25,5
+"T0094","Female","Electronics","PayPal",17.38,10
+"T0095","Male","Electronics","Credit Card",6.54,9
+"T0096","Female","Electronics","PayPal",19.54,1
+"T0097","MALE","Household","Debit Card",11.06,9
+"T0098","Male","Electronics","Credit Card",12.5,8
+"T0099","M","Clothing","PayPal",17.96,3
+"T0100","F","Clothing","Credit",9.84,9
+"T0101","FEMALE","Electronics","PayPal",12.25,1
+"T0102","M","Electronics","Credit Card",8.43,4
+"T0103","M","Clothing","Credit",16.77,2
+"T0104","Female","Electronics","Credit",16.5,2
+"T0105","Female","Clothing","Debit Card",6.48,10
+"T0106","M","Clothing","PayPal",19.98,7
+"T0107","MALE","Electronics","Credit Card",13.58,2
+"T0108","M","Elects","PayPal",5.52,5
+"T0109","Female","Clothing","PayPal",5.28,4
+"T0110","Male","Electronics","Credit",8.08,10
+"T0111","M","Electronics","Other",6.43,3
+"T0112","Female","Elects","Credit Card",7.37,5
+"T0113","Male","Electronics","Debit Card",12.37,3
+"T0114","Female","Household","Credit Card",19.78,10
+"T0115","Female","Electronics","Credit Card",8.67,9
+"T0116","Male","Elects","Other",17.42,4
+"T0117","Female","Clothing","Credit Card",18.09,7
+"T0118","MALE","Electronics","Credit Card",7.19,9
+"T0119","Female","Household","PayPal",10.77,4
+"T0120","F","Electronics","Debit Card",11.9,2
+"T0121","M","Clothing","Debit Card",7.36,9
+"T0122","MALE","Clothes","Credit",11.34,7
+"T0123","Female","Clothing","Credit Card",14.68,5
+"T0124","Female","Electronics","Debit Card",16.91,5
+"T0125","Female","Electronics","Credit",7.56,8
+"T0126","Male","Clothes","PayPal",14.77,4
+"T0127","MALE","Clothing","Credit Card",19.08,6
+"T0128","M","Electronics","Credit Card",5.76,6
+"T0129","Male","Clothing","Debit Card",14.28,3
+"T0130","Female","Clothing","Credit Card",9.08,3
+"T0131","M","Clothing","PayPal",18.94,9
+"T0132","Male","Electronics","Debit Card",19.47,7
+"T0133","OTHER","Clothing","Credit Card",5.49,8
+"T0134","MALE","Electronics","PayPal",6.95,9
+"T0135","Female","Electronics","Debit Card",7.93,5
+"T0136","MALE","Clothing","Credit Card",5.77,4
+"T0137","Female","Electronics","Credit Card",10.66,10
+"T0138","M","Clothing","Credit Card",7.68,5
+"T0139","MALE","Household","Other",6.88,3
+"T0140","MALE","Electronics","Other",7.48,9
+"T0141","Male","Electronics","Credit",19.29,1
+"T0142","Male","Electronics","PayPal",5.92,8
+"T0143","Male","Electronics","Credit",11.52,5
+"T0144","Male","Electronics","PayPal",18.9,9
+"T0145","M","Clothing","Credit Card",12.54,4
+"T0146","Male","Clothing","Debit Card",18.79,1
+"T0147","Male","Clothing","Debit Card",10.08,7
+"T0148","M","Clothing","Credit Card",18.89,1
+"T0149","Other","Clothing","Debit Card",13.81,1
+"T0150","Male","Clothing","Credit Card",16.24,7
+"T0151","Male","Household","Debit",7.34,6
+"T0152","Male","Electronics","Credit Card",12.34,5
+"T0153","Male","Clothes","Debit",17.54,9
+"T0154","Female","Clothing","Credit",9.52,9
+"T0155","Female","Household","Debit Card",18.6,4
+"T0156","FEMALE","Clothing","Credit Card",5.31,8
+"T0157","Male","Clothing","Debit Card",16.41,2
+"T0158","Female","Clothing","Debit Card",16.75,7
+"T0159","Male","Clothes","Credit Card",5.61,5
+"T0160","F","Elects","Credit",8.77,10
+"T0161","Male","Elects","Debit Card",13.91,5
+"T0162","Female","Elects","Credit Card",14.15,5
+"T0163","MALE","Clothing","Other",11.35,9
+"T0164","FEMALE","Electronics","Debit Card",9.59,3
+"T0165","FEMALE","Electronics","PayPal",7.56,4
+"T0166","F","Clothing","Debit Card",14.41,7
+"T0167","FEMALE","Electronics","Debit Card",7.19,1
+"T0168","Male","Electronics","Credit Card",16.3,5
+"T0169","Male","Electronics","Debit Card",11.75,2
+"T0170","Male","Electronics","Other",18.41,5
+"T0171","Male","Clothing","Credit",9.33,6
+"T0172","MALE","Clothing","Debit",17.53,8
+"T0173","Female","Household","Credit Card",13.85,10
+"T0174","Female","Clothing","Credit Card",16.56,6
+"T0175","F","Household","Credit Card",15.63,4
+"T0176","Female","Electronics","PayPal",10.15,8
+"T0177","Male","Elects","Credit Card",19.69,5
+"T0178","M","Clothing","PayPal",11.06,8
+"T0179","Male","Clothing","Other",8.59,9
+"T0180","Male","Elects","PayPal",7.5,7
+"T0181","Male","Household","Debit Card",16.73,8
+"T0182","F","Clothing","PayPal",9.48,2
+"T0183","Female","Clothing","Debit",12.2,1
+"T0184","Female","Electronics","PayPal",8.26,4
+"T0185","Male","Household","Debit Card",10.67,9
+"T0186","FEMALE","Household","Credit Card",12.48,9
+"T0187","M","Electronics","Debit Card",10.99,4
+"T0188","M","Clothing","Debit Card",12.02,9
+"T0189","Female","Electronics","Credit Card",9.31,10
+"T0190","F","Clothing","Credit Card",11.1,9
+"T0191","Male","Electronics","Debit Card",13.54,7
+"T0192","FEMALE","Clothing","Other",9.26,10
+"T0193","Male","Clothes","Debit Card",15.8,1
+"T0194","M","Clothes","Credit Card",16.48,2
+"T0195","Female","Clothing","Debit Card",5.42,9
+"T0196","Male","Clothing","Credit Card",12.75,7
+"T0197","Male","Electronics","Credit Card",10.66,9
+"T0198","M","Clothing","PayPal",13.73,4
+"T0199","Male","Elects","Debit",9.27,5
+"T0200","FEMALE","Electronics","Debit Card",19.49,1
+"T0201","Female","Clothing","Other",7.42,3
+"T0202","Male","Electronics","PayPal",5.7,1
+"T0203","Other","Electronics","Debit",11.42,3
+"T0204","Male","Electronics","Credit Card",8.29,4
+"T0205","M","Electronics","PayPal",16.86,9
+"T0206","F","Elects","Credit Card",16,7
+"T0207","Male","Clothes","PayPal",8.32,1
+"T0208","M","Clothing","PayPal",14.55,7
+"T0209","M","Electronics","Credit Card",16.61,6
+"T0210","MALE","Clothing","Credit Card",15.41,1
+"T0211","Male","Electronics","Credit Card",18.98,1
+"T0212","FEMALE","Electronics","Credit Card",17.53,2
+"T0213","Male","Clothing","Credit Card",16.74,5
+"T0214","Female","Clothing","Credit",11.45,1
+"T0215","FEMALE","Electronics","PayPal",18.71,6
+"T0216","OTHER","Clothing","Debit Card",7.06,3
+"T0217","Female","Clothing","Credit Card",8.93,7
+"T0218","Female","Elects","Debit Card",5.78,9
+"T0219","Male","Clothing","Credit Card",11.72,1
+"T0220","Female","Clothes","Credit",5.05,9
+"T0221","MALE","Clothing","Debit Card",15.14,10
+"T0222","Male","Clothing","Credit Card",13.19,8
+"T0223","Male","Clothing","Debit Card",11.76,8
+"T0224","F","Clothing","Credit",10.02,6
+"T0225","F","Clothing","Credit Card",12.7,8
+"T0226","Female","Clothing","Credit Card",7.73,2
+"T0227","OTHER","Clothing","Credit Card",12.65,6
+"T0228","M","Household","Credit Card",13.28,8
+"T0229","F","Clothing","Credit",18.17,6
+"T0230","Male","Clothing","Debit",16.99,10
+"T0231","F","Clothing","Credit",13.46,8
+"T0232","Male","Electronics","PayPal",15.37,9
+"T0233","F","Electronics","Credit",9.85,2
+"T0234","Male","Clothing","Credit Card",15.2,1
+"T0235","Male","Household","Credit Card",14.77,10
+"T0236","F","Electronics","Credit Card",5.21,5
+"T0237","Female","Elects","Credit Card",19.27,1
+"T0238","M","Clothing","Credit Card",9.74,4
+"T0239","Male","Clothing","Credit Card",7.58,6
+"T0240","F","Clothing","Debit Card",6.52,7
+"T0241","Female","Clothing","Other",9,1
+"T0242","Male","Clothing","PayPal",10.86,8
+"T0243","Male","Electronics","Credit Card",18.84,7
+"T0244","Female","Household","Credit Card",5.94,10
+"T0245","M","Clothing","PayPal",5.26,1
+"T0246","Female","Electronics","Debit",11.71,6
+"T0247","Male","Clothing","Debit Card",7.68,6
+"T0248","F","Electronics","PayPal",17.09,3
+"T0249","MALE","Clothing","Credit Card",9.49,6
+"T0250","F","Electronics","Debit Card",11.96,7
+"T0251","Male","Electronics","Credit Card",5.49,10
+"T0252","Other","Clothing","Debit Card",16.71,4
+"T0253","Male","Clothing","Credit Card",14.27,7
+"T0254","OTHER","Clothing","Credit Card",14.7,5
+"T0255","Male","Clothing","Credit Card",16.45,10
+"T0256","Male","Clothing","Credit Card",18.89,6
+"T0257","M","Electronics","PayPal",13.56,7
+"T0258","M","Clothing","Credit Card",11.33,3
+"T0259","Male","Electronics","PayPal",12.19,5
+"T0260","Female","Clothing","PayPal",16.61,7
+"T0261","Male","Electronics","Credit Card",13.23,5
+"T0262","Male","Electronics","Debit Card",17.33,2
+"T0263","MALE","Electronics","PayPal",16.06,9
+"T0264","F","Elects","Debit Card",12.28,2
+"T0265","F","Electronics","Credit Card",19.9,6
+"T0266","MALE","Electronics","PayPal",18.14,7
+"T0267","Female","Electronics","Debit Card",17.94,8
+"T0268","Male","Household","Debit Card",12.37,2
+"T0269","Male","Elects","Credit Card",6.15,4
+"T0270","FEMALE","Clothing","Credit Card",19.57,3
+"T0271","MALE","Clothing","PayPal",11.23,1
+"T0272","M","Household","Credit Card",16.8,6
+"T0273","M","Clothing","Credit",11.59,4
+"T0274","Male","Electronics","Credit",11.87,2
+"T0275","F","Electronics","Debit Card",13.4,5
+"T0276","Male","Clothing","Credit Card",17.93,5
+"T0277","Female","Clothing","Other",6.67,2
+"T0278","Female","Electronics","Credit",9,6
+"T0279","Male","Clothing","Debit Card",9.23,6
+"T0280","OTHER","Clothing","PayPal",17.18,10
+"T0281","MALE","Electronics","Debit Card",8.19,2
+"T0282","Male","Clothing","Credit Card",17.94,7
+"T0283","F","Electronics","PayPal",5.21,2
+"T0284","F","Clothing","Credit Card",5.54,5
+"T0285","Female","Electronics","Debit Card",19.69,3
+"T0286","F","Electronics","Other",9.64,10
+"T0287","F","Electronics","Credit Card",15.66,7
+"T0288","Female","Household","PayPal",18.3,6
+"T0289","Male","Electronics","PayPal",7.52,5
+"T0290","Male","Electronics","Credit Card",10.92,3
+"T0291","M","Electronics","Credit Card",5.46,4
+"T0292","Male","Electronics","Debit Card",8.63,9
+"T0293","MALE","Household","PayPal",14.3,8
+"T0294","Male","Clothing","Credit Card",9.26,10
+"T0295","M","Clothing","Credit Card",7.43,9
+"T0296","Male","Electronics","Credit Card",19.15,1
+"T0297","Female","Electronics","Credit Card",10.57,2
+"T0298","FEMALE","Clothing","Debit Card",19.86,4
+"T0299","Male","Electronics","Debit Card",13.4,8
+"T0300","Male","Clothing","Credit Card",10.48,1
+"T0301","Male","Clothing","Credit Card",18.15,1
+"T0302","Male","Electronics","Debit Card",5.45,7
+"T0303","Female","Household","Debit Card",19.87,7
+"T0304","MALE","Electronics","Credit Card",15.49,4
+"T0305","Female","Electronics","Debit Card",19.64,9
+"T0306","Female","Electronics","Credit Card",11.51,4
+"T0307","Male","Electronics","Credit Card",10.76,10
+"T0308","Male","Electronics","Credit Card",19.73,8
+"T0309","Female","Electronics","Credit Card",8.76,1
+"T0310","Male","Electronics","Debit Card",16.15,7
+"T0311","FEMALE","Household","Credit",5.89,4
+"T0312","FEMALE","Clothing","Credit Card",7.69,1
+"T0313","Male","Electronics","PayPal",6.59,6
+"T0314","Other","Clothing","PayPal",16.21,5
+"T0315","FEMALE","Electronics","Debit Card",14.46,3
+"T0316","Male","Electronics","Debit Card",15.04,4
+"T0317","MALE","Clothing","Debit Card",18.48,6
+"T0318","Male","Clothing","Credit Card",14.93,4
+"T0319","Male","Clothes","Credit Card",16.62,1
+"T0320","Male","Electronics","PayPal",7.72,7
+"T0321","Male","Electronics","Credit Card",7.25,5
+"T0322","Male","Clothing","Credit Card",18.92,1
+"T0323","Male","Electronics","Credit Card",14.59,6
+"T0324","F","Clothing","Debit Card",7.91,9
+"T0325","Female","Electronics","Credit Card",11.94,10
+"T0326","Male","Clothing","PayPal",5.23,1
+"T0327","M","Clothing","Credit Card",11.63,3
+"T0328","Male","Clothing","Credit Card",12.81,6
+"T0329","MALE","Electronics","PayPal",18.69,3
+"T0330","Male","Electronics","PayPal",14.02,2
+"T0331","Female","Electronics","Credit Card",7.46,6
+"T0332","OTHER","Clothing","Debit Card",14.23,1
+"T0333","Male","Clothing","Debit",12.18,10
+"T0334","MALE","Electronics","Credit",7.37,10
+"T0335","M","Clothing","Credit Card",18,4
+"T0336","M","Electronics","Credit Card",5.93,10
+"T0337","F","Clothes","Credit Card",17.77,4
+"T0338","Female","Clothing","Debit Card",12.72,3
+"T0339","Male","Clothing","Credit Card",9.3,4
+"T0340","Female","Elects","Credit Card",16.3,2
+"T0341","M","Clothing","Credit Card",15.96,4
+"T0342","MALE","Electronics","PayPal",13.2,3
+"T0343","Female","Electronics","Other",15.94,1
+"T0344","Female","Household","Credit Card",7.21,10
+"T0345","Other","Clothing","Credit Card",19.35,2
+"T0346","Other","Clothing","PayPal",15.1,3
+"T0347","Male","Clothing","Debit",16.7,9
+"T0348","FEMALE","Electronics","PayPal",15.03,2
+"T0349","F","Electronics","Credit Card",6.49,3
+"T0350","Female","Electronics","Credit Card",14.46,9
+"T0351","OTHER","Clothing","Credit Card",19.91,5
+"T0352","MALE","Electronics","Credit Card",5.87,3
+"T0353","Female","Clothing","Credit Card",11.66,2
+"T0354","Male","Clothing","PayPal",6.71,4
+"T0355","M","Electronics","Debit Card",12.85,6
+"T0356","Female","Clothing","Debit Card",17.62,9
+"T0357","Male","Electronics","Debit",14.21,5
+"T0358","Male","Electronics","Credit Card",8.31,3
+"T0359","Male","Clothing","Credit Card",8.76,1
+"T0360","F","Clothing","Credit Card",5.38,10
+"T0361","Male","Electronics","Credit",18.28,10
+"T0362","Male","Clothing","Credit",18.41,7
+"T0363","OTHER","Household","Credit Card",5.8,3
+"T0364","Female","Electronics","Debit Card",17.49,3
+"T0365","Female","Clothing","Credit Card",7.13,10
+"T0366","OTHER","Clothing","Credit Card",11.77,8
+"T0367","M","Clothing","PayPal",15.04,1
+"T0368","F","Clothing","Debit",11.72,8
+"T0369","Male","Electronics","Other",12.78,7
+"T0370","Female","Household","Debit Card",10.25,2
+"T0371","FEMALE","Electronics","Credit Card",13.44,8
+"T0372","Male","Electronics","Credit",6.76,4
+"T0373","Female","Clothing","Credit Card",15.57,4
+"T0374","Male","Electronics","Credit Card",19.48,4
+"T0375","FEMALE","Electronics","Credit",12.01,3
+"T0376","FEMALE","Electronics","PayPal",10.89,9
+"T0377","Male","Household","Debit",19.78,9
+"T0378","M","Clothing","Credit Card",8.58,9
+"T0379","Male","Clothing","PayPal",14.85,4
+"T0380","MALE","Electronics","PayPal",5.5,10
+"T0381","FEMALE","Electronics","Credit Card",8.42,7
+"T0382","Male","Electronics","Credit Card",13.02,2
+"T0383","Female","Clothing","PayPal",6.28,1
+"T0384","Female","Electronics","Debit",7.71,6
+"T0385","Female","Electronics","PayPal",7.25,10
+"T0386","Male","Clothing","PayPal",12.21,10
+"T0387","Male","Clothing","Credit Card",10.68,4
+"T0388","Male","Electronics","Other",11.32,5
+"T0389","Other","Electronics","PayPal",7.99,3
+"T0390","Female","Clothes","PayPal",5.87,4
+"T0391","F","Clothing","Credit",8.47,9
+"T0392","Female","Electronics","Credit",11.16,7
+"T0393","Female","Clothing","PayPal",16.02,5
+"T0394","F","Clothing","PayPal",7.15,7
+"T0395","Female","Elects","Credit Card",18.46,7
+"T0396","MALE","Electronics","Credit",9.23,6
+"T0397","Male","Electronics","PayPal",7.33,6
+"T0398","Other","Electronics","Credit Card",13.57,2
+"T0399","Female","Clothing","Credit Card",19.48,4
+"T0400","M","Electronics","Credit Card",7.06,9
+"T0401","Female","Electronics","Debit Card",15.12,1
+"T0402","F","Electronics","Other",15.07,7
+"T0403","Male","Electronics","Credit Card",17.96,1
+"T0404","MALE","Clothing","Debit Card",11.31,8
+"T0405","FEMALE","Clothing","Debit Card",7.52,4
+"T0406","Female","Clothing","Credit Card",10.61,5
+"T0407","M","Electronics","Other",11.44,2
+"T0408","Male","Electronics","Credit Card",14.85,6
+"T0409","Female","Clothing","Credit Card",8.22,7
+"T0410","Female","Clothing","Debit Card",7.98,7
+"T0411","Female","Clothing","Credit Card",7.53,9
+"T0412","Male","Electronics","Credit Card",6.33,1
+"T0413","FEMALE","Clothing","Credit Card",9.04,5
+"T0414","Male","Clothing","PayPal",12.22,1
+"T0415","Male","Clothing","Credit Card",9.42,7
+"T0416","MALE","Elects","PayPal",17.95,10
+"T0417","Male","Household","Debit Card",11.06,4
+"T0418","FEMALE","Clothing","Credit Card",5.97,3
+"T0419","Male","Electronics","Credit Card",12.87,2
+"T0420","Male","Clothing","Credit Card",16.32,10
+"T0421","Female","Clothing","Credit Card",17,5
+"T0422","Male","Electronics","Credit Card",8.9,5
+"T0423","Male","Electronics","Credit Card",17.15,10
+"T0424","Female","Clothing","Other",17.13,5
+"T0425","Male","Clothing","Credit Card",17.24,1
+"T0426","Male","Clothing","PayPal",10.84,1
+"T0427","Female","Household","Debit Card",19.63,6
+"T0428","MALE","Clothing","PayPal",17.45,6
+"T0429","Other","Clothing","PayPal",8.79,10
+"T0430","Male","Electronics","Debit",9.96,5
+"T0431","Male","Electronics","PayPal",6.97,4
+"T0432","Female","Electronics","Debit Card",11.33,5
+"T0433","Female","Household","Debit",17.19,3
+"T0434","Male","Clothing","PayPal",16.81,5
+"T0435","Male","Clothing","Other",7.81,6
+"T0436","MALE","Household","Credit Card",5.93,9
+"T0437","Female","Electronics","Credit",16.14,3
+"T0438","Female","Clothing","Credit",12.06,3
+"T0439","Female","Clothing","Credit",7.14,5
+"T0440","Male","Electronics","Credit Card",6.52,7
+"T0441","Female","Clothing","Other",15.53,8
+"T0442","Female","Electronics","Debit",17.04,8
+"T0443","FEMALE","Clothing","Debit Card",11.46,1
+"T0444","Male","Clothing","Credit Card",12.09,7
+"T0445","Female","Clothing","Debit Card",7.55,5
+"T0446","Male","Elects","Debit Card",7.17,5
+"T0447","Male","Electronics","Debit Card",11.15,7
+"T0448","Female","Electronics","Credit Card",8.66,1
+"T0449","Female","Electronics","Debit Card",15.19,3
+"T0450","Female","Electronics","Debit",16.07,9
+"T0451","Female","Electronics","Credit Card",18.15,10
+"T0452","Male","Electronics","Credit",13.7,10
+"T0453","Female","Clothing","Debit Card",14.31,10
+"T0454","Male","Electronics","PayPal",12.1,10
+"T0455","Female","Electronics","Credit",5.44,9
+"T0456","Female","Clothing","PayPal",18.08,2
+"T0457","Female","Electronics","PayPal",9.16,8
+"T0458","Other","Elects","Debit Card",8.58,5
+"T0459","Female","Electronics","Debit",12.59,10
+"T0460","Female","Clothing","Credit Card",18.47,1
+"T0461","Female","Elects","Debit Card",6.08,3
+"T0462","Female","Electronics","PayPal",7.5,4
+"T0463","OTHER","Electronics","Credit Card",7.18,4
+"T0464","M","Electronics","Debit Card",19.5,8
+"T0465","MALE","Clothing","Credit Card",8.89,3
+"T0466","Female","Clothing","Credit Card",9.39,10
+"T0467","Female","Electronics","Debit Card",18.74,7
+"T0468","F","Elects","Credit Card",5.42,3
+"T0469","Female","Electronics","Credit Card",11.38,8
+"T0470","Male","Elects","Credit Card",14.4,10
+"T0471","M","Electronics","Credit Card",14.01,5
+"T0472","M","Electronics","Credit Card",8.92,10
+"T0473","F","Clothes","Credit Card",15.9,8
+"T0474","OTHER","Electronics","Credit Card",13.25,2
+"T0475","Male","Clothing","Debit",19.97,4
+"T0476","M","Clothing","Credit",11.24,6
+"T0477","Male","Electronics","Debit Card",16.01,6
+"T0478","Male","Electronics","Debit Card",16.33,8
+"T0479","F","Clothing","Credit Card",19.12,7
+"T0480","FEMALE","Electronics","Debit Card",6.39,4
+"T0481","Female","Electronics","Credit Card",8.23,6
+"T0482","M","Electronics","Credit Card",13.93,7
+"T0483","FEMALE","Clothing","Debit Card",6.44,4
+"T0484","Female","Clothes","Debit Card",6.51,7
+"T0485","Male","Clothing","Credit",10,3
+"T0486","Female","Electronics","Credit Card",19.24,9
+"T0487","Female","Household","Credit",18.99,4
+"T0488","FEMALE","Electronics","Credit Card",8.66,4
+"T0489","Female","Clothing","Credit Card",18.08,8
+"T0490","MALE","Electronics","Debit Card",9.06,8
+"T0491","MALE","Clothing","Debit Card",19.18,8
+"T0492","FEMALE","Clothing","Credit Card",14.16,6
+"T0493","F","Clothing","Credit Card",19.52,8
+"T0494","Female","Electronics","Debit Card",7.94,8
+"T0495","Female","Household","Credit Card",11.21,8
+"T0496","Female","Clothing","Credit Card",16.54,5
+"T0497","Male","Clothing","Credit Card",16.39,5
+"T0498","Male","Clothing","Debit Card",9.13,3
+"T0499","Male","Clothing","PayPal",5.49,3
+"T0500","M","Electronics","Credit Card",10.06,1
+"T0501","Male","Clothing","PayPal",9.7,9
+"T0502","Female","Clothing","Credit Card",7.36,5
+"T0503","Female","Clothing","Credit Card",9.66,5
+"T0504","F","Electronics","Other",19.73,6
+"T0505","Male","Clothing","Credit Card",12.38,3
+"T0506","M","Electronics","Credit Card",13.19,2
+"T0507","F","Electronics","Debit Card",17.35,4
+"T0508","Male","Household","Debit",17.31,10
+"T0509","Male","Household","Credit Card",15.7,1
+"T0510","Female","Clothing","Credit Card",18.32,3
+"T0511","Female","Clothing","PayPal",7.79,2
+"T0512","F","Elects","PayPal",16.25,5
+"T0513","Male","Clothing","Credit Card",7.91,9
+"T0514","Female","Electronics","Debit Card",6.1,2
+"T0515","Other","Elects","Credit Card",5.82,8
+"T0516","Female","Clothing","Credit Card",12.65,6
+"T0517","Male","Clothing","Debit Card",17.04,10
+"T0518","M","Electronics","Credit Card",18.82,3
+"T0519","Female","Household","Credit",5.08,10
+"T0520","Male","Electronics","PayPal",7.2,9
+"T0521","Male","Clothing","PayPal",15.67,4
+"T0522","FEMALE","Clothing","PayPal",5,3
+"T0523","FEMALE","Electronics","PayPal",18.12,9
+"T0524","Female","Electronics","PayPal",15.78,1
+"T0525","MALE","Electronics","Debit",5.59,3
+"T0526","Male","Electronics","Debit Card",13.97,2
+"T0527","M","Electronics","Credit",17.56,7
+"T0528","Male","Clothing","Credit Card",14.83,3
+"T0529","F","Electronics","Credit Card",17.33,6
+"T0530","Male","Electronics","Credit Card",5.37,10
+"T0531","Male","Electronics","Debit Card",17.93,6
+"T0532","MALE","Electronics","PayPal",7.66,3
+"T0533","FEMALE","Clothing","PayPal",15.14,10
+"T0534","Female","Clothing","PayPal",18.18,10
+"T0535","Female","Clothing","Debit Card",18.69,4
+"T0536","Male","Clothing","PayPal",13.5,10
+"T0537","Male","Clothing","Debit Card",18.56,10
+"T0538","Male","Electronics","Credit",10.23,3
+"T0539","MALE","Electronics","Debit Card",18.66,9
+"T0540","Male","Clothing","Other",16.93,8
+"T0541","F","Household","Debit Card",19.63,6
+"T0542","Female","Clothes","Credit Card",5.33,2
+"T0543","Female","Electronics","Other",10.56,5
+"T0544","Female","Electronics","Credit Card",15.92,6
+"T0545","Male","Electronics","Debit",18.15,9
+"T0546","FEMALE","Clothing","Credit Card",8.67,10
+"T0547","Female","Clothing","Credit Card",14.09,6
+"T0548","Male","Electronics","Debit Card",5.88,2
+"T0549","Female","Clothing","Debit",9.1,4
+"T0550","Female","Electronics","PayPal",16.74,1
+"T0551","Other","Clothing","PayPal",15.14,2
+"T0552","Male","Clothes","Credit Card",16.64,2
+"T0553","Male","Electronics","Debit Card",14.89,2
+"T0554","Female","Clothes","Credit Card",13.12,5
+"T0555","Male","Clothing","PayPal",7.31,4
+"T0556","Male","Household","Credit Card",15.31,3
+"T0557","M","Electronics","Debit",8.24,9
+"T0558","M","Clothing","Credit Card",6.89,4
+"T0559","M","Electronics","Credit Card",10.59,6
+"T0560","Female","Electronics","Debit Card",12.77,2
+"T0561","Female","Clothing","Credit Card",10.06,7
+"T0562","MALE","Clothing","Credit Card",8.15,10
+"T0563","Female","Electronics","Credit Card",10.15,2
+"T0564","Female","Electronics","Credit Card",7.14,4
+"T0565","Male","Clothing","PayPal",12.73,5
+"T0566","FEMALE","Electronics","PayPal",10.83,2
+"T0567","Male","Clothes","Credit Card",12.25,6
+"T0568","Male","Electronics","Credit Card",8.24,3
+"T0569","Female","Clothes","Credit",5.27,3
+"T0570","F","Electronics","Debit Card",15.26,8
+"T0571","Male","Clothes","PayPal",18.56,8
+"T0572","Female","Household","Credit Card",19.81,5
+"T0573","Male","Clothes","PayPal",6.46,4
+"T0574","F","Elects","PayPal",14.56,7
+"T0575","M","Clothing","Debit Card",17.29,5
+"T0576","Female","Household","Credit Card",10.79,6
+"T0577","Female","Clothing","Credit",13.3,8
+"T0578","Male","Household","Debit Card",19.15,4
+"T0579","Female","Clothing","Credit Card",10.89,1
+"T0580","Female","Electronics","PayPal",9.52,6
+"T0581","Male","Electronics","Debit Card",8.43,7
+"T0582","Female","Clothes","Credit Card",15.67,9
+"T0583","M","Elects","Debit Card",9.65,7
+"T0584","Male","Elects","Debit Card",19.39,3
+"T0585","Male","Clothing","Other",17.78,5
+"T0586","Male","Clothing","Debit Card",13.78,8
+"T0587","FEMALE","Electronics","Credit Card",7.08,1
+"T0588","Female","Electronics","Credit",5.85,4
+"T0589","Male","Clothing","Credit Card",12.48,1
+"T0590","Male","Electronics","PayPal",7.38,8
+"T0591","Male","Clothing","Credit Card",13.85,3
+"T0592","M","Clothing","Debit Card",19.87,4
+"T0593","Female","Electronics","Other",13.75,9
+"T0594","F","Household","Credit Card",16.84,10
+"T0595","Female","Household","Credit Card",13.39,4
+"T0596","Male","Electronics","Credit Card",6.02,5
+"T0597","FEMALE","Electronics","Debit Card",15.04,7
+"T0598","F","Elects","Credit Card",6.58,7
+"T0599","Female","Electronics","Debit",18.6,2
+"T0600","Male","Electronics","Credit",10.39,9
+"T0601","Male","Electronics","Debit Card",11.75,10
+"T0602","M","Household","Credit Card",10.23,5
+"T0603","Male","Clothing","Credit Card",14.35,10
+"T0604","Male","Clothing","Credit Card",5.01,7
+"T0605","MALE","Household","Credit Card",19.26,9
+"T0606","MALE","Clothing","PayPal",13.26,2
+"T0607","Female","Household","PayPal",8.83,6
+"T0608","MALE","Clothing","Credit Card",9.6,1
+"T0609","Female","Clothing","Credit",11.79,5
+"T0610","Other","Electronics","Debit Card",12.41,6
+"T0611","Male","Household","Debit Card",11.12,5
+"T0612","F","Clothing","Debit Card",9.05,5
+"T0613","M","Household","Debit Card",9.4,7
+"T0614","M","Electronics","PayPal",7.21,9
+"T0615","FEMALE","Household","PayPal",8.85,1
+"T0616","Male","Electronics","Credit Card",7.51,3
+"T0617","Male","Electronics","Credit Card",10.2,2
+"T0618","Other","Clothing","Debit",7.85,1
+"T0619","M","Clothing","PayPal",9.99,5
+"T0620","F","Electronics","Credit Card",11.68,4
+"T0621","Male","Electronics","Credit",14.41,10
+"T0622","M","Electronics","Debit Card",10.71,6
+"T0623","Male","Household","Other",18.86,7
+"T0624","Female","Clothing","Credit",10.34,3
+"T0625","Male","Clothing","Debit Card",19.79,4
+"T0626","Female","Electronics","Credit Card",6.5,10
+"T0627","Male","Clothing","Debit Card",17.76,10
+"T0628","Male","Household","PayPal",5.32,2
+"T0629","M","Clothing","PayPal",11.01,9
+"T0630","Female","Household","Credit Card",14.56,8
+"T0631","M","Electronics","Credit Card",18.48,6
+"T0632","M","Elects","Debit",10.04,4
+"T0633","Male","Clothing","PayPal",14.97,4
+"T0634","Female","Elects","Debit Card",19.98,8
+"T0635","F","Clothing","Credit Card",17.12,10
+"T0636","Female","Household","PayPal",19.39,3
+"T0637","FEMALE","Clothing","Credit Card",16.87,4
+"T0638","Female","Household","Debit Card",11.61,2
+"T0639","Female","Clothing","Credit Card",8.6,6
+"T0640","FEMALE","Electronics","Credit Card",12.62,1
+"T0641","Female","Clothing","Credit",6.46,9
+"T0642","Male","Electronics","Credit Card",14.61,10
+"T0643","Female","Electronics","Credit Card",10.32,4
+"T0644","Male","Elects","Credit Card",9,6
+"T0645","Male","Clothing","Debit",6.08,9
+"T0646","Male","Clothing","Debit Card",7.03,3
+"T0647","Female","Electronics","Credit Card",6.85,6
+"T0648","Female","Household","Credit",11.86,1
+"T0649","F","Clothes","Credit Card",5.32,4
+"T0650","Male","Elects","Credit Card",12.89,3
+"T0651","Male","Clothing","Credit Card",14.31,1
+"T0652","Female","Electronics","Credit Card",18.08,4
+"T0653","Male","Clothing","Credit Card",13.59,1
+"T0654","Female","Clothing","PayPal",9.11,5
+"T0655","Male","Clothing","Credit Card",15.41,4
+"T0656","F","Clothing","Credit Card",9.1,5
+"T0657","M","Clothing","Credit Card",8.31,2
+"T0658","Female","Electronics","Credit Card",9.23,5
+"T0659","Female","Clothing","Credit Card",6.26,6
+"T0660","Female","Household","PayPal",13.73,1
+"T0661","Female","Clothing","Credit Card",7.61,1
+"T0662","Female","Clothing","Credit Card",5.35,8
+"T0663","Male","Electronics","PayPal",7.14,2
+"T0664","Male","Electronics","Debit Card",16.67,5
+"T0665","MALE","Electronics","PayPal",5.85,4
+"T0666","FEMALE","Clothing","Debit Card",18.95,2
+"T0667","MALE","Electronics","Credit Card",19.08,3
+"T0668","Female","Elects","PayPal",16.37,9
+"T0669","F","Clothing","PayPal",9.91,6
+"T0670","FEMALE","Electronics","Debit Card",6.27,3
+"T0671","F","Clothing","Debit Card",9.63,1
+"T0672","Female","Clothing","Credit Card",18.21,3
+"T0673","Female","Clothing","Debit Card",14.83,7
+"T0674","Female","Electronics","Credit Card",18.94,3
+"T0675","Female","Electronics","Debit Card",10.19,10
+"T0676","Male","Electronics","Credit Card",14.6,4
+"T0677","Male","Clothing","Credit Card",8.95,9
+"T0678","Male","Electronics","Debit Card",6.81,5
+"T0679","F","Elects","Debit Card",11.87,10
+"T0680","Female","Clothing","Credit Card",12.18,7
+"T0681","Male","Household","Credit Card",14.02,5
+"T0682","Male","Clothing","Credit Card",11.06,1
+"T0683","MALE","Clothing","PayPal",7.13,6
+"T0684","FEMALE","Clothing","Debit",5.46,5
+"T0685","Female","Elects","Debit Card",10.55,4
+"T0686","Male","Electronics","Credit Card",5.43,6
+"T0687","M","Clothes","Debit Card",16.38,9
+"T0688","F","Clothing","Debit Card",9.15,8
+"T0689","Male","Clothing","Credit Card",13.79,7
+"T0690","Male","Clothing","Debit",13.17,10
+"T0691","Female","Electronics","Other",11,9
+"T0692","Male","Electronics","Credit Card",18.44,6
+"T0693","Female","Household","Credit Card",6.39,5
+"T0694","FEMALE","Electronics","PayPal",18.08,9
+"T0695","Male","Clothing","PayPal",17.11,10
+"T0696","Male","Elects","Credit",15.57,10
+"T0697","Female","Clothing","Credit Card",12.54,4
+"T0698","Female","Clothing","Debit Card",10.32,6
+"T0699","Male","Clothing","Credit Card",5.22,6
+"T0700","Female","Household","Credit Card",17.17,5
+"T0701","Male","Clothing","Credit Card",9.08,3
+"T0702","Female","Clothing","PayPal",16.65,10
+"T0703","Male","Clothing","Credit Card",11.32,4
+"T0704","F","Clothes","Debit Card",13.3,1
+"T0705","Male","Clothing","Credit Card",12.26,4
+"T0706","MALE","Clothing","Credit Card",19.21,2
+"T0707","Male","Electronics","Credit Card",7.29,8
+"T0708","Female","Household","Credit",11.85,2
+"T0709","Female","Electronics","Credit",6.15,5
+"T0710","F","Electronics","Credit Card",12.3,7
+"T0711","Male","Elects","Credit Card",11.14,8
+"T0712","Male","Electronics","PayPal",19.74,1
+"T0713","Female","Clothing","PayPal",18.17,1
+"T0714","FEMALE","Electronics","PayPal",5.37,4
+"T0715","F","Clothing","PayPal",17.29,4
+"T0716","M","Electronics","Debit Card",11.94,7
+"T0717","Female","Clothing","Credit Card",16.76,1
+"T0718","M","Electronics","Credit Card",17.86,7
+"T0719","Female","Clothing","PayPal",13.71,10
+"T0720","Male","Clothing","Credit Card",9.83,1
+"T0721","Male","Clothes","Other",7.75,3
+"T0722","Female","Electronics","Credit Card",12.22,6
+"T0723","F","Elects","Credit",14.57,1
+"T0724","F","Clothing","Credit Card",18.19,10
+"T0725","Male","Clothing","Credit Card",18.41,5
+"T0726","Male","Clothing","Debit Card",19.61,6
+"T0727","MALE","Clothing","Credit Card",12.54,3
+"T0728","M","Household","Credit Card",10.57,5
+"T0729","Male","Clothing","PayPal",15.29,2
+"T0730","M","Clothing","Debit Card",7.19,6
+"T0731","Female","Household","Debit Card",15.65,9
+"T0732","FEMALE","Household","Credit Card",6.19,10
+"T0733","Female","Clothing","Credit Card",18.23,2
+"T0734","Female","Clothing","Credit Card",14.57,5
+"T0735","Male","Electronics","Debit Card",8.67,2
+"T0736","OTHER","Clothing","Credit Card",16.11,9
+"T0737","Male","Clothing","Credit Card",5.67,7
+"T0738","Female","Clothing","Debit Card",6.46,7
+"T0739","Male","Electronics","Debit Card",5.46,8
+"T0740","Male","Household","Credit",16.29,7
+"T0741","Female","Electronics","PayPal",6.85,5
+"T0742","MALE","Elects","PayPal",7.31,6
+"T0743","Female","Electronics","Credit Card",9.68,3
+"T0744","FEMALE","Electronics","Debit",7.28,9
+"T0745","Female","Clothing","PayPal",18.16,5
+"T0746","Other","Elects","Debit Card",8.66,7
+"T0747","Female","Household","Debit Card",8,1
+"T0748","Male","Electronics","PayPal",14.57,3
+"T0749","Female","Clothing","Credit Card",8.24,10
+"T0750","Male","Clothing","PayPal",19.31,5
+"T0751","Female","Clothing","PayPal",16.67,9
+"T0752","M","Clothing","Credit",15.59,6
+"T0753","Male","Electronics","PayPal",13.14,6
+"T0754","FEMALE","Electronics","Credit Card",12.83,3
+"T0755","Female","Clothing","Credit Card",17.36,7
+"T0756","Other","Electronics","Debit Card",5.04,4
+"T0757","M","Clothing","Credit Card",12.47,4
+"T0758","M","Electronics","Credit Card",7.75,9
+"T0759","FEMALE","Clothing","Debit",10.48,3
+"T0760","MALE","Clothing","Credit Card",12.68,3
+"T0761","Male","Clothing","Credit Card",6.84,4
+"T0762","Male","Clothing","PayPal",12.85,3
+"T0763","MALE","Household","Credit Card",9,9
+"T0764","FEMALE","Clothing","PayPal",9.39,6
+"T0765","Female","Household","Credit Card",18.44,1
+"T0766","Female","Clothes","Credit Card",5.44,9
+"T0767","FEMALE","Elects","Debit",8.92,2
+"T0768","OTHER","Electronics","Credit Card",9.99,2
+"T0769","FEMALE","Clothing","Credit Card",12.39,3
+"T0770","Female","Clothing","Credit",14.58,6
+"T0771","Male","Electronics","Credit",5.89,8
+"T0772","Female","Household","PayPal",12.91,2
+"T0773","Female","Electronics","Debit Card",13.17,4
+"T0774","M","Clothing","Credit Card",8.7,5
+"T0775","Male","Clothing","Other",5.36,2
+"T0776","Female","Clothing","Debit",19.43,10
+"T0777","F","Electronics","Credit Card",6.34,7
+"T0778","Male","Clothing","Debit Card",19.11,9
+"T0779","M","Clothing","Credit Card",5.69,10
+"T0780","Male","Elects","PayPal",13.96,4
+"T0781","F","Clothing","Debit Card",15.26,7
+"T0782","FEMALE","Clothing","Credit Card",11.03,8
+"T0783","Male","Clothing","Debit Card",15.8,8
+"T0784","M","Clothing","Credit",10.23,3
+"T0785","M","Clothing","PayPal",12.53,2
+"T0786","FEMALE","Electronics","Other",19.16,7
+"T0787","Male","Clothing","PayPal",9.1,5
+"T0788","M","Electronics","Credit",15.18,1
+"T0789","Female","Electronics","Credit Card",6.66,3
+"T0790","Male","Electronics","Other",6.54,1
+"T0791","F","Household","Other",18.77,4
+"T0792","Male","Clothing","Credit Card",16.73,4
+"T0793","Male","Clothing","Credit Card",5.78,3
+"T0794","Male","Electronics","Credit Card",12.18,6
+"T0795","Female","Electronics","PayPal",18.27,5
+"T0796","Male","Household","Credit Card",6.71,9
+"T0797","MALE","Clothing","Credit Card",17.33,10
+"T0798","Female","Electronics","Credit",16.67,10
+"T0799","Female","Clothing","Credit Card",10.23,10
+"T0800","M","Elects","Credit Card",13.28,7

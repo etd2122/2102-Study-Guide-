@@ -1,0 +1,47 @@
+---
+title: "Exam 2"
+author: "Emelia Davis"
+date: "October 30, 2026"
+output: pdf_document
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(tidyverse)
+```
+
+# Problem 1
+
+## Part 1
+
+```{r}
+# function here
+my_fun <- function(n) {
+
+}
+
+# test it exactly as the question says
+print(my_fun(10))
+```
+
+# Problem 2
+
+```{r}
+# put the data files in the same folder as this .Rmd (or use the full path)
+data1 <- read_csv("data1.csv", show_col_types = FALSE)
+print(data1)
+```
+
+## Part 1
+
+```{r}
+
+```
+
+Answer in words: ...
+
+## Part 2
+
+```{r}
+
+```

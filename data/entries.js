@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-23T18:40:00Z";
+window.ENTRIES_SAVED = "2026-10-29T16:30:00Z";
 window.ENTRIES = {
  "hw-01": {
   "type": "hw",
@@ -2759,6 +2759,11 @@ window.ENTRIES = {
     "type": "application/pdf"
    },
    {
+    "name": "Recitation 5 Solutions.pdf",
+    "size": 206848,
+    "type": "application/pdf"
+   },
+   {
     "name": "transaction_data_1.csv",
     "size": 38640,
     "type": "text/csv"
@@ -2769,7 +2774,7 @@ window.ENTRIES = {
     "type": "text/csv"
    }
   ],
-  "notes": "**Tidyverse only.** Two transaction files from an online store (800 purchases each). **Question 1:** find and fix the issues in both files, `inner_join` them into `transaction_data`, add `Total_Amount`. **Question 2:** five grouped summaries (category × payment, credit card by age group, discounts by income quartile, multi-category shoppers, repeat customers). **Question 3:** scatterplot with marginal histograms (`ggMarginal`).\n\n**Run on your real Courseworks files** (attached above): every output and number on this page comes from them. No posted solutions yet, so these are worked solutions; each one was run in R.\n\n**The issues in these files:** Yes/YES/No/NO; Male/MALE/M, Female/FEMALE/F, Other/OTHER; the category typos *Elects* and *Clothes*; *Credit*/*Debit* for Credit Card/Debit Card; Income stored as text like `$55000` and `$1e+05`; and Quantity and Price glued together in `Quantity-Product_Price` (note the **dash** in the column name). No duplicates, missing values or impossible numbers.\n\nEach part has a walkthrough and an **alternative answer**; five **practice problems** (own tab) run without any file.",
+  "notes": "**Tidyverse only.** Two transaction files from an online store (800 purchases each). **Question 1:** find and fix the issues in both files, `inner_join` them into `transaction_data`, add `Total_Amount`. **Question 2:** five grouped summaries (category × payment, credit card by age group, discounts by income quartile, multi-category shoppers, repeat customers). **Question 3:** scatterplot with marginal histograms (`ggMarginal`).\n\n**Run on your real Courseworks files** (attached above): every output and number on this page comes from them. The posted solutions are attached; the chunk after Step 0 compares them with this page (two bugs in the key: prices lose their cents, and MALE/FEMALE become \"Other\").\n\n**The issues in these files:** Yes/YES/No/NO; Male/MALE/M, Female/FEMALE/F, Other/OTHER; the category typos *Elects* and *Clothes*; *Credit*/*Debit* for Credit Card/Debit Card; Income stored as text like `$55000` and `$1e+05`; and Quantity and Price glued together in `Quantity-Product_Price` (note the **dash** in the column name). No duplicates, missing values or impossible numbers.\n\nEach part has a walkthrough and an **alternative answer**; five **practice problems** (own tab) run without any file.",
   "takeaways": [
    "Find issues first (count() every text column, range()/table() the numbers), then fix: separate() → parse_number() → case_when()/recode()/str_to_title().",
    "A column name with a dash (Quantity-Product_Price) needs backticks; check names() first.",
@@ -2782,7 +2787,7 @@ window.ENTRIES = {
    "Repeat customers: count(Customer_ID) |> filter(n > 1).",
    "Marginal histograms: save the ggplot, then ggMarginal(p, type = \"histogram\")."
   ],
-  "updatedAt": "2026-10-23T18:40:00Z",
+  "updatedAt": "2026-10-29T16:30:00Z",
   "chunks": [
    {
     "id": "rec-05-setup",
@@ -2798,6 +2803,14 @@ window.ENTRIES = {
     "question": "Identify all the issues introduced into the datasets.",
     "code": "# ---- Detective work: what is wrong with each data set?\n# Duplicates and missing values (none here, but always check)\nprint(sum(duplicated(transaction_data_1))); print(sum(duplicated(transaction_data_2)))\n#> [1] 0\n#> [1] 0\nprint(sum(is.na(transaction_data_1)));      print(sum(is.na(transaction_data_2)))\n#> [1] 0\n#> [1] 0\n\n# Inconsistent labels\nprint(count(transaction_data_1, Discount_Applied))\n#> # A tibble: 4 × 2\n#>   Discount_Applied     n\n#>   <chr>            <int>\n#> 1 NO                  83\n#> 2 No                 491\n#> 3 YES                 41\n#> 4 Yes                185\nprint(count(transaction_data_2, Gender))\n#> # A tibble: 8 × 2\n#>   Gender     n\n#>   <chr>  <int>\n#> 1 F         69\n#> 2 FEMALE    63\n#> 3 Female   228\n#> 4 M         85\n#> 5 MALE      58\n#> 6 Male     263\n#> 7 OTHER     14\n#> 8 Other     20\nprint(count(transaction_data_2, Category))\n#> # A tibble: 5 × 2\n#>   Category        n\n#>   <chr>       <int>\n#> 1 Clothes        27\n#> 2 Clothing      336\n#> 3 Electronics   312\n#> 4 Elects         47\n#> 5 Household      78\nprint(count(transaction_data_2, Payment_Method))\n#> # A tibble: 6 × 2\n#>   Payment_Method     n\n#>   <chr>          <int>\n#> 1 Credit            74\n#> 2 Credit Card      335\n#> 3 Debit             38\n#> 4 Debit Card       160\n#> 5 Other             35\n#> 6 PayPal           158\n\n# Numbers stored as text, and two values in one column\nprint(head(transaction_data_1$Income, 6))\n#> [1] \"$55000\" \"$80000\" \"$80000\" \"$75000\" \"$95000\" \"$1e+05\"\nprint(sum(str_detect(transaction_data_1$Income, \"e\\\\+\")))        # \"$1e+05\" style values\n#> [1] 45\nprint(head(transaction_data_1$`Quantity-Product_Price`))\n#> [1] \"1-$490.51\" \"3-$263.4\"  \"4-$238.99\" \"2-$48.47\"  \"1-$106.9\"  \"1-$342.83\"\n\n# Values in a possible range? (all fine here)\nprint(range(transaction_data_1$Age)); print(table(transaction_data_1$Customer_Rating))\n#> [1] 18 70\n#> \n#>   1   2   3   4   5 \n#>  37  89 172 240 262 \nprint(range(transaction_data_2$Shipping_Cost)); print(range(transaction_data_2$Delivery_Time))\n#> [1]  5.00 19.98\n#> [1]  1 10\n\n# Will the join key match?\nprint(identical(sort(transaction_data_1$Transaction_ID), sort(transaction_data_2$Transaction_ID)))\n#> [1] TRUE",
     "comment": "**Do this first on any \"clean the data\" question**, and list what you found in your write-up. In these files:\n\n| Check | Result |\n|---|---|\n| duplicate rows | none (0 and 0) |\n| missing values | none |\n| `Discount_Applied` | 4 spellings: Yes / YES / No / NO |\n| `Gender` | 8 spellings: Male / MALE / M, Female / FEMALE / F, Other / OTHER |\n| `Category` | typos: **Elects** (= Electronics, 47 rows), **Clothes** (= Clothing, 27) |\n| `Payment_Method` | short forms: **Credit** (= Credit Card, 74), **Debit** (= Debit Card, 38) |\n| `Income` | text with a `$`, and 45 values written as **`$1e+05`** (= 100,000) |\n| `Quantity-Product_Price` | two values in one cell: `\"1-$490.51\"` |\n| ages, ratings, shipping, delivery | all in a possible range (18–70, 1–5, $5–$20, 1–10 days) |\n| join key | the same 800 Transaction_IDs in both files |\n\nSo the cleaning here is about **labels and formats**, not removing rows.\n\n**Solve similar problems:** for every column ask: right **type**? consistent **labels** (`count()`)? possible **values** (`range()`, `table()`)? one value per cell? Then check duplicates, NAs, and whether the join key matches.",
+    "key": true
+   },
+   {
+    "id": "rec-05-posted",
+    "label": "Question 1 · Posted solution vs this page: two bugs in the posted key",
+    "question": "What the posted Recitation 5 solution does differently, and where it goes wrong.",
+    "code": "x <- tibble(Quantity.Product_Price = c(\"1-$490.51\", \"3-$263.4\"))\n\n# Posted solution: no sep -> splits at EVERY non-letter/number (\"-\", \"$\", \".\")\nx |> separate(Quantity.Product_Price, into = c(\"Quantity\", \"Product_Price\"), convert = TRUE)\n#> Warning: Expected 2 pieces. Additional pieces discarded in 2 rows [1, 2].\n#> # A tibble: 2 × 2\n#>   Quantity Product_Price\n#>      <int>         <int>\n#> 1        1           490\n#> 2        3           263\n\n# This page: split exactly at \"-$\" -> keeps the cents\nx |> separate(Quantity.Product_Price, into = c(\"Quantity\", \"Product_Price\"), sep = \"-\\\\$\", convert = TRUE)\n#> # A tibble: 2 × 2\n#>   Quantity Product_Price\n#>      <int>         <dbl>\n#> 1        1          491.\n#> 2        3          263.\n\n# Posted Gender rule: TRUE ~ \"Other\" catches MALE and FEMALE too\ng <- c(\"M\", \"Male\", \"MALE\", \"F\", \"FEMALE\", \"Other\")\ncase_when(g == \"M\" | g == \"Male\" ~ \"Male\", g == \"F\" | g == \"Female\" ~ \"Female\", TRUE ~ \"Other\")\n#> [1] \"Male\"   \"Male\"   \"Other\"  \"Female\" \"Other\"  \"Other\" ",
+    "comment": "**The posted solution (attached above) reaches the same Question 2 answers**, with a few differences worth knowing for tomorrow:\n\n**1. It reads the files with `read.csv(..., stringsAsFactors = T)`.** That base-R function changes the dash in `Quantity-Product_Price` to a dot (`Quantity.Product_Price`) and makes text columns factors. Either reader is fine; just use the column name your reader gives you (`names()`).\n\n**2. Bug: its `separate()` has no `sep`.** It splits at every non-letter/number (`-`, `$` **and** `.`), so `\"1-$490.51\"` becomes 1 and **490**. Every price loses its cents, and R warns *\"Additional pieces discarded in 790 rows\"*. That's why its averages are slightly lower (Clothing / Credit Card $794 vs $796 here; multi-category average $783 vs $785). **Always give the separator:** `sep = \"-\\\\$\"`.\n\n**3. Bug: its Gender rule ends with `TRUE ~ \"Other\"`**, which also catches MALE, FEMALE and OTHER in capitals: **121 people** become \"Other\" (155 instead of 34). It doesn't change Question 2 (Gender isn't used there), but on an exam that cleaning would be marked wrong. List every spelling, or use `str_to_lower()`.\n\n**4. Income:** it splits at `$` with `separate(..., extra = \"merge\")` and drops the empty first piece; `parse_number()` does the same in one step. Both handle `$1e+05`.\n\n**5. Income quartiles:** it uses `case_when()` with `quantile()` cutoffs (`<= Q1`, `Q1–Q2`, …). Same groups and percentages as `cut(include.lowest = TRUE)` here (26.6 / 33.3 / 26.0 / 27.2).\n\n**6. Multi-category shoppers:** it summarises customers first, then `filter(Customer_ID %in% ...)`: the same idea as the `semi_join` alternative on this page.\n\n**Lesson for the exam:** read every warning. *\"Additional pieces discarded\"* means `separate()` split in the wrong place.",
     "key": true
    },
    {
@@ -3540,6 +3553,144 @@ window.ENTRIES = {
    "set.seed(1); rnorm(n, mean, sd); sample(x, size, replace = TRUE, prob = ...)"
   ],
   "updatedAt": "2026-10-12T17:45:00Z"
+ },
+ "rev-07": {
+  "type": "prac",
+  "num": "07",
+  "title": "Exam 2 (R) review: functions + tidyverse, setup and checklists",
+  "date": "2026-10-30",
+  "exams": [
+   "Midterm 2"
+  ],
+  "topics": [
+   "Exam 2",
+   "R Markdown",
+   "functions",
+   "tidyverse",
+   "data cleaning",
+   "joins",
+   "group_by",
+   "ggplot2",
+   "checklist"
+  ],
+  "pdfs": [
+   {
+    "name": "Exam 2 template.Rmd",
+    "size": 592,
+    "type": "text/plain"
+   }
+  ],
+  "notes": "**Exam 2: Friday Oct 30, 9AM → Saturday Oct 31, 9AM.** Lectures 10–14. Section 1: functions (any code). Section 2: real data, **tidyverse only**; the professor said it follows **Rec 5** and **HW 3** closely. Submit an **R Markdown (.Rmd) file knitted to PDF**: only PDFs are accepted.\n\n**Tonight:** download **Exam 2 template.Rmd** above, open it in RStudio, and **Knit → Knit to PDF** to confirm the setup works (and `install.packages(\"ggExtra\")`).\n\nThis page is the one-stop review: the function template and patterns, the Section-2 workflow, cleaning, joins and grouped summaries with code run on the Rec 5 data, plot templates, the mistakes you've already hit (with fixes), and a submit checklist.",
+  "takeaways": [
+   "PDF only; show code for every answer; one final answer per question.",
+   "Section 1: any functions. Section 2: tidyverse only.",
+   "Test knitting the .Rmd to PDF before the exam; tinytex::install_tinytex() if it fails.",
+   "Look first: names(), count() each text column, range() the numbers.",
+   "separate() needs the separator (sep = \"-\\\\$\"); parse_number() for money; case_when() with every spelling.",
+   "% in group = mean(condition) * 100; ranges = cut(); quartiles = ntile() or quantile() + cut().",
+   "group_by(a, b) in ONE call; .groups = \"drop\"; add n = n().",
+   "Interpretation questions get a sentence with numbers.",
+   "If results look wrong: Restart R and Run All Chunks."
+  ],
+  "updatedAt": "2026-10-29T16:30:00Z",
+  "chunks": [
+   {
+    "id": "rev-07-format",
+    "label": "Exam 2 at a glance: format, rules, what's allowed",
+    "question": "Exam 2 (take-home): Friday Oct 30, 9AM to Saturday Oct 31, 9AM. Lectures 10-14. Section 1: write function(s) for a scenario (any functions). Section 2: real data sets, tidyverse only. Submit an R Markdown file knitted to PDF.",
+    "code": "# Exam 2 (R) - Friday Oct 30, 9AM -> Saturday Oct 31, 9AM (24 hours)\n# Covers Lectures 10-14 (on this site: Lec 10-14)\n#\n# Section 1: write function(s) for a scenario      -> ANY functions allowed (base R ok)\n# Section 2: real data sets                         -> TIDYVERSE ONLY (+ helpers: mean, median, ...)\n#\n# Submit: R Markdown (.Rmd) knitted to PDF  ->  ONLY the PDF is accepted\n# Allowed: Google, lecture notes, recitations, homework (this site = your notes)\n# Not allowed: other students, AI tools\n# No credit for an answer without the code that produced it",
+    "comment": "**Two sections, two rule sets:**\n\n| | Section 1 · functions | Section 2 · data |\n|---|---|---|\n| allowed code | **anything**, base R included | **tidyverse only** + helpers (`mean`, `median`, `as.numeric`, `quantile`, …) |\n| looks like | HW 2 Problem 1, Rec 2 / Rec 4, Exam review Rev 01 | **HW 3** and **Rec 5** (the professor said it follows these closely) |\n\n**Rules that cost points if missed:**\n- **PDF only.** Any other format gets a 0. Knit it to PDF and open the PDF before submitting.\n- **Show the code** for every answer; a final answer without code earns nothing.\n- **Give one final answer** per question. If you give several, the least favorable one is graded.\n- **Note errors in a question** on the exam itself; no one answers questions during the exam.\n\n**Allowed:** Google and all course materials, including this site (lecture notes, recitations, homework). **Not allowed:** talking to other students or using AI tools during the 24 hours.\n\n**Where to look on this site during the exam:**\n- **HW 03** and **Rec 05**: the closest models for Section 2.\n- **Kit 03**: the tidyverse function finder.\n- **Lec 13 / Lec 14**: ggplot.\n- **Rev 01**: function patterns.\n- **Find code for a question** with the question's own wording.",
+    "key": false
+   },
+   {
+    "id": "rev-07-rmd",
+    "label": "Before the exam: R Markdown → PDF setup (test it TODAY)",
+    "question": "The exam must be an R Markdown (.Rmd) file converted to PDF. The professor and TAs won't help with knitting problems during the exam. Make sure it works beforehand (Lecture 04).",
+    "code": "---\ntitle: \"Exam 2\"\nauthor: \"Emelia Davis\"\noutput: pdf_document\n---\n\n```{r setup, include = FALSE}\nknitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)\nlibrary(tidyverse)\n```\n\n# If \"Knit to PDF\" fails, run this ONCE in the console, restart RStudio, try again:\n# install.packages(\"tinytex\"); tinytex::install_tinytex()",
+    "comment": "**You've been writing homework in Quarto (.qmd). The exam asks for R Markdown (.Rmd).** They're very similar, but **test knitting a .Rmd to PDF tonight**, using the steps below.\n\n1. **File → New File → R Markdown… → PDF**, or download **Exam 2 template.Rmd** (attached above) and open it.\n2. Click **Knit → Knit to PDF**. If a PDF opens, you're set.\n3. If it fails with a LaTeX / \"pdflatex not found\" error, run this once in the Console, restart RStudio, and knit again:\n   ```r\n   install.packages(\"tinytex\")\n   tinytex::install_tinytex()\n   ```\n\n**Quarto vs R Markdown differences that matter tomorrow:**\n\n| Quarto (.qmd) | R Markdown (.Rmd) |\n|---|---|\n| `format: pdf` | `output: pdf_document` |\n| `#| message: false` inside a chunk | `{r, message = FALSE}` in the chunk header, or the `knitr::opts_chunk$set(...)` line in the setup chunk (template) |\n| Render button | **Knit** button |\n\n**The setup chunk in the template** hides the tidyverse banner and the messages and warnings for the whole file (`message = FALSE, warning = FALSE`), and loads tidyverse once.\n\n**Knitting starts from an empty session** and runs every chunk top to bottom. So:\n- the data files must be **in the same folder as the .Rmd**, or read them with the full path (`\"~/Downloads/file.csv\"`);\n- every object must be created in an earlier chunk;\n- remove `View()` and `install.packages()` lines from the .Rmd.\n\n**Knit early, and knit often.** After each part, so a knit error tomorrow is easy to find.",
+    "key": true
+   },
+   {
+    "id": "rev-07-fun_template",
+    "label": "Section 1 · function template: arguments → check → compute → return → test",
+    "question": "Write a function that takes n (and other inputs), simulates / computes something, and returns the results. Test it with the values given in the question.",
+    "code": "# Template: function -> check input -> compute -> return -> TEST\nsim_summary <- function(n, sides = 6) {\n  if (!is.numeric(n) || n < 1) stop(\"n must be a positive number\")   # optional check\n  rolls <- sample(1:sides, n, replace = TRUE)\n  result <- list(rolls  = rolls,\n                 mean   = mean(rolls),\n                 counts = table(factor(rolls, levels = 1:sides)))\n  return(result)\n}\n\nset.seed(1)\nout <- sim_summary(10)\nprint(out)\n#> $rolls\n#>  [1] 1 4 1 2 5 3 6 2 3 3\n#> \n#> $mean\n#> [1] 3\n#> \n#> $counts\n#> \n#> 1 2 3 4 5 6 \n#> 2 2 3 1 1 1 ",
+    "comment": "**Every Section-1 answer has the same five pieces:**\n1. **Name and arguments** exactly as the question says (`fun1 <- function(n)`), with defaults if useful (`sides = 6`).\n2. **Optional input check:** `if (...) stop(\"message\")`.\n3. **The work:** simulate with `sample()` / `rnorm()`, loop or vectorize, build vectors or tables.\n4. **Return** one object. For several results, return a `list(name = ..., name = ...)` or a `data.frame()`/`tibble()`.\n5. **Test it with the question's values** and `print()` the result. Add `set.seed()` if the output should be reproducible.\n\n**Watch out:**\n- `table(factor(x, levels = 1:6))` so faces that never came up still show as 0 (HW 2 Part 1.2's bug).\n- **Base R is allowed in Section 1,** so `ifelse`, `sapply`, `mapply`, `table`, `cumsum` and `for`/`while` are all fine.\n\n**More patterns on this site:** Exam review **Rev 01** (function anatomy, counting, classification, returning lists), **Rev 04 / Rev 05** (if-else, loops, apply family), **HW 02 Problem 1**, **Rec 02 / Rec 04**, Must-know **Core 01–02** (dice, coins, cards, repeat until).",
+    "key": true
+   },
+   {
+    "id": "rev-07-fun_patterns",
+    "label": "Section 1 · five function patterns you'll likely need",
+    "question": "Label each element, count with a loop, repeat until something happens, return a table of results, apply a function to each element.",
+    "code": "# 1. Label every element (vectorized)       -> ifelse() / case_when()\ngrade <- function(scores) ifelse(scores >= 70, \"pass\", \"fail\")\nprint(grade(c(95, 62, 78)))\n#> [1] \"pass\" \"fail\" \"pass\"\n\n# 2. Count things with a loop                -> counter + for\ncount_even <- function(x) {\n  count <- 0\n  for (v in x) if (v %% 2 == 0) count <- count + 1\n  count\n}\nprint(count_even(c(2, 5, 8, 11, 14)))\n#> [1] 3\n\n# 3. Repeat until something happens          -> while\nrolls_until_six <- function() {\n  n <- 0; roll <- 0\n  while (roll != 6) { roll <- sample(1:6, 1); n <- n + 1 }\n  n\n}\nset.seed(3); print(rolls_until_six())\n#> [1] 18\n\n# 4. Return a data frame of results          -> data.frame()/tibble()\ncoin_table <- function(n) {\n  flips <- sample(c(\"H\", \"T\"), n, replace = TRUE)\n  tibble(flip = 1:n, result = flips, heads_so_far = cumsum(flips == \"H\"))\n}\nset.seed(4); print(coin_table(5))\n#> # A tibble: 5 × 3\n#>    flip result heads_so_far\n#>   <int> <chr>         <int>\n#> 1     1 T                 0\n#> 2     2 H                 1\n#> 3     3 H                 2\n#> 4     4 H                 3\n#> 5     5 H                 4\n\n# 5. Apply a function to each element        -> sapply()\nprint(sapply(1:5, function(k) k^2))\n#> [1]  1  4  9 16 25",
+    "comment": "| Question says | Pattern |\n|---|---|\n| \"for each value, return pass/fail / a label\" | `ifelse()` (vectorized) or `case_when()` |\n| \"count how many …\" | counter + `for` loop, or simply `sum(condition)` |\n| \"until …\", \"how many tries\" | `while` loop with a counter |\n| \"return a data frame / table with columns …\" | `tibble(col1 = ..., col2 = ...)` or `data.frame()` |\n| \"without loops\" / \"use apply functions\" | `sapply(1:n, function(i) ...)`, `mapply()` for pairs |\n\n**`cumsum(flips == \"H\")`** gives a running count of heads, the standard trick for \"running total\" and \"running proportion\" columns.",
+    "key": false
+   },
+   {
+    "id": "rev-07-tidy_workflow",
+    "label": "Section 2 · the full workflow: look → clean → join → mutate → summarise",
+    "question": "Clean the data sets, merge them, add variables, and summarize by group (tidyverse only).",
+    "code": "# The full Section-2 workflow, shown on the Rec 5 transaction data\nt1 <- read_csv(\"~/Downloads/transaction_data_1.csv\", show_col_types = FALSE)\nt2 <- read_csv(\"~/Downloads/transaction_data_2.csv\", show_col_types = FALSE)\n\n# 1. LOOK: names, types, labels, ranges\nprint(names(t1))\n#> [1] \"Transaction_ID\"         \"Customer_ID\"            \"Age\"                   \n#> [4] \"Income\"                 \"Discount_Applied\"       \"Customer_Rating\"       \n#> [7] \"Quantity-Product_Price\"\nprint(count(t2, Category))\n#> # A tibble: 5 × 2\n#>   Category        n\n#>   <chr>       <int>\n#> 1 Clothes        27\n#> 2 Clothing      336\n#> 3 Electronics   312\n#> 4 Elects         47\n#> 5 Household      78\n\n# 2. CLEAN (one mutate per file is fine)\nt1 <- t1 |>\n  separate(`Quantity-Product_Price`, into = c(\"Quantity\", \"Product_Price\"),\n           sep = \"-\\\\$\", convert = TRUE) |>\n  mutate(Income = parse_number(Income),\n         Discount_Applied = str_to_title(Discount_Applied))\nt2 <- t2 |>\n  mutate(Category = case_when(Category == \"Elects\"  ~ \"Electronics\",\n                              Category == \"Clothes\" ~ \"Clothing\",\n                              TRUE ~ Category),\n         Payment_Method = case_when(Payment_Method == \"Credit\" ~ \"Credit Card\",\n                                    Payment_Method == \"Debit\"  ~ \"Debit Card\",\n                                    TRUE ~ Payment_Method))\n\n# 3. JOIN\ntd <- inner_join(t1, t2, by = \"Transaction_ID\")\n\n# 4. NEW VARIABLES\ntd <- td |> mutate(Total_Amount = Quantity * Product_Price + Shipping_Cost)\n\n# 5. SUMMARIZE BY GROUP\ntd |>\n  group_by(Category) |>\n  summarise(n = n(), avg_total = mean(Total_Amount), pct_discount = mean(Discount_Applied == \"Yes\") * 100) |>\n  print()\n#> # A tibble: 3 × 4\n#>   Category        n avg_total pct_discount\n#>   <chr>       <int>     <dbl>        <dbl>\n#> 1 Clothing      363      790.         26.4\n#> 2 Electronics   359      774.         29.5\n#> 3 Household      78      781.         30.8",
+    "comment": "**The order to work in** (HW 3 and Rec 5 both follow it):\n1. **Look:** `names()`, `print()`, `count()` every text column, `range()`/`summary()` the numbers.\n2. **Clean:** `separate()`, `parse_number()`, `case_when()` / `str_to_title()`, `distinct()`, `drop_na()`.\n3. **Join:** `inner_join` / `left_join` / … `by =` the key; check `dim()` and `sum(is.na())`.\n4. **New variables:** `mutate()`, and save back with `df <- df |> mutate(...)`.\n5. **Summaries:** `group_by()` + `summarise()`; write each answer in a sentence.\n\n**Read the names first.** `read_csv()` keeps names exactly, e.g. `Quantity-Product_Price` with a dash, which then needs backticks. (`read.csv()` would turn the dash into a dot.)\n\n**Write every interpretation question as a sentence under the output,** with the numbers. HW 3 lost points where the answers were missing.",
+    "key": true
+   },
+   {
+    "id": "rev-07-cleaning",
+    "label": "Section 2 · cleaning toolkit (labels, money, two-values-in-one, duplicates)",
+    "question": "Identify and fix all the issues: inconsistent labels, numbers stored as text, combined columns, duplicates.",
+    "code": "messy <- tibble(\n  id     = c(\"A1\", \"A2\", \"A2\", \"A3\", \"A4\"),\n  gender = c(\"M\", \"FEMALE\", \"FEMALE\", \"male\", \"Other\"),\n  price  = c(\"$1,200\", \"$85\", \"$85\", \"$1e+03\", \"$40\"),\n  `qty-size` = c(\"2-L\", \"1-M\", \"1-M\", \"3-S\", \"1-L\")\n)\nclean <- messy |>\n  distinct() |>                                                  # duplicates\n  separate(`qty-size`, into = c(\"qty\", \"size\"), sep = \"-\", convert = TRUE) |>   # two values in one cell\n  mutate(price  = parse_number(price),                            # \"$1,200\" -> 1200, \"$1e+03\" -> 1000\n         gender = case_when(gender %in% c(\"M\", \"male\", \"Male\", \"MALE\")         ~ \"Male\",\n                            gender %in% c(\"F\", \"female\", \"Female\", \"FEMALE\")   ~ \"Female\",\n                            gender %in% c(\"Other\", \"OTHER\", \"other\")           ~ \"Other\"))\nprint(clean)\n#> # A tibble: 4 × 5\n#>   id    gender price   qty size \n#>   <chr> <chr>  <dbl> <int> <chr>\n#> 1 A1    Male    1200     2 L    \n#> 2 A2    Female    85     1 M    \n#> 3 A3    Male    1000     3 S    \n#> 4 A4    Other     40     1 L    \nprint(count(clean, gender))      # check: no NA, only the levels you expect\n#> # A tibble: 3 × 2\n#>   gender     n\n#>   <chr>  <int>\n#> 1 Female     1\n#> 2 Male       2\n#> 3 Other      1",
+    "comment": "| Issue | Fix |\n|---|---|\n| duplicate rows | `distinct()`; check with `sum(duplicated(df))` |\n| `\"2-L\"`, `\"1-$490.51\"` (two values in one cell) | `separate(col, into = c(...), sep = \"-\", convert = TRUE)`; escape special characters: `sep = \"-\\\\$\"` |\n| `\"$1,200\"`, `\"$1e+03\"` (money as text) | `parse_number()` |\n| M / male / MALE / FEMALE | `case_when(x %in% c(\"M\", \"male\", \"Male\", \"MALE\") ~ \"Male\", ...)` |\n| case only (NO / No) | `str_to_title()` |\n| typos (Elects, Clothes) | `case_when(x == \"Elects\" ~ \"Electronics\", ..., TRUE ~ x)` |\n| impossible values | `if_else(Age >= 18 & Age <= 100, Age, NA)` then `drop_na()` |\n\n**Always check after cleaning:** `count(df, column)` should show only the valid levels and **no NA**.\n\n**Two traps from Rec 5's posted solution:**\n- `separate()` **without `sep`** splits at every non-letter, so `\"1-$490.51\"` loses its cents. Give the separator.\n- `TRUE ~ \"Other\"` as a catch-all silently turned MALE and FEMALE into \"Other\". List every spelling, and only use `TRUE ~ column` to keep the rest unchanged.",
+    "key": true
+   },
+   {
+    "id": "rev-07-joins",
+    "label": "Section 2 · joins: which one, dimensions, missing values, who didn't match",
+    "question": "Merge the data sets keeping all rows of the first / second / both / only matches. What are the dimensions? How many missing values?",
+    "code": "a <- tibble(id = c(1, 2, 2, 3), x = c(\"p\", \"q\", \"q\", \"r\"))\nb <- tibble(id = c(2, 3, 4),    y = c(TRUE, FALSE, TRUE))\n\nj <- left_join(a, b, by = \"id\")\nprint(dim(j)); print(sum(is.na(j)))          # \"dimensions?\" \"how many missing values?\"\n#> [1] 4 3\n#> [1] 1\nprint(anti_join(a, b, by = \"id\"))            # who didn't match\n#> # A tibble: 1 × 2\n#>      id x    \n#>   <dbl> <chr>\n#> 1     1 p    \nprint(a |> distinct())                       # remove duplicate rows\n#> # A tibble: 3 × 2\n#>      id x    \n#>   <dbl> <chr>\n#> 1     1 p    \n#> 2     2 q    \n#> 3     3 r    ",
+    "comment": "| Question says | Join |\n|---|---|\n| \"all observations from the first\" | `left_join(first, second, by = ...)` |\n| \"all observations from the second\" | `right_join` |\n| \"from both, regardless of match\" | `full_join` |\n| \"unmatched rows not included\" | `inner_join` |\n| \"rows with no match\" | `anti_join` |\n\n**Report:** `dim(result)` and `sum(is.na(result))`, then write the numbers in a sentence.\n\n**More rows than you started with** means a duplicated key; you'll see a many-to-many warning (HW 3 Parts 3–6). Join on **every** column needed to identify a row (state **and** county).",
+    "key": false
+   },
+   {
+    "id": "rev-07-groups",
+    "label": "Section 2 · grouped summaries: %, ranges, quartiles, highest per group, per-customer",
+    "question": "Percentage within each group; age groups / income quartiles; which is highest in each category; customers with 2+ categories; repeat customers.",
+    "code": "td <- td |>\n  mutate(Age_Group = cut(Age, breaks = c(-Inf, 24, 40, 60, Inf),\n                         labels = c(\"<25\", \"25-40\", \"41-60\", \">60\")),\n         Income_Q  = ntile(Income, 4))\n\n# % of rows meeting a condition, per group\ntd |> group_by(Age_Group) |>\n  summarise(n = n(), pct_credit = mean(Payment_Method == \"Credit Card\") * 100) |>\n  print()\n#> # A tibble: 4 × 3\n#>   Age_Group     n pct_credit\n#>   <fct>     <int>      <dbl>\n#> 1 <25          96       43.8\n#> 2 25-40       221       53.8\n#> 3 41-60       312       49.4\n#> 4 >60         171       55.0\n\n# two grouping variables + .groups = \"drop\", then wide for comparing\ntd |> group_by(Category, Discount_Applied) |>\n  summarise(avg = round(mean(Total_Amount), 1), .groups = \"drop\") |>\n  pivot_wider(names_from = Discount_Applied, values_from = avg) |>\n  print()\n#> # A tibble: 3 × 3\n#>   Category       No   Yes\n#>   <chr>       <dbl> <dbl>\n#> 1 Clothing     790.  792.\n#> 2 Electronics  774.  774.\n#> 3 Household    794.  751.\n\n# highest within each group\ntd |> group_by(Category, Payment_Method) |>\n  summarise(avg = mean(Total_Amount), n = n(), .groups = \"drop\") |>\n  group_by(Category) |> slice_max(avg, n = 1) |> ungroup() |> print()\n#> # A tibble: 3 × 4\n#>   Category    Payment_Method   avg     n\n#>   <chr>       <chr>          <dbl> <int>\n#> 1 Clothing    Other           933.    14\n#> 2 Electronics PayPal          840.    74\n#> 3 Household   Other          1024.     3\n\n# per-customer conditions: 2+ categories, repeat customers\ntd |> group_by(Customer_ID) |> filter(n_distinct(Category) >= 2) |> ungroup() |>\n  summarise(customers = n_distinct(Customer_ID), avg_total = mean(Total_Amount)) |> print()\n#> # A tibble: 1 × 2\n#>   customers avg_total\n#>       <int>     <dbl>\n#> 1       178      785.\ntd |> count(Customer_ID) |> filter(n > 1) |> summarise(repeat_customers = n(), avg_n = mean(n)) |> print()\n#> # A tibble: 1 × 2\n#>   repeat_customers avg_n\n#>              <int> <dbl>\n#> 1              242  2.92",
+    "comment": "| Question says | Code |\n|---|---|\n| \"percentage of … in each group\" | `group_by(g) \\|> summarise(pct = mean(condition) * 100)` |\n| \"create age groups (<25, 25–40, …)\" | `cut(Age, breaks = c(-Inf, 24, 40, 60, Inf), labels = ...)` or `case_when()` |\n| \"income quartiles\" | `ntile(Income, 4)`, or `quantile()` cutoffs + `cut(include.lowest = TRUE)` |\n| \"for each A and B combination\" | `group_by(A, B) \\|> summarise(..., .groups = \"drop\")` |\n| \"compare A to B within each group\" | the above + `pivot_wider()` for side by side |\n| \"which is highest in each category\" | `group_by(Category) \\|> slice_max(x, n = 1)` |\n| \"customers with at least 2 different categories\" | `group_by(id) \\|> filter(n_distinct(Category) >= 2)` |\n| \"customers with more than one transaction\" | `count(id) \\|> filter(n > 1)` |\n\n**Always add `n = n()`** so you can say when a group is tiny (Household \"Other\" = 3 transactions).\n\n**Answer interpretation questions in a sentence**, e.g. \"Credit card use is lowest under 25 (43.8%) and about 50–55% in every older group.\"",
+    "key": true
+   },
+   {
+    "id": "rev-07-plots",
+    "label": "Section 2 · scatterplot with marginal histograms (ggMarginal)",
+    "question": "Scatter plot of X vs Y, colored by a group, with marginal histograms, title and axis labels.",
+    "code": "library(ggExtra)\np <- ggplot(td, aes(x = Income, y = Total_Amount, color = Discount_Applied)) +\n  geom_point(alpha = 0.6) +\n  labs(title = \"Income vs total amount\", x = \"Income (USD)\", y = \"Total amount (USD)\",\n       color = \"Discount\") +\n  theme_minimal() +\n  theme(legend.position = \"bottom\")\nggMarginal(p, type = \"histogram\")",
+    "comment": "**Save the ggplot, then `ggMarginal(p, type = \"histogram\")`.** `ggMarginal` comes from the ggExtra package, so put `library(ggExtra)` in your setup chunk and make sure it's installed today: `install.packages(\"ggExtra\")`.\n\n![marginal histograms](files/plots/ex2-marginal.png)\n\n`groupFill = TRUE` splits the margins by the color group. Full walkthrough: **Rec 05 Question 3** and **Lec 14**.",
+    "key": false
+   },
+   {
+    "id": "rev-07-plots2",
+    "label": "Section 2 · histogram, boxplot and bar chart templates",
+    "question": "Histogram with a mean line, zoom and tick angle; boxplot by group with mean dots and transparency; bar chart with a second category.",
+    "code": "# histogram + mean line, zoom, angle      (HW 3 Part 15)\nggplot(td, aes(x = Total_Amount)) +\n  geom_histogram(binwidth = 100, fill = \"lightblue\", color = \"navy\") +\n  geom_vline(xintercept = mean(td$Total_Amount), color = \"red\", linewidth = 1) +\n  coord_cartesian(xlim = c(0, 2000)) +\n  labs(title = \"Total amount\", subtitle = \"red = mean\", x = \"USD\", y = \"Count\") +\n  theme_minimal() + theme(axis.text.x = element_text(angle = 60, hjust = 1))\n\n# boxplot by group + mean dots + alpha    (HW 3 Part 16)\nggplot(td, aes(x = Category, y = Total_Amount, fill = Category)) +\n  geom_boxplot(alpha = 0.45) +\n  stat_summary(fun = mean, geom = \"point\", color = \"black\", size = 3) +\n  labs(title = \"Total amount by category\", x = NULL, y = \"USD\")\n\n# bar chart with counts                   (Lec 14)\nggplot(td, aes(x = Payment_Method, fill = Category)) +\n  geom_bar(position = \"dodge\") +\n  labs(title = \"Transactions by payment method and category\", x = NULL, y = \"Count\")",
+    "comment": "Three templates in one chunk. Only the bar chart's picture is shown below; the histogram and boxplot are pictured in **HW 03 Parts 15–16**.\n\n![grouped bar chart](files/plots/ex2-bar.png)\n\n**The ggplot checklist** (each item is a common point loss):\n- **Labels:** `labs(title, subtitle, x, y, fill/color)`.\n- **Zoom:** `coord_cartesian(xlim = ...)`; `xlim()` deletes data.\n- **Theme order:** `theme_minimal()` **then** `theme(axis.text.x = element_text(angle = 60, hjust = 1))`.\n- **Fixed values outside `aes()`:** `fill = \"red\"`, `alpha = 0.45`.\n- **0/1 groups need `factor()`.**\n- **Lines use `linewidth`, not `size`.**",
+    "key": false
+   },
+   {
+    "id": "rev-07-mistakes",
+    "label": "Mistakes you've already made: don't repeat them tomorrow",
+    "question": "",
+    "code": "# See the table: symptom -> cause -> fix",
+    "comment": "Each of these came up in HW 3 or Rec 5:\n\n| Symptom | Cause → fix |\n|---|---|\n| *unexpected symbol / numeric constant* | missing **comma** (often before `TRUE ~` in `case_when`) or a missing `\\|>` |\n| *object 'percwhite' not found* in `summarise` | the line above is missing `\\|>`, so summarise ran on its own |\n| only 2 rows instead of 10 | two `group_by()` calls: the second **replaces** the first → `group_by(state, inmetro)` |\n| numbers in the billions / wrong columns | `mutate(existing_name = ...)` **overwrote** a column, or a chunk ran twice → rerun from the chunk that creates the data (**Run → Restart R and Run All Chunks**) |\n| plot or summary suddenly different | `data` was rebuilt by rerunning an earlier chunk out of order |\n| *object 'Quantity.Product_Price' not found* | real name has a dash → `` `Quantity-Product_Price` `` (check `names()`) |\n| *could not find function \"seperate\"* | spelling: **separate**, **summarise**, **Category** |\n| *unused arguments (header = T, stringsAsFactors = T)* | those are `read.csv()` arguments; `read_csv()` doesn't need them |\n| most people became \"Other\" | `TRUE ~ \"Other\"` swallowed MALE/FEMALE → list every spelling |\n| *unexpected '/'* when reading a file | `~` must be inside the quotes: `\"~/Downloads/file.csv\"` |\n| printed the wrong table | `print(data1)` left over from an earlier part |\n| \"filter out counties below 50,000\" | means **keep** `>= 50000` |\n| `relocate()` to reshape | reshaping is `pivot_longer()`; `relocate()` only moves columns |\n| PDF shows deprecation warnings / cut-off code | `linewidth` not `size`; break long lines; `warning = FALSE` in setup |",
+    "key": true
+   },
+   {
+    "id": "rev-07-submit",
+    "label": "Before you submit: final checklist",
+    "question": "",
+    "code": "# Session -> Restart R, then Knit -> Knit to PDF\n# Open the PDF, check every part, then upload the PDF to Courseworks",
+    "comment": "1. **Restart R and knit to PDF**: it runs everything fresh, top to bottom.\n2. **Open the PDF** and scroll through all of it:\n   - every part is answered;\n   - every answer shows the **code and its output**;\n   - **interpretation questions have a sentence** with numbers;\n   - no code line is cut off at the right edge;\n   - no error messages;\n   - the plots are there.\n3. **Section 2 uses tidyverse only**: no `df$col <- ...`, `aggregate()`, `tapply()`, base `hist()`/`boxplot()`. Helpers like `mean()`, `quantile()` and `as.numeric()` are fine.\n4. **One final answer per question.**\n5. **Submit the PDF**, not the .Rmd, on Courseworks **before 9AM Saturday**. Leave time for a slow upload, then check the submission shows on Courseworks.",
+    "key": true
+   }
+  ]
  },
  "lec-04": {
   "type": "lec",

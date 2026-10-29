@@ -511,8 +511,8 @@ function entryHTML(id,e){
 function fileHTML(f){
   const isImg=(f.type||'').startsWith('image/');
   const url=fileUrl(f), open=openPreviews.has(f.name);
-  if(/\.csv$/i.test(f.name)||f.type==='text/csv') return `<div class="file"><div class="file-row">
-    <span class="file-ic">CSV</span>
+  if(/\.(csv|rmd|r|qmd)$/i.test(f.name)||f.type==='text/csv') return `<div class="file"><div class="file-row">
+    <span class="file-ic">${/\.csv$/i.test(f.name)?'CSV':/\.r$/i.test(f.name)?'R':'RMD'}</span>
     <span class="file-name" title="${esc(f.name)}">${esc(f.name)}</span>
     <span class="file-size">${f.size?fmtSize(f.size):''}</span>
     <a class="btn sm" href="${url}" download="${esc(f.name)}">Download</a>
@@ -793,6 +793,13 @@ const SKILLS=[
  [/geometric|first (success|six|head|time)|until the first|number of (trials|tries|attempts) (until|before)/,'Geometric: wait for the first success','core-03','Geometric: waiting for the first success (watch the off-by-one)'],
  [/uniform|runif|between 0 and 1/,'Uniform random numbers (runif)','core-03','Uniform: runif for random numbers between a and b'],
  [/sample means?|sampling distribution|central limit|clt|means? of (many|each|the) samples?|average of each sample/,'Sample means (CLT)','core-03','Sample means: how the average behaves (CLT)'],
+ [/marginal (histogram|boxplot|densit|plot)|ggmarginal|histograms? on (the )?(x and y )?ax/,'Scatterplot + marginal histograms (ggMarginal)','rec-05','Question 3 · scatterplot of Income vs Total_Amount with marginal histograms (ggMarginal)'],
+ [/(fix|clean|identify).{0,40}(issues|problems|errors|messy|inconsisten)|issues introduced|make (them|it|the data(sets?)?) tidy|clean (the )?data/,'Find and fix data issues (cleaning checklist)','rec-05','Question 1 · Step 0 · find the issues before fixing anything'],
+ [/quartile|\bntile\b|25th percentile.*50th|income (groups|brackets)/,'Quartile groups + % per group','rec-05','Question 2 · Part 3 · income quartiles and % with a discount'],
+ [/at least (2|two) different|n_distinct|different categories|multi-?category/,'Ids with 2+ different categories','rec-05','Question 2 · Part 4 · customers who bought in 2+ categories'],
+ [/multiple transactions|more than one (transaction|purchase|order|visit)|repeat (customers|buyers)|made multiple/,'Repeat customers (count + filter n > 1)','rec-05','Question 2 · Part 5 · repeat customers and their average number of transactions'],
+ [/age groups?|\(<\s*25|<25|25\s*[-–]\s*40/,'Age groups with cut() / case_when()','rec-05','Question 2 · Part 2 · age groups and % paying by credit card'],
+ [/knit|r ?markdown|\.rmd|pdf (error|fail)|convert(ing)? to pdf|tinytex/,'Knit R Markdown to PDF (setup + fixes)','rev-07','Before the exam: R Markdown → PDF setup (test it TODAY)'],
  [/facet|panel (per|for each)|separate (plot|graph|panel|chart)s? (for|per) (each|every)|one (plot|panel|graph) (per|for each)|small multiples|subplots?/,'Facets: one panel per group (facet_wrap / facet_grid)','lec-13','Facets: facet_wrap(~ class)'],
  [/geom_point|ggplot.*scatter|scatter.*ggplot|\baes\b|aesthetic/,'ggplot scatterplot: aes(), color by group','lec-13','Color by a category: aes(color = cyl)'],
  [/\btheme(s|_bw|_classic|_light|_gray|_void)?\b|font size|bold title|legend (position|at the (top|bottom))/,'ggplot themes and theme() tweaks','lec-13','Customizing with theme(): text sizes, colors, angles, legend position'],

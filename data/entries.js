@@ -1,6 +1,391 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-10-29T16:30:00Z";
+window.ENTRIES_SAVED = "2026-11-04T17:40:00Z";
 window.ENTRIES = {
+ "py-14": {
+  "type": "py",
+  "num": "14",
+  "title": "Introduction to Python: setup, the REPL, arithmetic and indentation",
+  "date": "",
+  "exams": [],
+  "topics": [
+   "python setup",
+   "reticulate",
+   "repl_python",
+   "arithmetic",
+   "math module",
+   "scripts",
+   "quarto",
+   "indentation"
+  ],
+  "pdfs": [
+   {
+    "name": "Lecture14 slides - Introduction to Python.html",
+    "size": 3468814,
+    "type": "text/html"
+   }
+  ],
+  "notes": "Professor Goodrich's slides **Lecture14.html** (\"Introduction to Python\"; Lecture 15 on the course schedule), with the explanations you missed in class. Python runs **inside RStudio** through the `reticulate` package: the code is real Python, RStudio just sends it to Python. Every output below came from running the code.\n\n**Textbook:** *Python for Data Analysis* (3rd ed.) by Wes McKinney, free online: https://wesmckinney.com/book/. This lecture is [Chapter 2, Python Language Basics](https://wesmckinney.com/book/python-basics.html).\n\n| R | Python |\n|---|---|\n| `x <- 4` | `x = 4` |\n| `5^3` | `5**3` |\n| `5 %% 3` | `5 % 3` |\n| `5 %/% 3` | `5 // 3` |\n| `sqrt(5)`, `log(5, 3)` | `from math import sqrt, log` first |\n| `{ }` marks a block | indentation marks a block |\n| `>` prompt | `>>>` prompt (`exit` to leave) |",
+  "takeaways": [
+   "Open Python work through Python.Rproj so RStudio uses your .venv.",
+   "> is the R prompt, >>> is Python; exit goes back to R.",
+   "Power is **, remainder is %, integer division is //. ^ is NOT a power.",
+   "sqrt, log and pi need `from math import ...` first.",
+   "Leading spaces are part of the code: only indent inside if / for / def.",
+   "Scripts need print() to show results; .qmd chunks and the REPL show bare values."
+  ],
+  "updatedAt": "2026-11-04T17:40:00Z",
+  "chunks": [
+   {
+    "id": "py-14-setup",
+    "label": "Setup · one time: course folder + setup_python.R",
+    "question": "",
+    "code": "# In RStudio (this part is R, not Python)\n# 1. Make a course folder on your hard disk, e.g. Desktop/Applied Statistical Computing/Python\n# 2. File -> New Project -> Existing Directory -> pick that folder (makes Python.Rproj)\n# 3. Put setup_python.R (from Canvas) in the folder, open it, click Source\nsource(\"setup_python.R\")\n# 4. Session -> Restart R, then check it worked:\nreticulate::py_config()\n#> python:         .../Python/.venv/bin/python\n#> version:        3.14.x\n#> numpy:          .../Python/.venv/lib/python3.14/site-packages/numpy",
+    "comment": "**What the setup script does:** it makes a private Python environment called `.venv` inside your course folder, installs **numpy, pandas, seaborn and plotnine** (scipy, matplotlib and statsmodels come along with them), and writes a `.Renviron` file telling RStudio to use that Python.\n\n**Rules from the slides:**\n- The folder must be on your **hard disk, not a cloud service** (iCloud, Dropbox, Google Drive). If iCloud \"Desktop & Documents\" syncing is on, your Desktop counts as iCloud.\n- Put **all** your class work in that folder or folders inside it, and make a `Lecture14` subfolder for this lecture.\n- Always open Python work through the project (**Python.Rproj**, or the project menu at the top right of RStudio). The `.Renviron` path is relative (`./.venv/bin/python`), so it only works when RStudio is running in that folder.\n\n**If it fails:**\n\n| Message | Fix |\n|---|---|\n| `Failed to resolve 'pypi.org'` | internet problem: check Wi-Fi or VPN, then Source again |\n| `could not find function \"py_config\"` | that line ran before `library(reticulate)`: use **Source**, not Run |\n| Python ≥ 3.10 not found | `reticulate::install_python(version = \"3.12\")`, then Source again |\n| need another package later | `reticulate::virtualenv_install(\"./.venv\", \"scipy\")` |",
+    "key": true,
+    "lang": "r"
+   },
+   {
+    "id": "py-14-modes",
+    "label": "Four ways to run Python",
+    "question": "",
+    "code": "# 1. REPL (console):  reticulate::repl_python()   ->  >>> 2 + 2\n# 2. Script (.py):    File -> New File -> Python File\n# 3. Notebook (.ipynb, Jupyter)\n# 4. Quarto / R Markdown (.qmd / .Rmd) with a python chunk:\n```{python}\nprint(1 + 1)\n```",
+    "comment": "| Mode | Saved? | Good for |\n|---|---|---|\n| **REPL** (console) | no | trying one line, instant feedback |\n| **Script** `.py` | yes | code only, no text |\n| **Notebook** `.ipynb` | yes | Jupyter, common outside this class |\n| **Quarto / R Markdown** `.qmd` `.Rmd` | yes | **homework**: text + code + output, renders to HTML or PDF |\n\nThe professor writes his slides in Quarto. Like an IPython notebook, but more modern and it works better with R: one file can hold `{r}` **and** `{python}` chunks (that mixing is Lecture 26).",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-14-repl",
+    "label": "The REPL: reticulate::repl_python() and exit",
+    "question": "",
+    "code": "# In the RStudio console (the R prompt is >)\nreticulate::repl_python()\n#> Python 3.14.7 (.../Python/.venv/bin/python)\n#> Reticulate 1.47.0 REPL -- A Python interpreter in R.\n#> Enter 'exit' or 'quit' to exit the REPL and return to R.\n>>> 2 + 2\n4\n>>> exit",
+    "comment": "**REPL** = Read, Evaluate, Print, Loop: type a line, press Enter, see the result right away. Instant feedback is good for learning.\n\n**Which language is the console in?** Look at the prompt:\n\n| Prompt | Language | Leave with |\n|---|---|---|\n| `>` | R | |\n| `>>>` | Python | `exit` |\n| `...` | Python, waiting for you to finish a block | Enter on an empty line, or **Esc** |\n\nIf you type Python at the R prompt you get `Error: unexpected symbol in \"import numpy\"`: R is trying to read Python.\n\n**Big limitation:** nothing typed in the REPL is saved, so you can't reproduce or debug it later. Real work goes in a script or a `.qmd`/`.Rmd` file.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-14-arith",
+    "label": "Arithmetic: + - * / ** %",
+    "question": "",
+    "code": "from math import log, sqrt   # necessary: sqrt() and log() aren't built in\n5 + 3\n#> 8\n5 - 3\n#> 2\n5 * 3\n#> 15\n5 / 3\n#> 1.6666666666666667\n5**3      # exponent\n#> 125\n5 % 3     # remainder\n#> 2",
+    "comment": "| Python | Meaning | Example | R version |\n|---|---|---|---|\n| `+` `-` `*` `/` | the usual | `5 / 3` | same |\n| `**` | exponent | `5**3` is 125 | `5^3` |\n| `%` | remainder (modulo) | `5 % 3` is 2 | `5 %% 3` |\n| `//` | integer division | `5 // 3` is 1 | `5 %/% 3` |\n\n**Watch out:** `^` is **not** a power in Python. `5 ^ 3` runs without an error but gives 6 (it's a bitwise operation). Always use `**`.\n\n`5 / 3` prints `1.6666666666666667`: Python shows about 17 digits where R shows 7 (`1.666667`). Same number. Use `round(5 / 3, 2)` for 1.67.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-14-math",
+    "label": "sqrt(), log(), abs(): import math functions first",
+    "question": "",
+    "code": "from math import log, sqrt\nsqrt(5)\n#> 2.23606797749979\nlog(5, 3)     # log base 3 of 5\n#> 1.4649735207179269\nlog(100)      # one argument: natural log, like log() in R\n#> 4.605170185988092\nabs(-5)       # abs() is built in, no import needed\n#> 5\n\nimport math   # the other style: import the whole module\nmath.sqrt(16)\n#> 4.0\nmath.log10(1000)\n#> 3.0\nmath.pi\n#> 3.141592653589793",
+    "comment": "Python starts small: most math functions live in the **`math` module** and must be imported first. Without the import line, `sqrt(5)` gives `NameError: name 'sqrt' is not defined`.\n\n| Style | Then call it as |\n|---|---|\n| `from math import sqrt, log` | `sqrt(5)` |\n| `import math` | `math.sqrt(5)` |\n\nBuilt in, no import: `abs()`, `round()`, `min()`, `max()`, `sum()`, `len()`, `print()`, `type()`.\n\n`log(x, base)` takes the base as the second argument, like R's `log(x, base = 3)`.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-14-order",
+    "label": "Order of operations and integer division (beyond the slides)",
+    "question": "",
+    "code": "2 + 3 * 4\n#> 14\n(2 + 3) * 4\n#> 20\n-2**2         # ** comes before the minus sign, same as R\n#> -4\n(-2)**2\n#> 4\n17 // 5       # how many whole 5s fit in 17\n#> 3\n17 % 5        # what's left over\n#> 2",
+    "comment": "Same order as R and math class: parentheses, then `**`, then `*` `/` `//` `%`, then `+` `-`. When in doubt, add parentheses.\n\n`//` and `%` go together: `17 = 5 * (17 // 5) + (17 % 5)`, so 3 and 2. `x % 2 == 0` checks whether a number is even, just like `x %% 2 == 0` in R.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-14-script",
+    "label": "A Python script: Demo.py",
+    "question": "",
+    "code": "print(1 + 1)\n#> 2\nprint(1 + 2)\n#> 3",
+    "comment": "From the slides: **File → New File → Python File**, save it as `Demo.py` in your `Lecture14` folder, and type these two lines.\n\n- **Run one line:** put the cursor on it and press **Cmd + Enter**. RStudio starts the Python REPL for you and sends the line there.\n- **Run the whole file:** click **Source**.\n\n**Why `print()`?** When a whole script runs, a bare `1 + 1` is computed but not shown. `print()` makes it appear. (In the REPL and in `.qmd` chunks, bare values do show.)",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-14-rmd",
+    "label": "R Markdown / Quarto: put Python in a {python} chunk",
+    "question": "",
+    "code": "---\ntitle: \"Demo\"\nformat: html\n---\n\n```{python}\nprint(1 + 1)\nprint(1 + 2)\n```\n\n```{python}\nx = 5 / 3\nround(x, 2)\n```",
+    "comment": "From the slides: **File → New File → R Markdown** (or Quarto Document), save it as `Demo.Rmd` (or `.qmd`) in `Lecture14`, and put the contents of `Demo.py` into a chunk that starts with ` ```{python} ` instead of ` ```{r} `.\n\n- Run a chunk with its green arrow; render the whole file with **Render** (Quarto) or **Knit** (R Markdown), same as your R homework.\n- Variables carry over from one python chunk to the next, the same way R chunks share variables.\n- Code inside the chunk starts at the **left edge**: no leading spaces (next card).",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-14-indent",
+    "label": "Indentation: which of these breaks?",
+    "question": "",
+    "code": "1+1\n#> 2\n1 + 1\n#> 2\n1 +     1\n#> 2\n    1 + 1\n#> IndentationError: unexpected indent",
+    "comment": "Python treats the **spaces in front of a line as part of the command**, which forces \"neater\" code. Spaces **between** things don't matter (`1+1`, `1 + 1`, `1 +     1` all work), but a line can only start indented when it's **inside a block** (`if`, `for`, `def`, Lecture 18 and 19).\n\n```python\nx = 3\nif x > 0:\n    print(\"positive\")   # indented: belongs to the if\nprint(\"done\")           # back at the left edge: runs either way\n```\n\nIn R, braces `{ }` mark a block and indentation is only style. In Python, the indentation **is** the block, and the line before it ends with a colon `:`.\n\n**Watch out:** copying code from a PDF or a website often brings extra leading spaces. If the console gets stuck on `...` or says `unexpected indent`, press **Esc**, then delete the spaces at the start of the line.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-14-prac1",
+    "label": "Practice 1 · Arithmetic: translate R to Python",
+    "question": "Translate to Python and run: (3 + 4)^2 / 7, 17 %% 4, 17 %/% 4, and 2^10 - 1000.",
+    "code": "(3 + 4)**2 / 7     # R: (3 + 4)^2 / 7\n#> 7.0\n17 % 4            # R: 17 %% 4\n#> 1\n17 // 4           # R: 17 %/% 4\n#> 4\n2**10 - 1000\n#> 24",
+    "comment": "Matches **Arithmetic**. Translate each R line to Python before you look: `^` becomes `**`, `%%` becomes `%`, `%/%` becomes `//`.\n\nNotice `/` always gives a decimal (`7.0`) even when the answer is whole.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-14-prac2",
+    "label": "Practice 2 · Math functions",
+    "question": "Compute the hypotenuse of a triangle with sides 3 and 4, log base 2 of 1024, the area of a circle with radius 3 rounded to 2 decimals, and the distance between 7 and 12.",
+    "code": "from math import sqrt, log, pi\nsqrt(3**2 + 4**2)        # hypotenuse of a 3-4-5 triangle\n#> 5.0\nlog(1024, 2)             # log base 2\n#> 10.0\nround(pi * 3**2, 2)      # area of a circle with radius 3\n#> 28.27\nabs(7 - 12)\n#> 5",
+    "comment": "Matches **sqrt(), log(), abs()**. Everything except `abs()` and `round()` needs the import line first: run it without the import to see the `NameError`.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-14-prac3",
+    "label": "Practice 3 · Fix the indentation",
+    "question": "This code was pasted with extra spaces at the start of lines 2 and 3. Fix it so it prints the remainder of 10 divided by 3.",
+    "code": "# Broken (each line after the first starts with spaces):\n#   a = 10\n#       b = 3\n#     print(a % b)\n# Fixed:\na = 10\nb = 3\nprint(a % b)\n#> 1",
+    "comment": "Matches **Indentation**. None of these lines is inside an `if`, `for` or `def`, so all of them must start at the left edge. The broken version stops at the second line with `IndentationError: unexpected indent`.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-14-prac4",
+    "label": "Practice 4 · Write a script",
+    "question": "Write a script Circle.py that stores a radius of 5 and prints the circumference and the area of the circle.",
+    "code": "from math import pi\nr = 5\nprint(2 * pi * r)       # circumference\n#> 31.41592653589793\nprint(pi * r**2)        # area\n#> 78.53981633974483",
+    "comment": "Matches **A Python script**. Save it as `Lecture14/Circle.py` and click **Source**. Without `print()`, the script would compute both numbers but show nothing.",
+    "key": false,
+    "lang": "python"
+   }
+  ]
+ },
+ "py-15": {
+  "type": "py",
+  "num": "15",
+  "title": "Variables, data types and containers: tuple, list, dict, set",
+  "date": "",
+  "exams": [],
+  "topics": [
+   "assignment",
+   "int",
+   "float",
+   "bool",
+   "str",
+   "type",
+   "coercion",
+   "methods",
+   "tuple",
+   "list",
+   "indexing",
+   "dict",
+   "set"
+  ],
+  "pdfs": [
+   {
+    "name": "Lecture15 slides - Containers in Python.html",
+    "size": 3487363,
+    "type": "text/html"
+   }
+  ],
+  "notes": "Professor Goodrich's slides **Lecture15.html** (\"Containers in Python\"; Lecture 16 on the course schedule), with extra explanation and R comparisons. Two cards marked **beyond the slides** (list indexing and list math) cover things every later lecture uses.\n\n**Textbook:** [Chapter 2](https://wesmckinney.com/book/python-basics.html) (types) and [Chapter 3, Built-In Data Structures](https://wesmckinney.com/book/python-builtin.html) (tuple, list, dict, set) of *Python for Data Analysis*.\n\n| R | Python |\n|---|---|\n| `TRUE` / `FALSE` | `True` / `False` |\n| `class(x)` | `type(x)` |\n| `as.numeric()` `as.character()` | `float()` `str()` |\n| `paste0(a, b)` | `a + b` |\n| `toupper(a)` | `a.upper()` |\n| vector `c(1, 2, 3)` | list `[1, 2, 3]` |\n| `x[1]` (first) | `x[0]` (first) |\n| named list `list(a = 1)` | dict `{\"a\": 1}` |\n| `unique(x)` | `set(x)` |",
+  "takeaways": [
+   "= assigns, == compares; True/False are capitalized.",
+   "2 is an int, 2.0 is a float; / always gives a float.",
+   "int() chops decimals off, round() rounds.",
+   "Text and numbers don't mix: convert with float(), int(), str().",
+   "Methods use a dot: a.lower(). AttributeError = that type doesn't have the method.",
+   "Python list ≈ R vector; Python dict ≈ R list.",
+   "Indexing starts at 0; [a:b] stops before b; [-1] is the last element.",
+   "Tuples can't change; sets keep unique values with no order."
+  ],
+  "updatedAt": "2026-11-04T17:40:00Z",
+  "chunks": [
+   {
+    "id": "py-15-assign",
+    "label": "Assignment with =, legal names, case sensitivity",
+    "question": "",
+    "code": "x = 4\n2 * x\n#> 8\nfirst_name = \"Benjamin\"\nX\n#> NameError: name 'X' is not defined",
+    "comment": "Python assigns with **`=`** (R uses `<-`, though `=` also works in R).\n\n- A name can't start with a number and can't have spaces or punctuation: `first_name` works, `first name` and `2x` don't.\n- Use `_` in place of a space, like `first_name`. (R people often use dots, `first.name`, but a dot means something else in Python, see **Methods**.)\n- **Case sensitive:** `x` and `X` are different, so `X` gives `NameError: name 'X' is not defined`.\n\n**Watch out:** `x <- 4` is **not** an error in Python. It means \"is x less than -4?\" and gives `False`, without assigning anything.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-15-numeric",
+    "label": "Numbers: float and int, and why -2.35 + 4 isn't exact",
+    "question": "",
+    "code": "x = 2\ny = -2.35\nx + y\n#> -0.3500000000000001\nround(x + y, 2)\n#> -0.35",
+    "comment": "Four primitive types: **float**, **int**, **bool** and **str**.\n\nNumbers are basically real numbers, and every arithmetic operation from Lecture 14 works on them.\n\n**Why `-0.3500000000000001`?** Computers store decimals in binary, so most decimals are stored as a very close approximation. R has the same tiny error, it just prints 7 digits and hides it. Use `round()` for display, and don't test decimals with `==` (`0.1 + 0.2 == 0.3` is `False` in both languages).",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-15-type",
+    "label": "type(): what kind of object is this?",
+    "question": "",
+    "code": "type(x)\n#> <class 'int'>\ntype(y)\n#> <class 'float'>\ntype(first_name)\n#> <class 'str'>\ntype(x > 0)\n#> <class 'bool'>",
+    "comment": "`type()` tells you an object's type, like `class()` in R.\n\n| Python type | Example | R version |\n|---|---|---|\n| `int` | `2` | `2L` (integer) |\n| `float` | `2.0`, `-2.35` | `2` (double / numeric) |\n| `bool` | `True` | `TRUE` (logical) |\n| `str` | `\"Benjamin\"` | `\"Benjamin\"` (character) |\n\nIn RStudio it prints as `<class 'int'>`; in the professor's slides (Jupyter) the same thing prints as just `int`.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-15-int",
+    "label": "int vs float: isinstance(), float(), and / always gives a float",
+    "question": "",
+    "code": "isinstance(x, int)\n#> True\nz = float(x)\nz\n#> 2.0\ntype(z)\n#> <class 'float'>\ntype(x * x)\n#> <class 'int'>\ntype(x / 1)\n#> <class 'float'>",
+    "comment": "**A different convention than R:** in Python, `2` is an **int**. In R, `2` is a double (mathematically `2.0`); you have to write `2L` to get an integer.\n\n- `isinstance(x, int)` asks \"is x an int?\" and returns `True`/`False`, like `is.integer()` in R.\n- `float(x)` converts to a float: `2.0`.\n- int `*` int stays an int, but `/` **always** gives a float, even `4 / 2` is `2.0`. Use `//` to stay whole.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-15-bool",
+    "label": "Bool: True and False (capitalized, not TRUE)",
+    "question": "",
+    "code": "True\n#> True\nFalse\n#> False\nx > 0\n#> True\ny > 0\n#> False\nx == z            # 2 == 2.0\n#> True\n(x > 0) and (y > 0)\n#> False\n(x > 0) or (y > 0)\n#> True\nnot (x > 0)\n#> False",
+    "comment": "Python has exactly two logical values, **`True`** and **`False`**. Note the spelling: R uses `TRUE`/`FALSE`, and `true` or `TRUE` in Python gives `NameError`.\n\n| Python | R |\n|---|---|\n| `==` `!=` `<` `>` `<=` `>=` | same |\n| `and` | `&&` / `&` |\n| `or` | `\\|\\|` / `\\|` |\n| `not` | `!` |\n\n`x == z` is `True` because `2` and `2.0` are equal as numbers, even though one is an int and one is a float.\n\n`=` assigns, `==` compares, same as R.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-15-boolmath",
+    "label": "Arithmetic with bools: True is 1, False is 0",
+    "question": "",
+    "code": "(z > 0) * (y < 0)\n#> 1\nTrue + True\n#> 2\nsum([True, False, True, True])\n#> 3",
+    "comment": "For arithmetic, **`True` counts as 1 and `False` as 0**, in Python and essentially every other language.\n\nThat makes counting easy: `sum()` of a list of True/False values counts the `True`s, the same trick as `sum(x > 0)` in R.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-15-str",
+    "label": "Strings: quotes, joining with +, and why z + '3' fails",
+    "question": "",
+    "code": "last_name = 'Goodrich'        # ' or \" both work\nfirst_name + last_name\n#> 'BenjaminGoodrich'\nfirst_name + \" \" + last_name\n#> 'Benjamin Goodrich'\n\"ha\" * 3\n#> 'hahaha'\nz + '3'\n#> TypeError: unsupported operand type(s) for +: 'float' and 'str'",
+    "comment": "A **string** (`str`) is text. Use single or double quotes, but the same kind on both ends.\n\n- `+` **joins** strings: `first_name + last_name` gives `'BenjaminGoodrich'` with no space, like `paste0()` in R. Add `\" \"` yourself for a space.\n- `*` repeats a string.\n- **A number in quotes is text**, so `z + '3'` is `TypeError: unsupported operand type(s) for +: 'float' and 'str'`. Python won't guess whether you meant 5.0 or `'2.03'`; convert first (next card).",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-15-coerce",
+    "label": "Type coercion: float(), int(), str(), bool()",
+    "question": "",
+    "code": "float(z)\n#> 2.0\nbool(y)           # any nonzero number is True\n#> True\nbool(0)\n#> False\nstr(x)\n#> '2'\nint(y)            # What happened?\n#> -2\nint(2.9)\n#> 2\nround(2.9)\n#> 3\nint(\"42\") + 1\n#> 43\nint(first_name)\n#> ValueError: invalid literal for int() with base 10: 'Benjamin'",
+    "comment": "Convert between types with the type's name as a function, like the `as.` functions in R:\n\n| Python | R |\n|---|---|\n| `float(\"2.5\")` | `as.numeric(\"2.5\")` |\n| `int(2.9)` | `as.integer(2.9)` |\n| `str(2)` | `as.character(2)` |\n| `bool(0)` | `as.logical(0)` |\n\n**What happened with `int(y)`?** `int()` **chops off the decimals** (it truncates toward zero), so `-2.35` becomes `-2` and `2.9` becomes `2`. It doesn't round. Use `round()` to round.\n\n`int(first_name)` fails with `ValueError: invalid literal for int() with base 10: 'Benjamin'`: there's no number in \"Benjamin\" to convert. `int(\"42\")` works because the text is a number.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-15-methods",
+    "label": "Everything is an object: methods like a.lower()",
+    "question": "",
+    "code": "a = 'ABC'\na.lower()\n#> 'abc'\n\"emmy davis\".upper()\n#> 'EMMY DAVIS'\n\"emmy davis\".title()\n#> 'Emmy Davis'\n\"  hello  \".strip()\n#> 'hello'\n\"a,b,c\".split(\",\")\n#> ['a', 'b', 'c']\n\"2026-11-04\".replace(\"-\", \"/\")\n#> '2026/11/04'\nb = 123\nb.lower()\n#> AttributeError: 'int' object has no attribute 'lower'",
+    "comment": "Python is **object oriented**: an object holds its data **and** the operations that make sense for it, called **methods**. You call a method with a dot: `object.method()`.\n\n| Python method | R function |\n|---|---|\n| `a.lower()` / `a.upper()` | `tolower(a)` / `toupper(a)` |\n| `a.title()` | `str_to_title(a)` |\n| `a.strip()` | `trimws(a)` / `str_trim(a)` |\n| `a.split(\",\")` | `strsplit(a, \",\")` |\n| `a.replace(\"-\", \"/\")` | `gsub(\"-\", \"/\", a)` |\n\n`b.lower()` fails with `AttributeError: 'int' object has no attribute 'lower'`: numbers don't have text methods. **AttributeError** means the method doesn't exist for that type of object, so check `type()`.\n\nOnly `.lower()` is from the slides; the others are the common ones you'll want for data cleaning.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-15-containers",
+    "label": "Containers: tuple, list, dict, set at a glance",
+    "question": "",
+    "code": "t = (\"Benjamin\", \"Goodrich\")                  # tuple: ( )\nl = [\"Benjamin\", \"Goodrich\"]                  # list:  [ ]\nd = {\"first\": \"Benjamin\", \"last\": \"Goodrich\"}  # dict:  { key: value }\ns = {\"Benjamin\", \"Goodrich\"}                  # set:   { } without keys\ntype(t), type(l), type(d), type(s)\n#> (<class 'tuple'>, <class 'list'>, <class 'dict'>, <class 'set'>)",
+    "comment": "**Containers** are objects that hold other objects.\n\n| Type | Brackets | Ordered? | Can change? | Named values? | Mixed types? | Closest in R |\n|---|---|---|---|---|---|---|\n| **list** | `[ ]` | yes | yes | no | yes | vector `c()` |\n| **dict** | `{k: v}` | no* | yes | yes (keys) | yes | named `list()` |\n| **tuple** | `( )` | yes | **no** | no | yes | |\n| **set** | `{ }` | no | \"yes\" | no | only hashable | `unique()` |\n\n*Dicts remember insertion order in modern Python, but you look things up by key, not position.\n\n**Watch out:** a Python **list** is like an R **vector**, and a Python **dict** is like an R **list**. The names are swapped.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-15-tuple",
+    "label": "Tuples: ( ), fixed once made",
+    "question": "",
+    "code": "full_name = (\"Benjamin\", \"Goodrich\")\nfull_name[0]\n#> 'Benjamin'\nlen(full_name)\n#> 2\nfull_name[0] = \"Ben\"\n#> TypeError: 'tuple' object does not support item assignment",
+    "comment": "A **tuple** has a fixed length and is essentially **immutable**: once it's made, you can't change, add or remove elements. Good when you never want it to change (coordinates, a first and last name).\n\nCreate it with **round parentheses**. Trying to change it gives `TypeError: 'tuple' object does not support item assignment`; use a list if you need to change it.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-15-list",
+    "label": "Lists: [ ], len(), mixed types",
+    "question": "",
+    "code": "xy = [2, -2.35]\nlen(xy)\n#> 2\nfull_name = [\"Benjamin\", \"Goodrich\"]\ntype(full_name)\n#> <class 'list'>\nlen(full_name)\n#> 2",
+    "comment": "A **list** is the everyday container. Create it with **square brackets**; `len()` gives its size, like `length()` in R.\n\nA list *can* hold different types (`[2, \"a\", True]`), but by convention a list usually holds one kind of thing.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-15-index",
+    "label": "Indexing lists: [0] is the first element (beyond the slides)",
+    "question": "",
+    "code": "nums = [10, 20, 30, 40, 50]\nnums[0]          # first\n#> 10\nnums[-1]         # last\n#> 50\nnums[1:3]        # positions 1 and 2, not 3\n#> [20, 30]\nnums[:2]         # first two\n#> [10, 20]\nnums.append(60)  # add to the end (changes nums)\nnums\n#> [10, 20, 30, 40, 50, 60]\nnums[0] = 99     # lists can change\nnums\n#> [99, 20, 30, 40, 50, 60]",
+    "comment": "**The biggest R-to-Python change:** counting starts at **0**, so `nums[0]` is the first element and `nums[1]` is the second.\n\n| Want | Python | R |\n|---|---|---|\n| first element | `nums[0]` | `nums[1]` |\n| last element | `nums[-1]` | `nums[length(nums)]` |\n| 2nd and 3rd | `nums[1:3]` | `nums[2:3]` |\n| first two | `nums[:2]` | `nums[1:2]` |\n| add to the end | `nums.append(60)` | `nums <- c(nums, 60)` |\n\n**A slice `[a:b]` includes `a` and stops before `b`.** So `nums[1:3]` is 2 elements, positions 1 and 2.\n\n**Watch out:** a negative index means something different. In R, `x[-1]` *drops* the first element; in Python, `nums[-1]` *is* the last one. Asking for a position past the end gives `IndexError: list index out of range`.\n\nNot in the Lecture 15 slides, but every later lecture uses it.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-15-listmath",
+    "label": "Lists aren't vectors: + joins, * repeats (beyond the slides)",
+    "question": "",
+    "code": "[1, 2, 3] + [10, 20, 30]\n#> [1, 2, 3, 10, 20, 30]\n[1, 2, 3] * 2\n#> [1, 2, 3, 1, 2, 3]\nsum([1, 2, 3]) / len([1, 2, 3])   # the mean\n#> 2.0",
+    "comment": "In R, `c(1, 2, 3) + c(10, 20, 30)` adds element by element. **A Python list doesn't do math**: `+` glues the lists together and `*` repeats them.\n\nFor R-style vector math you'll use **NumPy arrays** (Lecture 17): `np.array([1, 2, 3]) + np.array([10, 20, 30])` gives `[11, 22, 33]`. Until then, `sum()` and `len()` get you a mean.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-15-dict",
+    "label": "Dictionaries: { key: value }, look up by name",
+    "question": "",
+    "code": "my_dict = {\"an integer\": 2, \"a bool\": -2.35 > 0, \"a list\": full_name}\nmy_dict[\"an integer\"]\n#> 2\nmy_dict[\"a list\"]\n#> ['Benjamin', 'Goodrich']\nmy_dict[\"a float\"] = 3.14     # add a new key\nmy_dict.keys()\n#> dict_keys(['an integer', 'a bool', 'a list', 'a float'])\nlen(my_dict)\n#> 4\nmy_dict[\"missing\"]\n#> KeyError: 'missing'",
+    "comment": "A **dict** stores values under **keys** and you look them up by name, like the named elements of an R list.\n\n| Want | Python | R |\n|---|---|---|\n| make | `{\"a\": 1, \"b\": 2}` | `list(a = 1, b = 2)` |\n| get one | `d[\"a\"]` | `l$a` or `l[[\"a\"]]` |\n| add or change | `d[\"c\"] = 3` | `l$c <- 3` |\n| all names | `d.keys()` | `names(l)` |\n\nCreate it with **curly braces and colons**. The values don't need to be the same type: here an int, a bool and a list.\n\nAsking for a key that isn't there gives `KeyError: 'missing'`. Keys are case sensitive and must match exactly, spaces included.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-15-set",
+    "label": "Sets: unique values, union, intersection, difference",
+    "question": "",
+    "code": "digits = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}\n{2, 2, 2, 1, 3, 3}\n#> {1, 2, 3}\neven_digits = {0, 2, 4, 6, 8}\nodd_digits = digits.difference(even_digits)\nodd_digits\n#> {1, 3, 5, 7, 9}\neven_digits.union(odd_digits)\n#> {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}\ndigits.intersection(even_digits)\n#> {0, 2, 4, 6, 8}\nset([3, 1, 3, 2, 1])        # remove duplicates from a list\n#> {1, 2, 3}\nlen(set([3, 1, 3, 2, 1]))   # how many unique values\n#> 3",
+    "comment": "A **set** is an unordered collection of **unique** elements, like a set in math. Repeats disappear automatically. Create it with curly braces but **no keys** (no colons).\n\n| Python | R |\n|---|---|\n| `a.union(b)` | `union(a, b)` |\n| `a.intersection(b)` | `intersect(a, b)` |\n| `a.difference(b)` | `setdiff(a, b)` |\n| `set(my_list)` | `unique(x)` |\n| `len(set(my_list))` | `length(unique(x))` |\n\nSets have no order, so `s[0]` is an error: convert with `sorted(s)` or `list(s)` first.\n\n**Watch out:** `{}` on its own makes an empty **dict**, not a set. Use `set()` for an empty set.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-15-prac1",
+    "label": "Practice 1 · Types and converting text to numbers",
+    "question": "price = \"19.99\" and quantity = 3. Check both types, compute the total cost rounded to 2 decimals, and print it as the text \"Total: $59.97\".",
+    "code": "price = \"19.99\"\nquantity = 3\ntype(price), type(quantity)\n#> (<class 'str'>, <class 'int'>)\ntotal = float(price) * quantity\nround(total, 2)\n#> 59.97\n\"Total: $\" + str(round(total, 2))\n#> 'Total: $59.97'",
+    "comment": "Matches **Type coercion** and **Strings**. `price` is text (it's in quotes), so `price * quantity` would repeat the text three times. Convert with `float()` first, then `str()` to glue the number back into a sentence.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-15-prac2",
+    "label": "Practice 2 · List indexing and a mean",
+    "question": "scores = [88, 92, 79, 95, 60]. Get the first score, the last score, the 2nd through 4th scores and the number of scores. Add a score of 85, then compute the mean.",
+    "code": "scores = [88, 92, 79, 95, 60]\nscores[0]                 # first\n#> 88\nscores[-1]                # last\n#> 60\nscores[1:4]               # 2nd through 4th\n#> [92, 79, 95]\nlen(scores)\n#> 5\nscores.append(85)\nsum(scores) / len(scores)\n#> 83.16666666666667",
+    "comment": "Matches **Indexing lists**. Count from 0, and a slice stops *before* its end number: the 2nd through 4th elements are positions 1, 2 and 3, so `[1:4]`.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-15-prac3",
+    "label": "Practice 3 · A dictionary for one student",
+    "question": "Make a dict with a student's name, graduation year and major. Look up the name, change the year, add a minor, and list the keys.",
+    "code": "student = {\"name\": \"Emmy\", \"year\": 2028, \"major\": \"Financial Economics\"}\nstudent[\"name\"]\n#> 'Emmy'\nstudent[\"year\"] = 2027          # change a value\nstudent[\"minor\"] = \"Applied Statistics\"   # add a key\nstudent.keys()\n#> dict_keys(['name', 'year', 'major', 'minor'])\nlen(student)\n#> 4",
+    "comment": "Matches **Dictionaries**. Changing and adding use the same syntax, `d[key] = value`: if the key exists it's replaced, if not it's added.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-15-prac4",
+    "label": "Practice 4 · Sets: two class rosters",
+    "question": "Two rosters: stat = Ana, Ben, Cara, Dev, Eli and econ = Ben, Dev, Fay, Gus. Who is in both classes, who is only in stat, and how many different students are there in total?",
+    "code": "stat = {\"Ana\", \"Ben\", \"Cara\", \"Dev\", \"Eli\"}\necon = {\"Ben\", \"Dev\", \"Fay\", \"Gus\"}\nstat.intersection(econ)          # in both classes\n#> {'Dev', 'Ben'}\nstat.difference(econ)            # only in stat\n#> {'Eli', 'Cara', 'Ana'}\nstat.union(econ)                 # everyone\n#> {'Dev', 'Ben', 'Fay', 'Eli', 'Gus', 'Ana', 'Cara'}\nlen(stat.union(econ))\n#> 7",
+    "comment": "Matches **Sets**. Sets print in no particular order, so your output may list the names in a different order. That's fine, the contents are the same.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-15-prac5",
+    "label": "Practice 5 · Clean a messy name with string methods",
+    "question": "raw = \"  emmy DAVIS \". Remove the extra spaces, capitalize it as \"Emmy Davis\", then pull out just the last name.",
+    "code": "raw = \"  emmy DAVIS \"\nclean = raw.strip().title()\nclean\n#> 'Emmy Davis'\nclean.split(\" \")\n#> ['Emmy', 'Davis']\nclean.split(\" \")[1]          # last name\n#> 'Davis'\nlen(clean)\n#> 10",
+    "comment": "Matches **Methods**. Methods can be chained left to right: `.strip()` removes the outer spaces, then `.title()` capitalizes each word. `.split(\" \")` returns a list, so `[1]` picks the second word.",
+    "key": false,
+    "lang": "python"
+   }
+  ]
+ },
  "hw-01": {
   "type": "hw",
   "num": "01",
@@ -5904,6 +6289,176 @@ window.ENTRIES = {
     "code": "library(patchwork)\ng1 <- ggplot(mpg, aes(drv)) + geom_bar()\ng2 <- ggplot(mpg, aes(drv, hwy)) + geom_boxplot()\ng1 | g2                                # side by side\n# g1 / g2                              # stacked\n# g1 + g2 + plot_layout(ncol = 1)      # set the grid",
     "comment": "**Why / when:** Save each plot in a variable, then combine: `|` = one row, `/` = one column, parentheses nest. `plot_layout(guides = \"collect\")` merges duplicate legends. Base R equivalent: `par(mfrow = c(1, 2))`; same plot per group: `facet_wrap()`.\n\n**From:** Lec 14 · **Used in:** Lec 14 arranging plots",
     "key": false
+   }
+  ]
+ },
+ "kit-04": {
+  "type": "kit",
+  "num": "04",
+  "title": "Function finder: Python (what each function does, with the R version)",
+  "date": "",
+  "exams": [],
+  "topics": [
+   "python",
+   "function finder"
+  ],
+  "pdfs": [],
+  "notes": "Every Python function and operator from the Python lectures so far, one card each: **what it does, when to use it, the R function you already know**, a tiny example run in Python with its output, and the usual mistake.\n\n**Find one by what you want to do:** search \"python remove duplicates\", \"python first element\", \"convert text to number\" or \"python lowercase\". Adding **python** to a search puts these cards first; without it, the R cards usually win. New cards get added with each Python lecture.",
+  "takeaways": [],
+  "updatedAt": "2026-11-04T17:40:00Z",
+  "chunks": [
+   {
+    "id": "kit-04-p00",
+    "label": "repl_python() / exit · switch the console to Python and back",
+    "question": "Use it when: You want to try a line of Python in the RStudio console.\n\nSearch words: python console, repl, switch to python, start python, >>> prompt, exit python, back to r",
+    "code": "# R console:\nreticulate::repl_python()\n# now the prompt is >>>\n# type exit to go back to R",
+    "comment": "**Why / when:** The console runs one language at a time: `>` is R, `>>>` is Python. Running a line from a `.py` file or a `{python}` chunk switches automatically.\n\n**Watch out:** Python typed at the R `>` prompt gives `Error: unexpected symbol`. Stuck on `...`? Press Esc.\n\n**From:** Py 14",
+    "key": false,
+    "lang": "r"
+   },
+   {
+    "id": "kit-04-p01",
+    "label": "print() · show a value from a script",
+    "question": "Use it when: A .py script should show a result when it runs.\n\nSearch words: print, show output, display value, python output, print text",
+    "code": "print(1 + 1)\n#> 2\nprint(\"total:\", 5 * 3)\n#> total: 15",
+    "comment": "**Why / when:** Bare values show up in the REPL and in `.qmd` chunks, but a script run with Source only shows what you `print()`. Several arguments print with spaces between.\n\n**R version:** `print()` / `cat()`\n\n**From:** Py 14",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p02",
+    "label": "** / % / // · power, remainder, whole-number division",
+    "question": "Use it when: Arithmetic in Python: exponents, remainders, integer division.\n\nSearch words: python exponent, power, squared, python remainder, modulo, integer division, even or odd, python arithmetic, ^",
+    "code": "5**3\n#> 125\n17 % 5\n#> 2\n17 // 5\n#> 3\n10 % 2 == 0\n#> True",
+    "comment": "**Why / when:** `**` is the power, `%` the remainder, `//` divides and drops the decimals.\n\n**R version:** `^`, `%%`, `%/%`\n\n**Watch out:** `^` is not a power in Python: `5 ^ 3` quietly gives 6.\n\n**From:** Py 14",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p03",
+    "label": "from math import sqrt, log · square root, logs, pi",
+    "question": "Use it when: You need sqrt, log, exp or pi in Python.\n\nSearch words: python square root, sqrt, python log, logarithm, log base, natural log, pi, exp, import math",
+    "code": "from math import sqrt, log, pi\nsqrt(16)\n#> 4.0\nlog(8, 2)\n#> 3.0\nround(pi, 4)\n#> 3.1416",
+    "comment": "**Why / when:** Math functions live in the `math` module, so import them first. `log(x)` is the natural log; `log(x, base)` for any base.\n\n**R version:** `sqrt()`, `log(x, base = )`, `pi`\n\n**Watch out:** Without the import: `NameError: name 'sqrt' is not defined`.\n\n**From:** Py 14",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p04",
+    "label": "abs() / round() · absolute value and rounding",
+    "question": "Use it when: Make a number positive, or round it to some decimals.\n\nSearch words: python absolute value, abs, python round, decimal places, round to 2 decimals",
+    "code": "abs(-5)\n#> 5\nround(2.34567, 2)\n#> 2.35\nround(-2.35 + 2, 2)\n#> -0.35",
+    "comment": "**Why / when:** Built in, no import needed.\n\n**R version:** `abs()`, `round(x, 2)`\n\n**From:** Py 14",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p05",
+    "label": "= · assign a value to a name",
+    "question": "Use it when: Store a value under a name in Python.\n\nSearch words: python assign, assignment, create variable, store value, save value, python variable",
+    "code": "x = 4\nfirst_name = \"Benjamin\"\n2 * x\n#> 8",
+    "comment": "**Why / when:** Python assigns with `=`. Names can't start with a number or contain spaces; use `_` between words. Case sensitive: `x` and `X` differ.\n\n**R version:** `<-`\n\n**Watch out:** `x <- 4` isn't assignment in Python: it compares x with -4.\n\n**From:** Py 15",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p06",
+    "label": "type() / isinstance() · what type is this object?",
+    "question": "Use it when: Check whether something is an int, float, bool, str, list, dict…\n\nSearch words: python type, check type, data type, class of object, isinstance, is it an integer, int or float",
+    "code": "type(2)\n#> <class 'int'>\ntype(2.0)\n#> <class 'float'>\ntype(\"2\")\n#> <class 'str'>\nisinstance(2, int)\n#> True",
+    "comment": "**Why / when:** `type()` names the type; `isinstance(x, int)` answers True/False.\n\n**R version:** `class()`, `is.integer()`\n\n**Watch out:** In RStudio it prints `<class 'int'>`; the slides show `int`.\n\n**From:** Py 15",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p07",
+    "label": "int() / float() / str() / bool() · convert between types",
+    "question": "Use it when: Text needs to become a number, a number needs to become text, etc.\n\nSearch words: python convert type, coerce, convert text to number, string to number, number to string, to integer, to float, cast",
+    "code": "float(\"19.99\")\n#> 19.99\nint(\"42\") + 1\n#> 43\nstr(2) + \" items\"\n#> '2 items'\nint(-2.35)\n#> -2\nbool(0)\n#> False",
+    "comment": "**Why / when:** Use the type's name as a function. `int()` cuts off the decimals (toward zero), it doesn't round.\n\n**R version:** `as.numeric()`, `as.integer()`, `as.character()`, `as.logical()`\n\n**Watch out:** `int(\"Benjamin\")` gives ValueError; adding a number to a string gives TypeError.\n\n**From:** Py 15",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p08",
+    "label": "True / False · and, or, not · logical values and comparisons",
+    "question": "Use it when: Compare values or combine conditions in Python.\n\nSearch words: python true false, boolean, bool, logical, and or not, compare, comparison, equal, ==, count true",
+    "code": "x = 2\nx > 0 and x < 5\n#> True\nnot x == 2\n#> False\nsum([True, False, True])\n#> 2",
+    "comment": "**Why / when:** Capitalized `True`/`False`. Combine with the words `and`, `or`, `not`. True counts as 1, so `sum()` counts the Trues.\n\n**R version:** `TRUE`/`FALSE`, `&`, `|`, `!`\n\n**Watch out:** `TRUE` and `true` don't exist in Python (NameError).\n\n**From:** Py 15",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p09",
+    "label": "+ on strings · join text together",
+    "question": "Use it when: Combine strings, like paste0().\n\nSearch words: python join strings, concatenate text, paste, paste0, combine text, add space between",
+    "code": "first = \"Emmy\"\nlast = \"Davis\"\nfirst + \" \" + last\n#> 'Emmy Davis'\n\"Total: \" + str(5)\n#> 'Total: 5'",
+    "comment": "**Why / when:** `+` glues strings with nothing between them, so add `\" \"` yourself.\n\n**R version:** `paste0()`, `paste()`\n\n**Watch out:** A number must be converted with `str()` first, or you get TypeError.\n\n**From:** Py 15",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p10",
+    "label": ".lower() .upper() .title() .strip() .split() .replace() · string methods",
+    "question": "Use it when: Change case, trim spaces, split or replace text in Python.\n\nSearch words: python lowercase, uppercase, capitalize, title case, trim spaces, remove whitespace, split text, replace text, string methods",
+    "code": "s = \"  emmy DAVIS \"\ns.strip().title()\n#> 'Emmy Davis'\ns.lower()\n#> '  emmy davis '\n\"a,b,c\".split(\",\")\n#> ['a', 'b', 'c']\n\"2026-11-04\".replace(\"-\", \"/\")\n#> '2026/11/04'",
+    "comment": "**Why / when:** Methods are called with a dot after the object, and can be chained left to right.\n\n**R version:** `tolower()`, `toupper()`, `str_to_title()`, `trimws()`, `strsplit()`, `gsub()`\n\n**Watch out:** Numbers don't have these: `AttributeError: 'int' object has no attribute 'lower'`.\n\n**From:** Py 15",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p11",
+    "label": "[ ] list / len() / .append() · make a list, count it, add to it",
+    "question": "Use it when: Store several values in order (like an R vector).\n\nSearch words: python list, make a list, vector in python, length, len, number of elements, append, add element, add to end",
+    "code": "nums = [10, 20, 30]\nlen(nums)\n#> 3\nnums.append(40)\nnums\n#> [10, 20, 30, 40]",
+    "comment": "**Why / when:** Square brackets make a list; `len()` counts; `.append()` adds to the end and changes the list in place.\n\n**R version:** `c()`, `length()`, `x <- c(x, 40)`\n\n**Watch out:** `[1, 2] + [3, 4]` joins lists, it doesn't add numbers (use NumPy for that).\n\n**From:** Py 15",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p12",
+    "label": "[0] / [-1] / [a:b] · index and slice a list",
+    "question": "Use it when: Get the first, last or some elements of a list, tuple or string.\n\nSearch words: python index, first element, last element, slice, subset list, positions, zero based, 0 index",
+    "code": "nums = [10, 20, 30, 40, 50]\nnums[0]\n#> 10\nnums[-1]\n#> 50\nnums[1:3]\n#> [20, 30]\nnums[:2]\n#> [10, 20]",
+    "comment": "**Why / when:** Counting starts at **0**. `[a:b]` includes a and stops before b. Negative numbers count from the end.\n\n**R version:** `x[1]`, `x[length(x)]`, `x[2:3]`\n\n**Watch out:** In R `x[-1]` drops the first element; in Python `[-1]` is the last one. Too big: IndexError.\n\n**From:** Py 15",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p13",
+    "label": "( ) tuple · an ordered group that can't change",
+    "question": "Use it when: A fixed group of values that should never be changed.\n\nSearch words: python tuple, immutable, fixed values, cannot change",
+    "code": "full_name = (\"Benjamin\", \"Goodrich\")\nfull_name[1]\n#> 'Goodrich'\nlen(full_name)\n#> 2",
+    "comment": "**Why / when:** Round parentheses. Indexing works like a list, but you can't change, add or remove elements.\n\n**Watch out:** `full_name[0] = \"Ben\"` gives `TypeError: 'tuple' object does not support item assignment`.\n\n**From:** Py 15",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p14",
+    "label": "{key: value} dict · store values under names",
+    "question": "Use it when: Look values up by name (like a named R list).\n\nSearch words: python dictionary, dict, key value, named list, look up by name, add key, keys, names",
+    "code": "d = {\"name\": \"Emmy\", \"year\": 2028}\nd[\"name\"]\n#> 'Emmy'\nd[\"minor\"] = \"Stats\"\nd.keys()\n#> dict_keys(['name', 'year', 'minor'])",
+    "comment": "**Why / when:** Curly braces with `key: value` pairs. `d[key]` gets a value; `d[key] = value` adds or changes one.\n\n**R version:** `list(name = ...)`, `l$name`, `names(l)`\n\n**Watch out:** A key that isn't there: KeyError.\n\n**From:** Py 15",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p15",
+    "label": "{ } set / set(list) · unique values",
+    "question": "Use it when: Remove duplicates or count unique values in Python.\n\nSearch words: python set, unique values, remove duplicates, distinct, count unique, how many different",
+    "code": "set([3, 1, 3, 2, 1])\n#> {1, 2, 3}\nlen(set([3, 1, 3, 2, 1]))\n#> 3",
+    "comment": "**Why / when:** A set keeps one copy of each value and has no order.\n\n**R version:** `unique()`, `length(unique(x))`\n\n**Watch out:** `{}` alone is an empty dict; use `set()`. Sets can't be indexed with `[0]`.\n\n**From:** Py 15",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p16",
+    "label": ".union() .intersection() .difference() · set operations",
+    "question": "Use it when: Values in both groups, in either group, or only in one.\n\nSearch words: python union, intersection, difference, in both, in either, only in one, setdiff, intersect, common elements",
+    "code": "a = {1, 2, 3, 4}\nb = {3, 4, 5}\na.intersection(b)\n#> {3, 4}\na.union(b)\n#> {1, 2, 3, 4, 5}\na.difference(b)\n#> {1, 2}",
+    "comment": "**Why / when:** Same meaning as in math class.\n\n**R version:** `intersect()`, `union()`, `setdiff()`\n\n**From:** Py 15",
+    "key": false,
+    "lang": "python"
    }
   ]
  },

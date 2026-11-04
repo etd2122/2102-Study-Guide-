@@ -13,7 +13,7 @@
   --paper:#f4f7fb; --panel:#ffffff; --ink:#152033; --muted:#5a6677; --line:#d9e0ea;
   --accent:#1f5fae; --accent-ink:#ffffff; --accent-soft:#e2ecf8; --mark:#f6dc5c; --mark-ink:#3a2f00;
   --code-bg:#eef2f8; --danger:#b3261e; --danger-soft:#fbe7e5;
-  --t-hw:#1f5fae; --t-rec:#257a5c; --t-lec:#55617a; --t-prac:#a5610f; --t-kit:#7a3fa0; --t-core:#b3332b; --t-test:#0f7c86;
+  --t-hw:#1f5fae; --t-rec:#257a5c; --t-lec:#55617a; --t-prac:#a5610f; --t-kit:#7a3fa0; --t-core:#b3332b; --t-test:#0f7c86; --t-py:#7a6400;
   --hl-kw:#8a2f9e; --hl-str:#2b7a2b; --hl-num:#b3541e; --hl-com:#7a8496; --hl-fn:#1f5fae;
   color-scheme:light;
   --display:"Familjen Grotesk","Helvetica Neue",Arial,sans-serif;
@@ -58,7 +58,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .item .tag{font-family:var(--mono);font-size:12px;font-weight:600;font-variant-numeric:tabular-nums}
 .item .t{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .item .meta{grid-column:2;font-size:12px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap}
-.tc-core{color:var(--t-core)}.tc-test{color:var(--t-test)}.tc-kit{color:var(--t-kit)}.tc-hw{color:var(--t-hw)}.tc-rec{color:var(--t-rec)}.tc-lec{color:var(--t-lec)}.tc-prac{color:var(--t-prac)}
+.tc-core{color:var(--t-core)}.tc-test{color:var(--t-test)}.tc-kit{color:var(--t-kit)}.tc-hw{color:var(--t-hw)}.tc-rec{color:var(--t-rec)}.tc-lec{color:var(--t-lec)}.tc-prac{color:var(--t-prac)}.tc-py{color:var(--t-py)}
 .side-foot{margin-top:auto;font-size:12px;color:var(--muted)}
 .savebox{border:1px solid var(--mark);background:var(--panel);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px;font-size:13px}
 .savebox b{font-family:var(--display);font-size:15px}
@@ -311,8 +311,8 @@ textarea.mono{font-family:var(--mono);font-size:13px;background:var(--code-bg)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
 <script>
 (function(){
-const TYPES={core:{label:'Must-know',short:'Core'},test:{label:'Practice tests',short:'Test'},kit:{label:'Everyday code',short:'Kit'},hw:{label:'Homework',short:'HW'},rec:{label:'Recitation',short:'Rec'},lec:{label:'Lecture',short:'Lec'},prac:{label:'Exam review',short:'Rev'}};
-const TYPE_ORDER=['core','kit','prac','test','hw','rec','lec'];
+const TYPES={core:{label:'Must-know',short:'Core'},test:{label:'Practice tests',short:'Test'},kit:{label:'Everyday code',short:'Kit'},hw:{label:'Homework',short:'HW'},rec:{label:'Recitation',short:'Rec'},lec:{label:'R lectures',short:'Lec'},py:{label:'Python lectures',short:'Py'},prac:{label:'Exam review',short:'Rev'}};
+const TYPE_ORDER=['py','core','kit','prac','test','hw','rec','lec'];
 const EXAMS=['Midterm 1','Midterm 2','Final'];
 
 let canWrite=true; const localUrls={};
@@ -332,7 +332,7 @@ function groupState(){try{return JSON.parse(localStorage.getItem(LS_GROUPS)||'{}
 function groupOpen(t){
   if(query||filterType!=='all')return true;
   const st=groupState(); if(st[t]!==undefined)return st[t];
-  return t==='hw' || !!(curId&&entries[curId]&&entries[curId].type===t);
+  return t==='hw' || t==='py' || !!(curId&&entries[curId]&&entries[curId].type===t);
 }
 const isPrac=c=>/-prac$/.test(c.id||'')||/(^|· )Practice\b/.test(c.label||'');
 const isAlt=c=>/-sol2$/.test(c.id||'')||/Solution #2/.test(c.label||'');
@@ -511,8 +511,14 @@ function entryHTML(id,e){
 function fileHTML(f){
   const isImg=(f.type||'').startsWith('image/');
   const url=fileUrl(f), open=openPreviews.has(f.name);
-  if(/\.(csv|rmd|r|qmd)$/i.test(f.name)||f.type==='text/csv') return `<div class="file"><div class="file-row">
-    <span class="file-ic">${/\.csv$/i.test(f.name)?'CSV':/\.r$/i.test(f.name)?'R':'RMD'}</span>
+  if(/\.html?$/i.test(f.name)) return `<div class="file"><div class="file-row">
+    <span class="file-ic">WEB</span>
+    <span class="file-name" title="${esc(f.name)}">${esc(f.name)}</span>
+    <span class="file-size">${f.size?fmtSize(f.size):''}</span>
+    <a class="btn sm" href="${url}" target="_blank" rel="noopener">Open slides</a>
+  </div></div>`;
+  if(/\.(csv|rmd|r|qmd|py)$/i.test(f.name)||f.type==='text/csv') return `<div class="file"><div class="file-row">
+    <span class="file-ic">${/\.csv$/i.test(f.name)?'CSV':/\.r$/i.test(f.name)?'R':/\.py$/i.test(f.name)?'PY':'RMD'}</span>
     <span class="file-name" title="${esc(f.name)}">${esc(f.name)}</span>
     <span class="file-size">${f.size?fmtSize(f.size):''}</span>
     <a class="btn sm" href="${url}" download="${esc(f.name)}">Download</a>
@@ -547,7 +553,7 @@ function codeSectionHTML(e,chunks){
   </section>`;
   }
   const tab=tabFor===curId?entryTab:'ans';
-  const first=e.type==='lec'?'Lecture code':(e.type==='hw'||e.type==='rec')?'Answers':'Code';
+  const first=(e.type==='lec'||e.type==='py')?'Lecture code':(e.type==='hw'||e.type==='rec')?'Answers':'Code';
   const nMain=ans.filter(([c])=>!isAlt(c)).length;
   return `<section class="block" id="codeTabs">
     <div class="tabs" role="tablist">
@@ -584,7 +590,7 @@ function chunkHTML(c,i,opt){
   return `<div class="chunk ${c.key?'key':''}" id="ch-${i}">
     <div class="chunk-code">
       <div class="chunk-bar"><span class="lbl" title="${esc(c.label||'')}">${esc(lbl)}</span>${c.key?'<span class="star">Exam</span>':''}<button class="btn sm ghost" type="button" data-act="copy" data-i="${i}">Copy</button></div>
-      <pre><code class="language-r">${esc(c.code||'')}</code></pre>
+      <pre><code class="language-${c.lang||'r'}">${esc(c.code||'')}</code></pre>
     </div>
     <div class="chunk-side">${c.question&&!opt.noQ?`<div class="chunk-q"><span class="label">Question</span>${esc(c.question)}</div>`:''}
     <div class="chunk-note ${c.comment?'':'none'}"><span class="label">My comment</span>${c.comment?`<div class="prose">${md(c.comment)}</div>`:'No comment on this chunk.'}</div></div>
@@ -838,7 +844,7 @@ function errCard(x){
     <div class="prose"><p><b>What it means:</b> ${mdInline(esc(x.means))}</p>
     <p><b>Usual causes:</b></p><ul>${x.causes.map(c=>'<li>'+mdInline(esc(c))+'</li>').join('')}</ul>
     <p><b>Fix:</b> ${mdInline(esc(x.fix))}</p></div>
-    ${x.wrong||x.right?`<div class="err-pair"><div class="bad"><span class="lab">Causes it</span><pre><code class="language-r">${esc(x.wrong||'')}</code></pre></div><div class="good"><span class="lab">Fixed</span><pre><code class="language-r">${esc(x.right||'')}</code></pre></div></div>`:''}
+    ${x.wrong||x.right?`<div class="err-pair"><div class="bad"><span class="lab">Causes it</span><pre><code class="language-${/^py-/.test(x.id)?'python':'r'}">${esc(x.wrong||'')}</code></pre></div><div class="good"><span class="lab">Fixed</span><pre><code class="language-${/^py-/.test(x.id)?'python':'r'}">${esc(x.right||'')}</code></pre></div></div>`:''}
     ${i>=0?`<div><button class="btn sm" type="button" data-act="goto" data-eid="${esc(x.see[0])}" data-i="${i}">See it in ${esc(tagOf(entries[x.see[0]]))}: ${esc(x.see[1])} →</button></div>`:''}
   </div>`;
 }
@@ -928,7 +934,7 @@ function quizHTML(){
         <button class="btn sm" type="button" data-act="q-note">${quizShow.note?'Hide explanation':'Show the explanation'}</button>
       </div>
       ${quizShow.hint?`<div class="needs"><span class="label">This question needs</span><div class="need-list">${sk.length?sk.map((k,n)=>`<span class="need"><span class="need-n">${n+1}</span>${esc(k.label)}</span>`).join(''):'<span class="hint">No standard pattern detected. Think: what goes in, what comes out, loop or not?</span>'}</div></div>`:''}
-      ${quizShow.code?`<span class="quiz-from tc-${esc(e.type)}">From ${esc(tagOf(e))} · ${esc(e.title)} · ${esc(c.label||'')}</span><pre><code class="language-r">${esc(c.code)}</code></pre>`:''}
+      ${quizShow.code?`<span class="quiz-from tc-${esc(e.type)}">From ${esc(tagOf(e))} · ${esc(e.title)} · ${esc(c.label||'')}</span><pre><code class="language-${c.lang||'r'}">${esc(c.code)}</code></pre>`:''}
       ${quizShow.note?`<div class="prose">${c.comment?md(c.comment):'<p class="empty-line">No explanation on this one.</p>'}</div>`:''}
       <div class="quiz-bar">
         <button class="btn sm primary" type="button" data-act="q-got">I got it</button>
@@ -980,27 +986,27 @@ let ffCache=null;
 function ffCards(){
   if(ffCache&&ffCache.v===Object.keys(entries).length)return ffCache.cards;
   const cards=[];
-  for(const eid of ['kit-02','kit-03']){
+  for(const eid of ['kit-02','kit-03','kit-04']){
     const e=entries[eid]; if(!e)continue;
     (e.chunks||[]).forEach((c,i)=>{
       const m=(c.question||'').match(/Search words:\s*([\s\S]*)$/);
       const lab=(c.label||'').split(' · ');
       const phrases=[...(m?m[1].split(','):[]), lab[1]||'', (lab[0]||'').replace(/[()\/]/g,' ')].map(ffTok).filter(x=>x.length);
       const all=new Set(phrases.flat().concat(ffTok(c.question||'')));
-      cards.push({eid,i,label:c.label,phrases,all,tidy:eid==='kit-03'});
+      cards.push({eid,i,label:c.label,phrases,all,tidy:eid==='kit-03',py:eid==='kit-04'});
     });
   }
   ffCache={v:Object.keys(entries).length,cards}; return cards;
 }
 function findFunctions(q,max){
   const qt=[...new Set(ffTok(q))]; if(!qt.length)return [];
-  const wantsTidy=/tidyverse|dplyr|tidyr|ggplot|pipe|%>%|\|>/.test(q.toLowerCase()), wantsBase=/base r|\bbase\b/.test(q.toLowerCase());
+  const wantsTidy=/tidyverse|dplyr|tidyr|ggplot|pipe|%>%|\|>/.test(q.toLowerCase()), wantsBase=/base r|\bbase\b/.test(q.toLowerCase()), wantsPy=/python|\bpy\b|pandas|numpy|\bdict|\btuple/.test(q.toLowerCase());
   const scored=ffCards().map(c=>{
     const cov=qt.filter(t=>c.all.has(t)).length/qt.length;
     let best=0;
     for(const p of c.phrases){const hit=p.filter(t=>qt.includes(t)).length; if(hit){const f=hit/p.length*(0.6+0.4*Math.min(hit,3)/3); if(f>best)best=f;}}
     let sc=cov*2+best;
-    if(wantsTidy&&c.tidy)sc+=0.35; if(wantsBase&&!c.tidy)sc+=0.35;
+    if(wantsTidy&&c.tidy)sc+=0.35; if(wantsBase&&!c.tidy&&!c.py)sc+=0.35; if(c.py)sc+=wantsPy?0.5:-0.7; else if(wantsPy)sc-=0.35;
     return {...c,sc,cov,best};
   }).filter(c=>c.cov>=0.5&&c.best>0).sort((a,b)=>b.sc-a.sc);
   if(!scored.length)return [];

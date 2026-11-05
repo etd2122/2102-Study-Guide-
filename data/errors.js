@@ -67,6 +67,14 @@ window.R_ERRORS = [
   fix:"The first element is `x[0]` and the last is `x[-1]` or `x[len(x) - 1]`.",
   wrong:"scores = [88, 92, 79, 95, 60]\nscores[5]", right:"scores[4]    # or scores[-1]", see:['py-15','Indexing lists: [0] is the first element (beyond the slides)'] },
 
+{ id:'py-broadcast', match:"could not be broadcast together", kind:'Error',
+  title:"ValueError: operands could not be broadcast together (NumPy)",
+  means:"Two arrays have shapes NumPy can't line up for element-by-element math.",
+  causes:["A flat array like `np.array([1, 2, 3])` combined with a 3 × 2 matrix: NumPy lines up the **last** dimension (2 vs 3).",
+          "Arrays of different lengths, like 5 values minus 4 values."],
+  fix:"Print `.shape` of both. To apply to every row use a 1-row array `np.array([[a, b]])`; for every column use a 1-column array `np.array([[a], [b], [c]])`.",
+  wrong:"demo1 - np.array([1, 2, 3])       # demo1 is 3 x 2", right:"demo1 - np.array([[1], [2], [3]])  # 3 x 1 column", see:['py-16','Broadcasting: arrays with numbers, rows and columns'] },
+
 { id:'py-key', match:"KeyError", kind:'Error',
   title:"KeyError: 'name' (Python)",
   means:"That key isn't in the dictionary.",

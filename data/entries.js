@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-11-04T17:40:00Z";
+window.ENTRIES_SAVED = "2026-11-05T03:20:00Z";
 window.ENTRIES = {
  "py-14": {
   "type": "py",
@@ -370,7 +370,7 @@ window.ENTRIES = {
     "id": "py-15-prac4",
     "label": "Practice 4 · Sets: two class rosters",
     "question": "Two rosters: stat = Ana, Ben, Cara, Dev, Eli and econ = Ben, Dev, Fay, Gus. Who is in both classes, who is only in stat, and how many different students are there in total?",
-    "code": "stat = {\"Ana\", \"Ben\", \"Cara\", \"Dev\", \"Eli\"}\necon = {\"Ben\", \"Dev\", \"Fay\", \"Gus\"}\nstat.intersection(econ)          # in both classes\n#> {'Dev', 'Ben'}\nstat.difference(econ)            # only in stat\n#> {'Eli', 'Cara', 'Ana'}\nstat.union(econ)                 # everyone\n#> {'Dev', 'Ben', 'Fay', 'Eli', 'Gus', 'Ana', 'Cara'}\nlen(stat.union(econ))\n#> 7",
+    "code": "stat = {\"Ana\", \"Ben\", \"Cara\", \"Dev\", \"Eli\"}\necon = {\"Ben\", \"Dev\", \"Fay\", \"Gus\"}\nstat.intersection(econ)          # in both classes\n#> {'Ben', 'Dev'}\nstat.difference(econ)            # only in stat\n#> {'Cara', 'Eli', 'Ana'}\nstat.union(econ)                 # everyone\n#> {'Eli', 'Dev', 'Cara', 'Ben', 'Ana', 'Gus', 'Fay'}\nlen(stat.union(econ))\n#> 7",
     "comment": "Matches **Sets**. Sets print in no particular order, so your output may list the names in a different order. That's fine, the contents are the same.",
     "key": false,
     "lang": "python"
@@ -381,6 +381,268 @@ window.ENTRIES = {
     "question": "raw = \"  emmy DAVIS \". Remove the extra spaces, capitalize it as \"Emmy Davis\", then pull out just the last name.",
     "code": "raw = \"  emmy DAVIS \"\nclean = raw.strip().title()\nclean\n#> 'Emmy Davis'\nclean.split(\" \")\n#> ['Emmy', 'Davis']\nclean.split(\" \")[1]          # last name\n#> 'Davis'\nlen(clean)\n#> 10",
     "comment": "Matches **Methods**. Methods can be chained left to right: `.strip()` removes the outer spaces, then `.title()` capitalizes each word. `.split(\" \")` returns a list, so `[1]` picks the second word.",
+    "key": false,
+    "lang": "python"
+   }
+  ]
+ },
+ "py-16": {
+  "type": "py",
+  "num": "16",
+  "title": "Indexing, copies and NumPy arrays",
+  "date": "",
+  "exams": [],
+  "topics": [
+   "indexing",
+   "insert",
+   "update",
+   "copy",
+   "bool",
+   "numpy",
+   "np.array",
+   "shape",
+   "dtype",
+   "random",
+   "nan",
+   "axis",
+   "broadcasting",
+   "views"
+  ],
+  "pdfs": [
+   {
+    "name": "Lecture16.qmd",
+    "size": 9211,
+    "type": "text/plain"
+   }
+  ],
+  "notes": "Professor Goodrich's **Lecture16.qmd** (\"Indexing in Python\"; Lecture 17 on the course schedule, NumPy). The first half finishes containers (subsetting, changing, copying); the second half starts **NumPy**, which brings R-style vectors and matrices to Python. Every output below came from running the code; the random-number chunks set a seed so they're reproducible (the slides don't).\n\n**Textbook:** [Chapter 3](https://wesmckinney.com/book/python-builtin.html) (lists, dicts, copies) and [Chapter 4, NumPy Basics](https://wesmckinney.com/book/numpy-basics.html) of *Python for Data Analysis*.\n\n| R | Python / NumPy |\n|---|---|\n| `x[1]` | `x[0]` |\n| `y <- x` (a copy) | `y = x.copy()` (`y = x` is the **same** list) |\n| `c(1, 2, 3) * 10` | `np.array([1, 2, 3]) * 10` |\n| `matrix(1:6, ncol = 2, byrow = TRUE)` | `np.array([[1, 2], [3, 4], [5, 6]])` |\n| `dim(m)` | `m.shape` |\n| `m[3, 2]`, `m[, 1]` | `m[2, 1]`, `m[:, 0]` |\n| `m[m[, 1] < 2, ]` | `m[m[:, 0] < 2, :]` |\n| `rnorm(100)` | `np.random.normal(0, 1, 100)` |\n| `NA`, `is.na()` | `np.nan`, `np.isnan()` |\n| `apply(m, 2, sum)` | `m.sum(axis=0)` |\n| `t(m)`, `m %*% n` | `m.T`, `m @ n` |",
+  "takeaways": [
+   "Lists by position (from 0), dicts by key only.",
+   ".insert(), .append(), .update() change the object in place and return None.",
+   "y = x does NOT copy a list, dict or array: use .copy().",
+   "Empty things (0, '', [], {}) are False.",
+   "NumPy arrays do element-by-element math like R vectors; one type per array.",
+   "[row, col] from 0; a bare : means all; filter rows with a True/False array.",
+   "axis=0 gives one answer per column, axis=1 per row (opposite of R's apply).",
+   "nan spreads through math; np.isnan() and np.nanmean() handle it.",
+   "Broadcasting matches shapes: a 1-row array applies to every row.",
+   "An array slice is a view: changing it changes the original."
+  ],
+  "updatedAt": "2026-11-05T03:20:00Z",
+  "chunks": [
+   {
+    "id": "py-16-pos",
+    "label": "Subsetting by position: [0], [1], [0:]",
+    "question": "",
+    "code": "full_name = [\"Benjamin\", \"Goodrich\"]\nfull_name[0]\n#> 'Benjamin'\nfull_name[1]\n#> 'Goodrich'\nfull_name[0:]      # from position 0 to the end\n#> ['Benjamin', 'Goodrich']",
+    "comment": "A list or tuple is subset by position with **square brackets**, and **Python starts counting at 0** (R starts at 1).\n\n| Python | Means | R |\n|---|---|---|\n| `x[0]` | first | `x[1]` |\n| `x[1]` | second | `x[2]` |\n| `x[0:]` | position 0 to the end (everything) | `x` |\n| `x[1:]` | everything except the first | `x[-1]` |\n| `x[-1]` | last | `x[length(x)]` |\n\nA slice `[a:b]` stops **before** b; leave a number out to mean \"from the start\" or \"to the end\".",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-key",
+    "label": "Subsetting a dict by key, not by position",
+    "question": "",
+    "code": "my_dict = {\"an integer\": 2, \"a bool\": -2.35 > 0, \"a list\": full_name}\nmy_dict[\"a list\"]\n#> ['Benjamin', 'Goodrich']\nmy_dict[0]\n#> KeyError: 0",
+    "comment": "A `dict` is subset by **key**, never by position: `my_dict[0]` looks for a key that is the number 0, finds none, and gives `KeyError: 0`.\n\nLike `my_list[[\"a list\"]]` or `my_list$\"a list\"` in R, except R would also let you use a position.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-modify",
+    "label": "Changing lists and dicts: .insert(), x[i] =, .update()",
+    "question": "",
+    "code": "full_name.insert(1, 'King')   # put 'King' at position 1; not possible with a tuple\nprint(full_name)\n#> ['Benjamin', 'King', 'Goodrich']\nfull_name[0] = \"Ben\"           # replace by position\nfull_name\n#> ['Ben', 'King', 'Goodrich']\nmy_dict.update({\"a float\": -2.35})   # add (or replace) keys\nmy_dict\n#> {'an integer': 2, 'a bool': False, 'a list': ['Ben', 'King', 'Goodrich'], 'a float': -2.35}",
+    "comment": "Lists change by **position**, dicts by **key**:\n\n| Want | list | dict |\n|---|---|---|\n| replace one | `x[0] = \"Ben\"` | `d[\"a bool\"] = True` |\n| add | `x.append(v)` (end), `x.insert(i, v)` (at position i) | `d[\"new\"] = v` or `d.update({\"new\": v})` |\n\n`.insert(1, 'King')` puts the new value **at** position 1 and shifts the rest right.\n\n**Watch out:** `full_name` is inside `my_dict`, so `my_dict[\"a list\"]` now shows `['Ben', 'King', 'Goodrich']` too. It's the same list, not a copy (see **Shallow vs deep copies**).\n\nThese methods change the object **in place** and return nothing: `full_name = full_name.insert(1, 'King')` would leave `full_name` as `None`.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-listmath",
+    "label": "\"Math\" on containers: + joins lists, * on a dict fails",
+    "question": "",
+    "code": "full_name + full_name\n#> ['Ben', 'King', 'Goodrich', 'Ben', 'King', 'Goodrich']\n2 * my_dict      # a dict has no order to repeat\n#> TypeError: unsupported operand type(s) for *: 'int' and 'dict'",
+    "comment": "`+` on two lists **joins** them, and `*` repeats a list. A dict has no ordering, so `2 * my_dict` gives `TypeError: unsupported operand type(s) for *: 'int' and 'dict'`.\n\nFor real element-by-element math, use **NumPy arrays** (below).",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-copy",
+    "label": "Shallow vs. deep copies: y = x doesn't copy a list",
+    "question": "",
+    "code": "x = [1, -2, 3]\ny = x\ny[0] = 2\nprint(\"x is \", x)\n#> x is  [2, -2, 3]\nprint(\"y is \", y)\n#> y is  [2, -2, 3]\n\nx = [1, -2, 3]\ny = x.copy()\ny[0] = 2\nprint(\"x = \", x)\n#> x =  [1, -2, 3]\nprint(\"y = \", y)\n#> y =  [2, -2, 3]",
+    "comment": "**What happened:** `y = x` doesn't make a new list. It gives the **same** list a second name, so changing `y` changes `x` too. **R does not behave like this:** in R, `y <- x` makes an independent copy.\n\n**To get a separate list, use `.copy()`** (or `list(x)` or `x[:]`). Then changing `y` leaves `x` alone.\n\nThis applies to anything that can change: lists, dicts, sets and NumPy arrays. Numbers and strings can't be changed in place, so `b = a` is always safe for them.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-bool",
+    "label": "Checking for emptiness: empty values are False",
+    "question": "",
+    "code": "bool(-1)\n#> True\nbool(1e10)\n#> True\nbool(0)\n#> False\nbool('hello')\n#> True\nbool('')\n#> False\nbool(my_dict)\n#> True\nbool([])\n#> False\nbool({})\n#> False",
+    "comment": "`bool()` turns **\"empty\" values into `False` and everything else into `True`**: `0`, `''`, `[]`, `{}` and `set()` are False; any other number, string or container is True. Most languages would throw an error here (like `int(\"abc\")`); Python treats it as a feature.\n\nThat's why you'll see code like:\n\n```python\nif my_list:          # \"if the list isn't empty\"\n    print(my_list[0])\n```\n\nIn R you'd write `if (length(my_list) > 0)`.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-np-why",
+    "label": "Why NumPy: arrays do math element by element",
+    "question": "",
+    "code": "num_list = [1, 2, 3]\nnum_list + num_list          # list: joins\n#> [1, 2, 3, 1, 2, 3]\n\nimport numpy as np\ndemo0 = np.array(num_list)\ndemo0 + demo0                # array: adds element by element\n#> array([2, 4, 6])\ndemo0 * 10\n#> array([10, 20, 30])\ndemo0.sum(), demo0.mean()\n#> (np.int64(6), np.float64(2.0))",
+    "comment": "**NumPy** gives Python fast arrays and matrices: a data type (`np.array`) plus many functions that work very fast on it. Convention: `import numpy as np`, then everything starts with `np.`.\n\nA NumPy array behaves like an **R vector**: `demo0 + demo0` adds element by element, and `demo0 * 10` multiplies every element, like `c(1, 2, 3) * 10` in R.\n\nOutput shows `array([2, 4, 6])` and `np.int64(6)`: that's NumPy labeling its types. `print(demo0 + demo0)` shows just `[2 4 6]`.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-np-2d",
+    "label": "2D arrays (matrices): np.array([[...], [...]]) and .shape",
+    "question": "",
+    "code": "demo1 = np.array([[1, 2], [3, 4], [5, 6]])\ndemo1\n#> array([[1, 2],\n#>        [3, 4],\n#>        [5, 6]])\ndemo1.shape          # (rows, columns)\n#> (3, 2)",
+    "comment": "A 2D array is a **matrix**: rows and columns, one basic value in each cell. Build it from a **list of lists**: each inner list becomes a **row** (stacked by rows).\n\n`.shape` gives `(rows, columns)`, like `dim()` in R. R version: `matrix(1:6, ncol = 2, byrow = TRUE)`.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-np-random",
+    "label": "Random numbers: np.random.normal(loc, scale, size)",
+    "question": "",
+    "code": "np.random.seed(2102)    # same numbers every run, like set.seed()\ndemo2 = np.random.normal(loc=0, scale=1, size=(100, 2))\ndemo2.shape\n#> (100, 2)\ndemo2[:3]               # first 3 rows\n#> array([[ 1.21924816, -1.42770921],\n#>        [ 1.51882467,  0.85776432],\n#>        [ 0.50809349,  0.32167986]])",
+    "comment": "`np.random.normal(loc=mean, scale=sd, size=...)` is `rnorm()`: here 200 draws from Normal(0, 1), arranged as 100 rows × 2 columns.\n\n| NumPy | R |\n|---|---|\n| `np.random.normal(0, 1, size=100)` | `rnorm(100, 0, 1)` |\n| `np.random.seed(2102)` | `set.seed(2102)` |\n\nThe slides don't set a seed, so your numbers will differ from anyone else's unless you add `np.random.seed()` first.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-np-make",
+    "label": "More constructors: np.zeros(), np.ones(), np.arange(), np.loadtxt()",
+    "question": "",
+    "code": "demo3 = np.zeros((3, 2))       # 3 x 2 of zeros\ndemo3\n#> array([[0., 0.],\n#>        [0., 0.],\n#>        [0., 0.]])\nnp.ones(4)\n#> array([1., 1., 1., 1.])\ndemo5 = np.arange(0, 1, 0.1)\nprint(demo5)                   # 1 itself is NOT included\n#> [0.  0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9]\nnp.arange(1, 11)               # like 1:10 in R\n#> array([ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10])\n# demo4 = np.loadtxt(\"demo.csv\", delimiter=\",\")   # read a CSV of numbers",
+    "comment": "| NumPy | Makes | R |\n|---|---|---|\n| `np.zeros((3, 2))` | 3×2 of 0s (note the double parentheses: the shape is a tuple) | `matrix(0, 3, 2)` |\n| `np.ones(4)` | four 1s | `rep(1, 4)` |\n| `np.arange(0, 1, 0.1)` | 0 to 1 by 0.1, **stopping before 1** | `seq(0, 0.9, by = 0.1)` |\n| `np.arange(1, 11)` | 1 to 10 | `1:10` |\n| `np.loadtxt(\"demo.csv\", delimiter=\",\")` | read a numeric CSV from your working directory | `read.csv()` |\n\nSame rule as slicing: the top value isn't included.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-np-dtype",
+    "label": "Arrays are homogeneous: .dtype and .shape",
+    "question": "",
+    "code": "demo2.dtype\n#> dtype('float64')\ndemo2.shape\n#> (100, 2)\nnp.array([1, 2, 3]).dtype\n#> dtype('int64')\nnp.array([1, 2.5]).dtype       # one decimal makes them all floats\n#> dtype('float64')\nnp.array([1, \"a\"])             # one string makes them all strings\n#> array(['1', 'a'], dtype='<U21')",
+    "comment": "**Every element of a NumPy array has the same type**, unlike lists, dicts and tuples. That restriction is what makes arrays so fast.\n\n- `.dtype` is the element type: `int64`, `float64`, `bool` or a string type like `<U21`.\n- `.shape` is `(rows, columns)`.\n\nLike an R vector, a mix gets converted to the most general type: `c(1, \"a\")` in R becomes all character too.\n\n`.dtype` and `.shape` have **no parentheses**: they're attributes (stored facts), not methods.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-np-index",
+    "label": "Subsetting arrays by position: [row, col]",
+    "question": "",
+    "code": "demo1\n#> array([[1, 2],\n#>        [3, 4],\n#>        [5, 6]])\ndemo1[2, 1]      # 3rd row, 2nd column\n#> np.int64(6)\ndemo1[1:, 1]     # rows 2 to the end, 2nd column\n#> array([4, 6])\ndemo1[:1, 0]     # first row only, 1st column\n#> array([1])\ndemo1[:, 0]      # every row, 1st column\n#> array([1, 3, 5])\ndemo1[0, :]      # 1st row, every column\n#> array([1, 2])",
+    "comment": "Same square brackets, now with **`[row, column]`**, counting from 0:\n\n| NumPy | Means | R |\n|---|---|---|\n| `demo1[2, 1]` | row 3, column 2 | `demo1[3, 2]` |\n| `demo1[:, 0]` | column 1 | `demo1[, 1]` |\n| `demo1[0, :]` | row 1 | `demo1[1, ]` |\n| `demo1[1:, 1]` | rows 2 to end, column 2 | `demo1[2:3, 2]` |\n\nA bare `:` means \"all\" (where R leaves the spot empty). `[:1, 0]` stops before row 1, so it's just row 0.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-np-boolidx",
+    "label": "Subsetting arrays by bool: keep rows that meet a condition",
+    "question": "",
+    "code": "small_col1 = demo1[:, 0] < 2      # True/False for each row\nsmall_col1\n#> array([ True, False, False])\ndemo1[small_col1, :]              # rows where column 1 < 2\n#> array([[1, 2]])\ndemo1[demo1[:, 1] > 3, :]         # rows where column 2 > 3, in one step\n#> array([[3, 4],\n#>        [5, 6]])",
+    "comment": "Put a True/False array where the row number goes, and you keep the rows that are `True`. The bool array must have one value per row.\n\nR version: `demo1[demo1[, 1] < 2, ]`. Same idea as `filter()` in dplyr.\n\nCombine conditions with `&` and `|` and **parentheses**: `demo1[(demo1[:, 0] > 1) & (demo1[:, 1] < 6), :]`. Inside NumPy, `and`/`or` don't work on arrays.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-np-special",
+    "label": "Special values: np.inf and np.nan",
+    "question": "",
+    "code": "1 / np.inf\n#> 0.0\n2 + np.inf\n#> inf\nnp.inf - np.inf          # undefined, so nan\n#> nan\n\nnp.nan * 2\n#> nan\nnp.nan + 1\n#> nan\nnan_demo = [2, np.nan, 5, -3]\nmax(nan_demo)            # built-in max: unreliable with nan\n#> 5\nnp.max(nan_demo)         # NumPy: nan spreads\n#> np.float64(nan)\nnp.nanmax(nan_demo)      # skip the nan\n#> np.float64(5.0)\nnp.isnan(nan_demo)\n#> array([False,  True, False, False])",
+    "comment": "| NumPy | Means | R |\n|---|---|---|\n| `np.inf` | infinity | `Inf` |\n| `np.nan` | missing / not a number | `NA` / `NaN` |\n| `np.isnan(x)` | which are missing | `is.na(x)` |\n| `np.nanmax(x)`, `np.nanmean(x)` | ignore missing | `max(x, na.rm = TRUE)` |\n\n**Any math with `nan` gives `nan`**, like `NA` in R, so missing values are obvious.\n\n**Watch out:** the slide says built-in `max()` ignores nans, but it only works here by luck: `max()` compares in order and every comparison with nan is False, so the result depends on where the nan sits (`max([np.nan, 2, 5])` gives `nan`). Use `np.nanmax()` when you mean \"ignore missing\".",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-np-methods",
+    "label": "Common methods: .reshape(), .sum(), .T, .dot()",
+    "question": "",
+    "code": "demo1.reshape(2, 3)       # same 6 numbers, 2 rows x 3 columns (filled by row)\n#> array([[1, 2, 3],\n#>        [4, 5, 6]])\ndemo1.reshape(2, -1)      # -1: NumPy works out the 3\n#> array([[1, 2, 3],\n#>        [4, 5, 6]])\ndemo1.sum()\n#> np.int64(21)\ndemo1.T                   # transpose\n#> array([[1, 3, 5],\n#>        [2, 4, 6]])\ndemo1.T.dot(demo1)        # matrix product, chained\n#> array([[35, 44],\n#>        [44, 56]])",
+    "comment": "| NumPy | Does | R |\n|---|---|---|\n| `a.reshape(2, 3)` | new shape, same values, read and filled **row by row** | `matrix(t(a), 2, 3, byrow = TRUE)` |\n| `a.reshape(2, -1)` | \"-1\": figure out that dimension so no data is lost | |\n| `a.sum()` | total of everything | `sum(a)` |\n| `a.T` | transpose | `t(a)` |\n| `a.dot(b)` | matrix multiplication | `a %*% b` |\n\n**Notice the order:** NumPy fills row by row; R's `matrix()` fills column by column unless you say `byrow = TRUE`.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-np-funcs",
+    "label": "Other NumPy functions: matmul, hstack/vstack, isnan, where, logical_not",
+    "question": "",
+    "code": "np.matmul(demo1.T, demo1)            # same as demo1.T @ demo1\n#> array([[35, 44],\n#>        [44, 56]])\nnp.hstack([np.array([1, 2]), np.array([3, 4])])\n#> array([1, 2, 3, 4])\nnp.vstack([np.array([1, 2]), np.array([3, 4])])\n#> array([[1, 2],\n#>        [3, 4]])\nnp.isinf(np.array([1, np.inf]))\n#> array([False,  True])\nnp.where(np.array([1, 2, 3]) > 2)    # positions that are True\n#> (array([2]),)\nnp.logical_not(np.array([True, False]))\n#> array([False,  True])",
+    "comment": "| NumPy | Does | R |\n|---|---|---|\n| `np.matmul(a, b)` or `a @ b` | matrix multiplication | `a %*% b` |\n| `np.hstack([a, b])` | join side by side | `c(a, b)` / `cbind()` |\n| `np.vstack([a, b])` | stack as rows | `rbind(a, b)` |\n| `np.isnan()`, `np.isinf()` | find nan / inf | `is.na()`, `is.infinite()` |\n| `np.where(cond)` | positions where True | `which(cond)` |\n| `np.logical_not(b)` | flip True/False | `!b` |\n\n`np.where()` gives **0-based** positions: `(array([2]),)` means position 2, the third element.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-np-apply",
+    "label": "Summaries by column or row: np.apply_along_axis() and axis=",
+    "question": "",
+    "code": "col_sum = np.apply_along_axis(np.sum, 0, demo2)\nprint(col_sum)                      # one total per column\n#> [ 9.79243281 -3.19837817]\ndemo2.sum(axis=0)                   # same thing, shorter\n#> array([ 9.79243281, -3.19837817])\ndemo2.mean(axis=0)                  # column means\n#> array([ 0.09792433, -0.03198378])\nnp.apply_along_axis(np.sum, 1, demo2)[:5]   # row totals (first 5)\n#> array([-0.20846105,  2.37658899,  0.82977335,  0.43956971,  0.30391348])",
+    "comment": "Same summary for every column or row, without a loop: like `apply(X, 2, sum)` in R.\n\n**Which axis is which?** `.shape` is `(rows, columns)`: position **0 is rows**, so `axis=0` works **down** the rows and gives **one answer per column**. `axis=1` gives one answer per row.\n\n| NumPy | R |\n|---|---|\n| `np.apply_along_axis(np.sum, 0, X)` or `X.sum(axis=0)` | `apply(X, 2, sum)` / `colSums(X)` |\n| `X.mean(axis=0)` | `colMeans(X)` |\n| `np.apply_along_axis(np.sum, 1, X)` | `apply(X, 1, sum)` / `rowSums(X)` |\n\n**Watch out:** the axis numbers are the **opposite** of R's `MARGIN` (R uses 1 = rows, 2 = columns).",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-np-broadcast",
+    "label": "Broadcasting: arrays with numbers, rows and columns",
+    "question": "",
+    "code": "demo1 = np.array([[1, 2], [3, 4], [5, 6]])\ndemo1 - 2                              # number: applied to every element\n#> array([[-1,  0],\n#>        [ 1,  2],\n#>        [ 3,  4]])\ndemo1 * np.array([[1, 2]])             # one row (1 x 2): applied to every row\n#> array([[ 1,  4],\n#>        [ 3,  8],\n#>        [ 5, 12]])\ndemo1 - np.array([[1], [3], [5]])      # one column (3 x 1): applied to every column\n#> array([[0, 1],\n#>        [0, 1],\n#>        [0, 1]])\ndemo1 - np.array([1, 2, 3])            # wrong shape: error\n#> ValueError: operands could not be broadcast together with shapes (3,2) (3,) ",
+    "comment": "**Broadcasting** is how NumPy combines arrays of different sizes, much faster than a loop:\n\n- **Array with a single number:** the number is used on every element.\n- **Array with a 1-row or 1-column array** whose other dimension matches: the small one is repeated until it's the same size. A `1 × 2` row multiplies every row; a `3 × 1` column subtracts from every column.\n- **Shapes that don't fit** give `ValueError: operands could not be broadcast together`. Check `.shape` on both.\n\nR just recycles a vector down the columns; NumPy matches **shapes**, which is easier to predict. A common use is subtracting each column's mean: `demo2 - demo2.mean(axis=0)`.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-np-view",
+    "label": "Copy behavior: an array slice is a view, a list slice is a copy",
+    "question": "",
+    "code": "arr_orig = np.array([1, 2, 3, 4])\narr_slice = arr_orig[1:3]   # a view: shares data with arr_orig\narr_slice[0] = 99\nprint(arr_orig)             # the original changed!\n#> [ 1 99  3  4]\n\nlist_orig = [1, 2, 3, 4]\nlist_slice = list_orig[1:3] # a copy\nlist_slice[0] = 99\nprint(list_orig)            # unchanged\n#> [1, 2, 3, 4]\n\narr1 = np.array([1, 2, 3])\narr_copy = arr1.copy()      # a real (deep) copy\narr_copy[0] = 99\nprint(arr1)                 # unchanged\n#> [1 2 3]",
+    "comment": "NumPy saves memory by making a slice a **view** of the same data, so changing the slice changes the original. It's a design choice that's the source of many bugs.\n\n| Code | Separate copy? |\n|---|---|\n| `y = x` (list or array) | **no**, same object |\n| `x[1:3]` on a **list** | yes |\n| `x[1:3]` on an **array** | **no**, a view |\n| `x.copy()` | **yes** |\n\n**Rule:** if you're going to change part of an array and still need the original, use `.copy()`.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-prac1",
+    "label": "Practice 1 · Edit a lineup list without wrecking the original",
+    "question": "lineup = [\"Ana\", \"Ben\", \"Cara\", \"Dev\"]. Get the first, last, and 2nd–3rd players. Make a new lineup that inserts Eli at position 2 and replaces the first player with Fay, without changing the original list.",
+    "code": "lineup = [\"Ana\", \"Ben\", \"Cara\", \"Dev\"]\nlineup[0]                  # leadoff hitter\n#> 'Ana'\nlineup[-1]\n#> 'Dev'\nlineup[1:3]                # 2nd and 3rd\n#> ['Ben', 'Cara']\nnew_lineup = lineup.copy() # NOT new_lineup = lineup\nnew_lineup.insert(2, \"Eli\")\nnew_lineup[0] = \"Fay\"\nlineup\n#> ['Ana', 'Ben', 'Cara', 'Dev']\nnew_lineup\n#> ['Fay', 'Ben', 'Eli', 'Cara', 'Dev']",
+    "comment": "Matches **Subsetting by position**, **.insert()** and **Shallow vs deep copies**. With `new_lineup = lineup` instead of `.copy()`, the original lineup would change too. Try it to see.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-prac2",
+    "label": "Practice 2 · Update a dict and check for empty values",
+    "question": "Make a dict of pitching stats with name, wins = 12, saves = 0 and an empty notes string. Use .update() to set wins to 13 and add an era of 1.85. Which values count as False? What happens with stats[1]?",
+    "code": "stats = {\"name\": \"Emmy\", \"wins\": 12, \"saves\": 0, \"notes\": \"\"}\nstats.update({\"wins\": 13, \"era\": 1.85})\nstats\n#> {'name': 'Emmy', 'wins': 13, 'saves': 0, 'notes': '', 'era': 1.85}\nbool(stats[\"saves\"]), bool(stats[\"notes\"]), bool(stats)\n#> (False, False, True)\nstats[1]\n#> KeyError: 1",
+    "comment": "Matches **Subsetting by key**, **.update()** and **Checking for emptiness**. `.update()` replaces `wins` and adds `era`. `0` and `\"\"` are \"empty\" so they're `False`; a dict with anything in it is `True`. `stats[1]` is a KeyError because dicts have no positions.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-prac3",
+    "label": "Practice 3 · A score matrix: shape, columns, filtering, curving",
+    "question": "scores is 4 students × 3 exams. Find its shape, everyone's exam 2 scores, student 3's scores, the average for each exam and each student, the students who scored above 80 on exam 1, and add a 5-point curve to exam 3 only.",
+    "code": "import numpy as np\nscores = np.array([[88, 92, 79],\n                   [95, 85, 91],\n                   [70, 68, 75],\n                   [82, 90, 88]])     # 4 students x 3 exams\nscores.shape\n#> (4, 3)\nscores[:, 1]                         # exam 2 for everyone\n#> array([92, 85, 68, 90])\nscores[2, :]                         # student 3's exams\n#> array([70, 68, 75])\nscores.mean(axis=0)                  # average per exam\n#> array([83.75, 83.75, 83.25])\nscores.mean(axis=1)                  # average per student\n#> array([86.33333333, 90.33333333, 71.        , 86.66666667])\nscores[scores[:, 0] > 80, :]         # students who got > 80 on exam 1\n#> array([[88, 92, 79],\n#>        [95, 85, 91],\n#>        [82, 90, 88]])\ncurved = scores + np.array([[0, 0, 5]])   # +5 on exam 3 only\ncurved\n#> array([[88, 92, 84],\n#>        [95, 85, 96],\n#>        [70, 68, 80],\n#>        [82, 90, 93]])",
+    "comment": "Matches **2D arrays**, **[row, col]**, **subsetting by bool**, **axis=** and **broadcasting**. `axis=0` gives one number per **column** (exam); `axis=1` one per **row** (student). The `1 × 3` array adds 0, 0 and 5 to every row.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-prac4",
+    "label": "Practice 4 · Simulate normal draws",
+    "question": "Draw 10,000 values from Normal(0, 1) with seed 1. Check the mean and standard deviation, and find the proportion above 1.96 and the proportion more than 1.96 away from 0.",
+    "code": "import numpy as np\nnp.random.seed(1)\nz = np.random.normal(loc=0, scale=1, size=10000)\nz.shape\n#> (10000,)\nround(z.mean(), 3), round(z.std(), 3)\n#> (np.float64(0.01), np.float64(0.999))\nnp.mean(z > 1.96)               # proportion above 1.96 (about 0.025)\n#> np.float64(0.0263)\nnp.mean(np.abs(z) > 1.96)       # both tails (about 0.05)\n#> np.float64(0.0508)",
+    "comment": "Matches **np.random.normal()**. Like in R, the mean of a True/False array is the proportion of Trues, so `np.mean(z > 1.96)` is `mean(z > 1.96)`. With 10,000 draws the answers land close to the theory: 2.5% in one tail, 5% in both.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-16-prac5",
+    "label": "Practice 5 · Fix the view bug",
+    "question": "temps has one missing value. Take the first three temperatures and set the missing one to 0 without changing temps, then count the missing values in temps and take the mean ignoring them.",
+    "code": "import numpy as np\ntemps = np.array([68.0, 71.5, np.nan, 74.2, 70.1])\n# Bug: first3 = temps[:3] is a view, so editing it edits temps\nfirst3 = temps[:3].copy()\nfirst3[2] = 0\ntemps                          # unchanged thanks to .copy()\n#> array([68. , 71.5,  nan, 74.2, 70.1])\nnp.isnan(temps).sum()          # how many missing\n#> np.int64(1)\nnp.nanmean(temps)              # mean ignoring the missing value\n#> np.float64(70.94999999999999)",
+    "comment": "Matches **Copy behavior** and **np.nan**. Without `.copy()`, setting `first3[2] = 0` would also put a 0 into `temps`, quietly replacing the missing value. `np.isnan(temps).sum()` counts missing values, like `sum(is.na(x))` in R.",
     "key": false,
     "lang": "python"
    }
@@ -6305,7 +6567,7 @@ window.ENTRIES = {
   "pdfs": [],
   "notes": "Every Python function and operator from the Python lectures so far, one card each: **what it does, when to use it, the R function you already know**, a tiny example run in Python with its output, and the usual mistake.\n\n**Find one by what you want to do:** search \"python remove duplicates\", \"python first element\", \"convert text to number\" or \"python lowercase\". Adding **python** to a search puts these cards first; without it, the R cards usually win. New cards get added with each Python lecture.",
   "takeaways": [],
-  "updatedAt": "2026-11-04T17:40:00Z",
+  "updatedAt": "2026-11-05T03:20:00Z",
   "chunks": [
    {
     "id": "kit-04-p00",
@@ -6457,6 +6719,123 @@ window.ENTRIES = {
     "question": "Use it when: Values in both groups, in either group, or only in one.\n\nSearch words: python union, intersection, difference, in both, in either, only in one, setdiff, intersect, common elements",
     "code": "a = {1, 2, 3, 4}\nb = {3, 4, 5}\na.intersection(b)\n#> {3, 4}\na.union(b)\n#> {1, 2, 3, 4, 5}\na.difference(b)\n#> {1, 2}",
     "comment": "**Why / when:** Same meaning as in math class.\n\n**R version:** `intersect()`, `union()`, `setdiff()`\n\n**From:** Py 15",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-q00",
+    "label": "x.insert(i, v) / x[i] = v / d.update({...}) · change a list or dict",
+    "question": "Use it when: Insert a value at a position, replace one, or add keys to a dict.\n\nSearch words: python insert, replace element, change value, update dict, add key, modify list, python assign position",
+    "code": "x = [\"Ben\", \"Goodrich\"]\nx.insert(1, \"King\")\nx[0] = \"Benjamin\"\nx\n#> ['Benjamin', 'King', 'Goodrich']\nd = {\"a\": 1}\nd.update({\"b\": 2})\nd\n#> {'a': 1, 'b': 2}",
+    "comment": "**Why / when:** Lists change by position, dicts by key. These methods change the object in place and return None.\n\n**R version:** `append()`, `x[1] <- v`, `modifyList()`\n\n**Watch out:** `x = x.insert(1, v)` sets x to None.\n\n**From:** Py 16",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-q01",
+    "label": ".copy() · a separate copy of a list, dict or array",
+    "question": "Use it when: You want to change a copy and keep the original as it was.\n\nSearch words: python copy, duplicate list, deep copy, shallow copy, y = x changes x, view, original changed",
+    "code": "x = [1, -2, 3]\ny = x.copy()\ny[0] = 2\nx\n#> [1, -2, 3]",
+    "comment": "**Why / when:** `y = x` only gives the same object a second name; `.copy()` makes a separate one. NumPy slices are views too.\n\n**R version:** `y <- x` (R always copies)\n\n**Watch out:** Without .copy(), changing y changes x.\n\n**From:** Py 16",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-q02",
+    "label": "bool(x) / if x: · is it empty?",
+    "question": "Use it when: Check whether a list, string or dict has anything in it.\n\nSearch words: python empty, is empty, check empty list, empty string, truthy, falsy",
+    "code": "bool([]), bool(\"\"), bool(0), bool([0]), bool(\"hi\")\n#> (False, False, False, True, True)",
+    "comment": "**Why / when:** Empty containers, empty strings and 0 are False; everything else is True.\n\n**R version:** `length(x) > 0`, `nchar(s) > 0`\n\n**From:** Py 16",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-q03",
+    "label": "import numpy as np / np.array() · make an array (vector or matrix)",
+    "question": "Use it when: You want R-style vector math or a matrix in Python.\n\nSearch words: numpy, np array, vector math, element wise, matrix in python, list of lists, python vector",
+    "code": "import numpy as np\na = np.array([1, 2, 3])\na * 10\n#> array([10, 20, 30])\nm = np.array([[1, 2], [3, 4], [5, 6]])\nm\n#> array([[1, 2],\n#>        [3, 4],\n#>        [5, 6]])",
+    "comment": "**Why / when:** Arrays do math element by element like R vectors. A list of lists becomes a matrix, one inner list per row.\n\n**R version:** `c()`, `matrix(..., byrow = TRUE)`\n\n**Watch out:** Every element must be one type; a single string turns them all into strings.\n\n**From:** Py 16",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-q04",
+    "label": ".shape / .dtype · dimensions and element type",
+    "question": "Use it when: How many rows and columns, and what type the values are.\n\nSearch words: numpy shape, dimensions, number of rows and columns, dim, dtype, data type of array, numpy size",
+    "code": "import numpy as np\nm = np.array([[1, 2], [3, 4], [5, 6]])\nm.shape\n#> (3, 2)\nm.dtype\n#> dtype('int64')\nm.shape[0]\n#> 3",
+    "comment": "**Why / when:** `.shape` is (rows, columns); `.shape[0]` is the number of rows. No parentheses: they're attributes.\n\n**R version:** `dim()`, `nrow()`, `class()`/`typeof()`\n\n**Watch out:** `m.shape()` is an error.\n\n**From:** Py 16",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-q05",
+    "label": "[row, col] · subset a NumPy array by position",
+    "question": "Use it when: Get a cell, a row or a column of a matrix.\n\nSearch words: numpy index, numpy subset, row, column, get column, get row, matrix element, numpy slice",
+    "code": "import numpy as np\nm = np.array([[1, 2], [3, 4], [5, 6]])\nm[2, 1]\n#> np.int64(6)\nm[:, 0]\n#> array([1, 3, 5])\nm[0, :]\n#> array([1, 2])\nm[1:, 1]\n#> array([4, 6])",
+    "comment": "**Why / when:** Row first, then column, counting from 0. A bare `:` means all.\n\n**R version:** `m[3, 2]`, `m[, 1]`, `m[1, ]`\n\n**Watch out:** Off by one: R's `m[3, 2]` is NumPy's `m[2, 1]`.\n\n**From:** Py 16",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-q06",
+    "label": "array[condition] · filter rows with True/False",
+    "question": "Use it when: Keep the rows (or values) that meet a condition.\n\nSearch words: numpy filter, filter rows, rows where, subset by condition, boolean index, logical index, keep values greater than",
+    "code": "import numpy as np\nm = np.array([[1, 2], [3, 4], [5, 6]])\nm[m[:, 1] > 3, :]\n#> array([[3, 4],\n#>        [5, 6]])\nv = np.array([4, 9, 1, 7])\nv[v > 3]\n#> array([4, 9, 7])",
+    "comment": "**Why / when:** Put a True/False array where the rows go. Combine conditions with `&`, `|` and parentheses.\n\n**R version:** `m[m[, 2] > 3, ]`, `filter()`\n\n**Watch out:** `and`/`or` don't work on arrays; use `&`/`|` with parentheses.\n\n**From:** Py 16",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-q07",
+    "label": "np.zeros() / np.ones() / np.arange() · build arrays",
+    "question": "Use it when: Make an array of 0s or 1s, or a sequence of numbers.\n\nSearch words: numpy zeros, ones, sequence, arange, seq, range of numbers, 1 to 10 in python, empty matrix",
+    "code": "import numpy as np\nnp.zeros((2, 3))\n#> array([[0., 0., 0.],\n#>        [0., 0., 0.]])\nnp.ones(3)\n#> array([1., 1., 1.])\nnp.arange(1, 6)\n#> array([1, 2, 3, 4, 5])\nnp.arange(0, 1, 0.25)\n#> array([0.  , 0.25, 0.5 , 0.75])",
+    "comment": "**Why / when:** `np.arange(start, stop, step)` stops **before** stop.\n\n**R version:** `matrix(0, 2, 3)`, `rep(1, 3)`, `1:5`, `seq(0, 0.75, by = 0.25)`\n\n**Watch out:** Shape needs its own parentheses: `np.zeros((2, 3))`.\n\n**From:** Py 16",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-q08",
+    "label": "np.random.normal() / np.random.seed() · random normal draws",
+    "question": "Use it when: Simulate values from a normal distribution in Python.\n\nSearch words: python rnorm, random normal, simulate normal, random numbers, numpy random, set seed python",
+    "code": "import numpy as np\nnp.random.seed(2102)\nx = np.random.normal(loc=0, scale=1, size=5)\nx.round(3)\n#> array([ 1.219, -1.428,  1.519,  0.858,  0.508])",
+    "comment": "**Why / when:** `loc` is the mean, `scale` the standard deviation, `size` how many (or a shape like `(100, 2)`).\n\n**R version:** `set.seed()`, `rnorm(n, mean, sd)`\n\n**From:** Py 16",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-q09",
+    "label": "np.nan / np.isnan() / np.nanmean() · missing values",
+    "question": "Use it when: Find missing values or summarize while ignoring them.\n\nSearch words: python missing values, nan, na, is na, ignore missing, na.rm, count missing, infinity, inf",
+    "code": "import numpy as np\nx = np.array([2, np.nan, 5])\nnp.isnan(x)\n#> array([False,  True, False])\nnp.isnan(x).sum()\n#> np.int64(1)\nnp.mean(x)\n#> np.float64(nan)\nnp.nanmean(x)\n#> np.float64(3.5)",
+    "comment": "**Why / when:** Math with nan gives nan; the `np.nan...` versions skip it.\n\n**R version:** `NA`, `is.na()`, `mean(x, na.rm = TRUE)`\n\n**Watch out:** Built-in `max()`/`min()` give unreliable answers with nan.\n\n**From:** Py 16",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-q10",
+    "label": ".sum(axis=) / .mean(axis=) / np.apply_along_axis() · column or row summaries",
+    "question": "Use it when: Totals or means for every column or every row.\n\nSearch words: numpy column means, row sums, column sums, apply, axis, summary per column, colMeans, rowSums",
+    "code": "import numpy as np\nm = np.array([[1, 2], [3, 4], [5, 6]])\nm.sum(axis=0)\n#> array([ 9, 12])\nm.mean(axis=1)\n#> array([1.5, 3.5, 5.5])\nnp.apply_along_axis(np.max, 0, m)\n#> array([5, 6])",
+    "comment": "**Why / when:** `axis=0` gives one answer per column, `axis=1` one per row.\n\n**R version:** `colSums()`, `rowMeans()`, `apply(m, 2, max)`\n\n**Watch out:** Opposite of R's MARGIN: R's 2 (columns) is NumPy's axis 0.\n\n**From:** Py 16",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-q11",
+    "label": ".reshape() / .T / @ · reshape, transpose, matrix multiply",
+    "question": "Use it when: Change dimensions, flip rows and columns, or multiply matrices.\n\nSearch words: numpy reshape, transpose, matrix multiplication, dot product, matmul, change dimensions",
+    "code": "import numpy as np\nm = np.array([[1, 2], [3, 4], [5, 6]])\nm.reshape(2, -1)\n#> array([[1, 2, 3],\n#>        [4, 5, 6]])\nm.T\n#> array([[1, 3, 5],\n#>        [2, 4, 6]])\nm.T @ m\n#> array([[35, 44],\n#>        [44, 56]])",
+    "comment": "**Why / when:** Reshape fills row by row; `-1` means \"work it out\". `@`, `.dot()` and `np.matmul()` all multiply matrices.\n\n**R version:** `matrix(..., byrow = TRUE)`, `t()`, `%*%`\n\n**Watch out:** `*` multiplies element by element, not as matrices.\n\n**From:** Py 16",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-q12",
+    "label": "np.where() / np.hstack() / np.vstack() · positions and stacking",
+    "question": "Use it when: Find which positions are True, or join arrays.\n\nSearch words: numpy which, positions where true, find index, stack arrays, cbind, rbind, combine arrays",
+    "code": "import numpy as np\nnp.where(np.array([5, 1, 8]) > 4)\n#> (array([0, 2]),)\nnp.vstack([np.array([1, 2]), np.array([3, 4])])\n#> array([[1, 2],\n#>        [3, 4]])",
+    "comment": "**Why / when:** `np.where()` returns 0-based positions.\n\n**R version:** `which()`, `cbind()`, `rbind()`\n\n**From:** Py 16",
     "key": false,
     "lang": "python"
    }

@@ -266,6 +266,69 @@ textarea.mono{font-family:var(--mono);font-size:13px;background:var(--code-bg)}
   .chunk-side{border-left:0;border-top:1px dashed var(--line)}
   .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+/* ===== Book theme (clean textbook look, like the Quarto book "Python for Data Analysis") ===== */
+:root{
+  --paper:#ffffff; --panel:#ffffff; --ink:#1f2328; --muted:#5f6b7a; --line:#e3e6ea;
+  --accent:#2470c2; --accent-soft:#edf4fc; --code-bg:#f6f8fa; --side-bg:#fafbfc;
+  --body:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --display:var(--body);
+  --hl-kw:#a0237a; --hl-str:#1a7f37; --hl-num:#b35900; --hl-com:#6e7781; --hl-fn:#2470c2;
+}
+body{font-size:16.5px;line-height:1.7;-webkit-font-smoothing:antialiased}
+.side{background:var(--side-bg);border-right:1px solid var(--line)}
+.brand h1{font-weight:700;font-size:21px}
+.search{background:#fff}
+.main{padding-block:36px 80px;padding-inline:48px}
+.page{display:grid;grid-template-columns:minmax(0,780px) 210px;gap:56px;align-items:start}
+.wrap{max-width:780px;gap:34px}
+.head h2{font-size:2.15rem;font-weight:700;letter-spacing:-.01em;line-height:1.15}
+.eyebrow{font-family:var(--body);font-size:13px;letter-spacing:.03em;text-transform:uppercase}
+.block-h{border-bottom:1px solid var(--line)}
+.block-h h3{font-size:1.45rem;font-weight:650}
+.prose{max-width:none}
+.prose p{margin:0 0 14px}
+.prose h1,.prose h2,.prose h3,.prose h4{font-weight:650}
+.prose table{font-size:14.5px;margin:4px 0 16px}
+.prose th{background:var(--code-bg);font-weight:600}
+.prose th,.prose td{padding:6px 10px;border-color:var(--line)}
+.prose code{font-size:.86em;background:var(--code-bg);border:1px solid var(--line);padding:0 5px}
+.prose pre code{border:0}
+.tab{font-family:var(--body);font-size:16px}
+/* one-column chunk: heading, question, explanation, code + output, plots, watch out */
+.chunk.book{display:block;border:0;border-radius:0;background:none;overflow:visible;box-shadow:none;scroll-margin-top:16px}
+.tabpane{gap:0}
+.tabpane>.chunk.book,.block>.chunk.book,.g-entry>.chunk.book{padding:26px 0 30px;border-top:1px solid var(--line)}
+.tabpane>.chunk.book:first-of-type,.tabpane>.pane-intro+.chunk.book{border-top:0;padding-top:18px}
+.chunk-h{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+.chunk-h h3{margin:0;flex:1;min-width:0;font-size:1.22rem;font-weight:650;line-height:1.35;overflow-wrap:anywhere}
+.chunk-h .btn{flex:none}
+.chunk.book .star{align-self:center}
+.callout{border-left:4px solid var(--line);border-radius:6px;padding:10px 14px;margin:0 0 14px;font-size:15.5px}
+.callout-t{font-weight:650;font-size:13px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+.callout.q{border-color:var(--accent);background:var(--accent-soft);white-space:pre-line}
+.callout.q .callout-t{color:var(--accent)}
+.callout.warn{border-color:#d4880f;background:#fff7e8;margin-top:14px}
+.callout.warn .callout-t{color:#9a5b00}
+.callout .prose p:last-child{margin-bottom:0}
+.cell{border:1px solid var(--line);border-radius:6px;overflow:hidden;margin:6px 0 4px}
+.cell pre{margin:0;border-radius:0;font-size:13.5px;line-height:1.6;padding:12px 16px}
+.cell-in{background:var(--code-bg)}
+.cell-out{padding-block:8px!important;background:#fff;color:#2b3036;border-top:1px solid var(--line);box-shadow:inset 3px 0 0 #c9d1d9}
+.cell-in+.cell-in{border-top:1px dashed var(--line)}
+.chunk-plots img{display:block;max-width:100%;height:auto;margin:12px 0 4px;border:1px solid var(--line);border-radius:6px;background:#fff}
+details.alt{margin:-14px 0 18px 0;border-left:3px solid var(--accent-soft);padding-left:14px}
+details.alt>.chunk.book{padding-top:8px}
+/* right-hand "On this page" */
+.toc{position:sticky;top:28px;max-height:calc(100vh - 56px);overflow:auto;font-size:13.5px;line-height:1.4;padding-bottom:20px}
+.toc .label{display:block;margin-bottom:8px;color:var(--ink)}
+.toc ol{list-style:none;margin:0;padding:0;border-left:1px solid var(--line)}
+.toc button{all:unset;box-sizing:border-box;display:block;width:100%;cursor:pointer;padding:4px 0 4px 12px;margin-left:-1px;border-left:2px solid transparent;color:var(--muted)}
+.toc button:hover{color:var(--ink)}
+.toc button[aria-current="true"]{color:var(--accent);border-left-color:var(--accent);font-weight:600}
+.toc .sec button{color:var(--ink);font-weight:600;margin-top:4px}
+@media (max-width:1240px){.page{grid-template-columns:minmax(0,1fr)}.toc{display:none}}
+@media (max-width:820px){.main{padding-inline:16px}.head h2{font-size:1.75rem}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -463,11 +526,33 @@ function renderMain(){
     if(!curId||!entries[curId]) curId=ids[0]||null;
     html+= curId? entryHTML(curId,entries[curId]) : emptyHTML();
   }
-  main.innerHTML=`<div class="wrap">${html}</div>`;
+  const isEntry=!editing&&!['guide','match','errors','quiz'].includes(view)&&curId;
+  main.innerHTML=isEntry?`<div class="page"><div class="wrap">${html}</div><nav class="toc" id="toc" aria-label="On this page"></nav></div>`:`<div class="wrap">${html}</div>`;
+  if(isEntry) buildToc();
   if(view==='match'&&!editing){ renderMatches(); }
   if(view==='errors'&&!editing){ renderErrors(); }
   highlight(main);
   if(!editing) collapseNotes(main);
+}
+let tocObs=null;
+function buildToc(){
+  const nav=$('#toc'); if(!nav)return;
+  const vis=el=>!el.closest('[hidden]')&&!el.closest('details:not([open])');
+  const items=[];
+  const sec=(id,t)=>{const el=document.getElementById(id); if(el&&vis(el)) items.push({id,t,sec:true});};
+  sec('sec-files','Files'); sec('sec-notes','Overview');
+  const ct=$('#codeTabs'); if(ct) items.push({id:'codeTabs',t:ct.querySelector('.tab[aria-selected="true"]')?.firstChild?.textContent||'Code',sec:true});
+  document.querySelectorAll('#main .chunk.book[id^="ch-"]').forEach(el=>{ if(vis(el)) items.push({id:el.id,t:(el.dataset.toc||'').replace(/\s*\[\d+\s*pts?\]/i,'')}); });
+  sec('sec-remember','Remember for the test');
+  nav.innerHTML=`<span class="label">On this page</span><ol>${items.map(x=>`<li class="${x.sec?'sec':''}"><button type="button" data-act="toc" data-to="${esc(x.id)}">${esc(x.t)}</button></li>`).join('')}</ol>`;
+  if(tocObs)tocObs.disconnect();
+  if(!('IntersectionObserver' in window))return;
+  tocObs=new IntersectionObserver(ents=>{
+    const on=ents.filter(x=>x.isIntersecting).sort((a,b)=>a.boundingClientRect.top-b.boundingClientRect.top)[0]; if(!on)return;
+    nav.querySelectorAll('button').forEach(b=>b.setAttribute('aria-current',b.dataset.to===on.target.id));
+    const cur=nav.querySelector('[aria-current="true"]'); if(cur&&nav.scrollHeight>nav.clientHeight){const r=cur.getBoundingClientRect(),n=nav.getBoundingClientRect(); if(r.top<n.top||r.bottom>n.bottom) cur.scrollIntoView({block:'nearest'});}
+  },{rootMargin:'0px 0px -70% 0px'});
+  items.forEach(x=>{const el=document.getElementById(x.id); if(el)tocObs.observe(el);});
 }
 function emptyHTML(){
   return `<div class="empty"><h3>Start your study guide</h3>
@@ -489,21 +574,21 @@ function entryHTML(id,e){
     <div class="badges">${(e.exams||[]).map(x=>`<span class="badge exam">${esc(x)}</span>`).join('')}${(e.topics||[]).map(x=>`<span class="badge">${esc(x)}</span>`).join('')}</div>
   </header>
 
-  <section class="block" ${(e.type==='prac'||e.type==='kit'||e.type==='core')&&!pdfs.length?'hidden':''}>
+  <section class="block" id="sec-files" ${(e.type==='prac'||e.type==='kit'||e.type==='core')&&!pdfs.length?'hidden':''}>
     <div class="block-h"><h3>Files<span class="count">${pdfs.length}</span></h3>
 
     </div>
     ${pdfs.length?`<div class="files">${pdfs.map(fileHTML).join('')}</div>`:`<p class="empty-line">No files yet. Use Edit to attach the assignment PDF, your solutions, or screenshots of output.</p>`}
   </section>
 
-  ${codeSectionHTML(e,chunks)}
-
-  <section class="block">
-    <div class="block-h"><h3>Notes</h3></div>
-    ${e.notes?`<div class="prose">${md(e.notes)}</div>`:`<p class="empty-line">No notes yet.</p>`}
+  <section class="block" id="sec-notes" ${e.notes?'':'hidden'}>
+    <div class="block-h"><h3>Overview</h3></div>
+    <div class="prose">${md(e.notes||'')}</div>
   </section>
 
-  <section class="block">
+  ${codeSectionHTML(e,chunks)}
+
+  <section class="block" id="sec-remember">
     <div class="block-h"><h3>Remember for the test<span class="count">${tk.length}</span></h3></div>
     ${tk.length?`<ol class="takeaways">${tk.map(x=>`<li><span>${esc(x)}</span></li>`).join('')}</ol>`:`<p class="empty-line">Nothing flagged yet. These lines feed the study guide view.</p>`}
   </section>`;
@@ -569,6 +654,7 @@ function codeSectionHTML(e,chunks){
   </section>`;
 }
 function collapseNotes(root){
+  return; // explanations are shown in full (book layout)
   root.querySelectorAll('.chunk-note .prose').forEach(p=>{
     if(p.dataset.cz)return; p.dataset.cz='1';
     const kids=[...p.children]; if(kids.length<3)return;
@@ -584,17 +670,40 @@ function collapseNotes(root){
     btn.textContent='Show full walkthrough \u25BE'; p.after(btn);
   });
 }
+function cellsHTML(code,lang){
+  const segs=[];
+  for(const l of String(code||'').split('\n')){
+    const out=/^\s*#>( |$)/.test(l), t=out?'out':'in', x=out?l.replace(/^\s*#> ?/,''):l;
+    if(segs.length&&segs[segs.length-1].t===t) segs[segs.length-1].x.push(x); else segs.push({t,x:[x]});
+  }
+  return segs.map(s=>{ if(s.t==='in'){ while(s.x.length&&!s.x[0].trim())s.x.shift(); while(s.x.length&&!s.x[s.x.length-1].trim())s.x.pop(); } return s; })
+    .filter(s=>s.x.length)
+    .map(s=>s.t==='in'?`<pre class="cell-in"><code class="language-${lang}">${esc(s.x.join('\n'))}</code></pre>`:`<pre class="cell-out"><code class="nohighlight">${esc(s.x.join('\n'))}</code></pre>`).join('');
+}
+function splitComment(text){
+  const r={main:'',plots:'',warn:''}; if(!text)return r;
+  const box=document.createElement('div'); box.innerHTML=md(text);
+  for(const el of [...box.children]){
+    if(el.querySelector&&el.querySelector('img')&&el.textContent.trim().length<3){ r.plots+=el.outerHTML; continue; }
+    if(el.tagName==='P'&&/^\s*watch out\b/i.test(el.textContent)){
+      const st=el.querySelector('strong'); if(st&&el.firstElementChild===st&&/^\s*watch out/i.test(st.textContent)){ st.remove(); el.innerHTML=el.innerHTML.replace(/^\s*:?\s*/,''); }
+      r.warn+=el.outerHTML; continue; }
+    r.main+=el.outerHTML;
+  }
+  return r;
+}
 function chunkHTML(c,i,opt){
   opt=opt||{};
   const lbl=opt.label||c.label||('Chunk '+(i+1));
-  return `<div class="chunk ${c.key?'key':''}" id="ch-${i}">
-    <div class="chunk-code">
-      <div class="chunk-bar"><span class="lbl" title="${esc(c.label||'')}">${esc(lbl)}</span>${c.key?'<span class="star">Exam</span>':''}<button class="btn sm ghost" type="button" data-act="copy" data-i="${i}">Copy</button></div>
-      <pre><code class="language-${c.lang||'r'}">${esc(c.code||'')}</code></pre>
-    </div>
-    <div class="chunk-side">${c.question&&!opt.noQ?`<div class="chunk-q"><span class="label">Question</span>${esc(c.question)}</div>`:''}
-    <div class="chunk-note ${c.comment?'':'none'}"><span class="label">My comment</span>${c.comment?`<div class="prose">${md(c.comment)}</div>`:'No comment on this chunk.'}</div></div>
-  </div>`;
+  const cm=splitComment(c.comment);
+  return `<section class="chunk book ${c.key?'key':''}" id="ch-${i}" data-toc="${esc(lbl)}">
+    <div class="chunk-h"><h3>${esc(lbl)}</h3>${c.key?'<span class="star">Exam</span>':''}<button class="btn sm ghost" type="button" data-act="copy" data-i="${i}">Copy code</button></div>
+    ${c.question&&!opt.noQ?(/^Use it when:/.test(c.question)?`<div class="callout q"><div class="callout-t">Use it when</div>${esc(c.question.replace(/^Use it when:\s*/,'').replace(/\n\s*\nSearch words:[\s\S]*$/,''))}</div>`:`<div class="callout q"><div class="callout-t">Question</div>${esc(c.question)}</div>`):''}
+    ${cm.main?`<div class="prose">${cm.main}</div>`:''}
+    ${(c.code||'').trim()?`<div class="cell">${cellsHTML(c.code,c.lang||'r')}</div>`:''}
+    ${cm.plots?`<div class="chunk-plots">${cm.plots}</div>`:''}
+    ${cm.warn?`<div class="callout warn"><div class="callout-t">Watch out</div><div class="prose">${cm.warn}</div></div>`:''}
+  </section>`;
 }
 function guideHTML(){
   const all=sorted().filter(e=>guideExam==='all'||(e.exams||[]).includes(guideExam));
@@ -1218,8 +1327,9 @@ document.addEventListener('click',async ev=>{
     document.querySelectorAll('#codeTabs .tab').forEach(t=>t.setAttribute('aria-selected',t.dataset.tab===entryTab));
     document.querySelectorAll('#codeTabs .tabpane').forEach(p=>{p.hidden=p.dataset.pane!==entryTab;});
     const ct=$('#codeTabs'); if(ct&&ct.getBoundingClientRect().top<0) ct.scrollIntoView({block:'start'});
-    return;
+    buildToc(); return;
   }
+  if(act==='toc'){ const el=document.getElementById(b.dataset.to); if(el)el.scrollIntoView({block:'start',behavior:'smooth'}); return; }
   if(act==='more'){
     const p=b.previousElementSibling; const c=p.classList.toggle('is-collapsed');
     b.textContent=c?'Show full walkthrough \u25BE':'Show less \u25B4'; return;
@@ -1240,11 +1350,11 @@ document.addEventListener('click',async ev=>{
   else if(act==='del-yes')deleteEntry(curId);
   else if(act==='preview'){const f=b.dataset.fid;openPreviews.has(f)?openPreviews.delete(f):openPreviews.add(f);renderMain();}
   else if(act==='copy'){
-    const e=entries[b.dataset.eid||curId]; const code=(e?.chunks||[])[+b.dataset.i]?.code||'';
+    const e=entries[b.dataset.eid||curId]; const code=((e?.chunks||[])[+b.dataset.i]?.code||'').split('\n').filter(l=>!/^\s*#>/.test(l)).join('\n').trim();
     const pre=b.closest('.chunk').querySelector('pre');
     try{await navigator.clipboard.writeText(code);b.textContent='Copied';}
     catch(x){const r=document.createRange();r.selectNodeContents(pre);const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Selected';}
-    setTimeout(()=>{b.textContent='Copy'},1400);
+    setTimeout(()=>{b.textContent='Copy code'},1400);
   }
   else if(act==='add-chunk'){readForm();draft.chunks.push({id:uid(),label:'',code:'',comment:'',key:false});renderMain();}
   else if(act==='rm-chunk'){readForm();draft.chunks.splice(+b.dataset.i,1);renderMain();}

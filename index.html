@@ -398,7 +398,7 @@ function highlight(root){
   root.querySelectorAll('pre code').forEach(el=>{ if(!el.className) el.className='language-r'; try{hljs.highlightElement(el)}catch(e){} });
 }
 function sorted(){
-  const rank=t=>(query&&t==='hw')?-1:TYPE_ORDER.indexOf(t);   // while searching, Homework comes first
+  const rank=t=>(query&&t==='py'&&!wantsRLang(query))?-2:(query&&t==='hw')?-1:TYPE_ORDER.indexOf(t);   // while searching, Python lectures come first, then Homework
   return Object.entries(entries).map(([id,e])=>({id,...e})).sort((a,b)=>{
     const ta=rank(a.type), tb=rank(b.type);
     if(ta!==tb)return ta-tb;
@@ -621,6 +621,7 @@ function guideHTML(){
 /* ---------- Question matcher ---------- */
 const STOP=new Set('the a an and or of to in on for with by is are be as at from that this it its into using use your you their there then than which what how does do did each per all any some these those them they using write create make find show given following print display result results value values code function functions problem part question answer data based new also only one two three between within whether should would can could will must need may way ways r'.split(' '));
 const CONCEPTS=[
+ [/\b(column|row|col)s? ?(means?|sums?|totals?|averages?)|(means?|sums?|totals?|averages?) (of|for|by) (each|every) (column|row)/,['axis','apply_along_axis','colmeans','colsums','rowsums','apply']],
  [/\b(loop|loops|iterat|repeat|each element|every element|go through)/,['for','while']],
  [/\bwhile\b|until|keep (going|rolling|flipping|sampling)|continues? until/,['while','break']],
  [/\bfor\b.*\bloop|nested/,['for']],
@@ -697,8 +698,10 @@ function queryTerms(q){
   for(const m of (q.match(/[A-Za-z_.][A-Za-z0-9_.]*(?=\s*\()/g)||[])) w.set(stem(m.toLowerCase()),2);
   return w;
 }
+const wantsRLang=q=>/\b(in|with|using|base) r\b|\br (code|function)|tidyverse|dplyr|tidyr|ggplot|%>%|\|>|<-|\bapply\(|\bsapply|\blapply|\btapply|\bdata\.frame/.test(String(q||'').toLowerCase());
+const isPyEntry=e=>e&&(e.type==='py'||e.id==='kit-04');
 function findMatches(q){
-  const idx=buildIndex(); const qt=queryTerms(q); const k1=1.2,b=0.75;
+  const idx=buildIndex(); const qt=queryTerms(q); const k1=1.2,b=0.75; const rMode=wantsRLang(q);
   const res=[];
   for(const d of idx.docs){
     let score=0; const hits=[];
@@ -707,14 +710,17 @@ function findMatches(q){
       const n=idx.df.get(t)||0, idf=Math.log(1+(idx.N-n+.5)/(n+.5));
       score+=w*idf*(f*(k1+1))/(f+k1*(1-b+b*d.len/idx.avg)); hits.push([t,w*idf]);
     }
-    if(score>0)res.push({d,score,hits:hits.sort((a,b)=>b[1]-a[1]).map(h=>h[0])});
+    if(score>0){ if(!rMode&&(d.e.type==='py'||d.c&&d.c.lang==='python'))score*=1.6; res.push({d,score,hits:hits.sort((a,b)=>b[1]-a[1]).map(h=>h[0])}); }
   }
   res.sort((a,b)=>b.score-a.score);
-  // Homework first: any homework chunk that is relevant (at least half the best score) goes to the top,
-  // ordered by score; then everything else by score.
+  // Python first (the rest of the course is Python): relevant Python chunks (at least half the best score)
+  // go to the top, unless the question asks for R; then relevant homework; then everything else by score.
   const top=res.length?res[0].score:0, rel=r=>r.score>=0.5*top;
-  const hw=res.filter(r=>r.d.e.type==='hw'&&rel(r)), rest=res.filter(r=>!(r.d.e.type==='hw'&&rel(r)));
-  return hw.slice(0,3).concat(rest).slice(0,10);
+  const isPy=r=>r.d.e.type==='py'||(r.d.c&&r.d.c.lang==='python');
+  const py=rMode?[]:res.filter(r=>isPy(r)&&rel(r)).slice(0,5);
+  const hw=res.filter(r=>r.d.e.type==='hw'&&rel(r)&&!py.includes(r)).slice(0,3);
+  const rest=res.filter(r=>!py.includes(r)&&!hw.includes(r));
+  return py.concat(hw,rest).slice(0,10);
 }
 const SKILLS=[
  [/cumulative|running (sum|total)|\bcumsum\b/,'Running total (cumsum, or a loop)','lec-05','FOR Loops'],
@@ -963,7 +969,7 @@ function matchHTML(){
     <div class="match-box">
       <label class="label" for="matchQ">Paste or type the question</label>
       <textarea class="inp" id="matchQ" placeholder="e.g. Write a function that simulates rolling two dice until the sum is 7 and returns the number of rolls">${esc(matchQuery)}</textarea>
-      <span class="hint">Matches on wording and on the R functions a question usually needs (<code>tapply</code> for "average by department", <code>while</code> for "keep rolling until"). Searches the code in every entry.</span>
+      <span class="hint">Python results come first; add "in R" or "tidyverse" to get R code. Matches on wording and on the functions a question usually needs (<code>tapply</code> for "average by department", <code>while</code> for "keep rolling until"). Searches the code in every entry.</span>
     </div>
     <div class="needs" id="matchNeeds"></div>
     <div class="results" id="matchResults"></div>`;
@@ -1006,7 +1012,7 @@ function findFunctions(q,max){
     let best=0;
     for(const p of c.phrases){const hit=p.filter(t=>qt.includes(t)).length; if(hit){const f=hit/p.length*(0.6+0.4*Math.min(hit,3)/3); if(f>best)best=f;}}
     let sc=cov*2+best;
-    if(wantsTidy&&c.tidy)sc+=0.35; if(wantsBase&&!c.tidy&&!c.py)sc+=0.35; if(c.py)sc+=wantsPy?0.5:-0.7; else if(wantsPy)sc-=0.35;
+    if(wantsTidy&&c.tidy)sc+=0.35; if(wantsBase&&!c.tidy&&!c.py)sc+=0.35; const rAsk=wantsTidy||wantsBase||wantsRLang(q); if(c.py)sc+=rAsk?-0.7:0.5; else if(!rAsk)sc-=0.35;
     return {...c,sc,cov,best};
   }).filter(c=>c.cov>=0.5&&c.best>0).sort((a,b)=>b.sc-a.sc);
   if(!scored.length)return [];

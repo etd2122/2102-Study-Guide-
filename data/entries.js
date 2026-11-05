@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-11-05T03:20:00Z";
+window.ENTRIES_SAVED = "2026-11-05T03:30:00Z";
 window.ENTRIES = {
  "py-14": {
   "type": "py",
@@ -370,7 +370,7 @@ window.ENTRIES = {
     "id": "py-15-prac4",
     "label": "Practice 4 · Sets: two class rosters",
     "question": "Two rosters: stat = Ana, Ben, Cara, Dev, Eli and econ = Ben, Dev, Fay, Gus. Who is in both classes, who is only in stat, and how many different students are there in total?",
-    "code": "stat = {\"Ana\", \"Ben\", \"Cara\", \"Dev\", \"Eli\"}\necon = {\"Ben\", \"Dev\", \"Fay\", \"Gus\"}\nstat.intersection(econ)          # in both classes\n#> {'Ben', 'Dev'}\nstat.difference(econ)            # only in stat\n#> {'Cara', 'Eli', 'Ana'}\nstat.union(econ)                 # everyone\n#> {'Eli', 'Dev', 'Cara', 'Ben', 'Ana', 'Gus', 'Fay'}\nlen(stat.union(econ))\n#> 7",
+    "code": "stat = {\"Ana\", \"Ben\", \"Cara\", \"Dev\", \"Eli\"}\necon = {\"Ben\", \"Dev\", \"Fay\", \"Gus\"}\nstat.intersection(econ)          # in both classes\n#> {'Dev', 'Ben'}\nstat.difference(econ)            # only in stat\n#> {'Ana', 'Eli', 'Cara'}\nstat.union(econ)                 # everyone\n#> {'Fay', 'Ben', 'Ana', 'Gus', 'Cara', 'Dev', 'Eli'}\nlen(stat.union(econ))\n#> 7",
     "comment": "Matches **Sets**. Sets print in no particular order, so your output may list the names in a different order. That's fine, the contents are the same.",
     "key": false,
     "lang": "python"
@@ -428,7 +428,7 @@ window.ENTRIES = {
    "Broadcasting matches shapes: a 1-row array applies to every row.",
    "An array slice is a view: changing it changes the original."
   ],
-  "updatedAt": "2026-11-05T03:20:00Z",
+  "updatedAt": "2026-11-05T03:30:00Z",
   "chunks": [
    {
     "id": "py-16-pos",
@@ -577,7 +577,7 @@ window.ENTRIES = {
    {
     "id": "py-16-np-apply",
     "label": "Summaries by column or row: np.apply_along_axis() and axis=",
-    "question": "",
+    "question": "Column means, column sums, row means or row totals of a NumPy array (like colMeans, colSums, rowSums or apply in R).",
     "code": "col_sum = np.apply_along_axis(np.sum, 0, demo2)\nprint(col_sum)                      # one total per column\n#> [ 9.79243281 -3.19837817]\ndemo2.sum(axis=0)                   # same thing, shorter\n#> array([ 9.79243281, -3.19837817])\ndemo2.mean(axis=0)                  # column means\n#> array([ 0.09792433, -0.03198378])\nnp.apply_along_axis(np.sum, 1, demo2)[:5]   # row totals (first 5)\n#> array([-0.20846105,  2.37658899,  0.82977335,  0.43956971,  0.30391348])",
     "comment": "Same summary for every column or row, without a loop: like `apply(X, 2, sum)` in R.\n\n**Which axis is which?** `.shape` is `(rows, columns)`: position **0 is rows**, so `axis=0` works **down** the rows and gives **one answer per column**. `axis=1` gives one answer per row.\n\n| NumPy | R |\n|---|---|\n| `np.apply_along_axis(np.sum, 0, X)` or `X.sum(axis=0)` | `apply(X, 2, sum)` / `colSums(X)` |\n| `X.mean(axis=0)` | `colMeans(X)` |\n| `np.apply_along_axis(np.sum, 1, X)` | `apply(X, 1, sum)` / `rowSums(X)` |\n\n**Watch out:** the axis numbers are the **opposite** of R's `MARGIN` (R uses 1 = rows, 2 = columns).",
     "key": true,
@@ -6565,9 +6565,9 @@ window.ENTRIES = {
    "function finder"
   ],
   "pdfs": [],
-  "notes": "Every Python function and operator from the Python lectures so far, one card each: **what it does, when to use it, the R function you already know**, a tiny example run in Python with its output, and the usual mistake.\n\n**Find one by what you want to do:** search \"python remove duplicates\", \"python first element\", \"convert text to number\" or \"python lowercase\". Adding **python** to a search puts these cards first; without it, the R cards usually win. New cards get added with each Python lecture.",
+  "notes": "Every Python function and operator from the Python lectures so far, one card each: **what it does, when to use it, the R function you already know**, a tiny example run in Python with its output, and the usual mistake.\n\n**Find one by what you want to do:** search \"remove duplicates\", \"first element of a list\", \"convert text to number\" or \"lowercase\". **Python comes first in every search**, since the rest of the course is Python. To get the R version instead, say so: \"mean by group **in R**\", \"add a column in **tidyverse**\", or type an R function like `tapply(`. New cards get added with each Python lecture.",
   "takeaways": [],
-  "updatedAt": "2026-11-05T03:20:00Z",
+  "updatedAt": "2026-11-05T03:30:00Z",
   "chunks": [
    {
     "id": "kit-04-p00",

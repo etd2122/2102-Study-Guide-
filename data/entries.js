@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-11-05T03:30:00Z";
+window.ENTRIES_SAVED = "2026-11-09T19:30:00Z";
 window.ENTRIES = {
  "py-14": {
   "type": "py",
@@ -643,6 +643,180 @@ window.ENTRIES = {
     "question": "temps has one missing value. Take the first three temperatures and set the missing one to 0 without changing temps, then count the missing values in temps and take the mean ignoring them.",
     "code": "import numpy as np\ntemps = np.array([68.0, 71.5, np.nan, 74.2, 70.1])\n# Bug: first3 = temps[:3] is a view, so editing it edits temps\nfirst3 = temps[:3].copy()\nfirst3[2] = 0\ntemps                          # unchanged thanks to .copy()\n#> array([68. , 71.5,  nan, 74.2, 70.1])\nnp.isnan(temps).sum()          # how many missing\n#> np.int64(1)\nnp.nanmean(temps)              # mean ignoring the missing value\n#> np.float64(70.94999999999999)",
     "comment": "Matches **Copy behavior** and **np.nan**. Without `.copy()`, setting `first3[2] = 0` would also put a 0 into `temps`, quietly replacing the missing value. `np.isnan(temps).sum()` counts missing values, like `sum(is.na(x))` in R.",
+    "key": false,
+    "lang": "python"
+   }
+  ]
+ },
+ "py-17": {
+  "type": "py",
+  "num": "17",
+  "title": "pandas: Series, Categoricals and DataFrames (plus NumPy review)",
+  "date": "",
+  "exams": [],
+  "topics": [
+   "pandas",
+   "series",
+   "index",
+   "iloc",
+   "value_counts",
+   "categorical",
+   "factor",
+   "codes",
+   "categories",
+   "dataframe",
+   "mtcars",
+   "statsmodels",
+   "shape",
+   "size",
+   "columns",
+   "dtypes"
+  ],
+  "pdfs": [
+   {
+    "name": "Lecture17 slides - Indexing in NumPy and pandas.html",
+    "size": 3608187,
+    "type": "text/html"
+   }
+  ],
+  "notes": "Professor Goodrich's slides **Lecture17.html** (\"Indexing in NumPy\"). The title is misleading: the **first half repeats Py 16** almost word for word (NumPy indexing, `inf`/`nan`, `reshape`, `apply_along_axis`, broadcasting, views vs. copies). That material is already explained, with practice, in **Py 16**, so it isn't repeated here. This entry covers what's new: **pandas**, Python's version of R data frames. Every output below came from running the code (pandas 3.0, NumPy 2.5).\n\n**Two slide claims are wrong:**\n- \"`max()`/`min()` ignore nans\": only true by luck of where the nan sits. Explained in Py 16 → *Special values*.\n- \"Since a Categorical is a Series\": it isn't (`isinstance(educ, pd.Series)` is `False`). See *A Categorical is not a Series* below.\n\n**Python ↔ R, the slide's summary:**\n\n| R | Python |\n|---|---|\n| named `list` | `dict` |\n| numeric `vector` / `matrix` / `array` | `np.array` (NumPy) |\n| `vector` with names, any type | `pd.Series` (pandas) |\n| `factor` | `pd.Categorical` (pandas) |\n| `data.frame` | `pd.DataFrame` (pandas) |\n\n**pandas 2 vs 3:** if your RStudio has pandas 2.x, text shows as `dtype: object` where these outputs say `str`. Nothing else here changes. Check with `pd.__version__`.\n\n**Textbook:** [Chapter 5, Getting Started with pandas](https://wesmckinney.com/book/pandas-basics.html) of *Python for Data Analysis* (Series and DataFrame), and section 7.5, *Categorical Data*, of [Chapter 7](https://wesmckinney.com/book/data-cleaning.html).",
+  "takeaways": [
+   "Lecture 17's NumPy half repeats Py 16: study it there.",
+   "pd.Series = values with labels (R named vector); obj[\"a\"] by label, obj.iloc[0] by position.",
+   "Several labels need a list: obj[[\"c\", \"a\"]].",
+   ".value_counts() is table(), sorted most common first.",
+   "pd.Categorical = factor; from_codes counts from 0; ordered=True allows < and >.",
+   "No arithmetic on a Categorical, and no new values unless they're already categories.",
+   "A Categorical is NOT a Series (slide error); a Series can hold categorical values.",
+   "pd.DataFrame({...}) = data.frame(); all columns the same length, types can differ.",
+   ".shape is (rows, cols); .size is rows × cols, not the number of rows.",
+   "Attributes (.shape, .columns, .dtypes, .index) take no parentheses."
+  ],
+  "updatedAt": "2026-11-09T19:30:00Z",
+  "chunks": [
+   {
+    "id": "py-17-import",
+    "label": "import pandas as pd: the data-frame package",
+    "question": "",
+    "code": "import pandas as pd\nimport numpy as np",
+    "comment": "**pandas** is the package that gives Python R-style data frames. Convention: `import pandas as pd`, then everything starts with `pd.`, the same way NumPy uses `np.`.\n\npandas is built on NumPy: every column of a DataFrame is a NumPy array underneath, so the NumPy rules from Py 16 (types, `nan`, True/False filtering) still apply.\n\nIn RStudio, a `{python}` chunk or a `.py` file needs pandas installed once: `reticulate::py_install(\"pandas\")` from the R console.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-17-series",
+    "label": "A Series: values with labels, obj2[\"a\"] and obj2[[\"c\", \"a\"]]",
+    "question": "",
+    "code": "obj2 = pd.Series([4, 7, -5, 3], index=[\"d\", \"b\", \"a\", \"c\"])\nobj2\n#> d    4\n#> b    7\n#> a   -5\n#> c    3\n#> dtype: int64\nobj2[\"a\"]                # look up by label\n#> np.int64(-5)\nobj2[\"d\"] = 6            # change by label\nobj2[[\"c\", \"a\", \"d\"]]    # several labels: a LIST inside the brackets\n#> c    3\n#> a   -5\n#> d    6\n#> dtype: int64",
+    "comment": "A **Series** is a one-dimensional column of values where **each value has a label** (the *index*). It's like a named vector in R: `c(d = 4, b = 7, a = -5, c = 3)`. Unlike a NumPy array, the values don't have to be numbers.\n\n| pandas | Means | R |\n|---|---|---|\n| `obj2[\"a\"]` | the value labeled a | `obj2[\"a\"]` |\n| `obj2[\"d\"] = 6` | change by label | `obj2[\"d\"] <- 6` |\n| `obj2[[\"c\", \"a\", \"d\"]]` | several labels, in that order | `obj2[c(\"c\", \"a\", \"d\")]` |\n\n**Watch out:** for several labels you need **two** sets of brackets. The outer `[ ]` subsets; the inner `[ ]` is a Python **list** of labels (Python's `c()`). `obj2[\"c\", \"a\"]` is a KeyError.\n\nThe printout shows labels on the left, values on the right, and the `dtype` at the bottom.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-17-series-more",
+    "label": "More Series basics: .index, .values, .iloc[], filtering (beyond the slides)",
+    "question": "",
+    "code": "obj2.index\n#> Index(['d', 'b', 'a', 'c'], dtype='str')\nobj2.values              # the plain NumPy array underneath\n#> array([ 6,  7, -5,  3])\nobj2.iloc[0]             # by position: first element\n#> np.int64(6)\nobj2[obj2 > 0]           # filter with True/False, like NumPy\n#> d    6\n#> b    7\n#> c    3\n#> dtype: int64\nobj2 * 2                 # math keeps the labels\n#> d    12\n#> b    14\n#> a   -10\n#> c     6\n#> dtype: int64",
+    "comment": "*Not on the slides, but you'll need it right away:*\n\n| pandas | Gives | R |\n|---|---|---|\n| `obj2.index` | the labels | `names(obj2)` |\n| `obj2.values` | the values as a NumPy array | `unname(obj2)` |\n| `obj2.iloc[0]` | **by position**, from 0 | `obj2[1]` |\n| `obj2[obj2 > 0]` | keep values meeting a condition | `obj2[obj2 > 0]` |\n| `obj2 * 2` | math on every value, labels kept | `obj2 * 2` |\n\n**Labels vs positions:** `[\"a\"]` uses labels; `.iloc[0]` uses positions. Don't write `obj2[0]` on a Series with text labels: it's ambiguous, and newer pandas treats the 0 as a label and gives a KeyError. Use `.iloc` whenever you mean a position.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-17-race",
+    "label": "A Series of text and .value_counts()",
+    "question": "",
+    "code": "race = pd.Series([\"black\", \"white\", \"white\", \"hispanic\", \"black\", \"other\"])\nrace.value_counts()\n#> black       2\n#> white       2\n#> hispanic    1\n#> other       1\n#> Name: count, dtype: int64\nrace.value_counts(normalize=True)   # proportions instead of counts\n#> black       0.333333\n#> white       0.333333\n#> hispanic    0.166667\n#> other       0.166667\n#> Name: proportion, dtype: float64",
+    "comment": "A Series can hold **text**, which a NumPy array of numbers can't do well. With no `index=`, pandas labels the values 0, 1, 2, …\n\n`.value_counts()` counts each distinct value, **most common first**: R's `table(race)`, sorted. `normalize=True` gives proportions instead, like `prop.table(table(race))`.\n\nThe slide's point: storing categories as plain text works for many things (\"many, but not all, functions\"). For a fixed set of levels with an order, use a **Categorical** (next).",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-17-cat",
+    "label": "pd.Categorical: Python's factor, built from codes",
+    "question": "",
+    "code": "educ = pd.Categorical.from_codes([0, 2, 1, 3, 1, 4],\n                                 categories=[\"No HS\", \"HS\", \"Some College\", \"College\", \"Graduate\"],\n                                 ordered=True)   # optional\neduc\n#> ['No HS', 'Some College', 'HS', 'College', 'HS', 'Graduate']\n#> Categories (5, str): ['No HS' < 'HS' < 'Some College' < 'College' < 'Graduate']\neduc + 1\n#> TypeError: unsupported operand type(s) for +: 'Categorical' and 'int'",
+    "comment": "A **Categorical** is R's **factor**: a fixed set of allowed values (*categories*, R's *levels*), each stored as a small integer **code**.\n\n`pd.Categorical.from_codes(codes, categories=...)` builds it from the codes: code **0** means the **first** category (\"No HS\"), 2 means the third (\"Some College\"), and so on. It's 0-based, while R's codes start at 1.\n\n| pandas | R |\n|---|---|\n| `pd.Categorical.from_codes([0, 2, 1], categories=[...])` | `factor(c(1, 3, 2), labels = c(...))` |\n| `ordered=True` | `factor(..., ordered = TRUE)` |\n| printout `'No HS' < 'HS' < ...` | `Levels: No HS < HS < ...` |\n\n**Arithmetic isn't defined:** `educ + 1` is a TypeError, because adding 1 to \"College\" means nothing. R gives a warning and `NA` for the same thing.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-17-cat-aux",
+    "label": "Working with a Categorical: .categories, .codes, indexing, assigning",
+    "question": "",
+    "code": "educ.categories\n#> Index(['No HS', 'HS', 'Some College', 'College', 'Graduate'], dtype='str')\neduc.codes\n#> array([0, 2, 1, 3, 1, 4], dtype=int8)\neduc[2]\n#> 'HS'\neduc[2] = \"No HS\"        # allowed: \"No HS\" is one of the categories\neduc\n#> ['No HS', 'Some College', 'No HS', 'College', 'HS', 'Graduate']\n#> Categories (5, str): ['No HS' < 'HS' < 'Some College' < 'College' < 'Graduate']\neduc[0] = \"PhD\"          # not a category\n#> TypeError: Cannot setitem on a Categorical with a new category (PhD), set the categories first\neduc > \"HS\"              # ordered=True allows comparisons\n#> array([False,  True, False,  True, False,  True])",
+    "comment": "| pandas | Gives | R |\n|---|---|---|\n| `educ.categories` | the allowed values, in order | `levels(educ)` |\n| `educ.codes` | the integer behind each value (from 0) | `as.integer(educ)` (from 1) |\n| `educ[2]` | the third value | `educ[3]` |\n| `educ[2] = \"No HS\"` | change one value | `educ[3] <- \"No HS\"` |\n\nYou can only assign values that are **already categories**. `educ[0] = \"PhD\"` fails with `TypeError: Cannot setitem on a Categorical with a new category (PhD), set the categories first`. In R this gives a warning and an `NA` instead.\n\n*Beyond the slides:* because `ordered=True`, comparisons like `educ > \"HS\"` work and give a True/False array, the same as an ordered factor in R. Without `ordered=True` that comparison is an error.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-17-cat-series",
+    "label": "A Categorical is not a Series (slide correction) and .astype(\"category\")",
+    "question": "",
+    "code": "isinstance(educ, pd.Series)          # the slide says it is; it isn't\n#> False\nrace_cat = race.astype(\"category\")   # a Series whose values are categorical\nrace_cat.dtype\n#> CategoricalDtype(categories=['black', 'hispanic', 'other', 'white'], ordered=False, categories_dtype=str)\nrace_cat.cat.categories\n#> Index(['black', 'hispanic', 'other', 'white'], dtype='str')",
+    "comment": "**The slide says \"Since a Categorical is a Series, you can index (or assign to) it.\" That's wrong.** `pd.Categorical` is its own array type; `isinstance(educ, pd.Series)` is `False`. You can index and assign to it because it behaves like an array, not because it's a Series.\n\nThe connection: a **Series can hold categorical values**. That happens when\n- you put a Categorical into a DataFrame or `pd.Series(educ)`, or\n- you convert a text Series with `race.astype(\"category\")` (R's `factor(race)`).\n\nThe Series then has `dtype: category`, and its categorical tools are under `.cat`: `race_cat.cat.categories` is `levels()`. Categories made this way are sorted alphabetically, like R's `factor()`.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-17-df",
+    "label": "pd.DataFrame({...}): a data frame from a dict of columns",
+    "question": "",
+    "code": "people = pd.DataFrame({\"race\": race, \"educ\": educ})\npeople\n#>        race          educ\n#> 0     black         No HS\n#> 1     white  Some College\n#> 2     white         No HS\n#> 3  hispanic       College\n#> 4     black            HS\n#> 5     other      Graduate\npeople.dtypes\n#> race         str\n#> educ    category\n#> dtype: object",
+    "comment": "A **DataFrame** is a table: like a **dict** whose values are columns that all have the **same length**. Since a dict can hold different types, so can a DataFrame: here `race` is text and `educ` is categorical.\n\n| pandas | R |\n|---|---|\n| `pd.DataFrame({\"race\": race, \"educ\": educ})` | `data.frame(race = race, educ = educ)` |\n| `.dtypes` | `str(df)` / `sapply(df, class)` |\n\nThe left column (0 to 5) is the **index**, the row labels. If every column has the same type, a DataFrame is conceptually a 2D NumPy array.\n\n**Watch out:** columns of different lengths give `ValueError: All arrays must be of the same length` (R: `arguments imply differing number of rows`).",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-17-mtcars",
+    "label": "Loading mtcars with statsmodels: get_rdataset()",
+    "question": "",
+    "code": "import statsmodels.api as sm\nmtcars = sm.datasets.get_rdataset(\"mtcars\", \"datasets\").data\nmtcars.head()            # first 5 rows; just mtcars prints all 32\n#>                     mpg  cyl   disp   hp  drat     wt   qsec  vs  am  gear  carb\n#> rownames                                                                        \n#> Mazda RX4          21.0    6  160.0  110  3.90  2.620  16.46   0   1     4     4\n#> Mazda RX4 Wag      21.0    6  160.0  110  3.90  2.875  17.02   0   1     4     4\n#> Datsun 710         22.8    4  108.0   93  3.85  2.320  18.61   1   1     4     1\n#> Hornet 4 Drive     21.4    6  258.0  110  3.08  3.215  19.44   1   0     3     1\n#> Hornet Sportabout  18.7    8  360.0  175  3.15  3.440  17.02   0   0     3     2",
+    "comment": "`sm.datasets.get_rdataset(\"mtcars\", \"datasets\")` downloads R's built-in `mtcars` (package `datasets`); `.data` is the DataFrame. It needs **statsmodels** installed (`reticulate::py_install(\"statsmodels\")`) and an internet connection.\n\nThe car names became the **index** (labeled `rownames`), like R's row names. `.head()` shows the first 5 rows (R's `head()`); typing `mtcars` alone shows all 32.\n\n*In RStudio you can also skip the download:* R's `mtcars` is available in Python as `r.mtcars` through reticulate.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-17-attrs",
+    "label": "DataFrame attributes: .shape, .size, .index, .columns, .axes, .dtypes",
+    "question": "How many rows and columns does a DataFrame have, what are its column names and types (like dim, nrow, names, str in R)?",
+    "code": "mtcars.shape\n#> (32, 11)\nmtcars.size              # rows x columns = number of cells\n#> 352\nmtcars.index[:4]         # row labels (first 4)\n#> Index(['Mazda RX4', 'Mazda RX4 Wag', 'Datsun 710', 'Hornet 4 Drive'], dtype='str', name='rownames')\nmtcars.columns\n#> Index(['mpg', 'cyl', 'disp', 'hp', 'drat', 'wt', 'qsec', 'vs', 'am', 'gear', 'carb'], dtype='str')\nlen(mtcars.axes)         # .axes is [index, columns]\n#> 2\nmtcars.dtypes\n#> mpg     float64\n#> cyl       int64\n#> disp    float64\n#> hp        int64\n#> drat    float64\n#> wt      float64\n#> qsec    float64\n#> vs        int64\n#> am        int64\n#> gear      int64\n#> carb      int64\n#> dtype: object\nmtcars.attrs\n#> {}\nmtcars.flags\n#> <Flags(allows_duplicate_labels=True)>",
+    "comment": "All of these are attributes: **no parentheses**.\n\n| pandas | Gives | R |\n|---|---|---|\n| `.shape` | `(rows, columns)` | `dim()` |\n| `.size` | number of **cells**, rows × columns | `length(as.matrix(df))` |\n| `.index` | row labels | `rownames()` |\n| `.columns` | column names | `names()` / `colnames()` |\n| `.axes` | `[index, columns]`: both at once | `dimnames()` |\n| `.dtypes` | type of each column | `sapply(df, class)` |\n| `.attrs` | extra metadata (usually empty `{}`) | `attributes()` |\n| `.flags` | settings like allowing duplicate labels | |\n\n**The slide's questions:**\n- *How does `.size` differ from `.shape`?* `.shape` is `(32, 11)`; `.size` is the product, 352. **`.size` is not the number of rows**: that's `.shape[0]` or `len(mtcars)`. R's `length(df)` gives the number of **columns**, so all three differ.\n- *How does `.axes` differ from `.index` and `.columns`?* It's a list holding both: `mtcars.axes[0]` is `.index`, `mtcars.axes[1]` is `.columns`.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-17-prac1",
+    "label": "Practice 1 · A Series of strikeouts by pitcher",
+    "question": "ks holds strikeouts: Ana 8, Cara 11, Dev 5, Emmy 9 (labels are the names). Get Emmy's total, change Dev's to 6, show Emmy and Ana in that order, keep the pitchers with 8 or more, and get the last value by position.",
+    "code": "import pandas as pd\nks = pd.Series([8, 11, 5, 9], index=[\"Ana\", \"Cara\", \"Dev\", \"Emmy\"])\nks[\"Emmy\"]\n#> np.int64(9)\nks[\"Dev\"] = 6\nks[[\"Emmy\", \"Ana\"]]\n#> Emmy    9\n#> Ana     8\n#> dtype: int64\nks[ks >= 8]\n#> Ana      8\n#> Cara    11\n#> Emmy     9\n#> dtype: int64\nks.iloc[-1]\n#> np.int64(9)",
+    "comment": "Matches **A Series** and **More Series basics**. Labels go in quotes; a list of labels needs double brackets; `.iloc[-1]` is the last value by position. `ks[ks >= 8]` works just like the True/False filtering of NumPy arrays.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-17-prac2",
+    "label": "Practice 2 · A Categorical of pitch types",
+    "question": "Build pitch types from codes [0, 2, 2, 1, 0, 2] with categories fastball, changeup, riseball. Show the codes and categories, count each pitch, change the 2nd pitch to fastball, then try curveball and try adding 1. Which lines fail and why?",
+    "code": "import pandas as pd\npitch = pd.Categorical.from_codes([0, 2, 2, 1, 0, 2],\n                                  categories=[\"fastball\", \"changeup\", \"riseball\"])\npitch.codes\n#> array([0, 2, 2, 1, 0, 2], dtype=int8)\npitch.categories\n#> Index(['fastball', 'changeup', 'riseball'], dtype='str')\npd.Series(pitch).value_counts()\n#> riseball    3\n#> fastball    2\n#> changeup    1\n#> Name: count, dtype: int64\npitch[1] = \"fastball\"\npitch[1] = \"curveball\"\n#> TypeError: Cannot setitem on a Categorical with a new category (curveball), set the categories first\npitch + 1\n#> TypeError: unsupported operand type(s) for +: 'Categorical' and 'int'",
+    "comment": "Matches **pd.Categorical** and **Working with a Categorical**. Codes start at 0, so code 2 is the third category (riseball). `\"fastball\"` is allowed because it's a category; `\"curveball\"` isn't, so it's a TypeError until you add it to the categories. To count a Categorical, wrap it in `pd.Series()` first, or put it in a DataFrame.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-17-prac3",
+    "label": "Practice 3 · A roster DataFrame with an ordered class year",
+    "question": "Make a DataFrame with name, era and class year (an ordered Categorical: First-year < Sophomore < Junior < Senior) for 5 players. Find its shape, size, column names and column types, and which players are Juniors or Seniors.",
+    "code": "import pandas as pd\nyear = pd.Categorical.from_codes([3, 0, 1, 1, 2],\n                                 categories=[\"First-year\", \"Sophomore\", \"Junior\", \"Senior\"],\n                                 ordered=True)\nroster = pd.DataFrame({\"name\": [\"Ana\", \"Ben\", \"Cara\", \"Dev\", \"Emmy\"],\n                       \"era\": [2.10, 3.45, 1.98, 4.02, 1.85],\n                       \"year\": year})\nroster.shape\n#> (5, 3)\nroster.size\n#> 15\nroster.columns\n#> Index(['name', 'era', 'year'], dtype='str')\nroster.dtypes\n#> name         str\n#> era      float64\n#> year    category\n#> dtype: object\nyear >= \"Junior\"\n#> array([ True, False, False, False,  True])",
+    "comment": "Matches **pd.DataFrame**, **attributes** and **ordered Categoricals**. 5 rows × 3 columns gives `.size` 15. The three columns have three different types (text, float, category), which a NumPy array can't hold. `year >= \"Junior\"` works only because of `ordered=True`.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-17-prac4",
+    "label": "Practice 4 · mtcars attributes",
+    "question": "Load mtcars. How many cars and variables are there, which cars come first and last, which columns hold decimals, and check that .size equals rows × columns.",
+    "code": "import statsmodels.api as sm\nmtcars = sm.datasets.get_rdataset(\"mtcars\", \"datasets\").data\nmtcars.shape\n#> (32, 11)\nmtcars.shape[0]                       # how many cars\n#> 32\nmtcars.index[0], mtcars.index[-1]     # first and last car\n#> ('Mazda RX4', 'Volvo 142E')\nlist(mtcars.columns[mtcars.dtypes == \"float64\"])   # decimal columns\n#> ['mpg', 'disp', 'drat', 'wt', 'qsec']\nmtcars.size == mtcars.shape[0] * mtcars.shape[1]\n#> True",
+    "comment": "Matches **get_rdataset()** and **DataFrame attributes**. `.shape[0]` is the number of rows (cars); `.index` holds the car names, so `[0]` and `[-1]` are the first and last. Comparing `.dtypes` to `\"float64\"` gives a True/False array that filters `.columns`, like `names(mtcars)[sapply(mtcars, is.double)]`. In R, `mpg` and every other column are double, but pandas keeps the whole-number ones as integers.",
     "key": false,
     "lang": "python"
    }
@@ -6567,7 +6741,7 @@ window.ENTRIES = {
   "pdfs": [],
   "notes": "Every Python function and operator from the Python lectures so far, one card each: **what it does, when to use it, the R function you already know**, a tiny example run in Python with its output, and the usual mistake.\n\n**Find one by what you want to do:** search \"remove duplicates\", \"first element of a list\", \"convert text to number\" or \"lowercase\". **Python comes first in every search**, since the rest of the course is Python. To get the R version instead, say so: \"mean by group **in R**\", \"add a column in **tidyverse**\", or type an R function like `tapply(`. New cards get added with each Python lecture.",
   "takeaways": [],
-  "updatedAt": "2026-11-05T03:30:00Z",
+  "updatedAt": "2026-11-09T19:30:00Z",
   "chunks": [
    {
     "id": "kit-04-p00",
@@ -6836,6 +7010,60 @@ window.ENTRIES = {
     "question": "Use it when: Find which positions are True, or join arrays.\n\nSearch words: numpy which, positions where true, find index, stack arrays, cbind, rbind, combine arrays",
     "code": "import numpy as np\nnp.where(np.array([5, 1, 8]) > 4)\n#> (array([0, 2]),)\nnp.vstack([np.array([1, 2]), np.array([3, 4])])\n#> array([[1, 2],\n#>        [3, 4]])",
     "comment": "**Why / when:** `np.where()` returns 0-based positions.\n\n**R version:** `which()`, `cbind()`, `rbind()`\n\n**From:** Py 16",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-r00",
+    "label": "pd.Series(values, index=[...]) · values with labels",
+    "question": "Use it when: A named vector in Python: values you look up by name.\n\nSearch words: pandas series, named vector, labels, index, look up by name, python named vector, series index",
+    "code": "import pandas as pd\ns = pd.Series([4, 7, -5], index=[\"d\", \"b\", \"a\"])\ns[\"a\"]\n#> np.int64(-5)\ns[[\"a\", \"d\"]]\n#> a   -5\n#> d    4\n#> dtype: int64\ns.iloc[0]\n#> np.int64(4)",
+    "comment": "**Why / when:** Each value gets a label. `s[\"a\"]` by label, `s[[\"a\", \"d\"]]` for several, `s.iloc[0]` by position.\n\n**R version:** `c(d = 4, b = 7, a = -5)`, `s[\"a\"]`, `s[1]`\n\n**Watch out:** Several labels need double brackets. Use `.iloc` for positions; `s[0]` is a KeyError in newer pandas.\n\n**From:** Py 17",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-r01",
+    "label": ".value_counts() · count each value",
+    "question": "Use it when: How many times each category appears in Python.\n\nSearch words: python table, frequency table, count values, count each value, how many of each, count categories, counts per category, value counts, tally, proportions, pandas column counts",
+    "code": "import pandas as pd\nrace = pd.Series([\"black\", \"white\", \"white\", \"other\"])\nrace.value_counts()\n#> white    2\n#> black    1\n#> other    1\n#> Name: count, dtype: int64\nrace.value_counts(normalize=True)\n#> white    0.50\n#> black    0.25\n#> other    0.25\n#> Name: proportion, dtype: float64",
+    "comment": "**Why / when:** Counts per value, most common first. `normalize=True` gives proportions.\n\n**R version:** `table()`, `prop.table(table())`\n\n**Watch out:** It's a Series method; a plain list or a Categorical needs `pd.Series(...)` around it first.\n\n**From:** Py 17",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-r02",
+    "label": "pd.Categorical.from_codes() / .astype(\"category\") · make a factor",
+    "question": "Use it when: A variable with a fixed set of levels, possibly ordered.\n\nSearch words: python factor, categorical, levels, ordered factor, codes, categories, convert to factor, as.factor",
+    "code": "import pandas as pd\neduc = pd.Categorical.from_codes([0, 2, 1], categories=[\"No HS\", \"HS\", \"College\"], ordered=True)\neduc\n#> ['No HS', 'College', 'HS']\n#> Categories (3, str): ['No HS' < 'HS' < 'College']\neduc.codes\n#> array([0, 2, 1], dtype=int8)\neduc.categories\n#> Index(['No HS', 'HS', 'College'], dtype='str')\neduc > \"No HS\"\n#> array([False,  True,  True])\npd.Series([\"b\", \"a\", \"b\"]).astype(\"category\").cat.categories\n#> Index(['a', 'b'], dtype='str')",
+    "comment": "**Why / when:** Code 0 is the first category. `ordered=True` allows `<`/`>`. `.astype(\"category\")` turns a text Series into categorical, levels sorted alphabetically.\n\n**R version:** `factor(..., levels = , ordered = TRUE)`, `levels()`, `as.integer()`\n\n**Watch out:** No arithmetic (`educ + 1` is a TypeError), and assigning a value that isn't a category is a TypeError.\n\n**From:** Py 17",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-r03",
+    "label": "pd.DataFrame({...}) · make a data frame",
+    "question": "Use it when: Build a table from columns in Python.\n\nSearch words: pandas dataframe, data frame in python, make a table, data.frame, columns from dict, create dataframe",
+    "code": "import pandas as pd\ndf = pd.DataFrame({\"name\": [\"Ana\", \"Ben\"], \"era\": [2.10, 3.45]})\ndf\n#>   name   era\n#> 0  Ana  2.10\n#> 1  Ben  3.45",
+    "comment": "**Why / when:** A dict of equal-length columns; keys become column names, and types can differ by column.\n\n**R version:** `data.frame(name = ..., era = ...)`\n\n**Watch out:** Columns of different lengths: `ValueError: All arrays must be of the same length`.\n\n**From:** Py 17",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-r04",
+    "label": ".shape / .size / .columns / .index / .dtypes · describe a DataFrame",
+    "question": "Use it when: Rows, columns, column names, row names or column types of a data frame.\n\nSearch words: dataframe dimensions, number of rows, nrow, ncol, dim, column names, names, row names, column types, str, dtypes, size",
+    "code": "import pandas as pd\ndf = pd.DataFrame({\"name\": [\"Ana\", \"Ben\", \"Cara\"], \"era\": [2.10, 3.45, 1.98]})\ndf.shape\n#> (3, 2)\ndf.shape[0]\n#> 3\ndf.size\n#> 6\ndf.columns\n#> Index(['name', 'era'], dtype='str')\ndf.dtypes\n#> name        str\n#> era     float64\n#> dtype: object",
+    "comment": "**Why / when:** `.shape` is (rows, columns); `.size` is rows × columns; `.axes` is `[index, columns]`.\n\n**R version:** `dim()`, `nrow()`, `names()`, `rownames()`, `sapply(df, class)`\n\n**Watch out:** No parentheses: `df.shape()` is an error. `.size` is not the number of rows.\n\n**From:** Py 17",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-r05",
+    "label": "sm.datasets.get_rdataset() · load an R dataset like mtcars",
+    "question": "Use it when: Use mtcars (or another R dataset) in Python.\n\nSearch words: mtcars python, load dataset, r datasets in python, statsmodels, get_rdataset, iris python, head",
+    "code": "import statsmodels.api as sm\nmtcars = sm.datasets.get_rdataset(\"mtcars\", \"datasets\").data\nmtcars.shape\n#> (32, 11)\nmtcars.head(3)\n#>                 mpg  cyl   disp   hp  drat     wt   qsec  vs  am  gear  carb\n#> rownames                                                                    \n#> Mazda RX4      21.0    6  160.0  110  3.90  2.620  16.46   0   1     4     4\n#> Mazda RX4 Wag  21.0    6  160.0  110  3.90  2.875  17.02   0   1     4     4\n#> Datsun 710     22.8    4  108.0   93  3.85  2.320  18.61   1   1     4     1",
+    "comment": "**Why / when:** Downloads the dataset; `.data` is the DataFrame, with R's row names as the index. `.head()` shows the first rows.\n\n**R version:** `data(mtcars)`, `head(mtcars, 3)`\n\n**Watch out:** Needs statsmodels and internet. In RStudio, `r.mtcars` gets R's copy through reticulate.\n\n**From:** Py 17",
     "key": false,
     "lang": "python"
    }

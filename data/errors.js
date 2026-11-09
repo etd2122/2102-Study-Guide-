@@ -31,7 +31,8 @@ window.R_ERRORS = [
   title:"TypeError: unsupported operand type(s) for +: 'float' and 'str' (Python)",
   means:"You combined a number and text. Python won't guess which one you meant.",
   causes:["A number stored as text, like `\"19.99\"` read from a file.",
-          "Gluing a number into a sentence with `+`."],
+          "Gluing a number into a sentence with `+`.",
+          "Math on a pandas Categorical (`'Categorical' and 'int'`): categories like \"College\" can't be added to. Use `.codes` if you really need the numbers (Py 17)."],
   fix:"Convert first: `float(\"19.99\")` for math, `str(5)` to join with text.",
   wrong:"\"Total: \" + 5", right:"\"Total: \" + str(5)", see:['py-15','Strings: quotes, joining with +, and why z + \'3\' fails'] },
 
@@ -74,6 +75,28 @@ window.R_ERRORS = [
           "Arrays of different lengths, like 5 values minus 4 values."],
   fix:"Print `.shape` of both. To apply to every row use a 1-row array `np.array([[a, b]])`; for every column use a 1-column array `np.array([[a], [b], [c]])`.",
   wrong:"demo1 - np.array([1, 2, 3])       # demo1 is 3 x 2", right:"demo1 - np.array([[1], [2], [3]])  # 3 x 1 column", see:['py-16','Broadcasting: arrays with numbers, rows and columns'] },
+
+{ id:'py-cat-new', match:"Cannot setitem on a Categorical with a new category", kind:'Error',
+  title:"TypeError: Cannot setitem on a Categorical with a new category (pandas)",
+  means:"You assigned a value that isn't one of the Categorical's categories (R's levels).",
+  causes:["A typo or different capitals: `\"no hs\"` vs `\"No HS\"`.",
+          "A genuinely new level, like `\"PhD\"` when the categories stop at `\"Graduate\"`."],
+  fix:"Check `x.categories`. To allow a new value, add it first: `x = x.add_categories([\"PhD\"])`, then assign. (R gives a warning and an NA instead of an error.)",
+  wrong:"educ[0] = \"PhD\"", right:"educ = educ.add_categories([\"PhD\"])\neduc[0] = \"PhD\"", see:['py-17','Working with a Categorical: .categories, .codes, indexing, assigning'] },
+
+{ id:'py-cat-unordered', match:"Unordered Categoricals can only compare equality", kind:'Error',
+  title:"TypeError: Unordered Categoricals can only compare equality or not (pandas)",
+  means:"You used `<`, `>`, `<=` or `>=` on a Categorical with no order.",
+  causes:["The Categorical was made without `ordered=True`, so \"HS\" < \"College\" means nothing to pandas."],
+  fix:"Make it with `ordered=True` (categories listed from lowest to highest), or use `==` / `!=` only.",
+  wrong:"pd.Categorical.from_codes([0, 1], categories=[\"HS\", \"College\"]) > \"HS\"", right:"pd.Categorical.from_codes([0, 1], categories=[\"HS\", \"College\"], ordered=True) > \"HS\"", see:['py-17','pd.Categorical: Python\'s factor, built from codes'] },
+
+{ id:'py-series-tuple', match:"key of type tuple not found", kind:'Error',
+  title:"KeyError: 'key of type tuple not found and not a MultiIndex' (pandas)",
+  means:"You asked a Series for several labels with only one set of brackets.",
+  causes:["`s[\"c\", \"a\"]` passes the pair (\"c\", \"a\") as ONE label."],
+  fix:"Put the labels in a list: two sets of brackets, `s[[\"c\", \"a\"]]`.",
+  wrong:"obj2[\"c\", \"a\"]", right:"obj2[[\"c\", \"a\"]]", see:['py-17','A Series: values with labels, obj2["a"] and obj2[["c", "a"]]'] },
 
 { id:'py-key', match:"KeyError", kind:'Error',
   title:"KeyError: 'name' (Python)",

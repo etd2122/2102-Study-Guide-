@@ -51,6 +51,9 @@ If the exam Wi-Fi is slow or blocked: on the repository page click **Code → Do
 
 ## Tools on the site
 
+- **Search box (code search)**: type a function or what you need ("loc", "count missing values", "average by group"). The sidebar lists the matching code chunks themselves, with a preview and a Copy button; click one to jump to it, or press **Enter** for every match with its full code and output. It forgives typos (`grupby`) and knows R names (`table` → `.value_counts()`, `is.na` → `.isna()`). Python comes first unless you add "in R" or "tidyverse".
+- **Python Quiz study page**: every point and exam chunk tagged *Python Quiz* (Py 14–18, Rec 10, HW 4), an R → Python lookup table, and a button for Python-only Self-test questions.
+
 - **Find code for a question**: paste an exam question; it lists the steps it needs and the most similar code on the site.
 - **Check code / error**: paste your R code and it points out common mistakes by line (missing brackets or commas, `replace = TRUE`, `==` vs `=`, `if` on a vector, loops that overwrite or never stop, functions that return nothing, capitalized levels…) with the fix. Or paste an R error / warning (or describe a strange result like "answer is NA") and it explains the cause and the fix. It does not run the code.
 - **Self-test**: random practice questions with the code hidden; mark each one "I got it" or "Need practice" and review the missed ones.

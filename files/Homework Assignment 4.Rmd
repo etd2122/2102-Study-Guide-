@@ -1,0 +1,84 @@
+---
+title: "UNSTAT2102: Homework 4"
+author: "Due Tuesday November 17 by 11:59PM"
+output: 
+  pdf_document: 
+    number_sections: true
+---
+
+You should create Python chunks below (no R) to answer each of the following questions.
+
+# Basic Python (12 points)
+
+## Columbia Courses
+
+Create a list that has the course abbreviations (letters and numbers) for all the courses that you have completed at Columbia, not including this semester. You should assign it to a symbol.
+
+## List Extension
+
+Modify the list (in place) that you created in the previous subproblem to include the course abbreviations for all of the classes that you are taking this semester.
+
+## Months and Days
+
+Create a dictionary whose keys are the months and whose values are the number of days in the corresponding month in 2026. You should assign it to a symbol.
+
+## Leap Years
+
+Now presume it is a leap year like 2028. Modify the dictionary that you created in the previous problem to include the correct number of days in February.
+
+# Using NumPy (12 points)
+
+## Creating a Matrix
+
+Create a two-dimensional numpy array with 10 rows and 5 columns where each element of that matrix is drawn independently from a normal distribution with a mean of 2 and a standard deviation of 3. You should assign it to a symbol.
+
+## Subsetting a Matrix
+
+Create a copy of a new matrix that consists of all the columns of the matrix you created in the previous subproblem where the value in the initial column is greater than $1$. You should assign it to an object.
+
+## Rowsums
+
+Create a vector that contains the sum across each row of the matrix in the previous subproblem. You should assign it to an object.
+
+## Data Type
+
+What is the type of object common to all elements of the vector in the previous subproblem?
+
+# Using Pandas (12 points)
+
+First, read this Wikipedia article on how Gross Domestic Product can be measured
+
+<https://en.wikipedia.org/wiki/Gross_domestic_product>
+
+We are going to compare real quarterly growth rates between what Wikipedia calls "the expenditure approach (GDP)" and "the income approach (GDI)".
+
+Execute the following to download that data from the United States Federal Reserve.
+
+```{python}
+import pandas as pd
+
+url = ("https://fred.stlouisfed.org/graph/fredgraph.csv"
+       "?id=A191RL1Q225SBEA,A261RL1Q225SBEA")
+growth = pd.read_csv(url,
+                     header=0, 
+                     names=["quarter", "gdp_growth", "gdi_growth"],
+                     parse_dates=["quarter"], 
+                     index_col="quarter")
+
+```
+
+## Observations
+
+How many observations are there and what is the date range that they span?
+
+## Missing Values
+
+How many values are missing on each of the variables in `growth`?
+
+## Correlation
+
+What is the correlation between the observed values of GDP growth and GDI growth?
+
+## Gross Domestic Output
+
+Many economists contend that the average of GDP growth and GDI growth is a more reliable measure of the change in output. Create a new column within `growth` called `gdo_growth` that computes this average.

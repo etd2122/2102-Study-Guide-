@@ -1,12 +1,14 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-11-09T19:30:00Z";
+window.ENTRIES_SAVED = "2026-11-14T20:00:00Z";
 window.ENTRIES = {
  "py-14": {
   "type": "py",
   "num": "14",
   "title": "Introduction to Python: setup, the REPL, arithmetic and indentation",
   "date": "",
-  "exams": [],
+  "exams": [
+   "Python Quiz"
+  ],
   "topics": [
    "python setup",
    "reticulate",
@@ -159,7 +161,9 @@ window.ENTRIES = {
   "num": "15",
   "title": "Variables, data types and containers: tuple, list, dict, set",
   "date": "",
-  "exams": [],
+  "exams": [
+   "Python Quiz"
+  ],
   "topics": [
    "assignment",
    "int",
@@ -391,7 +395,9 @@ window.ENTRIES = {
   "num": "16",
   "title": "Indexing, copies and NumPy arrays",
   "date": "",
-  "exams": [],
+  "exams": [
+   "Python Quiz"
+  ],
   "topics": [
    "indexing",
    "insert",
@@ -653,7 +659,9 @@ window.ENTRIES = {
   "num": "17",
   "title": "pandas: Series, Categoricals and DataFrames (plus NumPy review)",
   "date": "",
-  "exams": [],
+  "exams": [
+   "Python Quiz"
+  ],
   "topics": [
    "pandas",
    "series",
@@ -6733,7 +6741,9 @@ window.ENTRIES = {
   "num": "04",
   "title": "Function finder: Python (what each function does, with the R version)",
   "date": "",
-  "exams": [],
+  "exams": [
+   "Python Quiz"
+  ],
   "topics": [
    "python",
    "function finder"
@@ -6741,7 +6751,7 @@ window.ENTRIES = {
   "pdfs": [],
   "notes": "Every Python function and operator from the Python lectures so far, one card each: **what it does, when to use it, the R function you already know**, a tiny example run in Python with its output, and the usual mistake.\n\n**Find one by what you want to do:** search \"remove duplicates\", \"first element of a list\", \"convert text to number\" or \"lowercase\". **Python comes first in every search**, since the rest of the course is Python. To get the R version instead, say so: \"mean by group **in R**\", \"add a column in **tidyverse**\", or type an R function like `tapply(`. New cards get added with each Python lecture.",
   "takeaways": [],
-  "updatedAt": "2026-11-09T19:30:00Z",
+  "updatedAt": "2026-11-14T20:00:00Z",
   "chunks": [
    {
     "id": "kit-04-p00",
@@ -7064,6 +7074,168 @@ window.ENTRIES = {
     "question": "Use it when: Use mtcars (or another R dataset) in Python.\n\nSearch words: mtcars python, load dataset, r datasets in python, statsmodels, get_rdataset, iris python, head",
     "code": "import statsmodels.api as sm\nmtcars = sm.datasets.get_rdataset(\"mtcars\", \"datasets\").data\nmtcars.shape\n#> (32, 11)\nmtcars.head(3)\n#>                 mpg  cyl   disp   hp  drat     wt   qsec  vs  am  gear  carb\n#> rownames                                                                    \n#> Mazda RX4      21.0    6  160.0  110  3.90  2.620  16.46   0   1     4     4\n#> Mazda RX4 Wag  21.0    6  160.0  110  3.90  2.875  17.02   0   1     4     4\n#> Datsun 710     22.8    4  108.0   93  3.85  2.320  18.61   1   1     4     1",
     "comment": "**Why / when:** Downloads the dataset; `.data` is the DataFrame, with R's row names as the index. `.head()` shows the first rows.\n\n**R version:** `data(mtcars)`, `head(mtcars, 3)`\n\n**Watch out:** Needs statsmodels and internet. In RStudio, `r.mtcars` gets R's copy through reticulate.\n\n**From:** Py 17",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p36",
+    "label": "pd.read_csv() · read a CSV file into a DataFrame",
+    "question": "Use it when: You need to load data from a .csv file or a web link.\n\nSearch words: read csv, load data, import data, read file, read.csv, open dataset, read_csv, url",
+    "code": "tips = pd.read_csv(\"tips.csv\")      # or a URL\ntips.shape\n#> (244, 6)",
+    "comment": "**Why / when:** R's `read.csv()`. Add `index_col=\"col\"` to use a column as row labels, `parse_dates=[\"col\"]` for dates.\n\n**Watch out:** the file path is relative to your working folder (the `.Rproj` folder in RStudio).\n\n**From:** Py 18, HW 4",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p37",
+    "label": ".head() / .tail() · first or last rows",
+    "question": "Use it when: You want a quick look at the data.\n\nSearch words: head, tail, first rows, last rows, preview, peek, top rows",
+    "code": "tips.head(3)\n#>    total_bill   tip smoker  day    time  size\n#> 0       16.99  1.01     No  Sun  Dinner     2\n#> 1       10.34  1.66     No  Sun  Dinner     3\n#> 2       21.01  3.50     No  Sun  Dinner     3\ntips.tail(2)\n#>      total_bill   tip smoker   day    time  size\n#> 242       17.82  1.75     No   Sat  Dinner     2\n#> 243       18.78  3.00     No  Thur  Dinner     2",
+    "comment": "**Why / when:** R's `head()` / `tail()`; default is 5 rows.\n\n**From:** Py 18",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p38",
+    "label": "df.loc[condition, [cols]] · rows that meet a condition",
+    "question": "Use it when: You want rows where a column meets a condition, optionally only some columns.\n\nSearch words: filter rows, subset rows, condition, where, select rows, boolean, mask, which rows, loc, subset, filter",
+    "code": "tips.loc[tips[\"total_bill\"] > 45, [\"total_bill\", \"tip\", \"day\"]]\n#>      total_bill    tip  day\n#> 59        48.27   6.73  Sat\n#> 156       48.17   5.00  Sun\n#> 170       50.81  10.00  Sat\n#> 182       45.35   3.50  Sun\n#> 212       48.33   9.00  Sat",
+    "comment": "**Why / when:** R's `df[cond, c(...)]` or `filter()` + `select()`. Also takes labels: `df.loc[107, \"student\"]`; label slices include the end.\n\n**Watch out:** two conditions need `&` / `|` and parentheses around each: `(a > 1) & (b == \"x\")`.\n\n**From:** Py 18, Rec 10",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p39",
+    "label": "df.iloc[rows, cols] · rows and columns by position",
+    "question": "Use it when: You want rows or columns by number (first 3 rows, last row, column 2).\n\nSearch words: position, iloc, first rows, row number, column number, by index number, nth row, slice",
+    "code": "tips.iloc[:3, :2]\n#>    total_bill   tip\n#> 0       16.99  1.01\n#> 1       10.34  1.66\n#> 2       21.01  3.50\ntips.iloc[-1]\n#> total_bill     18.78\n#> tip              3.0\n#> smoker            No\n#> day             Thur\n#> time          Dinner\n#> size               2\n#> Name: 243, dtype: object",
+    "comment": "**Why / when:** R's `df[1:3, 1:2]`, but counting from **0** and the slice end **excluded**.\n\n**Watch out:** `.iloc` takes only numbers; column names need `.loc`.\n\n**From:** Py 18, Rec 10",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p40",
+    "label": "df[\"col\"] / df[[\"a\", \"b\"]] · pick one column or several",
+    "question": "Use it when: You want one column (a Series) or several columns (a DataFrame).\n\nSearch words: select column, pick columns, get column, column by name, $, dollar sign, keep columns, select",
+    "code": "tips[\"tip\"].head(2)\n#> 0    1.01\n#> 1    1.66\n#> Name: tip, dtype: float64\ntips[[\"tip\", \"day\"]].shape\n#> (244, 2)",
+    "comment": "**Why / when:** `df[\"col\"]` is R's `df$col`; a **list** of names gives a DataFrame.\n\n**Watch out:** `tips.size` is the DataFrame's cell count, not the size column: use `tips[\"size\"]`.\n\n**From:** Py 18, Rec 10",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p41",
+    "label": "df[\"new\"] = ... · add or change a column",
+    "question": "Use it when: You want a new column computed from other columns.\n\nSearch words: add column, new column, mutate, create variable, compute column, new variable, calculate",
+    "code": "tips[\"tip_pct\"] = 100 * tips[\"tip\"] / tips[\"total_bill\"]\ntips[\"tip_pct\"].round(1).head(3)\n#> 0     5.9\n#> 1    16.1\n#> 2    16.7\n#> Name: tip_pct, dtype: float64",
+    "comment": "**Why / when:** R's `df$new <- ...` / `mutate()`. Math on columns works row by row, no loop. Only some rows: `df.loc[mask, \"col\"] = value`.\n\n**Watch out:** create columns with brackets; `df.new = ...` doesn't add a column.\n\n**From:** Py 18, Rec 10",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p42",
+    "label": "& / | / ~ / .isin() · combine conditions",
+    "question": "Use it when: You need rows meeting two conditions, either condition, NOT a condition, or one of several values.\n\nSearch words: and, or, not, both conditions, multiple conditions, %in%, one of, isin, either",
+    "code": "tips.loc[(tips[\"day\"] == \"Sat\") & (tips[\"tip\"] > 7), [\"tip\", \"day\"]]\n#>        tip  day\n#> 23    7.58  Sat\n#> 170  10.00  Sat\n#> 212   9.00  Sat\ntips[\"day\"].isin([\"Sat\", \"Sun\"]).sum()\n#> np.int64(163)",
+    "comment": "**Why / when:** `&` = and, `|` = or, `~` = not, `.isin([...])` = R's `%in%`.\n\n**Watch out:** `and` / `or` give \"truth value of a Series is ambiguous\"; forgot parentheses gives a TypeError.\n\n**From:** Py 18, Rec 10",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p43",
+    "label": ".isna() / .notna() / .fillna() · missing values",
+    "question": "Use it when: You need to find, count or replace missing values (NaN).\n\nSearch words: missing, na, nan, is.na, count missing, how many missing, replace missing, null, fill na, complete",
+    "code": "df[\"quiz_2\"].isna()\n#> 101    False\n#> 104    False\n#> 107     True\n#> 110    False\n#> Name: quiz_2, dtype: bool\ndf.isna().sum()\n#> student    0\n#> section    0\n#> quiz_1     0\n#> quiz_2     1\n#> dtype: int64\ndf[\"quiz_2\"].fillna(0)\n#> 101    68.0\n#> 104    85.0\n#> 107     0.0\n#> 110    94.0\n#> Name: quiz_2, dtype: float64",
+    "comment": "**Why / when:** `.isna()` is `is.na()`; `.isna().sum()` counts missing (per column on a DataFrame).\n\n**Watch out:** `x == np.nan` is always False. pandas `.mean()` skips NaN by default (`skipna=False` to change).\n\n**From:** Rec 10, HW 4",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p44",
+    "label": ".mean() / .max() / .idxmax() / .corr() · summarize a column",
+    "question": "Use it when: You want the mean, max, where the max is, or a correlation of columns.\n\nSearch words: mean, average, max, maximum, min, which.max, argmax, idxmax, largest, correlation, cor, corr, std, sd",
+    "code": "tips[\"tip\"].mean()\n#> np.float64(2.99827868852459)\ntips[\"total_bill\"].idxmax()\n#> 170\ntips[\"total_bill\"].corr(tips[\"tip\"])\n#> np.float64(0.6757341092113647)",
+    "comment": "**Why / when:** Same names as R mostly. `.idxmax()` gives the row **label** of the max (use with `.loc`); `.argmax()` gives its **position**.\n\n**From:** Py 18, Rec 10",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p45",
+    "label": ".describe() · summary of every numeric column",
+    "question": "Use it when: You want count, mean, sd, min, quartiles and max of all numeric columns at once.\n\nSearch words: summary, describe, quartiles, overview, summary statistics, five number summary",
+    "code": "tips.describe().round(2)\n#>        total_bill     tip    size  tip_pct\n#> count      244.00  244.00  244.00   244.00\n#> mean        19.79    3.00    2.57    16.08\n#> std          8.90    1.38    0.95     6.11\n#> min          3.07    1.00    1.00     3.56\n#> 25%         13.35    2.00    2.00    12.91\n#> 50%         17.80    2.90    2.00    15.48\n#> 75%         24.13    3.56    3.00    19.15\n#> max         50.81   10.00    6.00    71.03",
+    "comment": "**Why / when:** R's `summary()`. Text columns skipped unless `include=\"all\"`.\n\n**From:** Py 18",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p46",
+    "label": ".mean(axis=) / .apply(f, axis=) · per column or per row",
+    "question": "Use it when: You want one result per column, or one result per row (e.g. each student's average).\n\nSearch words: row mean, column mean, rowMeans, colMeans, per row, each row, each column, apply, axis, rowSums",
+    "code": "df[[\"quiz_1\", \"quiz_2\"]].mean()                 # per column\n#> quiz_1    76.750000\n#> quiz_2    82.333333\n#> dtype: float64\ndf[[\"quiz_1\", \"quiz_2\"]].mean(axis=\"columns\")   # per row\n#> 101    64.0\n#> 104    83.5\n#> 107    75.0\n#> 110    92.0\n#> dtype: float64",
+    "comment": "**Why / when:** `axis=0` (default) = one value per column; `axis=1` / `\"columns\"` = per row. `.apply(f, axis=1)` runs your own function on each row.\n\n**Watch out:** `max` on a text column is alphabetical.\n\n**From:** Py 18, Rec 10",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p47",
+    "label": ".str.contains() / .str.upper() / .str.len() · text columns",
+    "question": "Use it when: You need to search or change text in a column.\n\nSearch words: string, text, contains, grepl, detect, upper, lower, nchar, length of string, starts with, str",
+    "code": "tips[\"day\"].str.contains(\"S\").sum()\n#> np.int64(163)\ntips[\"time\"].str.lower().head(2)\n#> 0    dinner\n#> 1    dinner\n#> Name: time, dtype: str",
+    "comment": "**Why / when:** `.str.` methods run on every value: `contains` = `grepl`, `upper` = `toupper`, `len` = `nchar`, `replace` = `gsub`.\n\n**Watch out:** case-sensitive unless `case=False`; needs `.str`.\n\n**From:** Py 18",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p48",
+    "label": "CategoricalDtype(ordered=True) / .astype() · order a text column",
+    "question": "Use it when: A text column has a natural order (days, sizes, class years) and you need sorting or comparisons in that order.\n\nSearch words: factor, ordered factor, levels, order categories, ordered, category, astype, categorical column",
+    "code": "days = pd.api.types.CategoricalDtype(categories=[\"Thur\", \"Fri\", \"Sat\", \"Sun\"], ordered=True)\ntips[\"day\"] = tips[\"day\"].astype(days)\n(tips[\"day\"] >= \"Sat\").sum()\n#> np.int64(163)",
+    "comment": "**Why / when:** R's `factor(x, levels = ..., ordered = TRUE)` for a DataFrame column.\n\n**Watch out:** values not in `categories` become NaN silently.\n\n**From:** Py 18",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p49",
+    "label": ".sort_values() / .rank() · sort rows, rank values",
+    "question": "Use it when: You want rows ordered by a column (largest first), or ranks.\n\nSearch words: sort, order, arrange, descending, largest first, top, rank, ranking, desc",
+    "code": "tips.sort_values(\"tip\", ascending=False).head(3)[[\"tip\", \"day\"]]\n#>        tip  day\n#> 170  10.00  Sat\n#> 212   9.00  Sat\n#> 23    7.58  Sat",
+    "comment": "**Why / when:** R's `arrange()` / `order()`. `sort_values([\"a\", \"b\"], ascending=[False, True])` breaks ties. Labels stay with rows.\n\n**From:** Rec 10",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p50",
+    "label": ".unique() / .map({...}) · distinct values, recode values",
+    "question": "Use it when: You need the distinct values of a column, or to rename values with a lookup.\n\nSearch words: unique, distinct, levels, recode, rename values, map, replace values, lookup",
+    "code": "df[\"section\"].unique()\n#> <StringArray>\n#> ['AM', 'PM']\n#> Length: 2, dtype: str\ndf[\"section\"].map({\"AM\": \"Morning\", \"PM\": \"Afternoon\"})\n#> 101      Morning\n#> 104    Afternoon\n#> 107      Morning\n#> 110    Afternoon\n#> Name: section, dtype: str",
+    "comment": "**Why / when:** `.unique()` = `unique()`; `.map(dict)` = `recode()`.\n\n**Watch out:** a value missing from the dict becomes NaN.\n\n**From:** Rec 10",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p51",
+    "label": ".drop() / .reindex() · remove or reorder rows and columns",
+    "question": "Use it when: You want to remove a column or row, or put rows in a given label order.\n\nSearch words: drop, remove column, delete column, remove row, reindex, reorder rows",
+    "code": "df.drop(columns=\"quiz_2\").columns.tolist()\n#> ['student', 'section', 'quiz_1']\ndf.reindex([110, 101]).loc[:, \"student\"]\n#> 110    Dev\n#> 101    Ari\n#> Name: student, dtype: str",
+    "comment": "**Why / when:** Both return a new DataFrame; the original is unchanged.\n\n**Watch out:** `.reindex` with a label that doesn't exist adds a NaN row.\n\n**From:** Rec 10",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p52",
+    "label": "s1 + s2 lines up labels / .add(fill_value=0) · Series arithmetic",
+    "question": "Use it when: You add or subtract two Series whose labels are in a different order or don't all match.\n\nSearch words: align, alignment, add series, label matching, fill value, bonus, different order, nan after adding",
+    "code": "a = pd.Series([1, 2], index=[\"x\", \"y\"])\nb = pd.Series([10, 20], index=[\"y\", \"z\"])\na + b\n#> x     NaN\n#> y    12.0\n#> z     NaN\n#> dtype: float64\na.add(b, fill_value=0)\n#> x     1.0\n#> y    12.0\n#> z    20.0\n#> dtype: float64",
+    "comment": "**Why / when:** pandas matches **labels**, not positions (R uses positions).\n\n**Watch out:** labels on one side only give NaN; `.reindex(a.index).fillna(0)` keeps exactly a's labels.\n\n**From:** Rec 10",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "kit-04-p53",
+    "label": ".groupby(\"g\")[\"col\"].mean() · a summary by group",
+    "question": "Use it when: You want an average (or count, sum) for each group: by day, by section.\n\nSearch words: group by, groupby, by group, tapply, aggregate, per group, mean by, average by, summarise",
+    "code": "tips.groupby(\"time\")[\"tip\"].mean()\n#> time\n#> Dinner    3.102670\n#> Lunch     2.728088\n#> Name: tip, dtype: float64",
+    "comment": "**Why / when:** R's `tapply(x, g, mean)` / `group_by() |> summarise()`. Beyond the slides, but the natural next step.\n\n**Watch out:** with a categorical group, add `observed=True`.\n\n**From:** Py 18 (beyond the slides)",
     "key": false,
     "lang": "python"
    }
@@ -8035,6 +8207,634 @@ window.ENTRIES = {
     "code": "par(mfrow = c(1, 2))\nhist(delivery$Delivery_Time_min, breaks = 10,\n     col = \"lightsteelblue1\", border = \"white\",\n     xlab = \"Delivery time (minutes)\", ylab = \"Number of Orders\",\n     main = \"Histogram of Delivery Time\")\nboxplot(delivery$Preparation_Time_min, col = \"wheat1\", notch = TRUE,\n        ylab = \"Preparation time (minutes)\", main = \"Boxplot of Prep Time\")\npar(mfrow = c(1, 1))",
     "comment": "[![2.11 plot](files/plots/fd-two.png)](files/plots/fd-two.png)\n\n**Answer:** Delivery time is roughly bell-shaped, centered near 60 minutes (median 60), ranging from 10 to 104. Preparation time is spread evenly between 5 and 29 minutes (median 17) with no outliers.\n\n*On your site:* HW 2 Problem 2 Part 8; Core 04 · Several plots in one window",
     "key": true
+   }
+  ]
+ },
+ "py-18": {
+  "type": "py",
+  "num": "18",
+  "title": "More pandas: the tips data, .loc / .iloc, summaries, apply and text columns",
+  "date": "",
+  "exams": [
+   "Python Quiz"
+  ],
+  "topics": [
+   "pandas",
+   "read_csv",
+   "tips",
+   "attributes",
+   "shape",
+   "size",
+   "loc",
+   "iloc",
+   "boolean subsetting",
+   "new column",
+   "value_counts",
+   "argmax",
+   "idxmax",
+   "corr",
+   "describe",
+   "apply",
+   "axis",
+   "str methods",
+   "contains",
+   "CategoricalDtype",
+   "ordered categorical",
+   "groupby"
+  ],
+  "pdfs": [
+   {
+    "name": "Lecture18 slides - More Pandas.html",
+    "size": 3586534,
+    "type": "text/html"
+   },
+   {
+    "name": "tips.csv",
+    "size": 6545,
+    "type": "text/csv"
+   }
+  ],
+  "notes": "Professor Goodrich's slides **Lecture18.html** (\"More Pandas\"). Lecture 17 introduced the Series and the DataFrame; this lecture *uses* a real DataFrame: the **restaurant tips** data (244 bills). Every output below came from running the code (pandas 3.1, NumPy 2.5).\n\n**Quiz:** 45-minute in-class quiz on **Python only**, Wednesday, November 18, after ~25 minutes of review. HW 4 (Python) is due Tuesday, November 17.\n\n**What's new here, in one table:**\n\n| Task | pandas | R |\n|---|---|---|\n| read a CSV | `pd.read_csv(\"file.csv\")` | `read.csv(\"file.csv\")` |\n| first rows | `tips.head()` | `head(tips)` |\n| rows by condition | `tips.loc[tips.tip > 5]` | `tips[tips$tip > 5, ]` |\n| rows/cols by position | `tips.iloc[:3, :3]` | `tips[1:3, 1:3]` |\n| some columns | `tips[[\"tip\", \"day\"]]` | `tips[, c(\"tip\", \"day\")]` |\n| one column | `tips[\"tip\"]` or `tips.tip` | `tips$tip` |\n| new column | `tips[\"pct\"] = ...` | `tips$pct <- ...` |\n| summary | `tips.describe()` | `summary(tips)` |\n| per column / row | `tips.apply(f, axis=0 / 1)` | `apply(tips, 2 / 1, f)` |\n| text test | `tips.day.str.contains(\"S\")` | `grepl(\"S\", tips$day)` |\n| ordered factor | `.astype(CategoricalDtype([...], ordered=True))` | `factor(x, levels=..., ordered=TRUE)` |\n\n**Offline:** the slides read the data from `https://tinyurl.com/5206tips`. A copy is attached above as **tips.csv**; if the internet is down use `pd.read_csv(\"tips.csv\")` after saving it next to your file.\n\n**Textbook:** [Chapter 5, Getting Started with pandas](https://wesmckinney.com/book/pandas-basics.html) (selection with loc/iloc, apply, summaries) and [Chapter 7.4, String Manipulation](https://wesmckinney.com/book/data-cleaning.html) of *Python for Data Analysis*.",
+  "takeaways": [
+   "pd.read_csv(url or file) reads a CSV into a DataFrame; tips has 244 rows × 6 columns.",
+   ".shape is (rows, cols); .size is rows × cols (1464); .axes is [index, columns].",
+   "tips.size is the ATTRIBUTE, not the size column: use tips[\"size\"] for that column.",
+   "Dot access tips.tip only works when the column name is a valid Python name and not a DataFrame attribute.",
+   ".loc[rows, cols] uses conditions and labels; .iloc[rows, cols] uses positions from 0, stop excluded.",
+   "tips[\"tip\"] is a Series; tips[[\"tip\"]] (a list inside) is a DataFrame.",
+   "Combine conditions with & and | and wrap each in parentheses; not 'and' / 'or'.",
+   "New column: tips[\"tip_pct\"] = 100 * tips.tip / (tips.total_bill - tips.tip); no loop needed.",
+   ".argmax() gives a POSITION, .idxmax() gives a LABEL (same here because the index is 0, 1, 2, ...).",
+   ".isna().sum() counts missing values; .value_counts() is table(); .corr() is cor().",
+   ".describe() summarizes numeric columns only (count, mean, std, min, quartiles, max).",
+   "apply(f, axis=0) runs f on each column; axis=1 on each row (axis=1 gives one value per row).",
+   "max() on a text column is alphabetical: the 'max' day is Thur and the 'max' smoker value is Yes.",
+   ".str.contains(), .str.upper(), .str.len() work on every value of a text Series; .any() asks 'is at least one True?'",
+   "Ordered days: CategoricalDtype(categories=[...], ordered=True) then .astype(); now tips.day >= \"Sat\" works."
+  ],
+  "updatedAt": "2026-11-14T20:00:00Z",
+  "chunks": [
+   {
+    "id": "py-18-read",
+    "label": "pd.read_csv(): load the tips data",
+    "question": "",
+    "code": "import pandas as pd\nimport numpy as np\ntips = pd.read_csv(\"https://tinyurl.com/5206tips\")\ntips\n#>      total_bill   tip smoker   day    time  size\n#> 0         16.99  1.01     No   Sun  Dinner     2\n#> 1         10.34  1.66     No   Sun  Dinner     3\n#> 2         21.01  3.50     No   Sun  Dinner     3\n#> 3         23.68  3.31     No   Sun  Dinner     2\n#> 4         24.59  3.61     No   Sun  Dinner     4\n#> ..          ...   ...    ...   ...     ...   ...\n#> 239       29.03  5.92     No   Sat  Dinner     3\n#> 240       27.18  2.00    Yes   Sat  Dinner     2\n#> 241       22.67  2.00    Yes   Sat  Dinner     2\n#> 242       17.82  1.75     No   Sat  Dinner     2\n#> 243       18.78  3.00     No  Thur  Dinner     2\n#>\n#> [244 rows x 6 columns]",
+    "comment": "`pd.read_csv()` reads a CSV file, from a web address or a file name, and returns a **DataFrame**. It's R's `read.csv()`.\n\nThe printout shows the first 5 and last 5 rows, with `...` in between, then the size: **244 rows × 6 columns**. Each row is one restaurant bill: the bill, the tip, whether the party smoked, the day, lunch or dinner, and the party size.\n\nThe numbers on the left (0, 1, 2, ..., 243) are the **index**: row labels. `read_csv` makes them 0, 1, 2, ... unless you pass `index_col=`.\n\n**Watch out:** in a `.qmd` / `.Rmd` file, just writing `tips` on the last line shows it. In a `.py` script you need `print(tips)`.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-18-attrs",
+    "label": "Attributes: .shape vs .size, .index, .columns, .axes, .dtypes",
+    "question": "",
+    "code": "tips.shape\n#> (244, 6)\ntips.size        # How does this differ from .shape?\n#> 1464\ntips.index\n#> RangeIndex(start=0, stop=244, step=1)\ntips.columns\n#> Index(['total_bill', 'tip', 'smoker', 'day', 'time', 'size'], dtype='str')\ntips.axes        # How does this differ from the previous two?\n#> [RangeIndex(start=0, stop=244, step=1), Index(['total_bill', 'tip', 'smoker', 'day', 'time', 'size'], dtype='str')]\ntips.dtypes\n#> total_bill    float64\n#> tip           float64\n#> smoker            str\n#> day               str\n#> time              str\n#> size            int64\n#> dtype: object\ntips.attrs\n#> {}\ntips.flags\n#> <Flags(allows_duplicate_labels=True)>",
+    "comment": "The slide's two questions, answered:\n\n- **`.size` vs `.shape`:** `.shape` is the pair `(rows, columns)` = `(244, 6)`. `.size` is **one number**, the count of cells: 244 × 6 = **1464**. For the number of rows use `tips.shape[0]` (R: `nrow(tips)`).\n- **`.axes` vs `.index` / `.columns`:** `.axes` is a **list of both**: `[tips.index, tips.columns]`, row labels first. So `tips.axes[0]` is the index and `tips.axes[1]` the column names.\n\n| pandas | Gives | R |\n|---|---|---|\n| `tips.shape` | `(244, 6)` | `dim(tips)` |\n| `tips.shape[0]` | 244 rows | `nrow(tips)` |\n| `tips.size` | 1464 cells | `length(as.matrix(tips))` |\n| `tips.columns` | column names | `names(tips)` |\n| `tips.index` | row labels | `rownames(tips)` |\n| `tips.dtypes` | type of each column | `sapply(tips, class)` |\n\n`RangeIndex(start=0, stop=244, step=1)` means the labels are 0 to 243 (stop is excluded). `str` columns hold text (pandas 2 shows `object`). `.attrs` (an empty dict) and `.flags` are rarely used; just know they exist.\n\n**Watch out:** attributes take **no parentheses**. `tips.shape()` is an error: `'tuple' object is not callable`.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-18-dot",
+    "label": "tips.size is not the size column: when dot access fails",
+    "question": "",
+    "code": "tips.size          # the DataFrame attribute: number of cells\n#> 1464\ntips[\"size\"]       # the column named size\n#> 0      2\n#> 1      3\n#> 2      3\n#> 3      2\n#> 4      4\n#>       ..\n#> 239    3\n#> 240    2\n#> 241    2\n#> 242    2\n#> 243    2\n#> Name: size, Length: 244, dtype: int64\ntips[\"size\"].mean()\n#> np.float64(2.569672131147541)\ntips.tip.mean()    # dot access is fine for a normal name\n#> np.float64(2.99827868852459)",
+    "comment": "The slide says `tips.total_bill` works \"only if the column name is also a valid Python symbol\". There's a second trap in this very data set: a column **named like a DataFrame attribute**. `size` is both a column and the `.size` attribute, and **the attribute wins**, so `tips.size` is 1464, not the party sizes.\n\n| You want | Always works | Dot works? |\n|---|---|---|\n| tip column | `tips[\"tip\"]` | `tips.tip` ✓ |\n| size column | `tips[\"size\"]` | `tips.size` ✗ gives 1464 |\n| a column called `total bill` (space) | `tips[\"total bill\"]` | ✗ syntax error |\n\n**Rule for the quiz:** use brackets `tips[\"col\"]` whenever you're unsure. They always mean the column. Dot access is a shortcut for reading, and you **can't create a new column with it** (`tips.new = 1` doesn't add a column).",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-18-loc",
+    "label": ".head() and .loc[condition]: rows that meet a condition",
+    "question": "",
+    "code": "tips.head()                              # first 5 rows (tips.head(10) for 10)\n#>    total_bill   tip smoker  day    time  size\n#> 0       16.99  1.01     No  Sun  Dinner     2\n#> 1       10.34  1.66     No  Sun  Dinner     3\n#> 2       21.01  3.50     No  Sun  Dinner     3\n#> 3       23.68  3.31     No  Sun  Dinner     2\n#> 4       24.59  3.61     No  Sun  Dinner     4\ntips.loc[tips.total_bill > 50, ]         # the slide's version\n#>      total_bill   tip smoker  day    time  size\n#> 170       50.81  10.0    Yes  Sat  Dinner     3\ntips.loc[tips[\"total_bill\"] > 50]        # same thing, no trailing comma needed\n#>      total_bill   tip smoker  day    time  size\n#> 170       50.81  10.0    Yes  Sat  Dinner     3\ntips.loc[tips['total_bill'] > 50, ].shape\n#> (1, 6)\ntips.loc[tips.tip >= 7, [\"total_bill\", \"tip\", \"day\"]]   # rows AND columns\n#>      total_bill    tip  day\n#> 23        39.42   7.58  Sat\n#> 170       50.81  10.00  Sat\n#> 212       48.33   9.00  Sat",
+    "comment": "`.loc[rows, columns]` selects by **condition or label**. `tips.total_bill > 50` is a True/False Series (one per row); `.loc` keeps the True rows. It's R's `tips[tips$total_bill > 50, ]`.\n\nOnly one bill is over $50: row **170**, $50.81 with a $10 tip. `.shape` confirms `(1, 6)`. The row keeps its original label 170; pandas does **not** renumber rows after filtering.\n\n| pandas | R |\n|---|---|\n| `tips.head()` | `head(tips)` |\n| `tips.loc[cond]` | `tips[cond, ]` |\n| `tips.loc[cond, [\"tip\", \"day\"]]` | `tips[cond, c(\"tip\", \"day\")]` |\n| `tips.loc[cond].shape[0]` | `sum(cond)` / `nrow(tips[cond, ])` |\n\nThe slide's trailing comma `tips.loc[cond, ]` is an R habit; Python allows it, but `tips.loc[cond]` is the normal way. To pick columns too, put a **list** of names after the comma.\n\n**Watch out:** two conditions need `&` (and) or `|` (or), with **each condition in parentheses**: `tips.loc[(tips.tip > 5) & (tips.day == \"Sat\")]`. Python's `and`/`or` give `ValueError: The truth value of a Series is ambiguous`.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-18-iloc",
+    "label": ".iloc[rows, cols]: subset by position",
+    "question": "",
+    "code": "tips.iloc[:3, :3]        # first 3 rows, first 3 columns\n#>    total_bill   tip smoker\n#> 0       16.99  1.01     No\n#> 1       10.34  1.66     No\n#> 2       21.01  3.50     No\ntips.iloc[0]             # first row, as a Series\n#> total_bill     16.99\n#> tip             1.01\n#> smoker            No\n#> day              Sun\n#> time          Dinner\n#> size               2\n#> Name: 0, dtype: object\ntips.iloc[-1, 1]         # last row, second column (tip)\n#> np.float64(3.0)\ntips.iloc[[0, 5, 10], [0, 1]]\n#>     total_bill   tip\n#> 0        16.99  1.01\n#> 5        25.29  4.71\n#> 10       10.27  1.71",
+    "comment": "`.iloc[rows, columns]` uses **positions**, counted from **0**, and a slice `a:b` **stops before b**: `:3` is positions 0, 1, 2. It's R's `tips[1:3, 1:3]`.\n\n| pandas | Means | R |\n|---|---|---|\n| `tips.iloc[:3, :3]` | rows 1-3, cols 1-3 | `tips[1:3, 1:3]` |\n| `tips.iloc[0]` | first row | `tips[1, ]` |\n| `tips.iloc[-1, 1]` | last row, 2nd column | `tips[nrow(tips), 2]` |\n| `tips.iloc[[0, 5, 10], [0, 1]]` | chosen rows/cols | `tips[c(1, 6, 11), 1:2]` |\n\n**`.loc` vs `.iloc`:** `.loc` = labels and conditions, and a label slice **includes** the end (`tips.loc[0:2]` gives 3 rows). `.iloc` = positions, end **excluded** (`tips.iloc[0:2]` gives 2 rows).\n\n**Watch out:** `.iloc` doesn't accept column names, and `.loc` doesn't accept column positions. `tips.iloc[:3, \"tip\"]` is an error.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-18-cols",
+    "label": "Columns by name: tips[\"tip\"] vs tips[[\"total_bill\", \"smoker\"]]",
+    "question": "",
+    "code": "tips[[\"total_bill\", \"smoker\"]].shape\n#> (244, 2)\ntips[[\"total_bill\", \"smoker\"]].head(3)\n#>    total_bill smoker\n#> 0       16.99     No\n#> 1       10.34     No\n#> 2       21.01     No\ntype(tips[\"tip\"])          # one name: a Series\n#> <class 'pandas.Series'>\ntype(tips[[\"tip\"]])        # a list of names: a DataFrame\n#> <class 'pandas.DataFrame'>",
+    "comment": "Square brackets with **column names** select columns:\n\n- **one name** `tips[\"tip\"]` gives a **Series** (one column, like R's `tips$tip`),\n- **a list of names** `tips[[\"total_bill\", \"smoker\"]]` gives a **DataFrame** (R's `tips[, c(\"total_bill\", \"smoker\")]`). The inner `[ ]` is the Python list (R's `c()`), the outer `[ ]` does the selecting.\n\n`(244, 2)`: all 244 rows, 2 columns.\n\n**Watch out:** `tips[\"total_bill\", \"smoker\"]` (one set of brackets, two names) is a **KeyError**. Two columns always need the double brackets.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-18-newcol",
+    "label": "A new column: tips['tip_pct'] = 100 * tips.tip / (tips.total_bill - tips.tip)",
+    "question": "",
+    "code": "tips['tip_pct'] = 100 * tips.tip / (tips.total_bill - tips.tip)\ntips.head(3)\n#>    total_bill   tip smoker  day    time  size    tip_pct\n#> 0       16.99  1.01     No  Sun  Dinner     2   6.320401\n#> 1       10.34  1.66     No  Sun  Dinner     3  19.124424\n#> 2       21.01  3.50     No  Sun  Dinner     3  19.988578\ntips.tip_pct.max()\n#> np.float64(245.23809523809527)",
+    "comment": "Assigning to a **new name in brackets** adds a column; math on whole columns works on every row at once, no loop. It's R's `tips$tip_pct <- 100 * tips$tip / (tips$total_bill - tips$tip)`.\n\nThe formula divides by `total_bill - tip`, the bill **before** the tip, so `tip_pct` is the tip as a percent of the pre-tip bill. Row 0: 100 × 1.01 / (16.99 − 1.01) = **6.32%**.\n\nThe max is **245%**: some bill has a tip bigger than the rest of the bill. Worth a look with `tips.loc[tips.tip_pct > 100]` before trusting averages.\n\n**Watch out:** create columns with brackets. `tips.tip_pct2 = ...` does **not** add a column (pandas warns), even though reading with `tips.tip_pct` works afterwards.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-18-series",
+    "label": "Functions on a column: .mean(), .isna().sum(), .value_counts(), .argmax(), .max(), .corr()",
+    "question": "",
+    "code": "tips.tip.mean()\n#> np.float64(2.99827868852459)\ntips.total_bill.isna().sum()      # how many missing\n#> np.int64(0)\ntips.smoker.value_counts()\n#> smoker\n#> No     151\n#> Yes     93\n#> Name: count, dtype: int64\ntips.total_bill.argmax()          # POSITION of the largest bill\n#> np.int64(170)\ntips.total_bill.idxmax()          # LABEL of the largest bill\n#> 170\ntips.total_bill.max()\n#> np.float64(50.81)\ntips.total_bill.corr(tips.tip)\n#> np.float64(0.6757341092113647)",
+    "comment": "A column is a Series, and a Series works like a 1-D NumPy array with extra methods:\n\n| pandas | Gives | R |\n|---|---|---|\n| `tips.tip.mean()` | average tip, $3.00 | `mean(tips$tip)` |\n| `tips.total_bill.isna().sum()` | number missing (0) | `sum(is.na(tips$total_bill))` |\n| `tips.smoker.value_counts()` | 151 No, 93 Yes | `table(tips$smoker)` |\n| `tips.total_bill.argmax()` | **position** of the max (170) | `which.max(tips$total_bill)` (but from 1) |\n| `tips.total_bill.idxmax()` | **label** of the max (170) | `names(which.max(...))` |\n| `tips.total_bill.max()` | $50.81 | `max(tips$total_bill)` |\n| `tips.total_bill.corr(tips.tip)` | 0.676 | `cor(tips$total_bill, tips$tip)` |\n\n`.isna()` gives True/False for each value; `.sum()` counts the Trues (True = 1). `.value_counts()` sorts **most common first**.\n\n**argmax vs idxmax:** they agree here only because the labels are 0, 1, 2, ... After filtering or sorting they differ; use `idxmax()` with `.loc`: `tips.loc[tips.total_bill.idxmax()]` is the whole row of the biggest bill.\n\nThe `np.float64(...)` wrapper is just how NumPy numbers print; treat it as a regular number. `print()` hides it.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-18-describe",
+    "label": ".describe(): summary of every numeric column",
+    "question": "",
+    "code": "tips.describe()\n#>        total_bill         tip        size     tip_pct\n#> count  244.000000  244.000000  244.000000  244.000000\n#> mean    19.785943    2.998279    2.569672   20.212349\n#> std      8.902412    1.383638    0.951100   16.338471\n#> min      3.070000    1.000000    1.000000    3.695515\n#> 25%     13.347500    2.000000    2.000000   14.827393\n#> 50%     17.795000    2.900000    2.000000   18.310994\n#> 75%     24.127500    3.562500    3.000000   23.682130\n#> max     50.810000   10.000000    6.000000  245.238095\ntips.describe().loc[\"mean\", \"tip\"]\n#> np.float64(2.99827868852459)\ntips.describe(include=\"all\").loc[[\"count\", \"unique\", \"top\", \"freq\"], [\"smoker\", \"day\", \"time\"]]\n#>        smoker  day    time\n#> count     244  244     244\n#> unique      2    4       2\n#> top        No  Sat  Dinner\n#> freq      151   87     176",
+    "comment": "`.describe()` is R's `summary()`: for each **numeric** column it gives count, mean, standard deviation, min, 25% / 50% (median) / 75% quartiles and max. Text columns (smoker, day, time) are skipped.\n\nThe result is itself a DataFrame, so you can pull out one number with `.loc[row, column]`: the mean tip is 2.998.\n\n`include=\"all\"` adds the text columns, with `unique` (how many different values), `top` (most common) and `freq` (how often). The busiest day is **Sat** (87 bills).\n\n**Watch out:** `std` here is the **sample** standard deviation (divides by n − 1), the same as R's `sd()`. NumPy's `np.std()` divides by n unless you pass `ddof=1`.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-18-apply",
+    "label": "apply(f, axis=0) for each column, axis=1 for each row",
+    "question": "",
+    "code": "tips.apply(max, axis=0)          # max of each column\n#> total_bill         50.81\n#> tip                 10.0\n#> smoker               Yes\n#> day                 Thur\n#> time               Lunch\n#> size                   6\n#> tip_pct       245.238095\n#> dtype: object\ntips[[\"total_bill\", \"tip\", \"size\"]].apply(max, axis=1).shape\n#> (244,)\ntips[[\"total_bill\", \"tip\", \"size\"]].apply(max, axis=1).head(3)\n#> 0    16.99\n#> 1    10.34\n#> 2    21.01\n#> dtype: float64\ntips[[\"total_bill\", \"tip\"]].apply(np.mean, axis=0)\n#> total_bill    19.785943\n#> tip            2.998279\n#> dtype: float64",
+    "comment": "`.apply(f, axis=)` runs a function along one direction, like NumPy's `apply_along_axis` and R's `apply()`:\n\n| axis | f gets | result | R |\n|---|---|---|---|\n| `axis=0` (default) | each **column** | one value per column | `apply(tips, 2, max)` |\n| `axis=1` | each **row** | one value per row (244) | `apply(tips, 1, max)` |\n\nSo `.apply(max, axis=1).shape` is `(244,)`: one max per bill.\n\n**Why is the max day \"Thur\" and the max smoker \"Yes\"?** On text, `max` is **alphabetical**: T comes after S, so \"Thur\" beats \"Sat\" and \"Sun\"; \"Yes\" beats \"No\"; \"Lunch\" beats \"Dinner\". It isn't the busiest day. (After the day column becomes an ordered category, the max is \"Sun\".)\n\n**Watch out:** only use `axis=1` on columns of the same kind (all numbers). Mixing text and numbers in one row gives an error or nonsense. For simple column math, `tips.tip / tips.total_bill` is faster and clearer than `apply`.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-18-str",
+    "label": "Text columns: .str.contains(\"Mon\").any(), .str.upper(), .str.len()",
+    "question": "",
+    "code": "tips.day.value_counts()\n#> day\n#> Sat     87\n#> Sun     76\n#> Thur    62\n#> Fri     19\n#> Name: count, dtype: int64\ntips.day.str.contains(\"Mon\").any()     # is any day Monday?\n#> np.False_\ntips.day.str.contains(\"S\").sum()      # how many days contain S\n#> np.int64(163)\ntips.time.str.upper().head(3)\n#> 0    DINNER\n#> 1    DINNER\n#> 2    DINNER\n#> Name: time, dtype: str\ntips.day.str.len().head(3)\n#> 0    3\n#> 1    3\n#> 2    3\n#> Name: day, dtype: int64",
+    "comment": "`.str` unlocks **string methods** that run on every value in a text column at once (R's `stringr` / `grepl`):\n\n| pandas | Gives | R |\n|---|---|---|\n| `s.str.contains(\"S\")` | True/False per value | `grepl(\"S\", s)` |\n| `.any()` | is at least one True? | `any(...)` |\n| `.sum()` | how many True | `sum(...)` |\n| `s.str.upper()` / `.lower()` | change case | `toupper(s)` |\n| `s.str.len()` | characters per value | `nchar(s)` |\n| `s.str.startswith(\"S\")` | starts with | `startsWith(s, \"S\")` |\n| `s.str.replace(\"a\", \"b\")` | replace text | `gsub(\"a\", \"b\", s)` |\n\nThe data has no Monday (`np.False_` means False), and 163 bills (Sat 87 + Sun 76) are on a day containing \"S\".\n\n**Watch out:** `.str.contains` is **case-sensitive**: `\"s\"` would miss \"Sat\" and \"Sun\". Use `case=False` to ignore case. Without `.str`, `tips.day.contains(...)` is an AttributeError.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-18-cat",
+    "label": "Ordered days: CategoricalDtype(..., ordered=True) and .astype()",
+    "question": "",
+    "code": "cat_type = pd.api.types.CategoricalDtype(categories=\n                                         [\"Thur\", \"Fri\", \"Sat\", \"Sun\"],\n                                         ordered=True)\ntips[\"day\"] = tips.day.astype(cat_type)\ntips.day.head(3)\n#> 0    Sun\n#> 1    Sun\n#> 2    Sun\n#> Name: day, dtype: category\n#> Categories (4, str): ['Thur' < 'Fri' < 'Sat' < 'Sun']\ntips.day.value_counts(sort=False)     # in day order, not by count\n#> day\n#> Thur    62\n#> Fri     19\n#> Sat     87\n#> Sun     76\n#> Name: count, dtype: int64\n(tips.day >= \"Sat\").sum()              # weekend bills\n#> np.int64(163)\ntips.day.max()\n#> 'Sun'",
+    "comment": "This turns the text column `day` into an **ordered categorical**, R's `factor(tips$day, levels = c(\"Thur\", \"Fri\", \"Sat\", \"Sun\"), ordered = TRUE)`. Two steps:\n\n1. `CategoricalDtype(categories=[...], ordered=True)` describes the type: these four values, in this order.\n2. `.astype(cat_type)` converts the column, and assigning back with `tips[\"day\"] = ...` replaces it.\n\nWhat changes:\n- the printout says `dtype: category` and lists `'Thur' < 'Fri' < 'Sat' < 'Sun'`,\n- `value_counts(sort=False)` lists days **in the category order**,\n- comparisons follow the order: `tips.day >= \"Sat\"` is the weekend (163 bills),\n- `max()` is now **Sun**, the last category, not the alphabetical last.\n\nCompare with Py 17: `pd.Categorical(...)` makes a standalone factor; `.astype(...)` converts a column that's already in a DataFrame.\n\n**Watch out:** a value not in `categories` becomes `NaN` silently (e.g. if the data said \"Thu\"). Check with `tips.day.isna().sum()` after converting.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-18-groupby",
+    "label": "Beyond the slides: an average by group with .groupby()",
+    "question": "",
+    "code": "tips.groupby(\"day\", observed=True)[\"tip\"].mean()\n#> day\n#> Thur    2.771452\n#> Fri     2.734737\n#> Sat     2.993103\n#> Sun     3.255132\n#> Name: tip, dtype: float64\ntips.groupby(\"smoker\")[\"tip_pct\"].median()\n#> smoker\n#> No     18.430753\n#> Yes    18.181818\n#> Name: tip_pct, dtype: float64",
+    "comment": "*Not on the slides, but it's the obvious next question (\"average tip by day\") and it's R's `tapply(tips$tip, tips$day, mean)` or `group_by(day) |> summarise(mean(tip))`.*\n\n`.groupby(\"day\")` splits the rows by day, `[\"tip\"]` picks the column, `.mean()` summarizes each group. Because `day` is now an ordered category, results come out Thur → Sun. `observed=True` lists only categories that appear (and avoids a warning).\n\nSunday diners leave the biggest average tip ($3.26).",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-18-prac1",
+    "label": "Practice 1 · Big parties",
+    "question": "Using tips, how many bills are for parties of 4 or more, what share of all bills is that, and what is the average tip for those parties?",
+    "code": "big = tips.loc[tips[\"size\"] >= 4]\nbig.shape[0]\n#> 46\nround(big.shape[0] / tips.shape[0], 3)\n#> 0.189\nround(big[\"tip\"].mean(), 2)\n#> np.float64(4.22)",
+    "comment": "Matches **.loc[condition]**, **tips[\"size\"] not tips.size**, and **.mean()**. `big.shape[0]` counts the rows that passed the filter; dividing by `tips.shape[0]` gives the share. Shortcut for the count: `(tips[\"size\"] >= 4).sum()`.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-18-prac2",
+    "label": "Practice 2 · The most generous bill",
+    "question": "Add a column tip_rate = tip / total_bill. Which bill has the highest tip_rate? Show its whole row, and the day and time of that bill.",
+    "code": "tips[\"tip_rate\"] = tips[\"tip\"] / tips[\"total_bill\"]\nbest = tips[\"tip_rate\"].idxmax()\nbest\n#> 172\ntips.loc[best]\n#> total_bill          7.25\n#> tip                 5.15\n#> smoker               Yes\n#> day                  Sun\n#> time              Dinner\n#> size                   2\n#> tip_pct       245.238095\n#> tip_rate        0.710345\n#> Name: 172, dtype: object\ntips.loc[best, [\"day\", \"time\"]]\n#> day        Sun\n#> time    Dinner\n#> Name: 172, dtype: str",
+    "comment": "Matches **new column**, **idxmax()** and **.loc[label]**. `idxmax()` returns the row **label**, which `.loc` takes directly. A tip of $5.15 on a $7.25 bill: 71%.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-18-prac3",
+    "label": "Practice 3 · Lunch vs dinner",
+    "question": "How many bills are lunch and how many dinner? What is the mean total bill at dinner, and what share of lunch parties are smokers?",
+    "code": "tips[\"time\"].value_counts()\n#> time\n#> Dinner    176\n#> Lunch      68\n#> Name: count, dtype: int64\ntips.loc[tips[\"time\"] == \"Dinner\", \"total_bill\"].mean()\n#> np.float64(20.79715909090909)\nlunch = tips.loc[tips[\"time\"] == \"Lunch\"]\n(lunch[\"smoker\"] == \"Yes\").mean()\n#> np.float64(0.3382352941176471)",
+    "comment": "Matches **value_counts()**, **.loc[cond, \"col\"]** and the True = 1 trick: the **mean of a True/False column is the share that's True** (R: `mean(lunch$smoker == \"Yes\")`).",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-18-prac4",
+    "label": "Practice 4 · loc vs iloc on the same rows",
+    "question": "Show the day and tip of rows 10 to 14 twice: once with .iloc (positions) and once with .loc (labels). Why do the slices look different?",
+    "code": "tips.iloc[10:15, [3, 1]]\n#>     day   tip\n#> 10  Sun  1.71\n#> 11  Sun  5.00\n#> 12  Sun  1.57\n#> 13  Sun  3.00\n#> 14  Sun  3.02\ntips.loc[10:14, [\"day\", \"tip\"]]\n#>     day   tip\n#> 10  Sun  1.71\n#> 11  Sun  5.00\n#> 12  Sun  1.57\n#> 13  Sun  3.00\n#> 14  Sun  3.02",
+    "comment": "Matches **.iloc** and **.loc**. `.iloc` stops **before** 15 and needs column positions (day is position 3, tip 1). `.loc` **includes** 14 and needs column names. With the default 0, 1, 2, ... index both give the same 5 rows.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-18-prac5",
+    "label": "Practice 5 · Weekend text checks",
+    "question": "Using string methods on the original text day values, count the bills on days that start with S. Then, using the ordered day category, count the bills from Friday on.",
+    "code": "tips[\"day\"].astype(str).str.startswith(\"S\").sum()\n#> np.int64(163)\n(tips[\"day\"] >= \"Fri\").sum()\n#> np.int64(182)",
+    "comment": "Matches **.str methods** and **ordered categories**. `.astype(str)` turns the category back into text so `.str` works on it in every pandas version. `>= \"Fri\"` uses the category order Thur < Fri < Sat < Sun: 19 + 87 + 76 = 182.",
+    "key": false,
+    "lang": "python"
+   }
+  ]
+ },
+ "rec-10": {
+  "type": "rec",
+  "num": "10",
+  "title": "Pandas: Series, DataFrames, .loc / .iloc, masks, missing values and label alignment",
+  "date": "",
+  "exams": [
+   "Python Quiz"
+  ],
+  "topics": [
+   "pandas",
+   "series",
+   "dataframe",
+   "loc",
+   "iloc",
+   "slicing",
+   "boolean mask",
+   "isin",
+   "copy",
+   "new column",
+   "reindex",
+   "drop",
+   "alignment",
+   "fill_value",
+   "isna",
+   "fillna",
+   "axis",
+   "skipna",
+   "count",
+   "sort_values",
+   "rank",
+   "unique",
+   "value_counts",
+   "map",
+   "apply",
+   "corr"
+  ],
+  "pdfs": [
+   {
+    "name": "Recitation 10 - Pandas Data Structures and Basic Operations.html",
+    "size": 73278,
+    "type": "text/html"
+   }
+  ],
+  "notes": "**Recitation 10** (\"Pandas: Data Structures and Basic Operations\"). One small table of 8 fictional students (section, study hours, two quiz scores, two missing values) used to practice everything you need on a pandas quiz: Series and DataFrames, `.loc` / `.iloc`, Boolean filters, new columns, missing values, summaries by column or row, sorting, `map` / `apply`, and how pandas **lines values up by label**. Every output below came from running the code.\n\n**The four ideas that trip people up:**\n1. `df[\"quiz_1\"]` is a Series; `df[[\"quiz_1\"]]` is a one-column DataFrame.\n2. `.loc` uses **labels** and its slices **include** the end; `.iloc` uses **positions** and its slices **exclude** the end.\n3. Combine conditions with `&`, `|`, `~` and parentheses, never `and` / `or`.\n4. Arithmetic between two Series matches **labels**, not positions. A label that's missing on one side gives `NaN`.\n\n**R ↔ pandas, from the handout:**\n\n| Operation | R | pandas |\n|---|---|---|\n| column as a vector | `df$quiz_1` | `df[\"quiz_1\"]` |\n| one-column table | `df[\"quiz_1\"]` | `df[[\"quiz_1\"]]` |\n| first row | `df[1, ]` | `df.iloc[0]` (Series) / `df.iloc[[0]]` (DataFrame) |\n| missing? | `is.na(x)` | `x.isna()` |\n| mean skipping NA | `mean(x, na.rm = TRUE)` | `x.mean()` (skips by default) |\n| counts | `table(x)` | `x.value_counts()` |\n\n**Defaults that differ from R:** pandas `mean()` **skips** missing values (R gives `NA` unless `na.rm = TRUE`), and Series arithmetic **aligns by label** (R adds by position).",
+  "takeaways": [
+   "df[\"col\"] → Series, shape (8,); df[[\"col\"]] → DataFrame, shape (8, 1).",
+   ".loc[107, \"student\"] uses labels; .iloc[2, 0] uses positions. df.loc[0] is a KeyError when no row is labeled 0.",
+   ".loc[104:110] includes 110; .iloc[1:3] excludes position 3.",
+   "Masks: (cond1) & (cond2), (cond1) | (cond2), ~cond; .isin([...]) for 'is one of'.",
+   "NaN >= 3 is False, so rows with missing values drop out of a filter.",
+   "practice = df.copy() before changing columns; practice = df would change df too.",
+   "Change some rows only: df.loc[mask, \"col\"] = new values.",
+   "Series + Series lines up LABELS; labels on only one side give NaN. .add(other, fill_value=0) fills the gap; .reindex(index) keeps a chosen roster.",
+   "Test missing with .isna() / .notna(), never == np.nan; .isna().sum() counts them.",
+   "mean() skips NaN by default; skipna=False makes it NaN; .count() gives the non-missing count.",
+   "axis=0 / \"index\" (default) → one result per column; axis=1 / \"columns\" → one result per row.",
+   "sort_values(\"col\", ascending=False) keeps the original labels; sort_values([\"a\", \"b\"], ascending=[False, True]) breaks ties.",
+   "rank(ascending=False): highest = 1, ties get the average rank (2.5).",
+   ".map({\"AM\": \"Morning\"}) recodes values; df.apply(f, axis=\"columns\") passes each row to f."
+  ],
+  "updatedAt": "2026-11-14T20:00:00Z",
+  "chunks": [
+   {
+    "id": "rec-10-series",
+    "label": "1 · A Series: values with an index (student IDs)",
+    "question": "",
+    "code": "import numpy as np\nimport pandas as pd\nscores = pd.Series([60, 82, 75], index=[101, 104, 107], name=\"quiz_1\")\nprint(scores)\n#> 101    60\n#> 104    82\n#> 107    75\n#> Name: quiz_1, dtype: int64\nprint(scores.index.tolist())\n#> [101, 104, 107]\nprint(scores.loc[107])\n#> 75\nprint(scores + 5)\n#> 101    65\n#> 104    87\n#> 107    80\n#> Name: quiz_1, dtype: int64\nprint(scores >= 75)\n#> 101    False\n#> 104     True\n#> 107     True\n#> Name: quiz_1, dtype: bool",
+    "comment": "A **Series** pairs each value with a **label** (here a student ID). `name=\"quiz_1\"` names the Series itself; it's not the index.\n\n- `scores.loc[107]` looks up the **label** 107 (Cam's score, 75). It is *not* position 107.\n- `scores + 5` and `scores >= 75` work on every value at once and **keep the labels**, like R's vectorized math.\n\n`.tolist()` turns the index into a plain Python list.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "rec-10-df",
+    "label": "1 · A DataFrame from a dict, with student IDs as the index",
+    "question": "",
+    "code": "df = pd.DataFrame({\n    \"student\": [\"Ari\", \"Bo\", \"Cam\", \"Dev\", \"Eli\", \"Fay\", \"Gia\", \"Han\"],\n    \"section\": [\"AM\", \"PM\", \"AM\", \"PM\", \"AM\", \"PM\", \"AM\", \"PM\"],\n    \"hours\": [2.0, 4.5, 3.0, 5.0, 1.5, 4.0, np.nan, 2.5],\n    \"quiz_1\": [60, 82, 75, 90, 55, 88, 70, 68],\n    \"quiz_2\": [68, 85, np.nan, 94, 64, 91, 78, 72]\n}, index=[101, 104, 107, 110, 113, 116, 119, 122])\ndf.index.name = \"student_id\"\nprint(df)\n#>            student section  hours  quiz_1  quiz_2\n#> student_id\n#> 101            Ari      AM    2.0      60    68.0\n#> 104             Bo      PM    4.5      82    85.0\n#> 107            Cam      AM    3.0      75     NaN\n#> 110            Dev      PM    5.0      90    94.0\n#> 113            Eli      AM    1.5      55    64.0\n#> 116            Fay      PM    4.0      88    91.0\n#> 119            Gia      AM    NaN      70    78.0\n#> 122            Han      PM    2.5      68    72.0\nprint(df.shape)\n#> (8, 5)\nprint(df.columns.tolist())\n#> ['student', 'section', 'hours', 'quiz_1', 'quiz_2']\nprint(df.head(2))\n#>            student section  hours  quiz_1  quiz_2\n#> student_id\n#> 101            Ari      AM    2.0      60    68.0\n#> 104             Bo      PM    4.5      82    85.0",
+    "comment": "A dict of equal-length lists becomes a DataFrame: **keys → column names**, lists → columns (Py 17). `index=[...]` sets the row labels; `df.index.name = \"student_id\"` names that index.\n\n`np.nan` marks a missing value. Gia's hours and Cam's quiz 2 are missing, and `quiz_2` prints as decimals (`68.0`) because a column with `NaN` must be float.\n\nThe index (`student_id`) is **not** one of the 5 columns, so `.shape` is `(8, 5)`. Cam has **label** 107 and **position** 2.\n\n**Watch out:** all lists must have the same length, or you get `ValueError: All arrays must be of the same length`.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "rec-10-brackets",
+    "label": "2 · df[\"quiz_1\"] (Series) vs df[[\"quiz_1\"]] (DataFrame)",
+    "question": "",
+    "code": "one_series = df[\"quiz_1\"]\none_column = df[[\"quiz_1\"]]\nprint(type(one_series).__name__, one_series.shape)\n#> Series (8,)\nprint(type(one_column).__name__, one_column.shape)\n#> DataFrame (8, 1)\nprint(df[[\"student\", \"quiz_1\"]].head(3))\n#>            student  quiz_1\n#> student_id\n#> 101            Ari      60\n#> 104             Bo      82\n#> 107            Cam      75",
+    "comment": "The number of brackets decides what comes back:\n\n| Code | Returns | Shape | R |\n|---|---|---|---|\n| `df[\"quiz_1\"]` | Series | `(8,)` | `df$quiz_1` |\n| `df[[\"quiz_1\"]]` | DataFrame | `(8, 1)` | `df[\"quiz_1\"]` |\n| `df[[\"student\", \"quiz_1\"]]` | DataFrame | `(8, 2)` | `df[c(\"student\", \"quiz_1\")]` |\n\nThe inner brackets make a **list**; the outer ones select. Note the R and pandas meanings of single vs double brackets are **reversed**.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "rec-10-locil",
+    "label": "2 · .loc (labels) vs .iloc (positions), and slicing",
+    "question": "",
+    "code": "print(df.loc[107, \"student\"])\n#> Cam\nprint(df.iloc[2, 0])\n#> Cam\nprint(df.iloc[-1, 0])\n#> Han\nprint(df.loc[[101, 107], [\"student\", \"quiz_1\"]])\n#>            student  quiz_1\n#> student_id\n#> 101            Ari      60\n#> 107            Cam      75\nprint(df.loc[104:110, [\"student\", \"quiz_1\"]])   # label slice: 110 INCLUDED\n#>            student  quiz_1\n#> student_id\n#> 104             Bo      82\n#> 107            Cam      75\n#> 110            Dev      90\nprint(df.iloc[1:3, [0, 3]])                     # position slice: 3 EXCLUDED\n#>            student  quiz_1\n#> student_id\n#> 104             Bo      82\n#> 107            Cam      75",
+    "comment": "Both take `[rows, columns]`:\n\n| Selection | Means |\n|---|---|\n| `df.loc[107, \"student\"]` | row **label** 107, column student |\n| `df.iloc[2, 0]` | row **position** 2, column position 0 |\n| `df.iloc[-1, 0]` | last row (negative counts from the end) |\n| `df.loc[[101, 107], [\"student\", \"quiz_1\"]]` | listed labels |\n| `df.loc[:, \"quiz_1\"]` | every row, one column |\n\n**Slices differ:** `.loc[104:110]` includes **both ends** (3 rows: 104, 107, 110). `.iloc[1:3]` stops **before** 3 (2 rows).\n\n**Watch out:** `df.loc[0]` is a **KeyError** here (no row is labeled 0); `df.iloc[0]` is the first row. If the table is re-sorted, `.loc[107]` still finds Cam, but `.iloc[2]` is whoever is third now.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "rec-10-mask",
+    "label": "3 · Filtering rows with a Boolean mask, &, | and .isin()",
+    "question": "",
+    "code": "mask = df[\"hours\"] >= 3\nprint(df.loc[mask, [\"student\", \"hours\"]])\n#>            student  hours\n#> student_id\n#> 104             Bo    4.5\n#> 107            Cam    3.0\n#> 110            Dev    5.0\n#> 116            Fay    4.0\nmask = (df[\"hours\"] >= 3) & (df[\"quiz_1\"] >= 80)\nprint(df.loc[mask, [\"student\", \"hours\", \"quiz_1\"]])\n#>            student  hours  quiz_1\n#> student_id\n#> 104             Bo    4.5      82\n#> 110            Dev    5.0      90\n#> 116            Fay    4.0      88\nis_morning = df[\"section\"].isin([\"AM\"])\nprint(df.loc[is_morning, [\"student\", \"section\"]])\n#>            student section\n#> student_id\n#> 101            Ari      AM\n#> 107            Cam      AM\n#> 113            Eli      AM\n#> 119            Gia      AM",
+    "comment": "A comparison on a column gives a **True/False Series** (a *mask*); `.loc[mask]` keeps the True rows.\n\n| Operator | Means | Example |\n|---|---|---|\n| `&` | both | `(df[\"hours\"] >= 3) & (df[\"quiz_1\"] >= 80)` |\n| `\\|` | either | `(df[\"section\"] == \"AM\") \\| (df[\"quiz_1\"] >= 90)` |\n| `~` | not | `~(df[\"section\"] == \"AM\")` |\n| `.isin([...])` | is one of | `df[\"section\"].isin([\"AM\"])` (R `%in%`) |\n\nGia's hours are `NaN`, and **`NaN >= 3` is False**, so she's dropped from the first filter. Cam passes the hours test but not quiz 1 ≥ 80.\n\n**Watch out:** put **each condition in parentheses**. `df[\"hours\"] >= 3 & df[\"quiz_1\"] >= 80` runs `3 & df[\"quiz_1\"]` first and fails. And `and` / `or` raise `ValueError: The truth value of a Series is ambiguous`.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "rec-10-assign",
+    "label": "4 · New columns, .copy(), and changing some rows with .loc",
+    "question": "",
+    "code": "practice = df.copy()\npractice[\"gain\"] = practice[\"quiz_2\"] - practice[\"quiz_1\"]\nprint(practice[[\"student\", \"quiz_1\", \"quiz_2\", \"gain\"]])\n#>            student  quiz_1  quiz_2  gain\n#> student_id\n#> 101            Ari      60    68.0   8.0\n#> 104             Bo      82    85.0   3.0\n#> 107            Cam      75     NaN   NaN\n#> 110            Dev      90    94.0   4.0\n#> 113            Eli      55    64.0   9.0\n#> 116            Fay      88    91.0   3.0\n#> 119            Gia      70    78.0   8.0\n#> 122            Han      68    72.0   4.0\npractice[\"adjusted_quiz_1\"] = practice[\"quiz_1\"]\nis_am = practice[\"section\"] == \"AM\"\npractice.loc[is_am, \"adjusted_quiz_1\"] = (\n    practice.loc[is_am, \"adjusted_quiz_1\"] + 2\n)\nprint(practice[[\"student\", \"section\", \"quiz_1\", \"adjusted_quiz_1\"]])\n#>            student section  quiz_1  adjusted_quiz_1\n#> student_id\n#> 101            Ari      AM      60               62\n#> 104             Bo      PM      82               82\n#> 107            Cam      AM      75               77\n#> 110            Dev      PM      90               90\n#> 113            Eli      AM      55               57\n#> 116            Fay      PM      88               88\n#> 119            Gia      AM      70               72\n#> 122            Han      PM      68               68",
+    "comment": "- `practice[\"gain\"] = ...` adds a column computed from two others, every row at once. Cam's gain is `NaN` because one score is missing (anything + NaN = NaN).\n- `df.copy()` makes a **separate** table, so `df` is untouched. `practice = df` would just be a second name for the same table (Py 16, shallow copies).\n- `practice.loc[is_am, \"adjusted_quiz_1\"] = ...` changes **only the AM rows** of that column: the left side picks the cells, the right side computes the new values. R: `practice$adj[is_am] <- practice$adj[is_am] + 2`.\n\n**Watch out:** `practice[is_am][\"adjusted_quiz_1\"] = ...` (two separate brackets) does **not** change `practice`. Always do it in one `.loc[rows, col]`.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "rec-10-reindex",
+    "label": "5 · .reindex() and .drop()",
+    "question": "",
+    "code": "reordered = df.reindex([122, 101, 125])\nprint(reordered[[\"student\", \"quiz_1\"]])\n#>            student  quiz_1\n#> student_id\n#> 122            Han    68.0\n#> 101            Ari    60.0\n#> 125            NaN     NaN\nwithout_hours = df.drop(columns=\"hours\")\nwithout_han = df.drop(index=122)\nprint(without_hours.columns.tolist())\n#> ['student', 'section', 'quiz_1', 'quiz_2']\nprint(without_han.shape)\n#> (7, 5)\nprint(df.shape)\n#> (8, 5)",
+    "comment": "- `.reindex([labels])` returns rows **in that order**; a label that doesn't exist (125) becomes a row of `NaN`.\n- `.drop(columns=\"hours\")` removes a column; `.drop(index=122)` removes a row. Both return a **new** DataFrame: `df` still has shape `(8, 5)`.\n\nR: `df[, names(df) != \"hours\"]` and `df[rownames(df) != \"122\", ]`.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "rec-10-align",
+    "label": "5 · Arithmetic matches labels: base + bonus, .add(fill_value=0), reindex",
+    "question": "",
+    "code": "base = df.loc[[101, 104, 107], \"quiz_1\"]\nbonus = pd.Series([3, 5, 2], index=[107, 101, 125])\nprint(base + bonus)\n#> student_id\n#> 101    65.0\n#> 104     NaN\n#> 107    78.0\n#> 125     NaN\n#> dtype: float64\nprint(base.add(bonus, fill_value=0))\n#> student_id\n#> 101    65.0\n#> 104    82.0\n#> 107    78.0\n#> 125     2.0\n#> dtype: float64\nroster_bonus = bonus.reindex(base.index)\nprint(base + roster_bonus.fillna(0))\n#> student_id\n#> 101    65.0\n#> 104    82.0\n#> 107    78.0\n#> dtype: float64",
+    "comment": "**pandas adds by label, not by position.** 101 gets 60 + 5 = 65 and 107 gets 75 + 3 = 78, even though the bonuses were typed in a different order. The result has the **union** of labels: 104 (no bonus) and 125 (no base score) come out `NaN`.\n\n| Goal | Code |\n|---|---|\n| plain sum, NaN where a label is missing | `base + bonus` |\n| treat a missing side as 0 (keeps 125!) | `base.add(bonus, fill_value=0)` |\n| exactly the students in `base`, no bonus = 0 | `base + bonus.reindex(base.index).fillna(0)` |\n\n**Watch out:** this is the biggest R difference. R's `c(a = 1, b = 2) + c(b = 10, a = 20)` adds by **position** and gives a = 11, b = 22; pandas, matching labels, gives a = 21, b = 12.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "rec-10-na",
+    "label": "6 · Missing values: .isna(), .notna(), .isna().sum()",
+    "question": "",
+    "code": "print(df.loc[df[\"hours\"].isna(), [\"student\", \"hours\"]])\n#>            student  hours\n#> student_id\n#> 119            Gia    NaN\nprint(df[\"quiz_2\"].isna().sum())\n#> 1\nprint(df[\"quiz_2\"].notna().sum())\n#> 7\nprint(df[\"quiz_2\"] == np.nan)\n#> student_id\n#> 101    False\n#> 104    False\n#> 107    False\n#> 110    False\n#> 113    False\n#> 116    False\n#> 119    False\n#> 122    False\n#> Name: quiz_2, dtype: bool",
+    "comment": "| pandas | Gives | R |\n|---|---|---|\n| `x.isna()` | True where missing | `is.na(x)` |\n| `x.notna()` | True where present | `!is.na(x)` |\n| `x.isna().sum()` | how many missing | `sum(is.na(x))` |\n| `df.isna().sum()` | missing per column | `colSums(is.na(df))` |\n| `x.fillna(0)` | replace missing | `x[is.na(x)] <- 0` |\n\n**Watch out:** `x == np.nan` is **always False**, even for missing values (last line). Always use `.isna()`. And don't fill a missing quiz with 0 unless a missing score really means zero.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "rec-10-axis",
+    "label": "6 · Summaries per column or per row: axis=, skipna=False, .count()",
+    "question": "",
+    "code": "quizzes = df[[\"quiz_1\", \"quiz_2\"]]\nprint(quizzes.mean())                         # one mean per column\n#> quiz_1    73.500000\n#> quiz_2    78.857143\n#> dtype: float64\nprint(quizzes.mean(axis=\"columns\"))           # one mean per student (row)\n#> student_id\n#> 101    64.0\n#> 104    83.5\n#> 107    75.0\n#> 110    92.0\n#> 113    59.5\n#> 116    89.5\n#> 119    74.0\n#> 122    70.0\n#> dtype: float64\nprint(quizzes.mean(axis=\"columns\", skipna=False))\n#> student_id\n#> 101    64.0\n#> 104    83.5\n#> 107     NaN\n#> 110    92.0\n#> 113    59.5\n#> 116    89.5\n#> 119    74.0\n#> 122    70.0\n#> dtype: float64\nprint(quizzes.count())\n#> quiz_1    8\n#> quiz_2    7\n#> dtype: int64",
+    "comment": "| Argument | Collapses | Result | R |\n|---|---|---|---|\n| `axis=0` / `axis=\"index\"` (default) | the rows | one value **per column** | `colMeans(q, na.rm = TRUE)` |\n| `axis=1` / `axis=\"columns\"` | the columns | one value **per row** | `rowMeans(q, na.rm = TRUE)` |\n\npandas **skips `NaN` by default**: the quiz 2 mean (78.86) uses 7 scores, and Cam's row mean is 75 from his one score. `skipna=False` makes any row with a missing value `NaN` instead (R's default). `.count()` gives the non-missing count per column (8 and 7), the denominators of the means.\n\nOther summaries take the same arguments: `.sum()`, `.min()`, `.max()`, `.std()`, `.median()`.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "rec-10-sort",
+    "label": "7 · sort_values(), rank(), unique(), value_counts()",
+    "question": "",
+    "code": "observed = df.loc[df[\"quiz_2\"].notna(), [\"student\", \"quiz_2\"]]\nprint(observed.sort_values(\"quiz_2\", ascending=False).head(3))\n#>            student  quiz_2\n#> student_id\n#> 110            Dev    94.0\n#> 116            Fay    91.0\n#> 104             Bo    85.0\ntied = pd.Series([88, 95, 88], index=[\"Ari\", \"Bo\", \"Cam\"])\nprint(tied.rank(ascending=False))\n#> Ari    2.5\n#> Bo     1.0\n#> Cam    2.5\n#> dtype: float64\nprint(df[\"section\"].unique())\n#> <StringArray>\n#> ['AM', 'PM']\n#> Length: 2, dtype: str\nprint(df[\"section\"].value_counts())\n#> section\n#> AM    4\n#> PM    4\n#> Name: count, dtype: int64",
+    "comment": "| pandas | Does | R |\n|---|---|---|\n| `df.sort_values(\"col\")` | sort rows by a column | `df[order(df$col), ]` / `arrange()` |\n| `ascending=False` | largest first | `order(-x)` / `desc()` |\n| `sort_values([\"a\", \"b\"], ascending=[False, True])` | sort by a, ties by b | `arrange(desc(a), b)` |\n| `df.sort_index()` | sort by the labels | |\n| `x.rank(ascending=False)` | 1 = highest, ties averaged | `rank(-x)` |\n| `x.unique()` | distinct values | `unique(x)` |\n| `x.value_counts()` | counts, most common first | `table(x)` |\n\nSorting **keeps the original labels** (110, 116, 104): it doesn't renumber. `rank` doesn't reorder; Ari and Cam tie for 2nd/3rd and both get 2.5.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "rec-10-map",
+    "label": "8 · .map({...}) to recode, .apply(f, axis=\"columns\") for a row function",
+    "question": "",
+    "code": "section_names = df[\"section\"].map({\"AM\": \"Morning\", \"PM\": \"Afternoon\"})\nprint(section_names)\n#> student_id\n#> 101      Morning\n#> 104    Afternoon\n#> 107      Morning\n#> 110    Afternoon\n#> 113      Morning\n#> 116    Afternoon\n#> 119      Morning\n#> 122    Afternoon\n#> Name: section, dtype: str\ndef score_range(row):\n    return row.max() - row.min()\nranges = quizzes.apply(score_range, axis=\"columns\")\nprint(ranges)\n#> student_id\n#> 101    8.0\n#> 104    3.0\n#> 107    0.0\n#> 110    4.0\n#> 113    9.0\n#> 116    3.0\n#> 119    8.0\n#> 122    4.0\n#> dtype: float64",
+    "comment": "- `Series.map(dict)` replaces each value using the dictionary (R: `recode()` or a named vector lookup). A value with no key becomes `NaN`.\n- `DataFrame.apply(f, axis=\"columns\")` passes **each row** (as a Series) to your function `f`; `axis=0` (default) passes each column. Here `f` returns the spread of a student's two scores.\n\nCam's range is 0 because `max()` and `min()` both skip his missing quiz 2 and see only 75; it doesn't mean his scores were equal.\n\n**Use apply only when you need a whole row at a time.** For simple math, `df[\"quiz_2\"] - df[\"quiz_1\"]` is clearer.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "rec-10-corr",
+    "label": "9 · Duplicate labels and .corr()",
+    "question": "",
+    "code": "marks = pd.Series([70, 80, 90], index=[\"lab\", \"lab\", \"exam\"])\nprint(marks.index.is_unique)\n#> False\nprint(marks.loc[\"lab\"])\n#> lab    70\n#> lab    80\n#> dtype: int64\ncomplete = quizzes.notna().all(axis=\"columns\")\nprint(complete.sum())\n#> 7\nprint(round(df[\"quiz_1\"].corr(df[\"quiz_2\"]), 4))\n#> 0.9922",
+    "comment": "- An index **can repeat** labels; `.loc[\"lab\"]` then returns **all** matches (a Series, not one number). `.index.is_unique` checks.\n- `x.corr(y)` is Pearson correlation (R `cor(x, y, use = \"complete.obs\")`): it lines the two up by label and uses only the 7 pairs where both are present. `.notna().all(axis=\"columns\")` is True for complete rows.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "rec-10-report",
+    "label": "11 · Worked example: a report of quiz improvements",
+    "question": "",
+    "code": "report = df.copy()\nreport[\"gain\"] = report[\"quiz_2\"] - report[\"quiz_1\"]\nkeep = report[\"quiz_2\"].notna() & (report[\"gain\"] >= 5)\nreport = report.loc[keep, [\"student\", \"section\", \"gain\"]]\nreport = report.sort_values(\n    [\"gain\", \"student\"], ascending=[False, True]\n)\nprint(report)\n#>            student section  gain\n#> student_id\n#> 113            Eli      AM   9.0\n#> 101            Ari      AM   8.0\n#> 119            Gia      AM   8.0",
+    "comment": "The whole recitation in five lines, the shape most quiz questions take:\n\n1. **copy** the table,\n2. **compute** a new column,\n3. build a **mask** (combined with `&`),\n4. **select** rows and columns with `.loc[mask, [cols]]`,\n5. **sort**, breaking ties by name.\n\nR (tidyverse): `df |> mutate(gain = quiz_2 - quiz_1) |> filter(!is.na(quiz_2), gain >= 5) |> select(student, section, gain) |> arrange(desc(gain), student)`.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "rec-10-ex1",
+    "label": "Exercise 1 · Selecting and summarizing quiz scores",
+    "question": "Using df: (a) which student IDs do df.loc[107:116] and df.iloc[2:5] return, and why do they differ? (b) Select PM students with Quiz 2 ≥ 80, keep student, quiz_1, quiz_2, sorted by Quiz 2 from highest. Store it as selected. (c) Find the mean Quiz 2 among them.",
+    "code": "print(df.loc[107:116].index.tolist())\n#> [107, 110, 113, 116]\nprint(df.iloc[2:5].index.tolist())\n#> [107, 110, 113]\neligible = (df[\"section\"] == \"PM\") & (df[\"quiz_2\"] >= 80)\nselected = df.loc[eligible, [\"student\", \"quiz_1\", \"quiz_2\"]]\nselected = selected.sort_values(\"quiz_2\", ascending=False)\nprint(selected)\n#>            student  quiz_1  quiz_2\n#> student_id\n#> 110            Dev      90    94.0\n#> 116            Fay      88    91.0\n#> 104             Bo      82    85.0\nprint(selected[\"quiz_2\"].mean())\n#> 90.0",
+    "comment": "(a) The **label** slice includes both ends: 107, 110, 113, 116 (4 rows). The **position** slice 2:5 is positions 2, 3, 4: 107, 110, 113 (3 rows).\n\n(b, c) Dev 94, Fay 91, Bo 85; mean (94 + 91 + 85) / 3 = **90**.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "rec-10-ex2",
+    "label": "Exercise 2 · Matching bonuses to student IDs",
+    "question": "exercise_scores = pd.Series([72, 84, 66], index=[201, 204, 207]) and exercise_bonus = pd.Series([4, 3, 2], index=[207, 201, 210]). Predict exercise_scores + exercise_bonus. Then compute adjusted scores for exactly the students in exercise_scores (missing bonus = 0, original order). Why doesn't .add(..., fill_value=0) alone do this?",
+    "code": "exercise_scores = pd.Series([72, 84, 66], index=[201, 204, 207])\nexercise_bonus = pd.Series([4, 3, 2], index=[207, 201, 210])\nprint(exercise_scores + exercise_bonus)\n#> 201    75.0\n#> 204     NaN\n#> 207    70.0\n#> 210     NaN\n#> dtype: float64\naligned_bonus = exercise_bonus.reindex(exercise_scores.index)\nadjusted_scores = exercise_scores + aligned_bonus.fillna(0)\nprint(adjusted_scores)\n#> 201    75.0\n#> 204    84.0\n#> 207    70.0\n#> dtype: float64\nprint(exercise_scores.add(exercise_bonus, fill_value=0))\n#> 201    75.0\n#> 204    84.0\n#> 207    70.0\n#> 210     2.0\n#> dtype: float64",
+    "comment": "Plain `+` matches IDs: 201 → 72 + 3 = 75, 207 → 66 + 4 = 70; 204 and 210 appear on only one side → `NaN`.\n\n`reindex` to the score roster, then `fillna(0)`: 75, 84, 70. `add(fill_value=0)` also keeps student **210** (value 2), who isn't on the roster.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "rec-10-p1-prac",
+    "label": "Practice: a problem just like it (Exercise 1 · filter, select, sort)",
+    "question": "Using df, list AM students who studied at least 2 hours, showing student, hours and quiz_1, sorted by quiz_1 from lowest to highest. Then give their mean quiz_1 and how many there are.",
+    "code": "am = df.loc[(df[\"section\"] == \"AM\") & (df[\"hours\"] >= 2), [\"student\", \"hours\", \"quiz_1\"]]\nam = am.sort_values(\"quiz_1\")\nprint(am)\n#>            student  hours  quiz_1\n#> student_id\n#> 101            Ari    2.0      60\n#> 107            Cam    3.0      75\nprint(am[\"quiz_1\"].mean(), am.shape[0])\n#> 67.5 2",
+    "comment": "Same steps as Exercise 1: mask with `&` and parentheses, `.loc[mask, [cols]]`, `sort_values`. Gia (hours NaN) and Eli (1.5 hours) drop out.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "rec-10-p2-prac",
+    "label": "Practice: a problem just like it (Exercise 2 · label alignment)",
+    "question": "hw = pd.Series([90, 75, 88], index=['Ari', 'Bo', 'Cam']) and late = pd.Series([5, 10], index=['Cam', 'Dev']) (points lost). Predict hw - late. Then compute final scores for exactly Ari, Bo and Cam, where no late entry means 0 points lost.",
+    "code": "hw = pd.Series([90, 75, 88], index=[\"Ari\", \"Bo\", \"Cam\"])\nlate = pd.Series([5, 10], index=[\"Cam\", \"Dev\"])\nprint(hw - late)\n#> Ari     NaN\n#> Bo      NaN\n#> Cam    83.0\n#> Dev     NaN\n#> dtype: float64\nprint(hw - late.reindex(hw.index).fillna(0))\n#> Ari    90.0\n#> Bo     75.0\n#> Cam    83.0\n#> dtype: float64",
+    "comment": "Subtraction lines up names: only Cam is on both sides (88 − 5 = 83); Ari, Bo and Dev get `NaN`. Reindexing `late` to `hw`'s names and filling with 0 keeps exactly the roster: 90, 75, 83.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "rec-10-p3-prac",
+    "label": "Practice: a problem just like it (Sections 6 and 8 · row summaries and map)",
+    "question": "Make a column best with each student's higher quiz score (skip missing), and a column level that maps section AM to 'early' and PM to 'late'. Then count the students in each level whose best score is at least 80.",
+    "code": "p = df.copy()\np[\"best\"] = p[[\"quiz_1\", \"quiz_2\"]].max(axis=\"columns\")\np[\"level\"] = p[\"section\"].map({\"AM\": \"early\", \"PM\": \"late\"})\nprint(p[[\"student\", \"best\", \"level\"]])\n#>            student  best  level\n#> student_id\n#> 101            Ari  68.0  early\n#> 104             Bo  85.0   late\n#> 107            Cam  75.0  early\n#> 110            Dev  94.0   late\n#> 113            Eli  64.0  early\n#> 116            Fay  91.0   late\n#> 119            Gia  78.0  early\n#> 122            Han  72.0   late\nprint(p.loc[p[\"best\"] >= 80, \"level\"].value_counts())\n#> level\n#> late    3\n#> Name: count, dtype: int64",
+    "comment": "`max(axis=\"columns\")` gives one value per row and skips Cam's missing quiz. `.map(dict)` recodes; `.value_counts()` on the filtered column counts per level. Three PM students (Bo, Dev, Fay) reach 80; Han's best is 72, and no AM student gets there.",
+    "key": false,
+    "lang": "python"
+   }
+  ]
+ },
+ "hw-04": {
+  "type": "hw",
+  "num": "04",
+  "title": "Python basics, NumPy and pandas (GDP vs GDI growth): what each question needs",
+  "date": "",
+  "exams": [
+   "Python Quiz"
+  ],
+  "topics": [
+   "python",
+   "list",
+   "append",
+   "extend",
+   "dict",
+   "numpy",
+   "random normal",
+   "matrix",
+   "boolean subsetting",
+   "copy",
+   "row sums",
+   "dtype",
+   "pandas",
+   "read_csv",
+   "missing values",
+   "correlation",
+   "new column"
+  ],
+  "pdfs": [
+   {
+    "name": "Homework Assignment 4.Rmd",
+    "size": 3032,
+    "type": "text/plain"
+   }
+  ],
+  "notes": "**Homework 4, due Tuesday, November 17 by 11:59 PM.** Python chunks only (no R). Three parts, 12 points each: basic Python, NumPy, pandas (GDP vs GDI growth from the Federal Reserve).\n\n**This page has no answers.** Each question lists what it needs and where on this site that tool is explained, so you can write the code yourself. The assignment file is attached above.\n\n**Setup:** open `Python.Rproj`, start a new R Markdown file, and use `{python}` chunks (Py 14 → *R Markdown / Quarto*). The pandas part reads data from the internet, so knit while online.\n\n| Part | Tools | Where |\n|---|---|---|\n| Basic Python | lists `[ ]`, `.append()` / `.extend()`, dicts `{key: value}`, changing a dict by key | Py 15, Py 16 |\n| NumPy | `np.random.normal(loc, scale, size)`, `[row, col]` and True/False subsetting, `.copy()`, `.sum(axis=)`, `.dtype` | Py 16 |\n| pandas | `.shape`, `.index.min()` / `.max()`, `.isna().sum()`, `.corr()`, new columns | Py 17, Py 18, Rec 10 |",
+  "takeaways": [
+   "Lists change in place with .append(one) / .extend(several); a dict changes with d[key] = value.",
+   "np.random.normal(loc=mean, scale=sd, size=(rows, cols)) makes a random matrix.",
+   "Filter rows of a matrix with a True/False array from one column: m[cond, :]; add .copy() for a separate object.",
+   ".sum(axis=1) adds across each row; .sum(axis=0) down each column.",
+   "With index_col=\"quarter\", the dates are the index: use .index for the date range.",
+   "df.isna().sum() counts missing values per column; Series.corr() uses only pairs where both are present.",
+   "Averaging two columns: (a + b) / 2 is NaN if either is missing; df[[a, b]].mean(axis=\"columns\") skips the missing one. Decide which you want."
+  ],
+  "updatedAt": "2026-11-14T20:00:00Z",
+  "chunks": [
+   {
+    "id": "hw-04-q1",
+    "label": "Basic Python · Columbia Courses",
+    "question": "Create a list that has the course abbreviations (letters and numbers) for all the courses that you have completed at Columbia, not including this semester. You should assign it to a symbol.",
+    "code": "",
+    "comment": "**This needs:** a **list** of **strings** in square brackets, assigned with `=` (not `<-`).\n\n**Look at:** Py 15 → *Lists: [ ], len(), mixed types* and *Strings: quotes*. Function finder: *[ ] list / len() / .append()*.\n\n**Watch out:** every abbreviation needs quotes, and items are separated by commas.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "hw-04-q2",
+    "label": "Basic Python · List Extension",
+    "question": "Modify the list (in place) that you created in the previous subproblem to include the course abbreviations for all of the classes that you are taking this semester.",
+    "code": "",
+    "comment": "**This needs:** changing the **same** list object (\"in place\"), adding **several** items.\n\n**Look at:** Py 16 → *Changing lists and dicts: .insert(), x[i] =, .update()* and Py 15 → *Lists aren't vectors: + joins*.\n\n**Think about:** `.append()` adds **one** item (a list passed to it becomes one nested item); `.extend()` adds each item of a list. `x = x + [...]` builds a **new** list rather than modifying in place. These methods return `None`, so don't write `x = x.extend(...)`.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "hw-04-q3",
+    "label": "Basic Python · Months and Days",
+    "question": "Create a dictionary whose keys are the months and whose values are the number of days in the corresponding month in 2026. You should assign it to a symbol.",
+    "code": "",
+    "comment": "**This needs:** a **dict** `{key: value, ...}` with 12 string keys and whole-number values. 2026 is **not** a leap year.\n\n**Look at:** Py 15 → *Dictionaries: { key: value }, look up by name*. Function finder: *{key: value} dict*.\n\n**Watch out:** keys are strings, so they need quotes; use `:` between key and value and `,` between pairs.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "hw-04-q4",
+    "label": "Basic Python · Leap Years",
+    "question": "Now presume it is a leap year like 2028. Modify the dictionary that you created in the previous problem to include the correct number of days in February.",
+    "code": "",
+    "comment": "**This needs:** changing **one value** of an existing dict **by its key**.\n\n**Look at:** Py 16 → *Changing lists and dicts: .insert(), x[i] =, .update()* and *Subsetting a dict by key, not by position*.\n\n**Watch out:** use exactly the same key spelling as in your dict (case matters).",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "hw-04-q5",
+    "label": "Using NumPy · Creating a Matrix",
+    "question": "Create a two-dimensional numpy array with 10 rows and 5 columns where each element of that matrix is drawn independently from a normal distribution with a mean of 2 and a standard deviation of 3. You should assign it to a symbol.",
+    "code": "",
+    "comment": "**This needs:** `np.random.normal()` with the mean as `loc`, the standard deviation as `scale`, and a `size` that is a (rows, columns) **tuple**.\n\n**Look at:** Py 16 → *Random numbers: np.random.normal(loc, scale, size)* and *2D arrays (matrices)*. Function finder: *np.random.normal() / np.random.seed()*.\n\n**Think about:** setting a seed first (`np.random.seed(...)`) makes your knitted numbers reproducible. Check the result with `.shape`.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "hw-04-q6",
+    "label": "Using NumPy · Subsetting a Matrix",
+    "question": "Create a copy of a new matrix that consists of all the columns of the matrix you created in the previous subproblem where the value in the initial column is greater than 1. You should assign it to an object.",
+    "code": "",
+    "comment": "**This needs:** (1) the **first column** of the matrix (`[:, 0]`, position 0), (2) a **True/False array** from comparing it to 1, (3) using that array to pick **rows** while keeping **all columns**, (4) `.copy()` so it's a separate object.\n\n**Look at:** Py 16 → *Subsetting arrays by position: [row, col]*, *Subsetting arrays by bool: keep rows that meet a condition* and *Copy behavior: an array slice is a view*.\n\n**Check:** the result should still have 5 columns and fewer than 10 rows (it's random, so the exact number varies).",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "hw-04-q7",
+    "label": "Using NumPy · Rowsums",
+    "question": "Create a vector that contains the sum across each row of the matrix in the previous subproblem. You should assign it to an object.",
+    "code": "",
+    "comment": "**This needs:** a sum along the **row** direction: one number per row.\n\n**Look at:** Py 16 → *Summaries by column or row: np.apply_along_axis() and axis=* and *Common methods: .sum()*.\n\n**Check:** the result's length should equal the number of **rows** of the subsetted matrix. If it equals 5, you summed the columns instead.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "hw-04-q8",
+    "label": "Using NumPy · Data Type",
+    "question": "What is the type of object common to all elements of the vector in the previous subproblem?",
+    "code": "",
+    "comment": "**This needs:** the **element type** of a NumPy array, not the type of the array itself.\n\n**Look at:** Py 16 → *Arrays are homogeneous: .dtype and .shape*. Function finder: *.shape / .dtype*.\n\n**Think about:** `type(x)` tells you it's an array; `x.dtype` tells you what every element is.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "hw-04-setup",
+    "label": "Using pandas · Setup code from the assignment (run as given)",
+    "question": "Execute the following to download the GDP and GDI growth data from the United States Federal Reserve.",
+    "code": "import pandas as pd\n\nurl = (\"https://fred.stlouisfed.org/graph/fredgraph.csv\"\n       \"?id=A191RL1Q225SBEA,A261RL1Q225SBEA\")\ngrowth = pd.read_csv(url,\n                     header=0,\n                     names=[\"quarter\", \"gdp_growth\", \"gdi_growth\"],\n                     parse_dates=[\"quarter\"],\n                     index_col=\"quarter\")",
+    "comment": "This is the assignment's own code, copied so you can paste it. What each argument does:\n\n| Argument | Does |\n|---|---|\n| `header=0` | the first line of the file is the header |\n| `names=[...]` | rename the three columns |\n| `parse_dates=[\"quarter\"]` | read the quarter column as **dates** |\n| `index_col=\"quarter\"` | make the dates the **index** (row labels), not a column |\n\nSo `growth` has **two** columns, and the dates live in `growth.index`.\n\n**Look at:** Py 18 → *pd.read_csv()*.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "hw-04-q9",
+    "label": "Using pandas · Observations",
+    "question": "How many observations are there and what is the date range that they span?",
+    "code": "",
+    "comment": "**This needs:** the number of **rows**, and the first and last date. The dates are the **index** (because of `index_col`).\n\n**Look at:** Py 18 → *Attributes: .shape vs .size* (rows = `.shape[0]`, not `.size`). For the dates, the index has `.min()` and `.max()` like a Series.\n\n**Watch out:** `.size` counts cells (rows × 2 columns), not observations.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "hw-04-q10",
+    "label": "Using pandas · Missing Values",
+    "question": "How many values are missing on each of the variables in growth?",
+    "code": "",
+    "comment": "**This needs:** True/False for missing, then a count **per column**.\n\n**Look at:** Rec 10 → *6 · Missing values: .isna(), .notna(), .isna().sum()* (the table row \"missing per column\"). Py 18 → *Functions on a column*.\n\n**Watch out:** never test with `== np.nan`; it's always False.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "hw-04-q11",
+    "label": "Using pandas · Correlation",
+    "question": "What is the correlation between the observed values of GDP growth and GDI growth?",
+    "code": "",
+    "comment": "**This needs:** Pearson correlation between two **Series** (columns).\n\n**Look at:** Py 18 → *Functions on a column: ... .corr()* and Rec 10 → *9 · Duplicate labels and .corr()*.\n\n**Think about:** \"observed values\" is a hint: `.corr()` already uses only the quarters where **both** values are present. You can confirm how many pairs that is with `.notna()` and `.all(axis=\"columns\")` (Rec 10).",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "hw-04-q12",
+    "label": "Using pandas · Gross Domestic Output",
+    "question": "Many economists contend that the average of GDP growth and GDI growth is a more reliable measure of the change in output. Create a new column within growth called gdo_growth that computes this average.",
+    "code": "",
+    "comment": "**This needs:** a **new column** assigned with brackets, computed from two existing columns.\n\n**Look at:** Py 18 → *A new column: tips['tip_pct'] = ...* and Rec 10 → *4 · New columns* and *6 · Summaries per column or per row: axis=*.\n\n**Think about:** there are two ways to average, and they differ only in quarters where one value is missing: arithmetic on the two columns gives `NaN` there, while a row mean with `axis=\"columns\"` skips the missing one. Decide which is the right \"average\" and say so in your answer.\n\n**Watch out:** create it with `growth[\"gdo_growth\"] = ...`; `growth.gdo_growth = ...` does not add a column.",
+    "key": false,
+    "lang": "python"
    }
   ]
  }

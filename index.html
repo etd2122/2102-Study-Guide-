@@ -372,6 +372,39 @@ details.alt{border-left-width:1px;border-left-color:color-mix(in srgb,var(--acce
 .btn.primary:hover{background:color-mix(in srgb,var(--accent) 88%,black)}
 .search:focus{border-color:var(--accent);background:var(--panel)}
 </style>
+<style id="code-search">
+/* Code search (chunk-level results in the sidebar and a full results page), Python Quiz page */
+.search-hint{font-size:12px;color:var(--muted);margin-top:-6px}
+.search-hint kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 4px;background:var(--panel)}
+.cs-side{display:flex;flex-direction:column;gap:6px;padding:2px 0 10px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.cs-side .label{display:flex;justify-content:space-between;padding:0 4px}
+.cs-n{font-family:var(--mono);letter-spacing:0;text-transform:none;font-weight:400}
+.cs-hit{position:relative;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+.cs-hit:hover{border-color:var(--accent)}
+.cs-open{all:unset;box-sizing:border-box;display:flex;flex-direction:column;gap:2px;width:100%;padding:7px 8px 6px;cursor:pointer}
+.cs-where{font-family:var(--mono);font-size:11px;font-weight:600}
+.cs-lab{font-size:13px;font-weight:600;line-height:1.35;padding-right:44px;overflow-wrap:anywhere}
+.cs-pre{margin:4px 0 0;padding:5px 7px;background:var(--code-bg);border-radius:4px;font-size:11.5px;line-height:1.45;max-height:64px;overflow:hidden;white-space:pre}
+.cs-pre code{font-family:var(--mono)}
+.cs-copy{position:absolute;top:5px;right:5px;border:1px solid var(--line);background:var(--panel);border-radius:4px;font-size:11px;padding:1px 6px;cursor:pointer;color:var(--muted)}
+.cs-copy:hover{color:var(--accent);border-color:var(--accent)}
+.cs-all{justify-content:center}
+.result .cell{margin:0;border:0;border-top:1px solid var(--line);border-radius:0;max-height:360px;overflow:auto}
+.result-btns{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.quiz-cta{display:flex;justify-content:space-between;align-items:center;width:100%;border-color:color-mix(in srgb,var(--t-py) 45%,var(--line));background:color-mix(in srgb,var(--mark) 22%,var(--panel));font-weight:600}
+.quiz-cta .quiz-when{font-family:var(--mono);font-size:12px;font-weight:400;color:var(--muted)}
+.quiz-cta[aria-pressed="true"]{background:var(--mark);border-color:var(--mark);color:var(--mark-ink)}
+.pyq{display:flex;flex-direction:column;gap:14px}
+.pyq-facts{display:flex;gap:10px;flex-wrap:wrap}
+.pyq-facts span{font-size:14px;border:1px solid var(--line);border-radius:999px;padding:3px 12px;background:var(--panel)}
+.pyq-actions{display:flex;gap:8px;flex-wrap:wrap}
+.pyq-jump{display:flex;flex-wrap:wrap;gap:6px}
+.pyq-jump button{font-size:13px}
+.lookup h3{font-size:1.2rem;margin:0 0 6px}
+.lookup table{display:table;width:100%}
+.lookup td:first-child{color:var(--muted);font-size:13.5px}
+.lookup tr.grp td{background:var(--code-bg);font-weight:650;color:var(--ink);font-size:13px;text-transform:uppercase;letter-spacing:.05em}
+</style>
 </head>
 <body>
 <div class="app">
@@ -386,13 +419,16 @@ details.alt{border-left-width:1px;border-left-color:color-mix(in srgb,var(--acce
       <button class="btn" id="btnGuide" type="button" aria-pressed="false">Study guide</button>
       <button class="btn ghost menu-btn" id="btnMenu" type="button" aria-expanded="true">List</button>
     </div>
+    <button class="btn quiz-cta" id="btnPyQuiz" type="button" aria-pressed="false"><span>Python Quiz study page</span><span class="quiz-when">Wed, Nov 18</span></button>
     <button class="btn match-btn" id="btnMatch" type="button" aria-pressed="false">Find code for a question</button>
     <div class="side-actions tool-row">
       <button class="btn" id="btnErr" type="button" aria-pressed="false">Check code / error</button>
       <button class="btn" id="btnQuiz" type="button" aria-pressed="false">Self-test</button>
     </div>
     <div class="collapsible" style="display:flex;flex-direction:column;gap:12px">
-      <input class="search" id="search" type="search" placeholder="Search titles, code, notes…" aria-label="Search entries">
+      <input class="search" id="search" type="search" placeholder="Search code: loc, missing values, groupby…" aria-label="Search code and entries" autocomplete="off">
+      <span class="search-hint">Typos and R names work (<code>table</code>, <code>is.na</code>). <kbd>Enter</kbd> shows every match with output.</span>
+      <div id="csBox" hidden></div>
       <div class="chips" id="typeChips" role="group" aria-label="Filter by type"></div>
       <div class="chips" id="examChips" role="group" aria-label="Filter by exam"></div>
       <ul class="list" id="list"></ul>
@@ -417,7 +453,8 @@ details.alt{border-left-width:1px;border-left-color:color-mix(in srgb,var(--acce
 (function(){
 const TYPES={core:{label:'Must-know',short:'Core'},test:{label:'Practice tests',short:'Test'},kit:{label:'Everyday code',short:'Kit'},hw:{label:'Homework',short:'HW'},rec:{label:'Recitation',short:'Rec'},lec:{label:'R lectures',short:'Lec'},py:{label:'Python lectures',short:'Py'},prac:{label:'Exam review',short:'Rev'}};
 const TYPE_ORDER=['py','core','kit','prac','test','hw','rec','lec'];
-const EXAMS=['Midterm 1','Midterm 2','Final'];
+const PYQ='Python Quiz';
+const EXAMS=['Midterm 1','Midterm 2',PYQ,'Final'];
 
 let canWrite=true; const localUrls={};
 const LS_KEY='s2102.entries', LS_PENDING='s2102.pending', LS_DELETED='s2102.deleted', LS_EDITED='s2102.edited';
@@ -515,7 +552,7 @@ function matches(e){
   if(query){
     const q=query.toLowerCase();
     const hay=[e.title,tagOf(e),(e.topics||[]).join(' '),e.notes,(e.takeaways||[]).join(' '),...(e.chunks||[]).map(c=>c.label+' '+(c.question||'')+' '+c.code+' '+c.comment)].join(' ').toLowerCase();
-    if(!hay.includes(q))return false;
+    if(!hay.includes(q)&&!(csHitIds&&csHitIds.has(e.id)))return false;   // exact text, or one of its chunks is a fuzzy code match
   }
   return true;
 }
@@ -530,10 +567,12 @@ function renderChips(){
 function renderList(){
   const list=$('#list');
   if(!loaded){list.innerHTML='';return;}
+  const cs=query.length>=2?codeSearch(query,40):[];
+  csHitIds=query.length>=2?new Set(cs.slice(0,25).map(r=>r.d.eid)):null;
   const items=sorted().filter(matches);
+  const box=$('#csBox'); if(box){ box.innerHTML=csSideHTML(cs); box.hidden=!cs.length; highlight(box); }
   let html='',last='',shut=false;
-  if(query.length>=3){const ff=findFunctions(query,3); if(ff.length) html+=`<li class="ff-side">${ffHTML(ff,'sm')}</li>`;}
-  if(!items.length){list.innerHTML=html+`<li class="empty-line" style="padding:8px">${Object.keys(entries).length?(html?'No entries contain that exact text; try the function cards above or Find code for a question.':'No entries match.'):'No entries yet.'}</li>`;return;}
+  if(!items.length){list.innerHTML=`<li class="empty-line" style="padding:8px">${Object.keys(entries).length?(cs.length?'No entries contain that exact text.':'Nothing matches. Try a function name (loc, mean) or what the code does ("count missing values").'):'No entries yet.'}</li>`;return;}
   const counts={}; items.forEach(e=>{counts[e.type]=(counts[e.type]||0)+1;});
   for(const e of items){
     if(e.type!==last){const op=groupOpen(e.type); shut=!op;
@@ -549,7 +588,7 @@ function renderList(){
   }
   list.innerHTML=html;
 }
-function renderSide(){ renderChips(); renderList(); $('#btnGuide').setAttribute('aria-pressed',view==='guide'); $('#btnMatch').setAttribute('aria-pressed',view==='match'); $('#btnErr').setAttribute('aria-pressed',view==='errors'); $('#btnQuiz').setAttribute('aria-pressed',view==='quiz'); $('#btnNew').hidden=!canWrite; }
+function renderSide(){ renderChips(); renderList(); $('#btnPyQuiz').setAttribute('aria-pressed',view==='guide'&&guideExam===PYQ); $('#btnGuide').setAttribute('aria-pressed',view==='guide'&&guideExam!==PYQ); $('#btnMatch').setAttribute('aria-pressed',view==='match'); $('#btnErr').setAttribute('aria-pressed',view==='errors'); $('#btnQuiz').setAttribute('aria-pressed',view==='quiz'); $('#btnNew').hidden=!canWrite; }
 
 /* ---------- Main ---------- */
 function renderMain(){
@@ -562,12 +601,13 @@ function renderMain(){
   else if(view==='match') html+=matchHTML();
   else if(view==='errors') html+=errorsHTML();
   else if(view==='quiz') html+=quizHTML();
+  else if(view==='search') html+=searchHTML();
   else{
     const ids=sorted().map(e=>e.id);
     if(!curId||!entries[curId]) curId=ids[0]||null;
     html+= curId? entryHTML(curId,entries[curId]) : emptyHTML();
   }
-  const isEntry=!editing&&!['guide','match','errors','quiz'].includes(view)&&curId;
+  const isEntry=!editing&&!['guide','match','errors','quiz','search'].includes(view)&&curId;
   main.innerHTML=isEntry?`<div class="page"><div class="wrap">${html}</div><nav class="toc" id="toc" aria-label="On this page"></nav></div>`:`<div class="wrap">${html}</div>`;
   if(isEntry) buildToc();
   if(view==='match'&&!editing){ renderMatches(); }
@@ -754,13 +794,15 @@ function guideHTML(){
   const nKey=all.reduce((s,e)=>s+(e.chunks||[]).filter(c=>c.key).length,0);
   return `<header class="head">
     <div class="eyebrow"><span>Study guide</span></div>
-    <h2>${guideExam==='all'?'Everything flagged for exams':esc(guideExam)}</h2>
+    <h2>${guideExam==='all'?'Everything flagged for exams':guideExam===PYQ?'Python Quiz study page':esc(guideExam)}</h2>
     <div class="chips" role="group" aria-label="Exam">${[['all','All exams'],...EXAMS.map(x=>[x,x])].map(([v,l])=>`<button class="chip" type="button" data-gexam="${esc(v)}" aria-pressed="${guideExam===v}">${esc(l)}</button>`).join('')}</div>
   </header>
+  ${guideExam===PYQ?pyQuizIntroHTML(withContent):''}
   <div class="guide-stats"><div class="stat"><b>${all.length}</b><span>entries</span></div><div class="stat"><b>${nTk}</b><span>points to remember</span></div><div class="stat"><b>${nKey}</b><span>exam code chunks</span></div></div>
+  ${guideExam===PYQ?pyLookupHTML():''}
   ${withContent.length?withContent.map(e=>{
     const tk=(e.takeaways||[]).filter(Boolean), keys=(e.chunks||[]).map((c,i)=>[c,i]).filter(([c])=>c.key);
-    return `<article class="g-entry"><h4><span class="tag tc-${esc(e.type)}">${esc(tagOf(e))}</span><button type="button" data-id="${esc(e.id)}">${esc(e.title||'Untitled')}</button></h4>
+    return `<article class="g-entry" id="g-${esc(e.id)}"><h4><span class="tag tc-${esc(e.type)}">${esc(tagOf(e))}</span><button type="button" data-id="${esc(e.id)}">${esc(e.title||'Untitled')}</button></h4>
       ${tk.length?`<ol class="takeaways">${tk.map(x=>`<li><span>${esc(x)}</span></li>`).join('')}</ol>`:''}
       ${keys.map(([c,i])=>chunkHTML(c,i).replace('data-act="copy"','data-act="copy" data-eid="'+esc(e.id)+'"')).join('')}
     </article>`;}).join('')
@@ -871,6 +913,213 @@ function findMatches(q){
   const hw=res.filter(r=>r.d.e.type==='hw'&&rel(r)&&!py.includes(r)).slice(0,3);
   const rest=res.filter(r=>!py.includes(r)&&!hw.includes(r));
   return py.concat(hw,rest).slice(0,10);
+}
+
+/* ---------- Code search: every chunk, fuzzy, R ↔ Python synonyms ---------- */
+// Typing in the sidebar search ranks individual code chunks (not whole entries). Tolerates typos
+// (edit distance 1-2), partial words (prefixes), dotted names (tips.loc → loc) and R names (table → value_counts).
+let csHitIds=null;
+const CS_STOP=new Set('a an the in of to for on with by and or is are be it its this that i me my how do does did what which use using want need can get make from into at as so if then than when where who why way one each show find code function python py pandas numpy np pd r vs versus like just only same give gives'.split(' '));
+function csNorm(w){ return (w.length>4&&!/ss$/.test(w)&&!/[._]/.test(w))?w.replace(/ies$/,'y').replace(/s$/,''):w; }
+const CS_SYN_RAW={
+  subset:['loc','iloc','mask','filter'], filter:['loc','mask','isin','boolean'], where:['loc','mask','where'], condition:['loc','mask','boolean'],
+  greater:['loc','mask','condition'], less:['loc','mask','condition'], above:['loc','mask'], below:['loc','mask'], least:['loc','mask','min'], most:['max','value_counts'],
+  select:['loc','iloc','columns'], pick:['loc','iloc'], column:['columns','col','loc'], row:['rows','iloc','loc','axis'],
+  missing:['isna','notna','nan','fillna','dropna'], na:['isna','nan','notna','fillna'], 'is.na':['isna','notna'], nan:['isna','nan'], null:['isna','nan'], 'na.rm':['skipna','nanmean'],
+  table:['value_counts'], tabulate:['value_counts'], frequency:['value_counts'], count:['value_counts','count','sum'], counts:['value_counts'],
+  factor:['categorical','category','categoricaldtype','astype'], level:['categories','categorical'], ordered:['ordered','categoricaldtype'],
+  average:['mean'], avg:['mean'], sd:['std'], deviation:['std'],
+  nrow:['shape'], ncol:['shape'], dim:['shape'], length:['len','shape'], dimension:['shape'],
+  summary:['describe'], summarize:['describe','groupby'], summarise:['describe','groupby'],
+  sapply:['apply','map'], lapply:['apply','map'], tapply:['groupby'], aggregate:['groupby'], group:['groupby'], 'group_by':['groupby'],
+  rowsum:['sum','axis'], rowmean:['mean','axis'], colmean:['mean','axis'], colsum:['sum','axis'], rowsums:['sum','axis'], colmeans:['mean','axis'], rowmeans:['mean','axis'], colsums:['sum','axis'],
+  sort:['sort_values','sort_index','sorted'], order:['sort_values','sort'], arrange:['sort_values'], desc:['ascending'], descending:['ascending'],
+  paste:['join','str'], grepl:['contains'], detect:['contains'], contain:['contains'], nchar:['len'], toupper:['upper'], tolower:['lower'], gsub:['replace'], sub:['replace'],
+  ifelse:['where'], rnorm:['normal','random'], runif:['uniform','random'], sample:['random','choice'], 'set.seed':['seed'],
+  matrix:['array','reshape'], vector:['list','array','series'], named:['dict','series','index'], dictionary:['dict'],
+  append:['append','extend','insert'], extend:['extend','append'], add:['append','insert','update','column'],
+  cor:['corr'], correlation:['corr'], mutate:['column','assign'], merge:['merge','join'], distinct:['unique','set'],
+  'read.csv':['read_csv'], csv:['read_csv'], load:['read_csv','get_rdataset'], read:['read_csv'],
+  first:['head','iloc'], last:['tail','iloc'], top:['head','sort_values'], 'which.max':['argmax','idxmax'], 'which.min':['argmin','idxmin'],
+  largest:['max','idxmax','argmax'], biggest:['max','idxmax'], smallest:['min','idxmin'], maximum:['max'], minimum:['min'],
+  position:['iloc','index'], label:['loc','index'], slice:['iloc','loc'],
+  class:['type','dtype','dtypes'], convert:['astype','int','float','str'], coerce:['astype','float','int'],
+  recode:['map','replace'], rename:['rename','map'], remove:['drop','remove','pop'], delete:['drop','remove','del'],
+  'data.frame':['dataframe'], df:['dataframe'], loop:['while'], c:['list','array'], seq:['arange','range'],
+  string:['str','text'], text:['str'], combine:['&','|','hstack','vstack'], both:['&'], either:['|'], 'in':['isin'],
+  rank:['rank'], copy:['copy','deep'], type:['type','dtype','isinstance']
+};
+const CS_SYN={}; for(const [k,v] of Object.entries(CS_SYN_RAW)) CS_SYN[csNorm(k)]=v;
+function csToks(text){
+  const out=[];
+  for(const w of (String(text||'').toLowerCase().match(/[a-z0-9_]+(?:\.[a-z0-9_]+)*/g)||[])){
+    out.push(csNorm(w));
+    if(/[._]/.test(w)) for(const p of w.split(/[._]+/)) if(p.length>1) out.push(csNorm(p));
+  }
+  return out;
+}
+let csIdx=null, csIdxKey='';
+function csIndex(){
+  const key=Object.keys(entries).length+':'+Object.values(entries).reduce((n,e)=>n+(e.chunks||[]).length*7+(e.updatedAt||'').length,0);
+  if(csIdx&&csIdxKey===key) return csIdx;
+  const docs=[], df=new Map();
+  for(const [eid,e] of Object.entries(entries)){
+    (e.chunks||[]).forEach((c,i)=>{
+      const code=(c.code||'').split('\n').filter(l=>!/^\s*#>/.test(l)).join('\n');
+      if(!code.trim()&&!(c.question||'').trim()) return;
+      const tf=new Map(); let len=0;
+      const add=(txt,w)=>{ for(const t of csToks(txt)){ tf.set(t,(tf.get(t)||0)+w); len+=w; } };
+      add(c.label,3); add((c.question||'').replace(/^Use it when:\s*/,''),1.5); add(code,1.3); add(c.comment,.6);
+      // entry title/topics are left out on purpose: they're shared by every chunk and would flood the results
+      for(const t of tf.keys()) df.set(t,(df.get(t)||0)+1);
+      const strong=new Set(csToks((c.label||'')+' '+(c.question||'')+' '+code));   // words in the title, question or code itself
+      docs.push({eid,i,e,c,tf,len,strong,flat:((c.label||'')+'\n'+code).toLowerCase().replace(/\s+/g,' ')});
+    });
+  }
+  const avg=docs.reduce((s,d)=>s+d.len,0)/Math.max(1,docs.length);
+  csIdx={docs,df,avg,N:docs.length,vocab:[...df.keys()]}; csIdxKey=key;
+  return csIdx;
+}
+function lev(a,b,max){
+  if(Math.abs(a.length-b.length)>max) return max+1;
+  let prev=Array.from({length:b.length+1},(_,j)=>j);
+  for(let i=1;i<=a.length;i++){
+    const cur=[i]; let lo=i;
+    for(let j=1;j<=b.length;j++){ cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1)); if(cur[j]<lo)lo=cur[j]; }
+    if(lo>max) return max+1; prev=cur;
+  }
+  return prev[b.length];
+}
+function csExpand(q,idx){
+  const m=new Map(); const put=(t,w)=>{ if(idx.df.has(t)&&(m.get(t)||0)<w) m.set(t,w); };
+  put(q,1);
+  for(const s of (CS_SYN[q]||[])) for(const t of csToks(s).concat([s])) put(t,.85);
+  const maxD=q.length>=7?2:1;
+  for(const t of idx.vocab){
+    if(t===q) continue;
+    if(q.length>=2&&t.startsWith(q)) put(t,q.length>=3?.75:.45);
+    else if(q.length>=4&&t.includes(q)) put(t,.5);
+    else if(q.length>=4&&Math.abs(t.length-q.length)<=maxD){ const d=lev(q,t,maxD); if(d<=maxD) put(t,d===1?.7:.55); }
+  }
+  return m;
+}
+function codeSearch(q,max){
+  const idx=csIndex(), raw=String(q||'').toLowerCase().trim();
+  if(raw.length<2) return [];
+  let qt=[...new Set(csToks(raw).filter(t=>!CS_STOP.has(t)))];
+  const words=raw.match(/[a-z0-9_.]+/g)||[];
+  for(let k=0;k+1<words.length;k++){                     // "data frame" → dataframe, "value counts" → value_counts
+    for(const j of [words[k]+words[k+1],words[k]+'_'+words[k+1]]){
+      const n=csNorm(j); if(idx.df.has(n)&&!qt.includes(n)){ qt=qt.filter(t=>t!==csNorm(words[k])&&t!==csNorm(words[k+1])); qt.push(n); }
+    }
+  }
+  if(!qt.length) qt=csToks(raw);                          // only stop words typed (e.g. "pandas"): search them anyway
+  if(!qt.length) return [];
+  const exps=qt.map(t=>csExpand(t,idx)).filter(m=>m.size);
+  if(!exps.length) return [];
+  const rMode=wantsRLang(raw), phrase=raw.replace(/\s+/g,' '), k1=1.2, b=.75, res=[];
+  for(const d of idx.docs){
+    let score=0, hit=0, sure=true; const terms=[];
+    for(const m of exps){
+      let best=0, bt='', bw=0;
+      for(const [t,w] of m){
+        const f=d.tf.get(t); if(!f) continue;
+        const n=idx.df.get(t), idf=Math.log(1+(idx.N-n+.5)/(n+.5));
+        const s=w*idf*(f*(k1+1))/(f+k1*(1-b+b*d.len/idx.avg));
+        if(s>best){ best=s; bt=t; bw=w; }
+      }
+      if(best>0){ score+=best; hit++; terms.push(bt); if(bw<.75) sure=false; }   // matched only by a typo/partial guess
+    }
+    if(!hit) continue;
+    score*=Math.pow(hit/exps.length,1.5);                 // chunks matching every word rank first
+    if(!terms.some(t=>d.strong.has(t))) score*=.45;       // only mentioned in the explanation ("no loop needed"): weaker
+    if(phrase.length>=3&&d.flat.includes(phrase)) score*=1.6;
+    const py=d.c.lang==='python'||d.e.type==='py';
+    score*=rMode?(py?.6:1.2):(py?1.35:1);
+    res.push({d,score,terms,sure});
+  }
+  res.sort((a,b)=>b.score-a.score);
+  const floor=res.length?res[0].score*.22:0;            // drop weak, one-word-of-many matches
+  const kept=res.filter(r=>r.score>=floor);
+  if(rMode) return kept.slice(0,max||40);
+  // Python first (the quiz is Python): relevant Python chunks go to the top unless the query asks for R
+  const top=kept.length?kept[0].score:0, isPy=r=>r.d.c.lang==='python'||r.d.e.type==='py';
+  const anySure=kept.some(r=>r.sure);
+  const py=kept.filter(r=>isPy(r)&&r.score>=.45*top&&(r.sure||!anySure));
+  return py.concat(kept.filter(r=>!py.includes(r))).slice(0,max||40);
+}
+const csCode=c=>String(c.code||'').split('\n').filter(l=>!/^\s*#>/.test(l)).join('\n').trim();
+function csPreview(c,n){ const ls=csCode(c).split('\n').filter(l=>l.trim()); return ls.slice(0,n).join('\n')+(ls.length>n?'\n…':''); }
+function csSideHTML(res){
+  if(!res.length) return '';
+  return `<div class="cs-side"><span class="label"><span>Code matches</span><span class="cs-n">${res.length>=40?'40+':res.length}</span></span>
+    ${res.slice(0,6).map(r=>{ const {eid,e,c,i}=r.d; return `<div class="cs-hit">
+      <button class="cs-open" type="button" data-act="goto" data-eid="${esc(eid)}" data-i="${i}" title="Open this chunk">
+        <span class="cs-where tc-${esc(e.type)}">${esc(tagOf(e))} · ${esc((e.title||'').slice(0,38))}${(e.title||'').length>38?'…':''}</span>
+        <span class="cs-lab">${esc(c.label||('Chunk '+(i+1)))}</span>
+        ${csCode(c)?`<pre class="cs-pre"><code class="language-${esc(c.lang||'r')}">${esc(csPreview(c,3))}</code></pre>`:''}
+      </button>${csCode(c)?`<button class="cs-copy" type="button" data-act="cs-copy" data-eid="${esc(eid)}" data-i="${i}" aria-label="Copy code">Copy</button>`:''}</div>`; }).join('')}
+    <button class="btn sm cs-all" type="button" data-act="cs-all">All ${res.length>=40?'40+':res.length} matches with output →</button></div>`;
+}
+function searchHTML(){
+  const res=codeSearch(query,40);
+  const top=res.length?res[0].score:1;
+  return `<header class="head"><div class="eyebrow"><span>Code search</span></div>
+    <h2>${query.length>=2?`Code for “${esc(query)}”`:'Search all your code'}</h2></header>
+    <p class="hint">Type in the search box on the left; results update as you type. It searches every code chunk, its title and explanation, forgives typos, and knows R names: <code>table</code> finds <code>.value_counts()</code>, <code>is.na</code> finds <code>.isna()</code>, <code>subset</code> finds <code>.loc</code>. Python comes first; add “in R” or “tidyverse” for R code.</p>
+    <div class="results">${query.length<2?'<p class="empty-line">Type at least 2 letters.</p>':res.length?res.map((r,n)=>{ const {eid,e,c,i}=r.d; return `<div class="result">
+      <div class="result-top"><span class="result-rank">${n+1}</span>
+        <div class="result-main">
+          <span class="result-where tc-${esc(e.type)}">${esc(tagOf(e))} · ${esc(e.title||'')}</span>
+          <span class="result-label">${esc(c.label||('Chunk '+(i+1)))}</span>
+          <span class="result-why">Matched: ${[...new Set(r.terms)].slice(0,6).map(h=>`<span class="term">${esc(h)}</span>`).join('')}</span>
+        </div>
+        <div class="result-btns"><div style="display:flex;gap:6px">
+          ${csCode(c)?`<button class="btn sm" type="button" data-act="cs-copy" data-eid="${esc(eid)}" data-i="${i}">Copy code</button>`:''}
+          <button class="btn sm" type="button" data-act="goto" data-eid="${esc(eid)}" data-i="${i}">Open</button></div>
+          <div class="meter" title="Match strength"><i style="width:${Math.max(8,Math.round(r.score/top*100))}%"></i></div></div>
+      </div>
+      ${(c.code||'').trim()?`<div class="cell">${cellsHTML(c.code,c.lang||'r')}</div>`:''}</div>`; }).join(''):'<p class="empty-line">No code matches. Try a function name (<code>loc</code>, <code>mean</code>) or what the code does (“count missing values”).</p>'}</div>`;
+}
+
+/* ---------- Python Quiz study page (top of the Study guide when "Python Quiz" is picked) ---------- */
+const PY_LOOKUP=[
+  ['Basics'],
+  ['x <- 3','x = 3'],['5^3 · 5 %% 3 · 5 %/% 3','5**3 · 5 % 3 · 5 // 3'],['sqrt(5), log(5, 3)','from math import sqrt, log first'],
+  ['TRUE / FALSE · & | !','True / False · and or not'],['class(x), is.numeric(x)','type(x), isinstance(x, float)'],['as.numeric("3")','float("3"), int("3")'],
+  ['paste0("a", "b")','"a" + "b"'],['toupper(s), nchar(s)','s.upper(), len(s)'],
+  ['Containers'],
+  ['c(1, 2, 3) / list(...)','[1, 2, 3]  (list)'],['x[1]  first','x[0]  first (Python counts from 0)'],['x[length(x)]  last','x[-1]'],['x[2:3]','x[1:3]  (stop excluded)'],
+  ['list(a = 1, b = 2)  named','{"a": 1, "b": 2}  dict'],['x$a','d["a"]'],['unique(x)','set(x)'],['y <- x  (a copy)','y = x.copy()  (y = x is NOT a copy)'],
+  ['NumPy'],
+  ['matrix(...)','np.array([[...], [...]])'],['dim(m)','m.shape'],['m[1, 2]','m[0, 1]'],['m[m[, 2] < 0, ]','m[m[:, 1] < 0, :]'],
+  ['rnorm(50, 2, 3)','np.random.normal(2, 3, size=50)'],['matrix(rnorm(50), 10, 5)','np.random.normal(size=(10, 5))'],
+  ['rowSums(m) / colMeans(m)','m.sum(axis=1) / m.mean(axis=0)'],['apply(m, 2, f)','np.apply_along_axis(f, 0, m)'],['is.na(x), NA','np.isnan(x), np.nan'],['t(m), m %*% w','m.T, m @ w'],
+  ['pandas'],
+  ['read.csv("f.csv")','pd.read_csv("f.csv")'],['data.frame(a = ..., b = ...)','pd.DataFrame({"a": ..., "b": ...})'],['factor(x, levels, ordered = TRUE)','pd.Categorical(...) / .astype(CategoricalDtype(..., ordered=True))'],
+  ['head(df), dim(df), nrow(df)','df.head(), df.shape, df.shape[0]'],['names(df)','df.columns'],['summary(df)','df.describe()'],
+  ['df$col','df["col"]  (or df.col)'],['df[, c("a", "b")]','df[["a", "b"]]'],['df[df$a > 1, ]','df.loc[df["a"] > 1]'],['df[1:3, 1:2]','df.iloc[0:3, 0:2]'],
+  ['df[(a > 1) & (b == "x"), ]','df.loc[(df.a > 1) & (df.b == "x")]'],['x %in% c("a", "b")','x.isin(["a", "b"])'],
+  ['df$new <- df$a / df$b','df["new"] = df["a"] / df["b"]'],['table(x)','x.value_counts()'],['sum(is.na(x))','x.isna().sum()'],
+  ['mean(x, na.rm = TRUE)','x.mean()  (skips NaN by default)'],['which.max(x)','x.idxmax() (label) / x.argmax() (position)'],['cor(x, y)','x.corr(y)'],
+  ['apply(df, 1, f)','df.apply(f, axis=1)'],['tapply(x, g, mean)','df.groupby("g")["x"].mean()'],['df[order(-df$a), ]','df.sort_values("a", ascending=False)'],
+  ['grepl("S", x)','x.str.contains("S")'],['recode / named vector lookup','x.map({"AM": "Morning"})']
+];
+function pyQuizIntroHTML(list){
+  return `<section class="pyq">
+    <div class="pyq-facts"><span><b>Wed, Nov 18</b> in class</span><span>45 minutes</span><span>Python only</span><span>~25 min review first</span><span>Open notes</span></div>
+    <p class="hint">Everything flagged for the Python quiz, in lecture order: the points to remember and the exam code from Py 14–18, Rec 10 and HW 4. Use the sidebar search during the quiz: type a function or what you need (“count missing”, “rows where”, “average by group”).</p>
+    <div class="pyq-actions">
+      <button class="btn sm primary" type="button" data-act="pyq-test">Self-test: Python questions →</button>
+      <button class="btn sm" type="button" data-act="toc" data-to="pyq-lookup">R → Python lookup table</button>
+      <button class="btn sm" type="button" data-act="pyq-search">Search code</button>
+    </div>
+    <div><span class="label">Jump to</span><div class="pyq-jump">${list.map(e=>`<button class="chip" type="button" data-act="toc" data-to="g-${esc(e.id)}">${esc(tagOf(e))}</button>`).join('')}</div></div>
+  </section>`;
+}
+function pyLookupHTML(){
+  return `<section class="lookup prose" id="pyq-lookup"><h3>R → Python lookup</h3>
+    <table><thead><tr><th>R</th><th>Python</th></tr></thead><tbody>${PY_LOOKUP.map(r=>r.length===1?`<tr class="grp"><td colspan="2">${esc(r[0])}</td></tr>`:`<tr><td><code>${esc(r[0])}</code></td><td><code>${esc(r[1])}</code></td></tr>`).join('')}</tbody></table></section>`;
 }
 const SKILLS=[
  [/cumulative|running (sum|total)|\bcumsum\b/,'Running total (cumsum, or a loop)','lec-05','FOR Loops'],
@@ -1043,13 +1292,14 @@ function renderErrors(){
 
 /* ---------- Self-test ---------- */
 const LS_QUIZ='s2102.quiz';
-let quizType='all', quizMode='new', quizCur=null, quizShow={hint:false,code:false,note:false};
+let quizType='all', quizExam='all', quizMode='new', quizCur=null, quizShow={hint:false,code:false,note:false};
 function quizStats(){try{return JSON.parse(localStorage.getItem(LS_QUIZ)||'null')||{got:[],missed:[]}}catch(e){return {got:[],missed:[]}}}
 function quizSave(st){try{localStorage.setItem(LS_QUIZ,JSON.stringify(st))}catch(e){}}
 function quizPool(){
   const out=[];
   for(const [eid,e] of Object.entries(entries)){
     if(quizType!=='all'&&e.type!==quizType)continue;
+    if(quizExam!=='all'&&!(e.exams||[]).includes(quizExam))continue;
     (e.chunks||[]).forEach((c,i)=>{
       const q=(c.question||'').trim();
       if(q.length<25||!(c.code||'').trim())return;
@@ -1075,6 +1325,7 @@ function quizHTML(){
   const inPool=k=>pool.some(p=>p.key===k);
   const got=st.got.filter(inPool).length, missed=st.missed.filter(inPool).length;
   const typeChips=[['all','All'],...TYPE_ORDER.map(t=>[t,TYPES[t].label])].map(([v,l])=>`<button class="chip" type="button" data-qtype="${v}" aria-pressed="${quizType===v}">${l}</button>`).join('');
+  const examChips=[['all','Any exam'],...EXAMS.map(x=>[x,x])].map(([v,l])=>`<button class="chip" type="button" data-qexam="${esc(v)}" aria-pressed="${quizExam===v}">${esc(l)}</button>`).join('');
   const modeChips=[['new','New questions first'],['missed','Only ones I missed'],['any','Anything']].map(([v,l])=>`<button class="chip" type="button" data-qmode="${v}" aria-pressed="${quizMode===v}">${l}</button>`).join('');
   let body='';
   if(!quizCur){ body=`<p class="empty-line">${quizMode==='missed'?'Nothing marked "Need practice" here yet.':'No questions in this filter.'}</p>`; }
@@ -1083,7 +1334,7 @@ function quizHTML(){
     const sk=detectSkills(c.question||'');
     body=`<div class="quiz-card">
       <span class="label">Question</span>
-      <div class="quiz-q">${esc(c.question)}</div>
+      <div class="quiz-q">${esc((c.question||'').replace(/\n\s*\nSearch words:[\s\S]*$/,''))}</div>
       <div class="quiz-bar">
         <button class="btn sm" type="button" data-act="q-hint">${quizShow.hint?'Hide hint':'Hint: what does it need?'}</button>
         <button class="btn sm" type="button" data-act="q-code">${quizShow.code?'Hide code':'Show the code'}</button>
@@ -1102,6 +1353,7 @@ function quizHTML(){
   }
   return `<header class="head"><div class="eyebrow"><span>Self-test</span></div><h2>Can I solve it without looking?</h2></header>
     <p class="hint">Write your answer in RStudio first, then reveal the code. Mark it so "Only ones I missed" brings it back later. Progress is saved in this browser.</p>
+    <div class="chips" role="group" aria-label="Exam">${examChips}</div>
     <div class="chips">${typeChips}</div>
     <div class="chips">${modeChips}</div>
     <div class="quiz-stats">${pool.length} questions in this filter · <b>${got}</b> got · <b>${missed}</b> need practice · <button class="btn sm ghost" type="button" data-act="q-reset">Reset progress</button></div>
@@ -1357,7 +1609,18 @@ document.addEventListener('click',async ev=>{
   }
   if(b.dataset.qtype){quizType=b.dataset.qtype;quizPick();renderMain();return;}
   if(b.dataset.qmode){quizMode=b.dataset.qmode;quizPick();renderMain();return;}
+  if(b.dataset.qexam){quizExam=b.dataset.qexam;quizPick();renderMain();return;}
   const act=b.dataset.act; if(!act)return;
+  if(act==='cs-copy'){
+    const c=((entries[b.dataset.eid]||{}).chunks||[])[+b.dataset.i]; if(!c)return;
+    const old=b.textContent;
+    try{await navigator.clipboard.writeText(csCode(c)); b.textContent='Copied';}
+    catch(x){ b.textContent='Open it to copy'; }
+    setTimeout(()=>{b.textContent=old},1400); return;
+  }
+  if(act==='cs-all'){ if(editing)return; view='search'; renderSide(); renderMain(); window.scrollTo(0,0); return; }
+  if(act==='pyq-test'){ view='quiz'; quizExam=PYQ; quizType='all'; quizPick(); renderSide(); renderMain(); window.scrollTo(0,0); return; }
+  if(act==='pyq-search'){ const s=$('#search'); if(s){ $('#side').classList.remove('collapsed'); s.focus(); s.scrollIntoView({block:'nearest'}); } return; }
   if(act==='q-hint'||act==='q-code'||act==='q-note'){const k=act.slice(2);quizShow[k]=!quizShow[k];renderMain();return;}
   if(act==='q-got'){quizMark('got');return;}
   if(act==='q-missed'){quizMark('missed');return;}
@@ -1378,6 +1641,7 @@ document.addEventListener('click',async ev=>{
   if(act==='goto'){
     curId=b.dataset.eid; view='entry'; store('s2102.cur',curId);
     const tc=(entries[curId]?.chunks||[])[+b.dataset.i]; entryTab=tc&&isPrac(tc)?'prac':'ans'; tabFor=curId;
+    if(window.innerWidth<820){$('#side').classList.add('collapsed');$('#btnMenu').setAttribute('aria-expanded','false');}
     renderSide(); renderMain();
     const el=document.getElementById('ch-'+b.dataset.i);
     if(el){ const d=el.closest('details'); if(d)d.open=true; el.scrollIntoView({block:'center'}); el.classList.add('flash'); setTimeout(()=>el.classList.remove('flash'),2200); }
@@ -1409,9 +1673,11 @@ $('#btnNew').addEventListener('click',()=>{ if(!editing)startEdit(null); });
 $('#btnMatch').addEventListener('click',()=>{ if(editing)return; view=view==='match'?'entry':'match'; renderSide(); renderMain(); window.scrollTo(0,0); const t=$('#matchQ'); if(t)t.focus(); });
 $('#btnErr').addEventListener('click',()=>{ if(editing)return; view=view==='errors'?'entry':'errors'; renderSide(); renderMain(); window.scrollTo(0,0); const t=$('#errQ'); if(t)t.focus(); });
 $('#btnQuiz').addEventListener('click',()=>{ if(editing)return; view=view==='quiz'?'entry':'quiz'; if(view==='quiz')quizPick(); renderSide(); renderMain(); window.scrollTo(0,0); });
-$('#btnGuide').addEventListener('click',()=>{ if(editing)return; view=view==='guide'?'entry':'guide'; renderSide(); renderMain(); window.scrollTo(0,0); });
+$('#btnGuide').addEventListener('click',()=>{ if(editing)return; if(view==='guide'&&guideExam!==PYQ){view='entry';} else {view='guide'; if(guideExam===PYQ)guideExam='all';} renderSide(); renderMain(); window.scrollTo(0,0); });
+$('#btnPyQuiz').addEventListener('click',()=>{ if(editing)return; if(view==='guide'&&guideExam===PYQ){view='entry';} else {view='guide'; guideExam=PYQ;} renderSide(); renderMain(); window.scrollTo(0,0); });
 $('#btnMenu').addEventListener('click',()=>{const s=$('#side');const c=s.classList.toggle('collapsed');$('#btnMenu').setAttribute('aria-expanded',String(!c));});
-let qt; $('#search').addEventListener('input',e=>{clearTimeout(qt);qt=setTimeout(()=>{query=e.target.value.trim();renderList();},150);});
+let qt; $('#search').addEventListener('input',e=>{clearTimeout(qt);qt=setTimeout(()=>{query=e.target.value.trim();renderList();if(view==='search'&&!editing)renderMain();},150);});
+$('#search').addEventListener('keydown',e=>{ if(e.key==='Enter'&&!editing){ e.preventDefault(); clearTimeout(qt); query=e.target.value.trim(); view='search'; renderSide(); renderMain(); window.scrollTo(0,0); } });
 document.addEventListener('submit',e=>{ if(e.target.id==='edForm'){e.preventDefault();saveEdit();} });
 let et; document.addEventListener('input',e=>{ if(e.target.id==='errQ'){ errQuery=e.target.value; clearTimeout(et); et=setTimeout(renderErrors,200); } });
 let mt; document.addEventListener('input',e=>{ if(e.target.id==='matchQ'){ matchQuery=e.target.value; clearTimeout(mt); mt=setTimeout(renderMatches,200); } });

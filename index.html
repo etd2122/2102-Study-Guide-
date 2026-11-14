@@ -931,13 +931,13 @@ const CS_SYN_RAW={
   average:['mean'], avg:['mean'], sd:['std'], deviation:['std'],
   nrow:['shape'], ncol:['shape'], dim:['shape'], length:['len','shape'], dimension:['shape'],
   summary:['describe'], summarize:['describe','groupby'], summarise:['describe','groupby'],
-  sapply:['apply','map'], lapply:['apply','map'], tapply:['groupby'], aggregate:['groupby'], group:['groupby'], 'group_by':['groupby'],
+  sapply:['apply','map'], lapply:['apply','map'], tapply:['groupby'], aggregate:['groupby'], group:['groupby'], 'group_by':['groupby'], groupby:['group_by'],
   rowsum:['sum','axis'], rowmean:['mean','axis'], colmean:['mean','axis'], colsum:['sum','axis'], rowsums:['sum','axis'], colmeans:['mean','axis'], rowmeans:['mean','axis'], colsums:['sum','axis'],
   sort:['sort_values','sort_index','sorted'], order:['sort_values','sort'], arrange:['sort_values'], desc:['ascending'], descending:['ascending'],
   paste:['join','str'], grepl:['contains'], detect:['contains'], contain:['contains'], nchar:['len'], toupper:['upper'], tolower:['lower'], gsub:['replace'], sub:['replace'],
   ifelse:['where'], rnorm:['normal','random'], runif:['uniform','random'], sample:['random','choice'], 'set.seed':['seed'],
   matrix:['array','reshape'], vector:['list','array','series'], named:['dict','series','index'], dictionary:['dict'],
-  append:['append','extend','insert'], extend:['extend','append'], add:['append','insert','update','column'],
+  append:['append','extend','insert'], extend:['extend','append'], add:['append','insert','update'],
   cor:['corr'], correlation:['corr'], mutate:['column','assign'], merge:['merge','join'], distinct:['unique','set'],
   'read.csv':['read_csv'], csv:['read_csv'], load:['read_csv','get_rdataset'], read:['read_csv'],
   first:['head','iloc'], last:['tail','iloc'], top:['head','sort_values'], 'which.max':['argmax','idxmax'], 'which.min':['argmin','idxmin'],
@@ -950,6 +950,34 @@ const CS_SYN_RAW={
   rank:['rank'], copy:['copy','deep'], type:['type','dtype','isinstance']
 };
 const CS_SYN={}; for(const [k,v] of Object.entries(CS_SYN_RAW)) CS_SYN[csNorm(k)]=v;
+// Common plain-English tasks → the chunks that answer them (matched by chunk title), shown first.
+const CS_INTENTS=[
+  [/\b(add|adding|create|creating|new|make|making|compute|calculate)\b.*\bcol(umn)?s?\b|\bmutate\b/, ['add or change a column','a new column:','4 · new columns']],
+  [/\b(drop|delete|remove|removing|deleting)\b.*\bcol(umn)?s?\b/, ['.drop() / .reindex()','5 · .reindex() and .drop()']],
+  [/\b(select|pick|get|grab|choose|one|single)\b.*\bcol(umn)?s?\b/, ['pick one column or several','2 · .loc (labels) vs .iloc']],
+  [/\b(filter|subset|keep|select)\b.*\brows?\b|\brows? (that|where|meeting|meet)\b/, ['df.loc[condition','3 · filtering rows','.head() and .loc[condition]','rows that meet a condition']],
+  [/\b(first|top|last|bottom)\b.*\brows?\b|\bpeek\b|\bpreview\b/, ['.head() / .tail()','.head() and .loc[condition]']],
+  [/\b(number|how many|count|size|dimensions?|nrow|ncol)\b.*\b(rows?|col(umn)?s?|obs|observations?)\b|\bnrow\b|\bncol\b|\bdim\b/, ['.shape / .size','attributes: .shape']],
+  [/\bunique\b|\bdistinct\b|\bdifferent values\b/, ['.unique() / .map','7 · sort_values(), rank(), unique()']],
+  [/\b(index|row|label|which|where|position|who|what)\b.*\b(max|min|maximum|minimum|largest|smallest|highest|lowest|biggest|most|least)\b|\b(idx|arg)(max|min)\b|which\.m(ax|in)/, ['.idxmax()','argmax','practice 2 · the most generous']],
+  [/\bpercent(age)?s?\b|\bproportion\b|\bratio\b/, ['a new column: tips','practice 2 · the most generous']],
+  [/\bstandard deviation\b|\bstd\b|\bsd\b|\bvariance\b|\bspread\b/, ['simulate normal draws','.describe() ·']],
+  [/\bmedian\b/, ['an average by group','.describe() ·']],
+  [/\b(write|make|define|own|custom)\b.*\bfunctions?\b|\bdef\b|\blambda\b/, ['8 · .map(','apply(f, axis','.unique() / .map']],
+  [/\b(average|mean|sum|total)\b.*\b(by|per|each|for each)\b.*\b(group|category|day|type)?|\bgroup ?by\b/, ['.groupby("g")','average by group with .groupby']],
+  [/\bfor ?loops?\b|\bloop\b|\biterate\b/, ['for loop ·','for loop that'], true],   // the Python lectures have no loops yet: show the R ones
+];
+function csIntentDocs(raw,idx){
+  const out=[];
+  for(const [re,labels,anyLang] of CS_INTENTS){
+    if(!re.test(raw)) continue;
+    for(const l of labels) for(const d of idx.docs){
+      const py=d.c.lang==='python'||d.e.type==='py';
+      if((py||anyLang)&&(d.c.code||'').trim()&&(d.c.label||'').toLowerCase().includes(l.toLowerCase())&&!out.includes(d)) out.push(d);
+    }
+  }
+  return out;
+}
 function csToks(text){
   const out=[];
   for(const w of (String(text||'').toLowerCase().match(/[a-z0-9_]+(?:\.[a-z0-9_]+)*/g)||[])){
@@ -1009,8 +1037,9 @@ function codeSearch(q,max){
   let qt=[...new Set(csToks(raw).filter(t=>!CS_STOP.has(t)))];
   const words=raw.match(/[a-z0-9_.]+/g)||[];
   for(let k=0;k+1<words.length;k++){                     // "data frame" → dataframe, "value counts" → value_counts
-    for(const j of [words[k]+words[k+1],words[k]+'_'+words[k+1]]){
-      const n=csNorm(j); if(idx.df.has(n)&&!qt.includes(n)){ qt=qt.filter(t=>t!==csNorm(words[k])&&t!==csNorm(words[k+1])); qt.push(n); }
+    const forms=[words[k]+words[k+1],words[k]+'_'+words[k+1]]; if(wantsRLang(raw)) forms.reverse();   // "group by in r" → group_by
+    for(const j of forms){
+      const n=csNorm(j); if(idx.df.has(n)&&!qt.includes(n)){ qt=qt.filter(t=>t!==csNorm(words[k])&&t!==csNorm(words[k+1])); qt.push(n); break; }
     }
   }
   if(!qt.length) qt=csToks(raw);                          // only stop words typed (e.g. "pandas"): search them anyway
@@ -1036,6 +1065,7 @@ function codeSearch(q,max){
     if(phrase.length>=3&&d.flat.includes(phrase)) score*=1.6;
     const py=d.c.lang==='python'||d.e.type==='py';
     score*=rMode?(py?.6:1.2):(py?1.35:1);
+    if(!(d.c.code||'').trim()) score*=.5;                 // HW questions with no code: still findable, but below real code
     res.push({d,score,terms,sure});
   }
   res.sort((a,b)=>b.score-a.score);
@@ -1046,7 +1076,9 @@ function codeSearch(q,max){
   const top=kept.length?kept[0].score:0, isPy=r=>r.d.c.lang==='python'||r.d.e.type==='py';
   const anySure=kept.some(r=>r.sure);
   const py=kept.filter(r=>isPy(r)&&r.score>=.45*top&&(r.sure||!anySure));
-  return py.concat(kept.filter(r=>!py.includes(r))).slice(0,max||40);
+  const ordered=py.concat(kept.filter(r=>!py.includes(r)));
+  const lead=csIntentDocs(raw,idx).map(d=>ordered.find(r=>r.d===d)||{d,score:top,terms:[],sure:true});
+  return lead.concat(ordered.filter(r=>!lead.includes(r))).slice(0,max||40);
 }
 const csCode=c=>String(c.code||'').split('\n').filter(l=>!/^\s*#>/.test(l)).join('\n').trim();
 function csPreview(c,n){ const ls=csCode(c).split('\n').filter(l=>l.trim()); return ls.slice(0,n).join('\n')+(ls.length>n?'\n…':''); }

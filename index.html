@@ -1139,10 +1139,12 @@ const PY_LOOKUP=[
 ];
 function pyQuizIntroHTML(list){
   return `<section class="pyq">
-    <div class="pyq-facts"><span><b>Wed, Nov 18</b> in class</span><span>45 minutes</span><span>Python only</span><span>~25 min review first</span><span>Open notes</span></div>
-    <p class="hint">Everything flagged for the Python quiz, in lecture order: the points to remember and the exam code from Py 14–18, Rec 10 and HW 4. Use the sidebar search during the quiz: type a function or what you need (“count missing”, “rows where”, “average by group”).</p>
+    <div class="pyq-facts"><span><b>Wed, Nov 18</b> in class</span><span>45 minutes</span><span>Python only</span><span>30 min review first</span><span>Proctorio (Chrome)</span></div>
+    <p class="hint"><b>During the quiz you can only use his files and the websites he gave, not this site.</b> Use it now to learn <i>where</i> things are (the map) and to practice the HW 4 Question 3 recipe. Below: every point and exam chunk from Py 14–19, Rec 10 and HW 4, in lecture order.</p>
     <div class="pyq-actions">
-      <button class="btn sm primary" type="button" data-act="pyq-test">Self-test: Python questions →</button>
+      <button class="btn sm primary" type="button" data-act="goto" data-eid="rev-08">Where everything is in his slides →</button>
+      <button class="btn sm primary" type="button" data-act="goto" data-eid="rev-09">Practice: HW 4 Q3 style →</button>
+      <button class="btn sm" type="button" data-act="pyq-test">Self-test: Python questions →</button>
       <button class="btn sm" type="button" data-act="toc" data-to="pyq-lookup">R → Python lookup table</button>
       <button class="btn sm" type="button" data-act="pyq-search">Search code</button>
     </div>

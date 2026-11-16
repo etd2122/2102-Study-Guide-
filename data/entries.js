@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-11-14T20:00:00Z";
+window.ENTRIES_SAVED = "2026-11-16T22:00:00Z";
 window.ENTRIES = {
  "py-14": {
   "type": "py",
@@ -8833,6 +8833,457 @@ window.ENTRIES = {
     "question": "Many economists contend that the average of GDP growth and GDI growth is a more reliable measure of the change in output. Create a new column within growth called gdo_growth that computes this average.",
     "code": "",
     "comment": "**This needs:** a **new column** assigned with brackets, computed from two existing columns.\n\n**Look at:** Py 18 → *A new column: tips['tip_pct'] = ...* and Rec 10 → *4 · New columns* and *6 · Summaries per column or per row: axis=*.\n\n**Think about:** there are two ways to average, and they differ only in quarters where one value is missing: arithmetic on the two columns gives `NaN` there, while a row mean with `axis=\"columns\"` skips the missing one. Decide which is the right \"average\" and say so in your answer.\n\n**Watch out:** create it with `growth[\"gdo_growth\"] = ...`; `growth.gdo_growth = ...` does not add a column.",
+    "key": false,
+    "lang": "python"
+   }
+  ]
+ },
+ "py-19": {
+  "type": "py",
+  "num": "19",
+  "title": "Visualization in Python: plotnine (ggplot), seaborn, matplotlib and pandas plots",
+  "date": "",
+  "exams": [
+   "Python Quiz"
+  ],
+  "topics": [
+   "plotnine",
+   "ggplot",
+   "geom_point",
+   "geom_histogram",
+   "facet_wrap",
+   "seaborn",
+   "matplotlib",
+   "subplots",
+   "savefig",
+   "show",
+   "density",
+   "plot",
+   "recode",
+   "replace",
+   "from_codes",
+   "yaml",
+   "listings",
+   "proctorio"
+  ],
+  "pdfs": [
+   {
+    "name": "Lecture19 slides - Visualization in Python.html",
+    "size": 3651780,
+    "type": "text/html"
+   }
+  ],
+  "notes": "Professor Goodrich's slides **Lecture19.html**, *Visualization in Python* (Monday, Nov 16).\n\n**Quiz (slide 3):**\n- Wednesday starts with 30 minutes of review, then a **45-minute quiz on Python only**.\n- It uses **Proctorio** screen recording in a recent Chrome, so clear your screen of anything you don't want recorded.\n- Before then, go to Canvas → Quizzes → **Proctorio Diagnostic** on Columbia WiFi to install the extension and check that it works.\n\n**HW 4 (slide 2):** due Tuesday night. Upload just the PDF, and replace the YAML with the one in the last chunk below.\n\n**Three ways to plot in Python:**\n\n| Library | Like in R | Start |\n|---|---|---|\n| `plotnine` (`p9`) | ggplot2 | `p9.ggplot(df) + p9.geom_point(p9.aes(x=\"a\", y=\"b\"))` |\n| `matplotlib.pyplot` (`plt`) | base graphics | `plt.subplots()`, `plt.show()`, `plt.savefig()` |\n| `seaborn` (`sns`) | nicer defaults | `sns.scatterplot(data=df, x=\"a\", y=\"b\", hue=\"g\")` |\n\n**Websites from this lecture:** [plotnine.org](https://plotnine.org/), [plotnine guide](https://jeroenjanssens.com/plotnine/), [seaborn tutorial](https://seaborn.pydata.org/tutorial.html) (read \"Data structures accepted by seaborn\" first), [seaborn function overview](https://seaborn.pydata.org/tutorial/function_overview.html).\n\nEvery output and plot below came from running the code. The drunk-driving data is on Canvas, so that example is shown without output.",
+  "takeaways": [
+   "plotnine = ggplot2 in Python: p9.ggplot(df) + p9.geom_point(p9.aes(x=\"a\", y=\"b\")). Column names go in QUOTES.",
+   "facet_wrap(\"var\", nrow=2) = one panel per group; fill=\"col\" colors bars by a column.",
+   "seaborn: sns.scatterplot / sns.histplot(data=df, x=..., hue=...); plt.subplots(1, 2) puts plots side by side.",
+   "plt.show() displays a plot, plt.savefig(\"x.png\") saves it (overwrites!), plt.close() clears it.",
+   "pandas can plot directly: series.plot.density(), df.plot().",
+   "Recoding: col > 0 makes True/False; .replace({old: new}); pd.Categorical.from_codes(codes, categories=[...]).",
+   "Quiz: 45 min, Python only, Proctorio in Chrome; run the Proctorio Diagnostic on Canvas first."
+  ],
+  "updatedAt": "2026-11-16T22:00:00Z",
+  "chunks": [
+   {
+    "id": "p19-1",
+    "label": "plotnine: ggplot in Python (column names in quotes)",
+    "question": "How do I make a ggplot-style scatterplot in Python?",
+    "code": "import plotnine as p9\nimport pandas as pd\ntips = pd.read_csv(\"https://tinyurl.com/5206tips\")\np = p9.ggplot(tips) + p9.geom_point(mapping=p9.aes(x=\"total_bill\", y=\"tip\"))\np",
+    "comment": "Slide 4 *The plotnine Library*. plotnine implements the same grammar of graphics as ggplot2: `ggplot(data) + geom_...(aes(...))`. Two differences from R: functions need the `p9.` prefix, and **variable names go inside quotation marks**.\n\n![tips scatter](files/py19-tips-scatter.png)",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "p19-2",
+    "label": "Recoding before a plot: a True/False column, .replace(), Categorical.from_codes()",
+    "question": "The practice on slides 6–8 (drunk driving and car-crash deaths): how are the variables recoded?",
+    "code": "fatalities = pd.read_csv(\"nhtsa2010fars.csv\")   # Canvas -> Files\nfatalities['DRUNK'] = fatalities.DRUNK_DR > 0\nmapping = {1: 6, 2: 0, 3: 1, 4: 2, 5: 3, 6: 4, 7: 5}   # Sunday=1 ... Saturday=7  ->  Mon=0 ... Sun=6\nfatalities['DAY_WEEK'] = fatalities.DAY_WEEK.replace(mapping)\nfatalities['DAY_WEEK'] = pd.Categorical.from_codes(fatalities.DAY_WEEK,\n    categories=['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])\nfatalities.loc[fatalities.HOUR > 24, 'HOUR'] = None\nfatalities['TIME'] = fatalities.HOUR + fatalities.MINUTE / 60",
+    "comment": "Slide 7 *Answer: Recoding*. Not run here: the data file is on Canvas → Files.\n\n- `DRUNK_DR > 0` makes a **True/False column**.\n- `.replace({old: new})` **recodes** the values.\n- `pd.Categorical.from_codes(codes, categories=[...])` turns the codes 0–6 into **day labels in that order**, like `factor()`.\n- `.loc[condition, 'HOUR'] = None` **sets the impossible hours to missing**.\n- `HOUR + MINUTE / 60` makes a **decimal time**.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "p19-3",
+    "label": "facet_wrap + geom_histogram: one panel per day",
+    "question": "How do I make histograms split into panels, with fill by a group?",
+    "code": "gg = p9.ggplot(fatalities) + p9.facet_wrap(\"DAY_WEEK\", nrow = 2)\ngg + p9.geom_histogram(mapping = p9.aes(\"TIME\", fill = \"DRUNK\"), bins = 24)",
+    "comment": "Slide 8 *Answer: Plot*. `facet_wrap(\"var\", nrow=2)` makes one panel per day in 2 rows. `fill=\"DRUNK\"` colors the bars by the True/False column. `bins=24` gives one bar per hour. You can save a ggplot in a variable (`gg`) and add layers to it later.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "p19-4",
+    "label": "seaborn + matplotlib: two plots side by side",
+    "question": "How do I put a seaborn scatterplot and histogram next to each other?",
+    "code": "import matplotlib.pyplot as plt\nimport seaborn as sns\npenguins = sns.load_dataset(\"penguins\")\nf, axs = plt.subplots(1, 2)      # 1 row, 2 columns of plots\nsns.scatterplot(data=penguins, x=\"flipper_length_mm\", y=\"bill_length_mm\",\n                hue=\"species\", ax=axs[0])\nsns.histplot(data=penguins, x=\"species\", hue=\"species\", legend=False, ax=axs[1])\nplt.savefig(\"test_seaborn.png\")\nplt.close()",
+    "comment": "Slides 9–11. `matplotlib.pyplot` (`plt`) is like base R graphics; `seaborn` (`sns`) makes nicer plots with less code. `plt.subplots(1, 2)` makes the grid and `ax=axs[0]` / `axs[1]` puts each plot in its place. `hue=` colors by a group (like `color=` in ggplot).\n\n**To see a plot:** `plt.show()`; in R Markdown it then appears in the PDF. `plt.savefig(\"name.png\")` saves it (and overwrites a file with the same name). `plt.close()` clears it so the next plot starts fresh.\n\n![seaborn side by side](files/py19-seaborn.png)",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "p19-5",
+    "label": "Plots straight from pandas: .plot.density(), .plot()",
+    "question": "Can a DataFrame or Series plot itself?",
+    "code": "penguins.bill_depth_mm.plot.density()\nplt.close()\nimport numpy as np\ndf = pd.DataFrame(np.random.standard_normal((10, 4)).cumsum(0),\n                  columns=[\"A\", \"B\", \"C\", \"D\"],\n                  index=np.arange(0, 100, 10))\ndf.shape\n#> (10, 4)",
+    "comment": "Slide 12 *Plots with Pandas*. `series.plot.density()` draws a smooth density curve; `df.plot()` draws one line per column against the index. `.cumsum(0)` makes running totals down each column (random walks). These use matplotlib underneath, so `plt.show()` / `plt.savefig()` work the same way.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "p19-6",
+    "label": "HW YAML: wrap long code lines in the PDF",
+    "question": "What YAML did he say to use for the homework PDF?",
+    "code": "# R Markdown YAML (not Python), from slide 2:\n# title: \"UNSTAT2102: Homework 4\"\n# author: \"Due Tuesday November 17 by 11:59PM\"\n# output:\n#   pdf_document:\n#     number_sections: true\n#     pandoc_args: --listings\n# header-includes:\n#   - \\lstset{breaklines=true, basicstyle=\\ttfamily\\small}",
+    "comment": "Slide 2 *Homework*. `--listings` with `breaklines=true` makes long code lines wrap in the PDF instead of running off the page. Upload **the PDF only**, not the .Rmd. The quiz template on *Rev 08* uses this same YAML.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "p19-7-prac",
+    "label": "Practice · A boxplot of tips by day (plotnine)",
+    "question": "Using tips, make a boxplot of tip for each day, filled by smoker.",
+    "code": "p = (p9.ggplot(tips)\n     + p9.geom_boxplot(p9.aes(x=\"day\", y=\"tip\", fill=\"smoker\")))\np",
+    "comment": "Any ggplot2 geom works with `p9.` in front: `geom_boxplot`, `geom_bar`, `geom_line`, `geom_histogram`… See plotnine.org (from slide 4) for the full list.\n\n![boxplot](files/py19-tips-box.png)",
+    "key": false,
+    "lang": "python"
+   }
+  ]
+ },
+ "rev-08": {
+  "type": "prac",
+  "num": "08",
+  "title": "Python Quiz: where everything is in his slides, plus an R Markdown template",
+  "date": "",
+  "exams": [
+   "Python Quiz"
+  ],
+  "topics": [
+   "quiz map",
+   "where to find",
+   "slides",
+   "lecture 18 slide 8",
+   "websites",
+   "template",
+   "r markdown",
+   "yaml",
+   "setup",
+   "imports"
+  ],
+  "pdfs": [
+   {
+    "name": "Quiz Template.Rmd",
+    "size": 1990,
+    "type": "text/plain"
+   }
+  ],
+  "notes": "**During the quiz you can only use his files and the websites he gave**, not this site. So learn *where* things are now. Everything below points into the files on Canvas.\n\n**Fastest way to find a slide:** open the lecture `.html`, click **☰** (bottom-left corner, or press **M**). A list of every slide title appears; click one to jump there. Use the titles in the tables below. **Esc** shows all slides as small tiles. Recitation 10 is a normal web page, so **Cmd + F** works there and it has a table of contents.\n\n**Slide numbers** below count the title slide as 1.\n\n### The quiz in one table: task → where it is\n\n| Task | Code | Where in his files |\n|---|---|---|\n| Read a CSV (URL or file) | `pd.read_csv(\"...\")` | **L18 s3** *Restaurant Tips* · L19 s4 · HW 4 Q3 setup (`names=`, `parse_dates=`, `index_col=`) |\n| Rows × columns | `df.shape`, `len(df)` | **L18 s4** / L17 s18 *Attributes of a DataFrame* |\n| Date range (dates are the index) | `df.index.min()`, `df.index.max()` | L18 s4 (`.index`); **not on a slide**: remember it |\n| **Missing values per column** | `df.isna().sum()` | **L18 s8** *Applying Functions to Dataframes* · Rec 10 §6 |\n| **Correlation** | `df[\"a\"].corr(df[\"b\"])` | **L18 s8** · Rec 10 §9 |\n| **New column** | `df[\"new\"] = ...` | **L18 s8** (`tip_pct`) · Rec 10 §4 |\n| Mean / max / position of max | `.mean()`, `.max()`, `.argmax()` | **L18 s8** |\n| First rows | `df.head()` | L18 s5 |\n| Rows that meet a condition | `df.loc[df.a > 50]` | **L18 s5** *Subsetting a DataFrame I* · Rec 10 §3 |\n| Rows / columns by position | `df.iloc[:3, :3]` | L18 s6 *Subsetting II* · Rec 10 §2 |\n| Pick columns | `df[[\"a\", \"b\"]]` | L18 s7 *Subsetting III* · Rec 10 §2 |\n| Summary of every numeric column | `df.describe()` | L18 s9 *Summaries* |\n| Per column / per row | `df.apply(f, axis=0 / 1)` | L18 s10 *Functions across Dimensions* |\n| Text columns | `.str.contains()`, `.str.upper()` | L18 s11 *Working with String Series* |\n| Ordered categories | `CategoricalDtype([...], ordered=True)` | L18 s11 · L17 s14–15 · L19 s7 |\n| Count each value | `.value_counts()` | L17 s13 · L18 s8 · Rec 10 §7 |\n| Sort, rank, unique | `.sort_values()`, `.rank()`, `.unique()` | Rec 10 §7 |\n| Recode values | `.map({...})`, `.replace({...})` | Rec 10 §8 · L19 s7 |\n| Drop / reorder rows or columns | `.drop()`, `.reindex()` | Rec 10 §5 |\n| Mean by group | `df.groupby(\"g\")[\"x\"].mean()` | **not in his slides**: P4DA ch. 10 (wesmckinney.com/book) |\n| Make a DataFrame / Series | `pd.DataFrame({...})`, `pd.Series(...)` | L17 s12, s16 · Rec 10 §1 |\n| A built-in R dataset | `sm.datasets.get_rdataset(\"mtcars\")` | L17 s17 |\n\n### NumPy and basic Python (HW 4 Questions 1–2)\n\n| Task | Code | Where |\n|---|---|---|\n| Types, `type()`, `isinstance()` | `type(x)` | L15 s5–6 |\n| Convert types | `int()`, `float()`, `str()`, `bool()` | L15 s10 *Type Coercion* |\n| Lists | `[ ]`, `len()` | L15 s15 *Lists* |\n| Add to a list / dict in place | `.append()`, `.extend()`, `.insert()`, `.update()` | **L16 s6** *Appending and Assigning* |\n| Dictionaries | `{\"key\": value}`, `d[\"key\"] = v` | L15 s16 · L16 s5 *Subsetting by Key* |\n| Tuples, sets, set methods | `( )`, `{ }`, `.union()` | L15 s14, s17–18 |\n| Copies of lists | `y = x.copy()` | L16 s8 *Shallow vs. Deep Copies* |\n| Make an array / matrix | `np.array([[...], [...]])` | L16 s12–13 · L17 s2 |\n| **Random normal matrix** | `np.random.normal(loc=, scale=, size=(r, c))` | **L16 s13** *More Numpy Constructors* · L17 s8 |\n| dtype of an array | `arr.dtype` | L16 s14 *Numpy Arrays Are Homogenous* |\n| **Keep rows by a condition** | `m[m[:, 0] > 1, :]` | **L16 s16** / L17 s4 *Subsetting Numpy Arrays by Bool* |\n| Sum / mean per row or column | `m.sum(axis=1)`, `np.apply_along_axis()` | L16 s18, s20 · L17 s6, s8 |\n| Copy an array | `m.copy()` | L16 s22 / L17 s10 *Copy Behavior* |\n| NaN, inf | `np.nan`, `np.isnan()` | L16 s17 / L17 s5 *Special Values* |\n\n### Plots (Lecture 19)\n\n| Task | Code | Where |\n|---|---|---|\n| ggplot in Python | `p9.ggplot(df) + p9.geom_point(p9.aes(x=\"a\", y=\"b\"))` | **L19 s4** *The plotnine Library* |\n| Histogram with panels | `+ p9.geom_histogram(...) + p9.facet_wrap(\"g\")` | L19 s8 *Answer: Plot* |\n| seaborn plots side by side | `sns.scatterplot(...)`, `sns.histplot(...)`, `plt.subplots(1, 2)` | L19 s11 *Example Code* |\n| Plot straight from a DataFrame | `df[\"x\"].plot.density()`, `df.plot()` | L19 s12 *Plots with Pandas* |\n| Show / save a plot | `plt.show()`, `plt.savefig(\"x.png\")` | L19 s10 *Tutorials* |\n\n### Each lecture, slide by slide\n\n**Lecture 14: Introduction to Python.** 2 What Is Statistical Computing? (textbook link) · 3 TIOBE Index · 4 Installation · 5 Modes of Python · 6 Read-Evaluate-Print Loop · 7 Arithmetic in Python · 8 Python Script · 9 RMarkdown Document · 10 Indentation\n\n**Lecture 15: Containers in Python.** 2 Assignment · 3 Primitive Data Types · 4 Numeric · 5 Types · 6 Integer · 7 Bool · 8 Arithmetic With Bools · 9 String · 10 Type Coercion · 11 Everything in Python Is an Object · 12 Containers · 13 Table of Data Types · 14 Tuples · 15 Lists · 16 Dictionaries · 17 Sets · 18 Methods for Sets\n\n**Lecture 16: Indexing in Python.** 2 Table of Data Types · 3 Methods for Sets · 4 Subsetting by Position · 5 Subsetting by Key · 6 Appending and Assigning · 7 \"Math\" Operations · 8 Shallow vs. Deep Copies · 9 Checking for \"Emptyness\" · 10 The numpy Package · 11 One Dimensional Numpy Arrays · 12 Numpy array · 13 More Numpy Constructors · 14 Numpy Arrays Are Homogenous · 15 Subsetting Numpy Arrays by Position · 16 Subsetting Numpy Arrays by Bool · 17 Special Values in Numpy · 18 Common Numpy Methods · 19 Other Numpy Functions · 20 Applying Numpy Functions · 21 Broadcasting · 22 Copy Behavior\n\n**Lecture 17: Indexing in NumPy (and pandas).** 2 Review of NumPy · 3 Subsetting Numpy Arrays by Position · 4 … by Bool · 5 Special Values · 6 Common Numpy Methods · 7 Other Numpy Functions · 8 Applying Numpy Functions · 9 Broadcasting · 10 Copy Behavior · 11 Connections with R · 12 A Series · 13 Character Representation · 14 Categorical Representation · 15 Auxiliary Functions for Categoricals · 16 DataFrames · 17 MotorTrend's Data on Cars · 18 Attributes of a DataFrame\n\n**Lecture 18: More Pandas.** 2 Schedule · 3 Restaurant Tips · 4 Attributes of a DataFrame · 5 Subsetting a DataFrame I · 6 Subsetting a DataFrame II · 7 Subsetting a DataFrame III · **8 Applying Functions to Dataframes** · 9 Summaries · 10 Functions across Dimensions · 11 Working with String Series\n\n**Lecture 19: Visualization in Python.** 2 Homework (YAML) · 3 Quiz · 4 The plotnine Library · 5 Plot from Previous Slide · 6 Practice · 7 Answer: Recoding · 8 Answer: Plot · 9 Visualization in Python · 10 Tutorials · 11 Example Code · 12 Plots with Pandas\n\n**Recitation 10: Pandas Data Structures** (a regular page with a table of contents): §1 Series and DataFrames · §2 Selecting rows and columns (.loc / .iloc / slicing) · §3 Filtering rows with Boolean conditions · §4 Calculating and assigning columns · §5 Reindexing, dropping, label alignment · §6 Missing values and summaries · §7 Sorting, ranking, counting · §8 map and apply · §9 Duplicate labels and correlation · §10 Connections with R · §11 Worked example · §12 Exercises\n\n### Websites he has given\n\n| Site | What it's for | He gave it in |\n|---|---|---|\n| [Python for Data Analysis (P4DA)](https://wesmckinney.com/book/) | the textbook: ch. 5 pandas basics, ch. 10 groupby | L14 s2 · Rec 10 references · L19 s12 |\n| [pandas: Indexing and selecting data](https://pandas.pydata.org/docs/user_guide/indexing.html) | `.loc`, `.iloc`, boolean selection | Rec 10 references |\n| [plotnine.org](https://plotnine.org/) | every geom, with examples | L19 s4 |\n| [plotnine guide (Jeroen Janssens)](https://jeroenjanssens.com/plotnine/) | plotnine tutorial | L19 s4 |\n| [seaborn tutorial](https://seaborn.pydata.org/tutorial.html) | seaborn plots | L19 s10 |\n| [seaborn function overview](https://seaborn.pydata.org/tutorial/function_overview.html) | which seaborn function to use | L19 s11 |\n| [reticulate: R Markdown](https://rstudio.github.io/reticulate/articles/r_markdown.html) | Python chunks in R Markdown | Rec 10 |\n\n**Before Wednesday:** redownload Lectures 14–19 and Recitation 10 from Canvas into one folder. Set up Proctorio in Chrome (Canvas → Quizzes → Proctorio Diagnostic, on Columbia WiFi), as Lecture 19 slide 3 says.",
+  "takeaways": [
+   "Q3-type questions live on ONE slide: Lecture 18 slide 8, 'Applying Functions to Dataframes' (.isna().sum(), .corr(), new column, .mean(), .argmax()).",
+   "In any lecture .html: click ☰ (bottom-left) or press M for the list of slide titles; Esc shows all slides as tiles.",
+   "Recitation 10 is a normal page: Cmd + F works and it has a table of contents.",
+   "Not on any slide: df.index.min() / .max() for a date range, .idxmax(), groupby (P4DA ch. 10).",
+   "NumPy for Q2-style questions: Lecture 16 slides 13 (random normal), 16 (keep rows by bool), 20 (axis), 22 (copy).",
+   "Lists / dicts for Q1-style questions: Lecture 15 slides 15–16, Lecture 16 slide 6 (append, extend, insert, update).",
+   "Plots: Lecture 19 slide 4 (plotnine), 8 (facet_wrap histogram), 11 (seaborn)."
+  ],
+  "updatedAt": "2026-11-16T22:00:00Z",
+  "chunks": [
+   {
+    "id": "r08-tmpl",
+    "label": "R Markdown template for the Python quiz (YAML, setup, imports)",
+    "question": "What do I put at the top of an R Markdown file for a Python quiz?",
+    "code": "---\ntitle: \"UNSTAT2102: Python Quiz\"\nauthor: \"Your Name (UNI)\"\noutput:\n  pdf_document:\n    number_sections: true\n    pandoc_args: --listings\nheader-includes:\n  - \\lstset{breaklines=true, basicstyle=\\ttfamily\\small}\n---\n\n```{r setup, include=FALSE}\nlibrary(reticulate)\nuse_python(path.expand(\"~/Desktop/Applied Statistical Computing /Python/.venv/bin/python\"), required = TRUE)\nknitr::opts_chunk$set(echo = TRUE, comment = \"##\", fig.width = 6, fig.height = 3.5)\n```\n\n```{python imports}\nimport numpy as np\nimport pandas as pd\nimport plotnine as p9\nimport matplotlib.pyplot as plt\nimport seaborn as sns\nfrom pandas.api.types import CategoricalDtype\npd.set_option(\"display.width\", 100)\n```\n\n# Question 1\n\n```{python}\n# df = pd.read_csv(url)   # his code goes here\n```\n\n## Part 1\n\n```{python}\n\n```",
+    "comment": "**R Markdown template for a Python quiz.** If he gives you a template, use his. If not, this one is ready. It is saved as **Quiz Template.Rmd** in your *Python* project folder and attached above.\n\n- The YAML is the one from **Lecture 19 slide 2**: the PDF output with `--listings`, so long code lines wrap instead of running off the page.\n- A hidden R setup chunk connects R Markdown to your Python. It works from any folder, including Downloads.\n- One Python chunk imports everything the quiz could need: `numpy`, `pandas`, `plotnine as p9`, `matplotlib.pyplot as plt`, `seaborn as sns`.\n- Headings for Question 1 / Part 1 match the numbered sections of the homework PDF.\n\n**Tested:** it knits to PDF on your Mac, and all three kinds of plot appear in the PDF: plotnine, seaborn, and plotnine with `.draw()`.\n\n**Every quiz chunk is Python:** start chunks with ```` ```{python} ````. The quickest way to add one in RStudio is **Cmd + Option + I**, then change `r` to `python`.",
+    "key": true,
+    "lang": "python"
+   }
+  ]
+ },
+ "rev-09": {
+  "type": "prac",
+  "num": "09",
+  "title": "Python Quiz practice: HW 4 Question 3 style (read, count, missing, correlate, new column, plot)",
+  "date": "",
+  "exams": [
+   "Python Quiz"
+  ],
+  "topics": [
+   "practice",
+   "quiz",
+   "read_csv",
+   "fred",
+   "shape",
+   "date range",
+   "index",
+   "isna",
+   "missing",
+   "corr",
+   "new column",
+   "idxmax",
+   "condition",
+   "groupby",
+   "plotnine",
+   "tips",
+   "penguins",
+   "list",
+   "dict",
+   "numpy"
+  ],
+  "pdfs": [],
+  "notes": "**The quiz will be a lot like HW 4 Question 3.** That question is one recipe:\n\n1. **Read** the data with the `pd.read_csv(url, header=0, names=[...], parse_dates=[...], index_col=...)` call he gives you.\n2. **Observations and date range:** `df.shape` (or `len(df)`), `df.index.min()`, `df.index.max()`.\n3. **Missing values per variable:** `df.isna().sum()`.\n4. **Correlation:** `df[\"a\"].corr(df[\"b\"])`.\n5. **New column:** `df[\"new\"] = (df[\"a\"] + df[\"b\"]) / 2`.\n\nProblems A–D repeat that recipe on four new datasets, plus the next-most-likely questions: the max/min and *when* it happened, counting rows that meet a condition, a mean by group, and a plot. Problem E is a quick drill for the list / dict / NumPy questions (HW 4 Questions 1–2).\n\n**How to practice:** try each problem in your own R Markdown file (use the template on *Rev 08*) *before* opening the answer. **Self-test** → *Python Quiz* hides the code for you.\n\nEvery answer below was run (pandas 3.1, plotnine 0.15). FRED adds new months every few weeks, so counts on A and B may be slightly higher when you run them.",
+  "takeaways": [
+   "Q3 recipe: read_csv → .shape / .index.min() / .index.max() → .isna().sum() → a.corr(b) → df['new'] = ...",
+   "With index_col='quarter' the dates are the INDEX, not a column: use df.index.min(), not df['quarter'].",
+   "(a + b) / 2 gives NaN if either is missing; df[['a','b']].mean(axis=1) skips the NaN.",
+   ".corr() automatically uses only rows where both values exist.",
+   ".idxmax() = the label (date) of the max; .argmax() = its position; .max() = the value.",
+   "Count rows meeting a condition: (df['x'] > 8).sum(); share of rows: (df['x'] > 8).mean().",
+   "Two conditions: df.loc[(cond1) & (cond2)], each in parentheses; never 'and' / 'or'.",
+   "plotnine: p9.ggplot(df) + p9.geom_point(p9.aes(x='a', y='b')), column names in quotes."
+  ],
+  "updatedAt": "2026-11-16T22:00:00Z",
+  "chunks": [
+   {
+    "id": "qa-0",
+    "label": "Problem A · Setup · unemployment and the federal funds rate (FRED)",
+    "question": "Run this to download two monthly series from the Federal Reserve: the unemployment rate (UNRATE) and the federal funds interest rate (FEDFUNDS). It is the same `read_csv` call as HW 4 Question 3, just with different `id=` codes and column names.",
+    "code": "url = (\"https://fred.stlouisfed.org/graph/fredgraph.csv\"\n       \"?id=UNRATE,FEDFUNDS\")\nrates = pd.read_csv(url,\n                    header=0,\n                    names=[\"month\", \"unemployment\", \"fed_funds\"],\n                    parse_dates=[\"month\"],\n                    index_col=\"month\")\nrates.head(3)\n#>             unemployment  fed_funds\n#> month\n#> 1948-01-01           3.4        NaN\n#> 1948-02-01           3.8        NaN\n#> 1948-03-01           4.0        NaN",
+    "comment": "**What each argument does (the professor gives you this code; you only need to read it):**\n\n- `header=0`: row 0 of the file holds the column names...\n- `names=[...]`: ...but replace them with these readable names (one per column, the date column included).\n- `parse_dates=[\"month\"]`: turn the text `1948-01-01` into real dates, so `.min()` / `.max()` work as dates.\n- `index_col=\"month\"`: make the dates the **row labels** (the index). After this, `rates` has only **2 columns**; the dates are not a column any more.\n\nFRED adds a new month every few weeks, so your counts may be one or two higher than the numbers shown here.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "qa-1-prac",
+    "label": "Practice A1 · Observations and date range",
+    "question": "How many observations are in `rates`, and what range of dates do they span?",
+    "code": "rates.shape\n#> (946, 2)\nlen(rates)\n#> 946\nrates.index.min()\n#> Timestamp('1948-01-01 00:00:00')\nrates.index.max()\n#> Timestamp('2026-10-01 00:00:00')",
+    "comment": "`.shape` is **(rows, columns)**; the number of observations is the first number, or `len(rates)`. The dates are the **index** (because of `index_col=`), so the range is `rates.index.min()` and `rates.index.max()`, **not** `rates[\"month\"]` (that would be a KeyError: month is no longer a column).\n\n**Answer in words:** \"There are 946 monthly observations, from January 1948 to October 2026.\"\n\n**In his files:** `.shape`: Lecture 18 slide 4 / Lecture 17 slide 18 (*Attributes of a DataFrame*). `.index`: same slides.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "qa-2-prac",
+    "label": "Practice A2 · Missing values on each variable",
+    "question": "How many values are missing on each of the variables in `rates`?",
+    "code": "rates.isna().sum()\n#> unemployment     1\n#> fed_funds       78\n#> dtype: int64\nrates.count()\n#> unemployment    945\n#> fed_funds       868\n#> dtype: int64",
+    "comment": "`.isna()` gives True/False for every cell; `.sum()` adds the Trues **per column** (True counts as 1). `.count()` is the opposite: the non-missing values per column. They add up to the number of rows.\n\n**Answer in words:** \"unemployment is missing 1 value and fed_funds 78.\" The federal funds series only starts in July 1954, so its first 78 months are missing; unemployment is missing for October 2025 (no survey during the government shutdown). Always check **every** column; a single NaN is easy to miss.\n\n**In his files:** Lecture 18 slide 8 *Applying Functions to Dataframes* has `.isna().sum()`, `.corr()`, `.mean()`, `.argmax()` and the new-column line, all on one slide. Also Rec 10 section 6.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "qa-3-prac",
+    "label": "Practice A3 · Correlation",
+    "question": "What is the correlation between unemployment and the federal funds rate?",
+    "code": "rates[\"unemployment\"].corr(rates[\"fed_funds\"])\n#> np.float64(0.06653873343810604)\nrates.corr()\n#>               unemployment  fed_funds\n#> unemployment      1.000000   0.066539\n#> fed_funds         0.066539   1.000000",
+    "comment": "`series1.corr(series2)` gives one number. It **automatically uses only the months where both values exist** (pairwise), so the missing federal funds months don't break it. `rates.corr()` gives the whole correlation table. Here it's about 0.07: almost no linear relationship.\n\n**In his files:** Lecture 18 slide 8 *Applying Functions to Dataframes* has `.isna().sum()`, `.corr()`, `.mean()`, `.argmax()` and the new-column line, all on one slide.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "qa-4-prac",
+    "label": "Practice A4 · A new column (average) and what happens with NaN",
+    "question": "Create a new column `avg_rate` that is the average of unemployment and the federal funds rate. What is it for a month where fed_funds is missing?",
+    "code": "rates[\"avg_rate\"] = (rates[\"unemployment\"] + rates[\"fed_funds\"]) / 2\nrates.head(2)\n#>             unemployment  fed_funds  avg_rate\n#> month\n#> 1948-01-01           3.4        NaN       NaN\n#> 1948-02-01           3.8        NaN       NaN\nrates[[\"unemployment\", \"fed_funds\"]].mean(axis=1).head(2)\n#> month\n#> 1948-01-01    3.4\n#> 1948-02-01    3.8\n#> dtype: float64",
+    "comment": "`df[\"new\"] = ...` creates the column, computed for every row at once (no loop).\n\n**The NaN trap:** `(a + b) / 2` gives **NaN** whenever either value is missing (NaN + anything = NaN). `.mean(axis=1)` instead **skips** NaN and averages what is there (here it just returns unemployment). Both are fine answers; say which one you used and why. HW 4's Question 3 used the first one.\n\n`axis=1` means \"across each row\"; `axis=0` (the default) means \"down each column\".\n\n**In his files:** Lecture 18 slide 8 *Applying Functions to Dataframes* has `.isna().sum()`, `.corr()`, `.mean()`, `.argmax()` and the new-column line, all on one slide. Rec 10 section 4 (*Calculating and assigning columns*).",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "qa-5-prac",
+    "label": "Practice A5 · When was unemployment highest?",
+    "question": "Which month had the highest unemployment rate, and what was the rate?",
+    "code": "rates[\"unemployment\"].idxmax()\n#> Timestamp('2020-04-01 00:00:00')\nrates[\"unemployment\"].max()\n#> np.float64(14.8)\nrates[\"unemployment\"].argmax()\n#> np.int64(867)",
+    "comment": "`.idxmax()` returns the **label** of the largest value, here a date because the index is dates. `.argmax()` returns its **position** (row number counting from 0), which is less useful when the index is dates. `.max()` is the value itself.\n\n**In his files:** `.argmax()` and `.max()`: Lecture 18 slide 8. `.idxmax()` isn't on a slide; it's in Rec 10 and on the Function finder.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "qa-6-prac",
+    "label": "Practice A6 · Rows that meet a condition",
+    "question": "How many months had unemployment above 8%? Show the first three of them.",
+    "code": "(rates[\"unemployment\"] > 8).sum()\n#> np.int64(86)\nrates.loc[rates[\"unemployment\"] > 8].head(3)\n#>             unemployment  fed_funds  avg_rate\n#> month\n#> 1975-01-01           8.1       7.13     7.615\n#> 1975-02-01           8.1       6.24     7.170\n#> 1975-03-01           8.6       5.54     7.070",
+    "comment": "The condition `rates[\"unemployment\"] > 8` is a True/False Series; `.sum()` counts the Trues. Put the same condition inside `.loc[ ]` to **keep only those rows**. For two conditions use `&` / `|` with each part in parentheses: `rates.loc[(rates.unemployment > 8) & (rates.fed_funds < 1)]`.\n\n**In his files:** Lecture 18 slide 5 (*Subsetting a DataFrame I*), Rec 10 section 3.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "qa-7-prac",
+    "label": "Practice A7 · Beyond the slides: an average per decade",
+    "question": "What was the average unemployment rate in each decade?",
+    "code": "decade = (rates.index.year // 10) * 10\nrates.groupby(decade)[\"unemployment\"].mean().round(2)\n#> month\n#> 1940    4.90\n#> 1950    4.51\n#> 1960    4.78\n#> 1970    6.22\n#> 1980    7.27\n#> 1990    5.76\n#> 2000    5.54\n#> 2010    6.22\n#> 2020    4.77\n#> Name: unemployment, dtype: float64",
+    "comment": "`rates.index.year` pulls the year out of each date; `// 10 * 10` turns 1987 into 1980. `.groupby(...)[col].mean()` is R's `tapply(col, group, mean)`.\n\n**In his files:** `groupby` isn't on his slides; it's in *Python for Data Analysis* chapter 10 (wesmckinney.com/book, the textbook he links on Lecture 14 slide 2). Less likely on the quiz than A1–A6.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "qb-0",
+    "label": "Problem B · Setup · the HW 4 GDP / GDI growth data, new questions",
+    "question": "Same data as HW 4 Question 3. These are **different questions** from the homework, to practice on data you already know.",
+    "code": "url = (\"https://fred.stlouisfed.org/graph/fredgraph.csv\"\n       \"?id=A191RL1Q225SBEA,A261RL1Q225SBEA\")\ngrowth = pd.read_csv(url,\n                     header=0,\n                     names=[\"quarter\", \"gdp_growth\", \"gdi_growth\"],\n                     parse_dates=[\"quarter\"],\n                     index_col=\"quarter\")",
+    "comment": "Each row is one quarter; the values are annualized percent growth. The homework's own questions (observations, missing values, correlation, gdo_growth) are left out here on purpose.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "qb-1-prac",
+    "label": "Practice B1 · How many quarters had negative GDP growth?",
+    "question": "In how many quarters was GDP growth negative? What fraction of all quarters is that?",
+    "code": "(growth[\"gdp_growth\"] < 0).sum()\n#> np.int64(44)\n(growth[\"gdp_growth\"] < 0).mean().round(3)\n#> np.float64(0.138)",
+    "comment": "`.sum()` of a True/False Series counts the Trues; `.mean()` gives the **proportion** that are True (Trues ÷ total). Same idea as `sum(x < 0)` and `mean(x < 0)` in R.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "qb-2-prac",
+    "label": "Practice B2 · The worst quarter for each measure",
+    "question": "Which quarter had the lowest GDP growth, and which had the lowest GDI growth?",
+    "code": "growth[\"gdp_growth\"].idxmin()\n#> Timestamp('2020-04-01 00:00:00')\ngrowth[\"gdi_growth\"].idxmin()\n#> Timestamp('2020-04-01 00:00:00')\ngrowth.idxmin()\n#> gdp_growth   2020-04-01\n#> gdi_growth   2020-04-01\n#> dtype: datetime64[us]",
+    "comment": "`.idxmin()` on a column gives the **date** of the smallest value; on the whole DataFrame it does that for every column at once. NaN is skipped. (Both are 2020-04-01: the COVID quarter.)",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "qb-3-prac",
+    "label": "Practice B3 · When do the two measures disagree?",
+    "question": "Create a column `gap` = GDP growth minus GDI growth. In how many quarters do they differ by more than 3 percentage points (in either direction)?",
+    "code": "growth[\"gap\"] = growth[\"gdp_growth\"] - growth[\"gdi_growth\"]\n(growth[\"gap\"].abs() > 3).sum()\n#> np.int64(39)\ngrowth[\"gap\"].describe().round(2)\n#> count    317.00\n#> mean      -0.03\n#> std        2.07\n#> min      -11.00\n#> 25%       -1.30\n#> 50%        0.00\n#> 75%        1.20\n#> max        5.90\n#> Name: gap, dtype: float64",
+    "comment": "`.abs()` is the absolute value (R's `abs()`), so \"more than 3 in either direction\" is `gap.abs() > 3`. The quarter where GDI is missing gets `gap = NaN`, and `NaN > 3` is False, so it isn't counted. `.describe()` summarizes the column (count is one less than the rows because of that NaN).\n\n**In his files:** `.describe()`: Lecture 18 slide 9 (*Summaries*).",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "qb-4-prac",
+    "label": "Practice B4 · Recent quarters only",
+    "question": "Using only quarters from 2020 on, what is the mean of each growth measure?",
+    "code": "recent = growth.loc[growth.index >= \"2020-01-01\"]\nrecent.shape\n#> (27, 3)\nrecent[[\"gdp_growth\", \"gdi_growth\"]].mean().round(2)\n#> gdp_growth    2.79\n#> gdi_growth    2.95\n#> dtype: float64",
+    "comment": "Because the index holds real dates (`parse_dates=`), you can compare it to a date written as text. `.mean()` on a DataFrame gives one mean per column and skips NaN. `df[[\"a\", \"b\"]]` (double brackets) picks several columns.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "qc-0",
+    "label": "Problem C · Setup · the tips data from Lecture 18",
+    "question": "Restaurant bills: total_bill, tip, smoker, day, time, size (people at the table).",
+    "code": "tips = pd.read_csv(\"https://tinyurl.com/5206tips\")\ntips.head(3)\n#>    total_bill   tip smoker  day    time  size\n#> 0       16.99  1.01     No  Sun  Dinner     2\n#> 1       10.34  1.66     No  Sun  Dinner     3\n#> 2       21.01  3.50     No  Sun  Dinner     3",
+    "comment": "Lecture 18 slide 3 (*Restaurant Tips*) and Lecture 19 slide 4 read the data this way. There's no `index_col=`, so the rows are labeled 0, 1, 2, …",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "qc-1-prac",
+    "label": "Practice C1 · Size, missing values, column types",
+    "question": "How many bills and variables are there? Are any values missing? Which columns are numbers?",
+    "code": "tips.shape\n#> (244, 6)\ntips.isna().sum()\n#> total_bill    0\n#> tip           0\n#> smoker        0\n#> day           0\n#> time          0\n#> size          0\n#> dtype: int64\ntips.dtypes\n#> total_bill    float64\n#> tip           float64\n#> smoker            str\n#> day               str\n#> time              str\n#> size            int64\n#> dtype: object",
+    "comment": "`.dtypes`: `float64` / `int64` are numbers, `object` / `str` are text. **Trap:** `tips.size` is the DataFrame *attribute* (rows × columns = 1464), not the size column; use `tips[\"size\"]`.\n\n**In his files:** Lecture 18 slide 4 (*Attributes of a DataFrame*).",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "qc-2-prac",
+    "label": "Practice C2 · A per-person column and a correlation",
+    "question": "Create `per_person` = total_bill divided by size. What is its correlation with the tip?",
+    "code": "tips[\"per_person\"] = tips[\"total_bill\"] / tips[\"size\"]\ntips[\"per_person\"].corr(tips[\"tip\"]).round(3)\n#> np.float64(0.347)\ntips[\"total_bill\"].corr(tips[\"tip\"]).round(3)\n#> np.float64(0.676)",
+    "comment": "The total bill is more strongly correlated with the tip (0.676) than the per-person amount is (0.347).\n\n**In his files:** Lecture 18 slide 8 *Applying Functions to Dataframes* has `.isna().sum()`, `.corr()`, `.mean()`, `.argmax()` and the new-column line, all on one slide.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "qc-3-prac",
+    "label": "Practice C3 · Counts and averages by day",
+    "question": "How many bills are there on each day, and what is the average tip on each day?",
+    "code": "tips[\"day\"].value_counts()\n#> day\n#> Sat     87\n#> Sun     76\n#> Thur    62\n#> Fri     19\n#> Name: count, dtype: int64\ntips.groupby(\"day\")[\"tip\"].mean().round(2)\n#> day\n#> Fri     2.73\n#> Sat     2.99\n#> Sun     3.26\n#> Thur    2.77\n#> Name: tip, dtype: float64",
+    "comment": "`.value_counts()` is R's `table()`: counts of each value, largest first. **In his files:** Lecture 18 slide 8, Lecture 17 slide 13. `groupby` is beyond the slides (see A7).",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "qc-4-prac",
+    "label": "Practice C4 · Rows with two conditions",
+    "question": "How many dinner bills had a tip of at least $5? What share of all dinner bills is that?",
+    "code": "big_dinner = tips.loc[(tips[\"time\"] == \"Dinner\") & (tips[\"tip\"] >= 5)]\nbig_dinner.shape[0]\n#> 21\nround(big_dinner.shape[0] / (tips[\"time\"] == \"Dinner\").sum(), 3)\n#> np.float64(0.119)",
+    "comment": "Each condition goes in its own parentheses, joined with `&` (and) or `|` (or). Python's `and` / `or` give an error on a Series. `.shape[0]` is the number of rows.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "qc-5-prac",
+    "label": "Practice C5 · A plotnine scatterplot",
+    "question": "Make a scatterplot of tip against total_bill, colored by time (lunch or dinner).",
+    "code": "p = (p9.ggplot(tips)\n     + p9.geom_point(p9.aes(x=\"total_bill\", y=\"tip\", color=\"time\")))\np",
+    "comment": "Exactly like ggplot2, except every function needs `p9.` in front and **column names go in quotes**. Wrap the whole thing in parentheses to split it over several lines. In an R Markdown chunk, the plot shows when `p` (or the ggplot expression) is the last line.\n\n![tip vs total bill](files/quiz-tips-scatter.png)\n\n**In his files:** Lecture 19 slide 4 (*The plotnine Library*); plotnine.org for more geoms.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "qd-0",
+    "label": "Problem D · Setup · the penguins data from Lecture 19",
+    "question": "344 penguins from three islands: species, island, bill length/depth, flipper length, body mass, sex.",
+    "code": "penguins = sns.load_dataset(\"penguins\")\npenguins.shape\n#> (344, 7)",
+    "comment": "Lecture 19 slide 11 (*Example Code*) loads it this way. Unlike tips, this data **has missing values**, so it's good practice for Q3-style questions.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "qd-1-prac",
+    "label": "Practice D1 · Missing values per column",
+    "question": "How many values are missing on each variable? How many penguins have no missing values at all?",
+    "code": "penguins.isna().sum()\n#> species               0\n#> island                0\n#> bill_length_mm        2\n#> bill_depth_mm         2\n#> flipper_length_mm     2\n#> body_mass_g           2\n#> sex                  11\n#> dtype: int64\npenguins.notna().all(axis=1).sum()\n#> np.int64(333)",
+    "comment": "`.notna().all(axis=1)` is True for a row when **every** value in it is present; `.sum()` counts those rows (R's `sum(complete.cases(df))`).",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "qd-2-prac",
+    "label": "Practice D2 · Correlation with missing values",
+    "question": "What is the correlation between flipper length and body mass?",
+    "code": "penguins[\"flipper_length_mm\"].corr(penguins[\"body_mass_g\"]).round(3)\n#> np.float64(0.871)",
+    "comment": "The 2 penguins with missing measurements are skipped automatically: `.corr()` only uses rows where both values exist.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "qd-3-prac",
+    "label": "Practice D3 · A new column and a summary by species",
+    "question": "Create `mass_kg` = body_mass_g / 1000. What is the mean mass (kg) of each species?",
+    "code": "penguins[\"mass_kg\"] = penguins[\"body_mass_g\"] / 1000\npenguins.groupby(\"species\")[\"mass_kg\"].mean().round(2)\n#> species\n#> Adelie       3.70\n#> Chinstrap    3.73\n#> Gentoo       5.08\n#> Name: mass_kg, dtype: float64\npenguins[\"species\"].value_counts()\n#> species\n#> Adelie       152\n#> Gentoo       124\n#> Chinstrap     68\n#> Name: count, dtype: int64",
+    "comment": "A new column computed from an existing one; NaN stays NaN. Gentoo penguins are the heaviest.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "qd-4-prac",
+    "label": "Practice D4 · A plotnine histogram, one panel per species",
+    "question": "Make a histogram of flipper length with a separate panel for each species.",
+    "code": "p = (p9.ggplot(penguins.dropna(subset=[\"flipper_length_mm\"]))\n     + p9.geom_histogram(p9.aes(x=\"flipper_length_mm\"), bins=20)\n     + p9.facet_wrap(\"species\"))\np",
+    "comment": "`facet_wrap(\"species\")`: one panel per value, like Lecture 19 slide 8 (`facet_wrap(\"DAY_WEEK\", nrow = 2)`). `.dropna(subset=[col])` drops the rows missing that column so plotnine doesn't warn.\n\n![flipper length by species](files/quiz-penguins-hist.png)",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "qe-1-prac",
+    "label": "Practice E1 · Lists: append vs extend, in place",
+    "question": "Make a list of three fruits. Add one fruit, then add two more in one step, changing the same list (in place).",
+    "code": "fruit = [\"apple\", \"pear\", \"fig\"]\nfruit.append(\"kiwi\")\nfruit.extend([\"plum\", \"lime\"])\nfruit\n#> ['apple', 'pear', 'fig', 'kiwi', 'plum', 'lime']\nlen(fruit)\n#> 6",
+    "comment": "`.append(x)` adds **one** item; `.extend([...])` adds **each** item of a list. Both change the list in place and return nothing (don't write `fruit = fruit.append(...)`: that makes fruit `None`).\n\n**In his files:** Lecture 15 slide 15 (*Lists*), Lecture 16 slide 6 (*Appending and Assigning*).",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "qe-2-prac",
+    "label": "Practice E2 · Dictionaries: create, change, add",
+    "question": "Make a dictionary of three U.S. states and their capitals (one of them wrong). Fix the wrong capital, then add a fourth state.",
+    "code": "capitals = {\"New York\": \"New York City\", \"Texas\": \"Austin\", \"Ohio\": \"Columbus\"}\ncapitals[\"New York\"] = \"Albany\"          # change the value of an existing key\ncapitals.update({\"Maine\": \"Augusta\"})    # add a new key\ncapitals\n#> {'New York': 'Albany', 'Texas': 'Austin', 'Ohio': 'Columbus', 'Maine': 'Augusta'}\nlist(capitals.keys())\n#> ['New York', 'Texas', 'Ohio', 'Maine']",
+    "comment": "`d[key] = value` changes the value if the key exists and adds it if not; `.update({...})` does the same for several keys at once.\n\n**In his files:** Lecture 15 slide 16 (*Dictionaries*), Lecture 16 slides 5–6.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "qe-3-prac",
+    "label": "Practice E3 · NumPy: random matrix, keep rows, row means, dtype",
+    "question": "Draw a 6 × 4 matrix from a normal distribution with mean 10 and standard deviation 2 (use seed 42). Keep the rows whose **last** column is below 10 (as a copy), compute each kept row's mean, and give the dtype.",
+    "code": "np.random.seed(42)\nm = np.random.normal(loc=10, scale=2, size=(6, 4))\nkeep = m[:, -1] < 10\nsmall = m[keep, :].copy()\nsmall.shape\n#> (4, 4)\nrow_means = small.mean(axis=1)\nrow_means.round(2)\n#> array([9.57, 8.02, 8.49, 9.94])\nrow_means.dtype\n#> dtype('float64')",
+    "comment": "`size=(rows, cols)` makes a matrix. `m[:, -1]` is the last column (`-1` counts from the end; the first column would be `m[:, 0]`). A True/False array in the **row** position keeps those rows. `.copy()` makes it independent of `m`. `axis=1` = one value per row.\n\n**In his files:** Lecture 16 slide 13 (random normal), slide 16 (*Subsetting Numpy Arrays by Bool*), slide 20 (axis), slide 22 (copy); Lecture 17 slides 4, 8, 10.",
     "key": false,
     "lang": "python"
    }

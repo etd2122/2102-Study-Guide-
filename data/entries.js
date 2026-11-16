@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-11-16T20:00:00Z";
+window.ENTRIES_SAVED = "2026-11-16T20:30:00Z";
 window.ENTRIES = {
  "py-14": {
   "type": "py",
@@ -8207,6 +8207,198 @@ window.ENTRIES = {
     "code": "par(mfrow = c(1, 2))\nhist(delivery$Delivery_Time_min, breaks = 10,\n     col = \"lightsteelblue1\", border = \"white\",\n     xlab = \"Delivery time (minutes)\", ylab = \"Number of Orders\",\n     main = \"Histogram of Delivery Time\")\nboxplot(delivery$Preparation_Time_min, col = \"wheat1\", notch = TRUE,\n        ylab = \"Preparation time (minutes)\", main = \"Boxplot of Prep Time\")\npar(mfrow = c(1, 1))",
     "comment": "[![2.11 plot](files/plots/fd-two.png)](files/plots/fd-two.png)\n\n**Answer:** Delivery time is roughly bell-shaped, centered near 60 minutes (median 60), ranging from 10 to 104. Preparation time is spread evenly between 5 and 29 minutes (median 17) with no outliers.\n\n*On your site:* HW 2 Problem 2 Part 8; Core 04 · Several plots in one window",
     "key": true
+   }
+  ]
+ },
+ "test-03": {
+  "type": "test",
+  "num": "03",
+  "title": "Python Quiz drill: HW 4 Q3-style pandas problems (with answers)",
+  "date": "2026-11-16",
+  "exams": [
+   "Python Quiz"
+  ],
+  "topics": [
+   "practice test",
+   "answer key",
+   "read_csv",
+   "names",
+   "parse_dates",
+   "index_col",
+   "shape",
+   "date range",
+   "isna",
+   "corr",
+   "new column",
+   "mean axis",
+   "idxmin",
+   "idxmax",
+   "boolean mask",
+   "groupby",
+   "value_counts",
+   "timedelta",
+   "describe"
+  ],
+  "pdfs": [
+   {
+    "name": "two_surveys.csv",
+    "size": 2756,
+    "type": "text/csv"
+   },
+   {
+    "name": "taxis.csv",
+    "size": 869349,
+    "type": "text/csv"
+   }
+  ],
+  "notes": "**Python quiz drill, built like HW 4 Q3 (the pandas part).** Professor Goodrich said much of the Wednesday quiz will look like Q3: `read_csv` with `names` / `parse_dates` / `index_col`, then observations and date range, missing values, a correlation, and a new column. **These are new problems on different data, not HW 4 answers.**\n\n- **Set A** (`two_surveys.csv`, **simulated** to look like a FRED download): the same steps as Q3, plus *which quarter*, *how many rows meet a condition* and a plot.\n- **Set B** (`taxis.csv`, **real** NYC taxi trips): the same skills when the dates are **columns**, not the index.\n\n**How to use it:** do each problem in a `{python}` chunk **before** opening the answer. Time yourself: the real quiz is 45 minutes. Every answer below was run (pandas 3.0); `#>` lines are output.\n\n**The Q3 pattern in one table:**\n\n| Question | Code | Trap |\n|---|---|---|\n| how many observations | `df.shape[0]` / `len(df)` | `.size` counts cells |\n| date range (dates = index) | `df.index.min()`, `df.index.max()` | `df[\"date\"]` → KeyError after `index_col` |\n| date range (dates = column) | `df[\"date\"].min()` | needs `parse_dates` or it's text |\n| missing per variable | `df.isna().sum()` | `== np.nan` is always False |\n| correlation | `df[\"a\"].corr(df[\"b\"])` | already skips missing pairs |\n| new column = average | `df[\"new\"] = (df[\"a\"] + df[\"b\"]) / 2` | vs `.mean(axis=\"columns\")`: differs where one is NaN |\n| which row is max/min | `.idxmax()` / `.idxmin()` | `.argmax()` gives a position |\n| how many rows meet a condition | `(df[\"a\"] < 0).sum()` | `&` + parentheses, never `and` |",
+  "takeaways": [
+   "After index_col=\"quarter\", the dates are surveys.index, NOT a column: use .index.min() / .index.max().",
+   "Observations = .shape[0] or len(df); .size is rows × columns.",
+   "df.isna().sum() = missing per column; .corr() already uses only rows where both values exist.",
+   "(a + b) / 2 is NaN if either is missing; df[[\"a\", \"b\"]].mean(axis=\"columns\") skips the missing one. Say which you used.",
+   "New column: df[\"new\"] = ... with brackets; df.new = ... does not add a column.",
+   ".idxmax() / .idxmin() give the label (the date); .argmax() gives a position.",
+   "Count rows meeting a condition: (condition).sum(); combine with & and parentheses.",
+   "Subtracting two date columns gives a Timedelta: .dt.total_seconds() / 60 for minutes.",
+   "Write the answer in a sentence under each chunk, not just the output."
+  ],
+  "updatedAt": "2026-11-16T20:30:00Z",
+  "chunks": [
+   {
+    "id": "test-03-a0",
+    "label": "Setup A · read the file exactly like HW 4",
+    "question": "Download two_surveys.csv (Files, above) into your Python project folder. Read it so the columns are called quarter, a_growth and b_growth, the quarter column is read as dates, and the dates are the row labels.",
+    "code": "import pandas as pd\nsurveys = pd.read_csv(\"two_surveys.csv\",\n                      header=0,\n                      names=[\"quarter\", \"a_growth\", \"b_growth\"],\n                      parse_dates=[\"quarter\"],\n                      index_col=\"quarter\")\nsurveys.head()\n#>             a_growth  b_growth\n#> quarter                       \n#> 1990-01-01       1.5       NaN\n#> 1990-04-01       2.2       NaN\n#> 1990-07-01       6.8       NaN\n#> 1990-10-01       0.4       NaN\n#> 1991-01-01       5.8       NaN",
+    "comment": "Same `read_csv` call as HW 4 Q3, on a **simulated** file built to look like a FRED download (real FRED isn't reachable from here, and this keeps the answers checkable). The raw file's header is `observation_date,SURVEYA_GR,SURVEYB_GR`:\n\n| Argument | Does |\n|---|---|\n| `header=0` | line 1 is the header… |\n| `names=[...]` | …and gets **replaced** by these three names |\n| `parse_dates=[\"quarter\"]` | read that column as **dates** (`Timestamp`), not text |\n| `index_col=\"quarter\"` | make the dates the **row labels**, so there are only **2 columns** |\n\n**Watch out:** `names=` must have **one name per column in the file** (3 here, counting the date column), and the names in `parse_dates` / `index_col` are the **new** names, not the file's.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-a1",
+    "label": "Problem A.1 · Observations and date range",
+    "question": "How many observations are there and what is the date range that they span?",
+    "code": "surveys.shape[0]          # number of rows = observations\n#> 143\nlen(surveys)              # same thing\n#> 143\nsurveys.index.min(), surveys.index.max()\n#> (Timestamp('1990-01-01 00:00:00'), Timestamp('2025-07-01 00:00:00'))",
+    "comment": "**143 quarters, from 1990-01-01 (1990 Q1) to 2025-07-01 (2025 Q3).**\n\n- Rows: `.shape[0]` or `len()`. **Not** `.size` (that's 143 × 2 = 286 cells).\n- Dates: they're the **index**, so it's `surveys.index.min()` / `.max()`. `surveys[\"quarter\"]` gives `KeyError`, because `index_col` moved it out of the columns.\n\n**On the quiz, write the answer in a sentence** below the chunk too, not just the output.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-a2",
+    "label": "Problem A.2 · Missing values per variable",
+    "question": "How many values are missing on each of the variables in surveys?",
+    "code": "surveys.isna().sum()\n#> a_growth     2\n#> b_growth    10\n#> dtype: int64",
+    "comment": "`.isna()` makes True/False for every cell; `.sum()` adds the Trues **down each column** (True = 1). R: `colSums(is.na(surveys))`.\n\n`b_growth` is missing at the **start and end** (the series starts later and isn't released yet), like GDI in HW 4.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-a3",
+    "label": "Problem A.3 · Correlation of the observed values",
+    "question": "What is the correlation between the observed values of a_growth and b_growth? How many quarters does it use?",
+    "code": "surveys[\"a_growth\"].corr(surveys[\"b_growth\"])\n#> np.float64(0.9616179176916864)\nsurveys.corr()                          # the whole 2 x 2 matrix\n#>           a_growth  b_growth\n#> a_growth  1.000000  0.961618\n#> b_growth  0.961618  1.000000\nsurveys.notna().all(axis=\"columns\").sum()   # quarters where BOTH are observed\n#> np.int64(131)",
+    "comment": "**r ≈ 0.96.** `.corr()` uses only the **131 quarters where both are observed** (pairwise deletion), which is what \"observed values\" means. No `dropna()` needed first.\n\n`notna().all(axis=\"columns\")` is True for a row only if **every** column is present; summing counts those rows.\n\n**Two ways to ask:** `col1.corr(col2)` gives one number; `df.corr()` gives the matrix (read the off-diagonal).",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-a4",
+    "label": "Problem A.4 · New column: the average of the two",
+    "question": "Create a new column avg_growth that is the average of a_growth and b_growth. How many missing values does it have?",
+    "code": "surveys[\"avg_growth\"] = (surveys[\"a_growth\"] + surveys[\"b_growth\"]) / 2\nsurveys[\"avg_growth\"].isna().sum()\n#> np.int64(12)\nsurveys[\"avg_growth2\"] = surveys[[\"a_growth\", \"b_growth\"]].mean(axis=\"columns\")\nsurveys[\"avg_growth2\"].isna().sum()\n#> np.int64(0)\nsurveys.head(3)\n#>             a_growth  b_growth  avg_growth  avg_growth2\n#> quarter                                                \n#> 1990-01-01       1.5       NaN         NaN          1.5\n#> 1990-04-01       2.2       NaN         NaN          2.2\n#> 1990-07-01       6.8       NaN         NaN          6.8",
+    "comment": "The two ways **only differ where one value is missing**:\n\n| | Formula | Missing quarters |\n|---|---|---|\n| Way 1 | `(a + b) / 2` | **12**: NaN whenever either is NaN |\n| Way 2 | `df[[\"a\", \"b\"]].mean(axis=\"columns\")` | **0**: falls back to the one that exists |\n\nFor \"the average of the two measures\", **Way 1 is the honest one**: a quarter with only `a_growth` isn't an average of two measures. Way 2 quietly mixes one-measure and two-measure quarters. Either can get credit if you **say which you chose and why**.\n\n**Watch out:** `surveys.avg_growth = ...` (dot) does **not** create a column. Use brackets.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-a5",
+    "label": "Problem A.5 · Which quarter was the worst?",
+    "question": "In which quarter was avg_growth lowest, and what was its value? Same for the highest.",
+    "code": "surveys[\"avg_growth\"].idxmin()\n#> Timestamp('2020-04-01 00:00:00')\nsurveys[\"avg_growth\"].min()\n#> np.float64(-24.25)\nsurveys[\"avg_growth\"].idxmax(), surveys[\"avg_growth\"].max()\n#> (Timestamp('2020-07-01 00:00:00'), np.float64(33.1))",
+    "comment": "`.idxmin()` / `.idxmax()` return the **index label**: here a date, because the dates are the index. `.argmin()` would give a **position** (a number), not the quarter.\n\nThe worst quarter is **2020 Q2 (−24.25)**, the best the bounce right after, **2020 Q3 (33.1)**. NaN rows are skipped automatically.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-a6",
+    "label": "Problem A.6 · Rows that meet a condition",
+    "question": "How many quarters had negative avg_growth? Show the quarters since 2008 where it was below -2.",
+    "code": "(surveys[\"avg_growth\"] < 0).sum()\n#> np.int64(16)\nsurveys.loc[(surveys.index >= \"2008-01-01\") & (surveys[\"avg_growth\"] < -2),\n            [\"a_growth\", \"b_growth\", \"avg_growth\"]]\n#>             a_growth  b_growth  avg_growth\n#> quarter                                   \n#> 2008-01-01      -2.7      -2.7       -2.70\n#> 2008-07-01      -6.0      -5.9       -5.95\n#> 2008-10-01      -6.7      -4.6       -5.65\n#> 2009-01-01      -2.2      -2.6       -2.40\n#> 2020-04-01     -24.9     -23.6      -24.25",
+    "comment": "- **Count rows meeting a condition:** build the True/False Series and `.sum()` it. `NaN < 0` is **False**, so missing quarters aren't counted.\n- **Two conditions:** `&`, with **each condition in parentheses**. `and` gives `ValueError: The truth value of a Series is ambiguous`.\n- **Dates compare to strings:** `surveys.index >= \"2008-01-01\"` works because the index is real dates (that's what `parse_dates` bought you).\n- `.loc[rows, [columns]]`: rows by condition, columns by name (Py 18).",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-a7",
+    "label": "Problem A.7 · Summary and a plot",
+    "question": "Summarize the three growth columns, then plot a_growth and b_growth over time on one graph.",
+    "code": "surveys[[\"a_growth\", \"b_growth\", \"avg_growth\"]].describe().round(2)\n#>        a_growth  b_growth  avg_growth\n#> count    141.00    133.00      131.00\n#> mean       2.19      2.33        2.23\n#> std        4.18      4.10        4.15\n#> min      -24.90    -23.60      -24.25\n#> 25%        0.70      1.00        0.95\n#> 50%        2.20      2.50        2.40\n#> 75%        3.50      3.50        3.38\n#> max       33.10     33.10       33.10\nsurveys[[\"a_growth\", \"b_growth\"]].plot();",
+    "comment": "`.describe()` is R's `summary()`: `count` is the number **not** missing, so 141 + 2 missing = 143 ✓.\n\n`df.plot()` draws one line per column with the **dates on the x-axis** (Lecture 19). NaN makes a gap in the line.\n\n![a_growth and b_growth over time](files/plots/q3drill-lines.png)",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-b0",
+    "label": "Setup B · real NYC taxi trips, two date columns",
+    "question": "Read the seaborn taxis data from https://raw.githubusercontent.com/mwaskom/seaborn-data/master/taxis.csv (or the copy under Files) so that pickup and dropoff are dates. Assign it to taxis.",
+    "code": "url = \"https://raw.githubusercontent.com/mwaskom/seaborn-data/master/taxis.csv\"\ntaxis = pd.read_csv(url, parse_dates=[\"pickup\", \"dropoff\"])\ntaxis.dtypes\n#> pickup             datetime64[us]\n#> dropoff            datetime64[us]\n#> passengers                  int64\n#> distance                  float64\n#> fare                      float64\n#> tip                       float64\n#> tolls                     float64\n#> total                     float64\n#> color                         str\n#> payment                       str\n#> pickup_zone                   str\n#> dropoff_zone                  str\n#> pickup_borough                str\n#> dropoff_borough               str\n#> dtype: object",
+    "comment": "Real data: 6,433 NYC taxi trips from March 2019 (shipped with seaborn). **No `index_col` here**: the dates stay ordinary columns, and there are **two** of them, so `parse_dates` gets a list of both.\n\n`datetime64` = dates/times. Without `parse_dates` they'd be `str`, and `.min()` would compare text and subtraction (B.4) would fail.\n\nOffline: `pd.read_csv(\"taxis.csv\", parse_dates=[\"pickup\", \"dropoff\"])` with the copy under Files.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-b1",
+    "label": "Problem B.1 · Observations and date range",
+    "question": "How many trips are there, and what range of pickup times do they span?",
+    "code": "taxis.shape\n#> (6433, 14)\ntaxis[\"pickup\"].min(), taxis[\"pickup\"].max()\n#> (Timestamp('2019-02-28 23:29:03'), Timestamp('2019-03-31 23:43:45'))",
+    "comment": "**6,433 trips × 14 columns; pickups from 2019-02-28 23:29 to 2019-03-31 23:43.**\n\nThe dates are a **column** this time, so it's `taxis[\"pickup\"].min()`, not `taxis.index.min()` (the index is just 0–6432). Compare with A.1: **where the dates live decides the code.**",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-b2",
+    "label": "Problem B.2 · Missing values",
+    "question": "How many values are missing in each column? Which columns have none?",
+    "code": "taxis.isna().sum()\n#> pickup              0\n#> dropoff             0\n#> passengers          0\n#> distance            0\n#> fare                0\n#> tip                 0\n#> tolls               0\n#> total               0\n#> color               0\n#> payment            44\n#> pickup_zone        26\n#> dropoff_zone       45\n#> pickup_borough     26\n#> dropoff_borough    45\n#> dtype: int64\ntaxis.columns[taxis.isna().sum() == 0]\n#> Index(['pickup', 'dropoff', 'passengers', 'distance', 'fare', 'tip', 'tolls',\n#>        'total', 'color'],\n#>       dtype='str')",
+    "comment": "Text columns can be missing too: `payment` (44), the zones and boroughs. The numbers (`fare`, `tip`, ...) have none.\n\n`taxis.columns[mask]` keeps the column names where the mask is True: the \"which columns\" part.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-b3",
+    "label": "Problem B.3 · Correlations",
+    "question": "What is the correlation between distance and fare? Between fare and tip?",
+    "code": "taxis[\"distance\"].corr(taxis[\"fare\"])\n#> np.float64(0.920107702789575)\ntaxis[\"fare\"].corr(taxis[\"tip\"])\n#> np.float64(0.4886124004721826)",
+    "comment": "**distance–fare ≈ 0.92** (fare is set by the meter); **fare–tip ≈ 0.49**: weaker, because **cash tips are recorded as 0** (see B.5), which breaks the pattern. Correlation ≠ causation, but a mechanical reason like this is worth one sentence in an answer.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-b4",
+    "label": "Problem B.4 · New columns from other columns",
+    "question": "Create a column minutes with the length of each trip in minutes, and a column tip_pct with the tip as a percent of the fare. What is the median trip length?",
+    "code": "taxis[\"minutes\"] = (taxis[\"dropoff\"] - taxis[\"pickup\"]).dt.total_seconds() / 60\ntaxis[\"tip_pct\"] = 100 * taxis[\"tip\"] / taxis[\"fare\"]\ntaxis[\"minutes\"].median()\n#> np.float64(10.9)\ntaxis[[\"fare\", \"tip\", \"minutes\", \"tip_pct\"]].head(3)\n#>    fare   tip   minutes    tip_pct\n#> 0   7.0  2.15  6.250000  30.714286\n#> 1   5.0  0.00  7.083333   0.000000\n#> 2   7.5  2.36  7.400000  31.466667",
+    "comment": "- **Subtracting two date columns** gives a `Timedelta` (\"0 days 00:06:15\"). `.dt.total_seconds()` turns it into seconds, `/ 60` into minutes. R: `difftime(dropoff, pickup, units = \"mins\")`.\n- New columns are **whole-column arithmetic**, no loop (Py 18).\n- **Median 10.9 minutes.** Median is safer than mean here: a few trips have absurd lengths.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-b5",
+    "label": "Problem B.5 · Average by group",
+    "question": "What is the average tip_pct by payment type? How many trips used each payment type?",
+    "code": "taxis.groupby(\"payment\")[\"tip_pct\"].mean().round(2)\n#> payment\n#> cash            0.00\n#> credit card    23.78\n#> Name: tip_pct, dtype: float64\ntaxis[\"payment\"].value_counts()\n#> payment\n#> credit card    4577\n#> cash           1812\n#> Name: count, dtype: int64",
+    "comment": "`groupby(\"payment\")[\"tip_pct\"].mean()` is R's `tapply(tip_pct, payment, mean)`.\n\n**Cash shows 0%: not stingy riders, just unrecorded tips.** If a quiz asks \"do cash riders tip less?\", the honest answer is \"the data can't tell\". Rows with missing `payment` are left out of `groupby`, which is why 4,577 + 1,812 = 6,389, not 6,433.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-b6",
+    "label": "Problem B.6 · Two conditions at once",
+    "question": "How many trips were paid by credit card AND had a tip over 25% of the fare? What share of credit-card trips is that?",
+    "code": "card = taxis[\"payment\"] == \"credit card\"\nbig = taxis[\"tip_pct\"] > 25\n(card & big).sum()\n#> np.int64(2435)\nround((card & big).sum() / card.sum(), 3)\n#> np.float64(0.532)",
+    "comment": "Store each condition in a variable, then combine with `&`. **2,435 trips; 53.2% of credit-card trips.**\n\n`sum(mask) / sum(other mask)` is a share. `(card & big).mean()` would be the share of **all** trips instead: read which denominator the question wants.",
+    "key": true,
+    "lang": "python"
    }
   ]
  },

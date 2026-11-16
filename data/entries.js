@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-11-16T22:00:00Z";
+window.ENTRIES_SAVED = "2026-11-16T23:00:00Z";
 window.ENTRIES = {
  "py-14": {
   "type": "py",
@@ -8210,6 +8210,198 @@ window.ENTRIES = {
    }
   ]
  },
+ "test-03": {
+  "type": "test",
+  "num": "03",
+  "title": "Python Quiz drill: HW 4 Q3-style pandas problems (with answers)",
+  "date": "2026-11-16",
+  "exams": [
+   "Python Quiz"
+  ],
+  "topics": [
+   "practice test",
+   "answer key",
+   "read_csv",
+   "names",
+   "parse_dates",
+   "index_col",
+   "shape",
+   "date range",
+   "isna",
+   "corr",
+   "new column",
+   "mean axis",
+   "idxmin",
+   "idxmax",
+   "boolean mask",
+   "groupby",
+   "value_counts",
+   "timedelta",
+   "describe"
+  ],
+  "pdfs": [
+   {
+    "name": "two_surveys.csv",
+    "size": 2756,
+    "type": "text/csv"
+   },
+   {
+    "name": "taxis.csv",
+    "size": 869349,
+    "type": "text/csv"
+   }
+  ],
+  "notes": "**Python quiz drill, built like HW 4 Q3 (the pandas part).** Professor Goodrich said much of the Wednesday quiz will look like Q3: `read_csv` with `names` / `parse_dates` / `index_col`, then observations and date range, missing values, a correlation, and a new column. **These are new problems on different data, not HW 4 answers.**\n\n- **Set A** (`two_surveys.csv`, **simulated** to look like a FRED download): the same steps as Q3, plus *which quarter*, *how many rows meet a condition* and a plot.\n- **Set B** (`taxis.csv`, **real** NYC taxi trips): the same skills when the dates are **columns**, not the index.\n\n**How to use it:** do each problem in a `{python}` chunk **before** opening the answer. Time yourself: the real quiz is 45 minutes. Every answer below was run (pandas 3.0); `#>` lines are output.\n\n**The Q3 pattern in one table:**\n\n| Question | Code | Trap |\n|---|---|---|\n| how many observations | `df.shape[0]` / `len(df)` | `.size` counts cells |\n| date range (dates = index) | `df.index.min()`, `df.index.max()` | `df[\"date\"]` → KeyError after `index_col` |\n| date range (dates = column) | `df[\"date\"].min()` | needs `parse_dates` or it's text |\n| missing per variable | `df.isna().sum()` | `== np.nan` is always False |\n| correlation | `df[\"a\"].corr(df[\"b\"])` | already skips missing pairs |\n| new column = average | `df[\"new\"] = (df[\"a\"] + df[\"b\"]) / 2` | vs `.mean(axis=\"columns\")`: differs where one is NaN |\n| which row is max/min | `.idxmax()` / `.idxmin()` | `.argmax()` gives a position |\n| how many rows meet a condition | `(df[\"a\"] < 0).sum()` | `&` + parentheses, never `and` |",
+  "takeaways": [
+   "After index_col=\"quarter\", the dates are surveys.index, NOT a column: use .index.min() / .index.max().",
+   "Observations = .shape[0] or len(df); .size is rows × columns.",
+   "df.isna().sum() = missing per column; .corr() already uses only rows where both values exist.",
+   "(a + b) / 2 is NaN if either is missing; df[[\"a\", \"b\"]].mean(axis=\"columns\") skips the missing one. Say which you used.",
+   "New column: df[\"new\"] = ... with brackets; df.new = ... does not add a column.",
+   ".idxmax() / .idxmin() give the label (the date); .argmax() gives a position.",
+   "Count rows meeting a condition: (condition).sum(); combine with & and parentheses.",
+   "Subtracting two date columns gives a Timedelta: .dt.total_seconds() / 60 for minutes.",
+   "Write the answer in a sentence under each chunk, not just the output."
+  ],
+  "updatedAt": "2026-11-16T20:30:00Z",
+  "chunks": [
+   {
+    "id": "test-03-a0",
+    "label": "Setup A · read the file exactly like HW 4",
+    "question": "Download two_surveys.csv (Files, above) into your Python project folder. Read it so the columns are called quarter, a_growth and b_growth, the quarter column is read as dates, and the dates are the row labels.",
+    "code": "import pandas as pd\nsurveys = pd.read_csv(\"two_surveys.csv\",\n                      header=0,\n                      names=[\"quarter\", \"a_growth\", \"b_growth\"],\n                      parse_dates=[\"quarter\"],\n                      index_col=\"quarter\")\nsurveys.head()\n#>             a_growth  b_growth\n#> quarter                       \n#> 1990-01-01       1.5       NaN\n#> 1990-04-01       2.2       NaN\n#> 1990-07-01       6.8       NaN\n#> 1990-10-01       0.4       NaN\n#> 1991-01-01       5.8       NaN",
+    "comment": "Same `read_csv` call as HW 4 Q3, on a **simulated** file built to look like a FRED download (real FRED isn't reachable from here, and this keeps the answers checkable). The raw file's header is `observation_date,SURVEYA_GR,SURVEYB_GR`:\n\n| Argument | Does |\n|---|---|\n| `header=0` | line 1 is the header… |\n| `names=[...]` | …and gets **replaced** by these three names |\n| `parse_dates=[\"quarter\"]` | read that column as **dates** (`Timestamp`), not text |\n| `index_col=\"quarter\"` | make the dates the **row labels**, so there are only **2 columns** |\n\n**Watch out:** `names=` must have **one name per column in the file** (3 here, counting the date column), and the names in `parse_dates` / `index_col` are the **new** names, not the file's.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-a1",
+    "label": "Problem A.1 · Observations and date range",
+    "question": "How many observations are there and what is the date range that they span?",
+    "code": "surveys.shape[0]          # number of rows = observations\n#> 143\nlen(surveys)              # same thing\n#> 143\nsurveys.index.min(), surveys.index.max()\n#> (Timestamp('1990-01-01 00:00:00'), Timestamp('2025-07-01 00:00:00'))",
+    "comment": "**143 quarters, from 1990-01-01 (1990 Q1) to 2025-07-01 (2025 Q3).**\n\n- Rows: `.shape[0]` or `len()`. **Not** `.size` (that's 143 × 2 = 286 cells).\n- Dates: they're the **index**, so it's `surveys.index.min()` / `.max()`. `surveys[\"quarter\"]` gives `KeyError`, because `index_col` moved it out of the columns.\n\n**On the quiz, write the answer in a sentence** below the chunk too, not just the output.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-a2",
+    "label": "Problem A.2 · Missing values per variable",
+    "question": "How many values are missing on each of the variables in surveys?",
+    "code": "surveys.isna().sum()\n#> a_growth     2\n#> b_growth    10\n#> dtype: int64",
+    "comment": "`.isna()` makes True/False for every cell; `.sum()` adds the Trues **down each column** (True = 1). R: `colSums(is.na(surveys))`.\n\n`b_growth` is missing at the **start and end** (the series starts later and isn't released yet), like GDI in HW 4.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-a3",
+    "label": "Problem A.3 · Correlation of the observed values",
+    "question": "What is the correlation between the observed values of a_growth and b_growth? How many quarters does it use?",
+    "code": "surveys[\"a_growth\"].corr(surveys[\"b_growth\"])\n#> np.float64(0.9616179176916864)\nsurveys.corr()                          # the whole 2 x 2 matrix\n#>           a_growth  b_growth\n#> a_growth  1.000000  0.961618\n#> b_growth  0.961618  1.000000\nsurveys.notna().all(axis=\"columns\").sum()   # quarters where BOTH are observed\n#> np.int64(131)",
+    "comment": "**r ≈ 0.96.** `.corr()` uses only the **131 quarters where both are observed** (pairwise deletion), which is what \"observed values\" means. No `dropna()` needed first.\n\n`notna().all(axis=\"columns\")` is True for a row only if **every** column is present; summing counts those rows.\n\n**Two ways to ask:** `col1.corr(col2)` gives one number; `df.corr()` gives the matrix (read the off-diagonal).",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-a4",
+    "label": "Problem A.4 · New column: the average of the two",
+    "question": "Create a new column avg_growth that is the average of a_growth and b_growth. How many missing values does it have?",
+    "code": "surveys[\"avg_growth\"] = (surveys[\"a_growth\"] + surveys[\"b_growth\"]) / 2\nsurveys[\"avg_growth\"].isna().sum()\n#> np.int64(12)\nsurveys[\"avg_growth2\"] = surveys[[\"a_growth\", \"b_growth\"]].mean(axis=\"columns\")\nsurveys[\"avg_growth2\"].isna().sum()\n#> np.int64(0)\nsurveys.head(3)\n#>             a_growth  b_growth  avg_growth  avg_growth2\n#> quarter                                                \n#> 1990-01-01       1.5       NaN         NaN          1.5\n#> 1990-04-01       2.2       NaN         NaN          2.2\n#> 1990-07-01       6.8       NaN         NaN          6.8",
+    "comment": "The two ways **only differ where one value is missing**:\n\n| | Formula | Missing quarters |\n|---|---|---|\n| Way 1 | `(a + b) / 2` | **12**: NaN whenever either is NaN |\n| Way 2 | `df[[\"a\", \"b\"]].mean(axis=\"columns\")` | **0**: falls back to the one that exists |\n\nFor \"the average of the two measures\", **Way 1 is the honest one**: a quarter with only `a_growth` isn't an average of two measures. Way 2 quietly mixes one-measure and two-measure quarters. Either can get credit if you **say which you chose and why**.\n\n**Watch out:** `surveys.avg_growth = ...` (dot) does **not** create a column. Use brackets.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-a5",
+    "label": "Problem A.5 · Which quarter was the worst?",
+    "question": "In which quarter was avg_growth lowest, and what was its value? Same for the highest.",
+    "code": "surveys[\"avg_growth\"].idxmin()\n#> Timestamp('2020-04-01 00:00:00')\nsurveys[\"avg_growth\"].min()\n#> np.float64(-24.25)\nsurveys[\"avg_growth\"].idxmax(), surveys[\"avg_growth\"].max()\n#> (Timestamp('2020-07-01 00:00:00'), np.float64(33.1))",
+    "comment": "`.idxmin()` / `.idxmax()` return the **index label**: here a date, because the dates are the index. `.argmin()` would give a **position** (a number), not the quarter.\n\nThe worst quarter is **2020 Q2 (−24.25)**, the best the bounce right after, **2020 Q3 (33.1)**. NaN rows are skipped automatically.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-a6",
+    "label": "Problem A.6 · Rows that meet a condition",
+    "question": "How many quarters had negative avg_growth? Show the quarters since 2008 where it was below -2.",
+    "code": "(surveys[\"avg_growth\"] < 0).sum()\n#> np.int64(16)\nsurveys.loc[(surveys.index >= \"2008-01-01\") & (surveys[\"avg_growth\"] < -2),\n            [\"a_growth\", \"b_growth\", \"avg_growth\"]]\n#>             a_growth  b_growth  avg_growth\n#> quarter                                   \n#> 2008-01-01      -2.7      -2.7       -2.70\n#> 2008-07-01      -6.0      -5.9       -5.95\n#> 2008-10-01      -6.7      -4.6       -5.65\n#> 2009-01-01      -2.2      -2.6       -2.40\n#> 2020-04-01     -24.9     -23.6      -24.25",
+    "comment": "- **Count rows meeting a condition:** build the True/False Series and `.sum()` it. `NaN < 0` is **False**, so missing quarters aren't counted.\n- **Two conditions:** `&`, with **each condition in parentheses**. `and` gives `ValueError: The truth value of a Series is ambiguous`.\n- **Dates compare to strings:** `surveys.index >= \"2008-01-01\"` works because the index is real dates (that's what `parse_dates` bought you).\n- `.loc[rows, [columns]]`: rows by condition, columns by name (Py 18).",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-a7",
+    "label": "Problem A.7 · Summary and a plot",
+    "question": "Summarize the three growth columns, then plot a_growth and b_growth over time on one graph.",
+    "code": "surveys[[\"a_growth\", \"b_growth\", \"avg_growth\"]].describe().round(2)\n#>        a_growth  b_growth  avg_growth\n#> count    141.00    133.00      131.00\n#> mean       2.19      2.33        2.23\n#> std        4.18      4.10        4.15\n#> min      -24.90    -23.60      -24.25\n#> 25%        0.70      1.00        0.95\n#> 50%        2.20      2.50        2.40\n#> 75%        3.50      3.50        3.38\n#> max       33.10     33.10       33.10\nsurveys[[\"a_growth\", \"b_growth\"]].plot();",
+    "comment": "`.describe()` is R's `summary()`: `count` is the number **not** missing, so 141 + 2 missing = 143 ✓.\n\n`df.plot()` draws one line per column with the **dates on the x-axis** (Lecture 19). NaN makes a gap in the line.\n\n![a_growth and b_growth over time](files/plots/q3drill-lines.png)",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-b0",
+    "label": "Setup B · real NYC taxi trips, two date columns",
+    "question": "Read the seaborn taxis data from https://raw.githubusercontent.com/mwaskom/seaborn-data/master/taxis.csv (or the copy under Files) so that pickup and dropoff are dates. Assign it to taxis.",
+    "code": "url = \"https://raw.githubusercontent.com/mwaskom/seaborn-data/master/taxis.csv\"\ntaxis = pd.read_csv(url, parse_dates=[\"pickup\", \"dropoff\"])\ntaxis.dtypes\n#> pickup             datetime64[us]\n#> dropoff            datetime64[us]\n#> passengers                  int64\n#> distance                  float64\n#> fare                      float64\n#> tip                       float64\n#> tolls                     float64\n#> total                     float64\n#> color                         str\n#> payment                       str\n#> pickup_zone                   str\n#> dropoff_zone                  str\n#> pickup_borough                str\n#> dropoff_borough               str\n#> dtype: object",
+    "comment": "Real data: 6,433 NYC taxi trips from March 2019 (shipped with seaborn). **No `index_col` here**: the dates stay ordinary columns, and there are **two** of them, so `parse_dates` gets a list of both.\n\n`datetime64` = dates/times. Without `parse_dates` they'd be `str`, and `.min()` would compare text and subtraction (B.4) would fail.\n\nOffline: `pd.read_csv(\"taxis.csv\", parse_dates=[\"pickup\", \"dropoff\"])` with the copy under Files.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-b1",
+    "label": "Problem B.1 · Observations and date range",
+    "question": "How many trips are there, and what range of pickup times do they span?",
+    "code": "taxis.shape\n#> (6433, 14)\ntaxis[\"pickup\"].min(), taxis[\"pickup\"].max()\n#> (Timestamp('2019-02-28 23:29:03'), Timestamp('2019-03-31 23:43:45'))",
+    "comment": "**6,433 trips × 14 columns; pickups from 2019-02-28 23:29 to 2019-03-31 23:43.**\n\nThe dates are a **column** this time, so it's `taxis[\"pickup\"].min()`, not `taxis.index.min()` (the index is just 0–6432). Compare with A.1: **where the dates live decides the code.**",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-b2",
+    "label": "Problem B.2 · Missing values",
+    "question": "How many values are missing in each column? Which columns have none?",
+    "code": "taxis.isna().sum()\n#> pickup              0\n#> dropoff             0\n#> passengers          0\n#> distance            0\n#> fare                0\n#> tip                 0\n#> tolls               0\n#> total               0\n#> color               0\n#> payment            44\n#> pickup_zone        26\n#> dropoff_zone       45\n#> pickup_borough     26\n#> dropoff_borough    45\n#> dtype: int64\ntaxis.columns[taxis.isna().sum() == 0]\n#> Index(['pickup', 'dropoff', 'passengers', 'distance', 'fare', 'tip', 'tolls',\n#>        'total', 'color'],\n#>       dtype='str')",
+    "comment": "Text columns can be missing too: `payment` (44), the zones and boroughs. The numbers (`fare`, `tip`, ...) have none.\n\n`taxis.columns[mask]` keeps the column names where the mask is True: the \"which columns\" part.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-b3",
+    "label": "Problem B.3 · Correlations",
+    "question": "What is the correlation between distance and fare? Between fare and tip?",
+    "code": "taxis[\"distance\"].corr(taxis[\"fare\"])\n#> np.float64(0.920107702789575)\ntaxis[\"fare\"].corr(taxis[\"tip\"])\n#> np.float64(0.4886124004721826)",
+    "comment": "**distance–fare ≈ 0.92** (fare is set by the meter); **fare–tip ≈ 0.49**: weaker, because **cash tips are recorded as 0** (see B.5), which breaks the pattern. Correlation ≠ causation, but a mechanical reason like this is worth one sentence in an answer.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-b4",
+    "label": "Problem B.4 · New columns from other columns",
+    "question": "Create a column minutes with the length of each trip in minutes, and a column tip_pct with the tip as a percent of the fare. What is the median trip length?",
+    "code": "taxis[\"minutes\"] = (taxis[\"dropoff\"] - taxis[\"pickup\"]).dt.total_seconds() / 60\ntaxis[\"tip_pct\"] = 100 * taxis[\"tip\"] / taxis[\"fare\"]\ntaxis[\"minutes\"].median()\n#> np.float64(10.9)\ntaxis[[\"fare\", \"tip\", \"minutes\", \"tip_pct\"]].head(3)\n#>    fare   tip   minutes    tip_pct\n#> 0   7.0  2.15  6.250000  30.714286\n#> 1   5.0  0.00  7.083333   0.000000\n#> 2   7.5  2.36  7.400000  31.466667",
+    "comment": "- **Subtracting two date columns** gives a `Timedelta` (\"0 days 00:06:15\"). `.dt.total_seconds()` turns it into seconds, `/ 60` into minutes. R: `difftime(dropoff, pickup, units = \"mins\")`.\n- New columns are **whole-column arithmetic**, no loop (Py 18).\n- **Median 10.9 minutes.** Median is safer than mean here: a few trips have absurd lengths.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-b5",
+    "label": "Problem B.5 · Average by group",
+    "question": "What is the average tip_pct by payment type? How many trips used each payment type?",
+    "code": "taxis.groupby(\"payment\")[\"tip_pct\"].mean().round(2)\n#> payment\n#> cash            0.00\n#> credit card    23.78\n#> Name: tip_pct, dtype: float64\ntaxis[\"payment\"].value_counts()\n#> payment\n#> credit card    4577\n#> cash           1812\n#> Name: count, dtype: int64",
+    "comment": "`groupby(\"payment\")[\"tip_pct\"].mean()` is R's `tapply(tip_pct, payment, mean)`.\n\n**Cash shows 0%: not stingy riders, just unrecorded tips.** If a quiz asks \"do cash riders tip less?\", the honest answer is \"the data can't tell\". Rows with missing `payment` are left out of `groupby`, which is why 4,577 + 1,812 = 6,389, not 6,433.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "test-03-b6",
+    "label": "Problem B.6 · Two conditions at once",
+    "question": "How many trips were paid by credit card AND had a tip over 25% of the fare? What share of credit-card trips is that?",
+    "code": "card = taxis[\"payment\"] == \"credit card\"\nbig = taxis[\"tip_pct\"] > 25\n(card & big).sum()\n#> np.int64(2435)\nround((card & big).sum() / card.sum(), 3)\n#> np.float64(0.532)",
+    "comment": "Store each condition in a variable, then combine with `&`. **2,435 trips; 53.2% of credit-card trips.**\n\n`sum(mask) / sum(other mask)` is a share. `(card & big).mean()` would be the share of **all** trips instead: read which denominator the question wants.",
+    "key": true,
+    "lang": "python"
+   }
+  ]
+ },
  "py-18": {
   "type": "py",
   "num": "18",
@@ -8433,6 +8625,168 @@ window.ENTRIES = {
     "question": "Using string methods on the original text day values, count the bills on days that start with S. Then, using the ordered day category, count the bills from Friday on.",
     "code": "tips[\"day\"].astype(str).str.startswith(\"S\").sum()\n#> np.int64(163)\n(tips[\"day\"] >= \"Fri\").sum()\n#> np.int64(182)",
     "comment": "Matches **.str methods** and **ordered categories**. `.astype(str)` turns the category back into text so `.str` works on it in every pandas version. `>= \"Fri\"` uses the category order Thur < Fri < Sat < Sun: 19 + 87 + 76 = 182.",
+    "key": false,
+    "lang": "python"
+   }
+  ]
+ },
+ "py-19": {
+  "type": "py",
+  "num": "19",
+  "title": "Visualization in Python: plotnine, seaborn + matplotlib and pandas plots",
+  "date": "",
+  "exams": [
+   "Python Quiz"
+  ],
+  "topics": [
+   "plotnine",
+   "ggplot",
+   "aes",
+   "geom_point",
+   "geom_histogram",
+   "facet_wrap",
+   "fill",
+   "seaborn",
+   "matplotlib",
+   "plt.subplots",
+   "ax=",
+   "hue",
+   "scatterplot",
+   "histplot",
+   "boxplot",
+   "savefig",
+   "plt.show",
+   "plt.close",
+   "pandas plot",
+   "density",
+   "Categorical.from_codes",
+   "replace",
+   "recode",
+   "Proctorio"
+  ],
+  "pdfs": [
+   {
+    "name": "Lecture19 slides - Visualization in Python.html",
+    "size": 3651780,
+    "type": "text/html"
+   }
+  ],
+  "notes": "Professor Goodrich's slides **Lecture19.html** (\"Visualization in Python\"). Three ways to plot in Python: **plotnine** (ggplot2 with a Python accent), **seaborn + matplotlib** (what most Python users actually use) and **pandas' own `.plot` methods**. Every plot below came from running the code (plotnine 0.15, seaborn 0.13, matplotlib 3.11, pandas 3.0), except the drunk-driving histogram, which is the professor's image: the `nhtsa2010fars.csv` data is on Canvas only.\n\n**Logistics from the slides:**\n- **HW 4** due **Tuesday, Nov 17, 11:59 PM**. Upload **only the PDF**, not the .Rmd, and replace the whole YAML block with the one on the HW 4 page.\n- **Python quiz Wednesday, Nov 18:** ~30 min review, then a **45-minute quiz on Python only**, recorded with **Proctorio**. Clear your screen of anything you don't want recorded. Before Wednesday: in an up-to-date Chrome, on Columbia Wi-Fi, run **Canvas → Quizzes → Proctorio Diagnostic** to install and test the extension.\n\n**Which library does what:**\n\n| Want | plotnine | seaborn / matplotlib | pandas | R (ggplot2) |\n|---|---|---|---|---|\n| import | `import plotnine as p9` | `import seaborn as sns` · `import matplotlib.pyplot as plt` | (built in) | `library(ggplot2)` |\n| scatter | `p9.ggplot(df) + p9.geom_point(p9.aes(x=\"a\", y=\"b\"))` | `sns.scatterplot(data=df, x=\"a\", y=\"b\")` | `df.plot.scatter(x=\"a\", y=\"b\")` | `ggplot(df) + geom_point(aes(a, b))` |\n| histogram | `p9.geom_histogram(p9.aes(\"a\"), bins=20)` | `sns.histplot(data=df, x=\"a\")` | `df.a.plot.hist(bins=20)` | `geom_histogram(aes(a))` |\n| color by group | `aes(..., color=\"g\")` / `fill=\"g\"` | `hue=\"g\"` | (one line per column) | `aes(..., color = g)` |\n| panels by group | `p9.facet_wrap(\"g\")` | `sns.displot(..., col=\"g\")` | n/a | `facet_wrap(~ g)` |\n| two plots side by side | n/a | `f, axs = plt.subplots(1, 2)` then `ax=axs[0]` | `ax=axs[0]` | `par(mfrow = c(1, 2))` (base R) |\n| save | `g.save(\"p.png\")` | `plt.savefig(\"p.png\")` then `plt.close()` | same as seaborn | `ggsave(\"p.png\")` |\n\n**The one rule that trips everyone from R:** column names go **in quotation marks** in Python (`x=\"tip\"`), never bare (`x = tip` is an R habit and gives `NameError`).\n\n**Textbook:** [Chapter 9, Plotting and Visualization](https://wesmckinney.com/book/plotting-and-visualization.html) of *Python for Data Analysis*. Also the [seaborn tutorial](https://seaborn.pydata.org/tutorial.html) (read \"Data structures accepted by seaborn\" first, then \"Overview of seaborn plotting functions\"), [plotnine.org](https://plotnine.org/) and [jeroenjanssens.com/plotnine](https://jeroenjanssens.com/plotnine/).",
+  "takeaways": [
+   "plotnine = ggplot2 in Python: import plotnine as p9, then p9.ggplot(df) + p9.geom_point(mapping=p9.aes(x=\"a\", y=\"b\")).",
+   "In Python every column name inside aes() is a STRING in quotes: aes(x=\"total_bill\"), not aes(x = total_bill).",
+   "Every plotnine function needs the p9. prefix (p9.geom_histogram, p9.facet_wrap) because of import plotnine as p9.",
+   "p9.facet_wrap(\"g\", nrow=2) makes one panel per group, like facet_wrap(~ g) in R.",
+   "Recode before plotting: df[\"DRUNK\"] = df.DRUNK_DR > 0 makes a True/False column; .replace({old: new}) renumbers codes.",
+   "pd.Categorical.from_codes(codes, categories=[...]) turns 0, 1, 2, ... into labels in that order (0 = first label).",
+   "df.loc[df.HOUR > 24, \"HOUR\"] = None marks impossible codes (99 = unknown) as missing; the column becomes float.",
+   "matplotlib.pyplot (plt) is like base R graphics and controls the figure; seaborn (sns) makes the nice-looking plot on top.",
+   "f, axs = plt.subplots(1, 2) makes 1 row × 2 columns of plots; send each seaborn plot to one with ax=axs[0] / ax=axs[1].",
+   "seaborn uses hue=\"col\" to color by group (ggplot's color/fill).",
+   "plt.savefig(\"name.png\") saves to the working directory and silently OVERWRITES a file with the same name; then plt.close().",
+   "plt.show() opens a window and blocks the console until you close it; in a knitted .Rmd/.qmd you don't need it.",
+   "pandas plots directly: df.col.plot.density(), df.col.plot.hist(), df.plot() (one line per column, index on the x-axis).",
+   "A trailing ; after a plot command hides the text printout of the plot object (e.g. <Axes: ...>).",
+   "plt.style.use(\"grayscale\") changes EVERY plot after it in the session; plt.style.use(\"default\") undoes it."
+  ],
+  "updatedAt": "2026-11-16T20:00:00Z",
+  "chunks": [
+   {
+    "id": "py-19-p9",
+    "label": "plotnine: ggplot2 syntax in Python",
+    "question": "",
+    "code": "import plotnine as p9\nimport pandas as pd\n\ntips = pd.read_csv(\"https://tinyurl.com/5206tips\")\n# This is Python!\np9.ggplot(tips) + p9.geom_point(mapping=p9.aes(x=\"total_bill\", y=\"tip\"))",
+    "comment": "**plotnine** copies R's ggplot2 \"grammar of graphics\" almost word for word: start with the data, then **add layers with `+`**. The tips data is the same 244 bills from Py 18.\n\n![plotnine scatter of tip vs total bill](files/plots/lec19-p9-scatter.png)\n\nLine by line, compared with R:\n\n| Python (plotnine) | R (ggplot2) |\n|---|---|\n| `import plotnine as p9` | `library(ggplot2)` |\n| `p9.ggplot(tips)` | `ggplot(tips)` |\n| `p9.geom_point(mapping=p9.aes(x=\"total_bill\", y=\"tip\"))` | `geom_point(mapping = aes(x = total_bill, y = tip))` |\n\nTwo differences, both about Python rules rather than plotting:\n\n1. **Quotes around column names.** In R, `aes(x = total_bill)` works because ggplot looks the name up inside the data. In Python, a bare `total_bill` means \"a Python variable called total_bill\", which doesn't exist, so you get `NameError: name 'total_bill' is not defined`. Write `\"total_bill\"`.\n2. **The `p9.` prefix** on every function, because the import was `import plotnine as p9` (same idea as `pd.` and `np.`). Writing `ggplot(...)` alone gives `NameError`.\n\n**Watch out:** a multi-line plotnine command must be wrapped in **parentheses** so Python knows the `+` continues on the next line (see the next card). In R the trailing `+` is enough; in Python it isn't.\n\n**Offline:** `pd.read_csv(\"tips.csv\")` with the copy attached to Py 18.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-19-p9-more",
+    "label": "Beyond the slides · color, labels and multi-line plotnine",
+    "question": "",
+    "code": "g = (p9.ggplot(tips, p9.aes(x=\"total_bill\", y=\"tip\", color=\"time\"))\n     + p9.geom_point()\n     + p9.labs(title=\"Tips vs total bill\", x=\"Total bill ($)\", y=\"Tip ($)\"))\ng\ng.save(\"tips_scatter.png\")   # like ggsave()",
+    "comment": "Not on the slides, but you'll want it the first time you make a real plot.\n\n![plotnine scatter colored by lunch vs dinner](files/plots/lec19-p9-color.png)\n\n- **`aes()` in `p9.ggplot()`** applies to every layer, exactly like R.\n- **`color=\"time\"`** colors points by a column (quoted). `fill=` is for bars and histograms.\n- **`p9.labs(...)`** sets the title and axis labels, same arguments as R's `labs()`.\n- **The outer parentheses** let the command run over several lines. Without them, Python stops at the end of the first line and the next line starting with `+` is an error.\n- **`g.save()`** writes a file (R: `ggsave()`); writing `g` on its own line shows it.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-19-recode",
+    "label": "Drunk driving (slide practice), step 1: recode the data",
+    "question": "",
+    "code": "import pandas as pd\nfatalities = pd.read_csv(\"nhtsa2010fars.csv\") # Canvas -> Files\n\nfatalities['DRUNK'] = fatalities.DRUNK_DR > 0\nmapping = {\n    1: 6, # Sunday\n    2: 0, # Monday\n    3: 1, # Tuesday\n    4: 2, # Wednesday\n    5: 3, # Thursday\n    6: 4, # Friday\n    7: 5  # Saturday\n}\nfatalities['DAY_WEEK'] = fatalities.DAY_WEEK.replace(mapping)\nfatalities['DAY_WEEK'] = pd.Categorical.from_codes(fatalities.DAY_WEEK,\n  categories = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])\nfatalities.loc[fatalities.HOUR > 24, 'HOUR'] = None\nfatalities['TIME'] = fatalities.HOUR + fatalities.MINUTE / 60\n\n# What it does, on 5 made-up rows (the real file is on Canvas):\n#> BEFORE                               AFTER\n#>    DRUNK_DR  DAY_WEEK  HOUR  MINUTE     DRUNK_DR DAY_WEEK  HOUR  MINUTE  DRUNK   TIME\n#> 0         0         1     2      30  0         0      Sun   2.0      30  False   2.50\n#> 1         1         2    23      15  1         1      Mon  23.0      15   True  23.25\n#> 2         2         7    99      99  2         2      Sat   NaN      99   True    NaN\n#> 3         0         6    14       0  3         0      Fri  14.0       0  False  14.00\n#> 4         0         3     0      45  4         0      Tue   0.0      45  False   0.75",
+    "comment": "The practice question: *how can we show the relationship between drinking and highway fatalities?* Each row of the NHTSA 2010 file is one fatal crash. Before plotting, the raw codes have to become things a plot can use. Every line uses a Py 17/18 tool:\n\n1. **`fatalities.DRUNK_DR > 0`**: `DRUNK_DR` counts drunk drivers in the crash. Comparing to 0 gives a **True/False** column: \"was at least one driver drunk?\" That's the variable we'll color by.\n2. **`mapping` + `.replace(mapping)`**: the file codes days **1 = Sunday … 7 = Saturday**. We want **Monday first** and the codes to start at **0** (the next step needs 0, 1, 2, ...). The dict says \"replace 1 with 6, 2 with 0, ...\". R: `recode()` or a named-vector lookup.\n3. **`pd.Categorical.from_codes(codes, categories=[...])`**: turns the numbers into **labels, in that order**: code 0 → `'Mon'`, 1 → `'Tue'`, ..., 6 → `'Sun'`. The result is a categorical (R: `factor(x, levels = 0:6, labels = c(\"Mon\", ...))`), so plots keep Monday-to-Sunday order instead of alphabetical.\n4. **`.loc[fatalities.HOUR > 24, 'HOUR'] = None`**: hour **99 means unknown**. `.loc[rows, column] = value` changes only those cells (R: `df$HOUR[df$HOUR > 24] <- NA`). The column turns into floats with `NaN`.\n5. **`HOUR + MINUTE / 60`**: one decimal clock time, e.g. 23:15 → 23.25. If `HOUR` is missing, `TIME` is missing too (NaN + anything = NaN), so unknown times drop out of the histogram.\n\n**Watch out:** `from_codes` needs codes **0 to (number of labels − 1)**. Using the original 1–7 would put Sunday's code 7 out of range: `ValueError`. That's why `mapping` comes first.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-19-facet",
+    "label": "Drunk driving (slide practice), step 2: faceted histogram by hour and day",
+    "question": "",
+    "code": "gg = p9.ggplot(fatalities) + p9.facet_wrap(\"DAY_WEEK\", nrow = 2)\ngg + p9.geom_histogram(mapping = p9.aes(\"TIME\", fill = \"DRUNK\"), bins = 24)",
+    "comment": "![Histogram of crash time by day, filled by drunk driver involvement](files/plots/lec19-fars-facet.png)\n*(The professor's output: the data is on Canvas.)*\n\n- **`gg = ...`** stores the base plot so you can add layers to it later, like R.\n- **`p9.facet_wrap(\"DAY_WEEK\", nrow = 2)`**: one panel per day, on 2 rows. R: `facet_wrap(~ DAY_WEEK, nrow = 2)`. No `~` in Python: just the column name as a string.\n- **`p9.aes(\"TIME\", fill = \"DRUNK\")`**: the first unnamed argument is `x`. `fill` colors the bars, so each bar is split into crashes **with** (True) and **without** (False) a drunk driver, stacked.\n- **`bins = 24`**: one bar per hour of the day.\n\n**How to read it:** on weekdays most deaths happen in the afternoon commute and are mostly not drunk-driving. On **Saturday and Sunday, around 1–3 AM**, the tallest bars of the week appear, and most of those bars are drunk-driving crashes (the Friday and Saturday nights out).\n\n**Quiz-style point:** `DAY_WEEK` panels appear Mon → Sun *because* it's a categorical with that order. With the original numbers they'd be 1–7; with plain text they'd be alphabetical (Fri, Mon, Sat, ...).",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-19-libs",
+    "label": "matplotlib.pyplot vs seaborn: who does what",
+    "question": "",
+    "code": "import matplotlib.pyplot as plt   # \"plt\": the figure, axes, saving, showing\nimport seaborn as sns             # \"sns\": good-looking statistical plots\n\n# look at a plot:\nplt.show()                 # opens a window; the console waits until you close it\n# or save it:\nplt.savefig('MYPLOTNAME.png')   # into the working directory (overwrites!)\nplt.close()                     # start fresh for the next plot",
+    "comment": "plotnine is nice but rare in the Python world. Most Python plots are made with two packages that **work together**:\n\n| | matplotlib.pyplot (`plt`) | seaborn (`sns`) |\n|---|---|---|\n| Like in R | base graphics (`plot`, `par`) | ggplot2's look, with less code |\n| Its job | the **figure and its layout**: subplots, titles, saving | the **plot itself**: scatter, histogram, box, colored by group |\n| Example | `plt.subplots(1, 2)`, `plt.savefig()` | `sns.scatterplot()`, `sns.histplot()` |\n\nseaborn is built **on top of** matplotlib: every seaborn plot is drawn on a matplotlib \"Axes\". So when you need two plots side by side, `plt` makes the grid and seaborn fills each cell (next card).\n\n**Viewing vs saving (from the slides):**\n- **`plt.show()`** opens a separate window. Your console is **frozen** until you close it, so don't be confused when typing does nothing.\n- **`plt.savefig('name.png')`** writes the file to the **working directory** and **overwrites** a file with the same name without asking.\n- **`plt.close()`** (best practice) clears the figure; otherwise the next plot can draw **on top of** the old one.\n\n**In a knitted .Rmd / .qmd** (HW and the quiz), a `{python}` chunk shows the plot under the chunk on its own; you don't need `plt.show()`.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-19-subplots",
+    "label": "Two seaborn plots side by side with plt.subplots",
+    "question": "",
+    "code": "import matplotlib.pyplot as plt\nimport seaborn as sns\n\npenguins = sns.load_dataset(\"penguins\")\nf, axs = plt.subplots(1, 2)  # 1 row and 2 columns for the subplots\nsns.scatterplot(data=penguins,\n                x=\"flipper_length_mm\",\n                y=\"bill_length_mm\",\n                hue=\"species\",\n                ax=axs[0]) # This places this graph on the first subplot\nsns.histplot(data=penguins,\n             x=\"species\",\n             hue=\"species\",\n             legend=False, # This is supresses bc the first subplot has it\n             ax=axs[1])    # This places this graph on the second subplot\nplt.savefig('test_seaborn.png') # create a file at your working directory\nplt.close() # best practice",
+    "comment": "![Scatter of bill vs flipper length by species, and a bar count of species](files/plots/lec19-sns-two.png)\n\n- **`sns.load_dataset(\"penguins\")`**: a built-in example data set (344 penguins × 7 columns; it downloads, so be online).\n- **`f, axs = plt.subplots(1, 2)`** returns **two things** at once: `f`, the whole figure, and `axs`, an array of the 2 plot areas. R: `par(mfrow = c(1, 2))`.\n- **`ax=axs[0]`** says \"draw here\". Python counts from 0, so `axs[0]` is the **left** plot and `axs[1]` the **right** one. Without `ax=`, both plots land on top of each other in the last area.\n- **`data=`, `x=`, `y=`** take the data frame and **quoted** column names, like plotnine.\n- **`hue=\"species\"`** colors by group (ggplot's `color` / `fill`), and adds a legend.\n- **`legend=False`** on the right plot: the left one already explains the colors.\n- **`histplot` of a text column** counts each category, so it acts as a **bar chart** of counts.\n\n**Too cramped?** Add `figsize=(10, 4)` (width, height in inches) and `plt.tight_layout()` before saving:\n\n```python\nf, axs = plt.subplots(1, 2, figsize=(10, 4))\n...\nplt.tight_layout()\n```\n\n![The same two plots, wider, with titles set by axs[0].set_title](files/plots/lec19-sns-two-wide.png)\n\nTitles per panel: `axs[0].set_title(\"...\")`.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-19-pd-plot",
+    "label": "pandas' own plots: .plot.density(), .plot()",
+    "question": "",
+    "code": "penguins.bill_depth_mm.plot.density();\n\nimport numpy as np\n\nnp.random.seed(2102)   # added so the lines are reproducible (the slides don't)\ndf = pd.DataFrame(np.random.standard_normal((10, 4)).cumsum(0),\n                  columns=[\"A\", \"B\", \"C\", \"D\"],\n                  index=np.arange(0, 100, 10))\nplt.style.use('grayscale')\ndf.plot();",
+    "comment": "The professor's advice: decide what you want, find an example online that looks similar, and tweak the code. The quickest place to start is often **pandas itself**: a Series or DataFrame has a `.plot` method (matplotlib underneath).\n\n**`penguins.bill_depth_mm.plot.density()`**: a smooth density curve of one column (R: `plot(density(x, na.rm = TRUE))`). Missing values are skipped.\n\n![Density of penguin bill depth with two humps](files/plots/lec19-pd-density.png)\n\nTwo humps = two groups of penguins (Gentoo have shallower bills).\n\n**`df.plot()`** on a whole DataFrame draws **one line per column**, with the **index on the x-axis**:\n\n- `np.random.standard_normal((10, 4))` is a 10 × 4 array of N(0, 1) draws (Py 16).\n- `.cumsum(0)` adds them up **down each column** (axis 0), so each column is a **random walk**.\n- `index=np.arange(0, 100, 10)` labels the rows 0, 10, ..., 90: that's the x-axis.\n\n![Four random-walk lines A to D in grayscale](files/plots/lec19-pd-lines.png)\n\n**Watch out:**\n- **`plt.style.use('grayscale')` sticks** for every later plot in the session (or knitted file). Undo with `plt.style.use('default')`.\n- **The trailing `;`** only hides the text line `<Axes: ...>` that Python prints for the plot object. The plot is the same with or without it.\n- Other kinds: `.plot.hist(bins=20)`, `.plot.box()`, `.plot.bar()`, `.plot.scatter(x=\"a\", y=\"b\")`, `.plot.line()`.\n\nMore examples in [P4DA Chapter 9.2](https://wesmckinney.com/book/plotting-and-visualization.html#vis_pandas): practice them on `penguins`.",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "py-19-prac1",
+    "label": "Practice 1 · seaborn scatter colored by group",
+    "question": "Using seaborn, plot tip against total_bill for the tips data, with lunch and dinner bills in different colors.",
+    "code": "import seaborn as sns\nsns.scatterplot(data=tips, x=\"total_bill\", y=\"tip\", hue=\"time\")",
+    "comment": "Matches **seaborn `hue=`**. Same plot as the plotnine color card, with seaborn's look.\n\n![seaborn scatter of tips colored by lunch and dinner](files/plots/lec19-prac1.png)",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-19-prac2",
+    "label": "Practice 2 · boxplot by an ordered group",
+    "question": "Make the Py 18 tip_pct column, then draw a boxplot of tip_pct by day with the days in order Thur, Fri, Sat, Sun. Do the medians differ much?",
+    "code": "tips[\"tip_pct\"] = 100 * tips.tip / (tips.total_bill - tips.tip)   # Py 18\nax = sns.boxplot(data=tips, x=\"day\", y=\"tip_pct\",\n                 order=[\"Thur\", \"Fri\", \"Sat\", \"Sun\"])\nax.set(ylim=(0, 60), ylabel=\"Tip (% of pre-tip bill)\")\ntips.groupby(\"day\")[\"tip_pct\"].median().round(2)\n#> day\n#> Fri     18.43\n#> Sat     17.90\n#> Sun     19.20\n#> Thur    18.18\n#> Name: tip_pct, dtype: float64",
+    "comment": "Matches **new column** (Py 18), **sns.boxplot** and **ordering the categories**. `order=` puts the days in calendar order (otherwise they follow the data). seaborn returns the Axes, so `ax.set(...)` changes limits and labels.\n\n![Boxplots of tip percentage by day](files/plots/lec19-prac2.png)\n\n`ylim=(0, 60)` cuts off **2 extreme bills** (one tip over 200% on Sunday) that squash every box. The medians are all about 18–19%: day barely matters.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-19-prac3",
+    "label": "Practice 3 · two pandas plots side by side",
+    "question": "In one figure, put a histogram of tip (20 bins) on the left and a bar chart of the number of bills per day on the right, then save it as tips_two.png.",
+    "code": "f, axs = plt.subplots(1, 2, figsize=(10, 4))\ntips.tip.plot.hist(bins=20, ax=axs[0], title=\"Tips\")\ntips.day.value_counts().plot.bar(ax=axs[1], title=\"Bills per day\")\nplt.tight_layout()\nplt.savefig(\"tips_two.png\")\nplt.close()",
+    "comment": "Matches **plt.subplots + ax=** and **pandas .plot**. pandas plots take `ax=` exactly like seaborn. `.value_counts()` (Py 18) makes the counts first, then `.plot.bar()` draws them: Sat 87, Sun 76, Thur 62, Fri 19.\n\n![Histogram of tips and bar chart of bills per day](files/plots/lec19-prac3.png)",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "py-19-prac4",
+    "label": "Practice 4 · plotnine histogram with fill and facets",
+    "question": "With plotnine, draw a 20-bin histogram of tip, with bars split by lunch/dinner, in one panel per smoker value.",
+    "code": "(p9.ggplot(tips)\n + p9.geom_histogram(p9.aes(\"tip\", fill=\"time\"), bins=20)\n + p9.facet_wrap(\"smoker\"))",
+    "comment": "Matches **the fatalities plot**, on the tips data: x first in `aes`, `fill=` splits each bar, `facet_wrap` makes panels (No / Yes smoker).\n\n![Histograms of tip by smoker, filled by lunch vs dinner](files/plots/lec19-prac4.png)",
     "key": false,
     "lang": "python"
    }
@@ -8707,7 +9061,7 @@ window.ENTRIES = {
     "type": "text/plain"
    }
   ],
-  "notes": "**Homework 4, due Tuesday, November 17 by 11:59 PM.** Python chunks only (no R). Three parts, 12 points each: basic Python, NumPy, pandas (GDP vs GDI growth from the Federal Reserve).\n\n**This page has no answers.** Each question lists what it needs and where on this site that tool is explained, so you can write the code yourself. The assignment file is attached above.\n\n**Setup:** open `Python.Rproj`, start a new R Markdown file, and use `{python}` chunks (Py 14 → *R Markdown / Quarto*). The pandas part reads data from the internet, so knit while online.\n\n| Part | Tools | Where |\n|---|---|---|\n| Basic Python | lists `[ ]`, `.append()` / `.extend()`, dicts `{key: value}`, changing a dict by key | Py 15, Py 16 |\n| NumPy | `np.random.normal(loc, scale, size)`, `[row, col]` and True/False subsetting, `.copy()`, `.sum(axis=)`, `.dtype` | Py 16 |\n| pandas | `.shape`, `.index.min()` / `.max()`, `.isna().sum()`, `.corr()`, new columns | Py 17, Py 18, Rec 10 |",
+  "notes": "**Homework 4, due Tuesday, November 17 by 11:59 PM.** Python chunks only (no R). Three parts, 12 points each: basic Python, NumPy, pandas (GDP vs GDI growth from the Federal Reserve).\n\n**This page has no answers.** Each question lists what it needs and where on this site that tool is explained, so you can write the code yourself. The assignment file is attached above.\n\n**Setup:** open `Python.Rproj`, start a new R Markdown file, and use `{python}` chunks (Py 14 → *R Markdown / Quarto*). The pandas part reads data from the internet, so knit while online.\n\n| Part | Tools | Where |\n|---|---|---|\n| Basic Python | lists `[ ]`, `.append()` / `.extend()`, dicts `{key: value}`, changing a dict by key | Py 15, Py 16 |\n| NumPy | `np.random.normal(loc, scale, size)`, `[row, col]` and True/False subsetting, `.copy()`, `.sum(axis=)`, `.dtype` | Py 16 |\n| pandas | `.shape`, `.index.min()` / `.max()`, `.isna().sum()`, `.corr()`, new columns | Py 17, Py 18, Rec 10 |\n\n**Submitting (from Lecture 19):** upload **only the PDF**, not the .Rmd. Replace the **entire YAML block** at the top of the file with:\n\n```\n---\ntitle: \"UNSTAT2102: Homework 4\"\nauthor: \"Due Tuesday November 17 by 11:59PM\"\noutput: \n  pdf_document: \n    number_sections: true\n    pandoc_args: --listings\nheader-includes:\n  - \\lstset{breaklines=true, basicstyle=\\ttfamily\\small}\n---\n```\n\n`--listings` + `breaklines=true` wrap long code lines so they don't run off the PDF page.",
   "takeaways": [
    "Lists change in place with .append(one) / .extend(several); a dict changes with d[key] = value.",
    "np.random.normal(loc=mean, scale=sd, size=(rows, cols)) makes a random matrix.",
@@ -8717,7 +9071,7 @@ window.ENTRIES = {
    "df.isna().sum() counts missing values per column; Series.corr() uses only pairs where both are present.",
    "Averaging two columns: (a + b) / 2 is NaN if either is missing; df[[a, b]].mean(axis=\"columns\") skips the missing one. Decide which you want."
   ],
-  "updatedAt": "2026-11-14T20:00:00Z",
+  "updatedAt": "2026-11-16T20:00:00Z",
   "chunks": [
    {
     "id": "hw-04-q1",
@@ -8838,118 +9192,6 @@ window.ENTRIES = {
    }
   ]
  },
- "py-19": {
-  "type": "py",
-  "num": "19",
-  "title": "Visualization in Python: plotnine (ggplot), seaborn, matplotlib and pandas plots",
-  "date": "",
-  "exams": [
-   "Python Quiz"
-  ],
-  "topics": [
-   "plotnine",
-   "ggplot",
-   "geom_point",
-   "geom_histogram",
-   "facet_wrap",
-   "seaborn",
-   "matplotlib",
-   "subplots",
-   "savefig",
-   "show",
-   "density",
-   "plot",
-   "recode",
-   "replace",
-   "from_codes",
-   "yaml",
-   "listings",
-   "proctorio"
-  ],
-  "pdfs": [
-   {
-    "name": "Lecture19 slides - Visualization in Python.html",
-    "size": 3651780,
-    "type": "text/html"
-   }
-  ],
-  "notes": "Professor Goodrich's slides **Lecture19.html**, *Visualization in Python* (Monday, Nov 16).\n\n**Quiz (slide 3):**\n- Wednesday starts with 30 minutes of review, then a **45-minute quiz on Python only**.\n- It uses **Proctorio** screen recording in a recent Chrome, so clear your screen of anything you don't want recorded.\n- Before then, go to Canvas → Quizzes → **Proctorio Diagnostic** on Columbia WiFi to install the extension and check that it works.\n\n**HW 4 (slide 2):** due Tuesday night. Upload just the PDF, and replace the YAML with the one in the last chunk below.\n\n**Three ways to plot in Python:**\n\n| Library | Like in R | Start |\n|---|---|---|\n| `plotnine` (`p9`) | ggplot2 | `p9.ggplot(df) + p9.geom_point(p9.aes(x=\"a\", y=\"b\"))` |\n| `matplotlib.pyplot` (`plt`) | base graphics | `plt.subplots()`, `plt.show()`, `plt.savefig()` |\n| `seaborn` (`sns`) | nicer defaults | `sns.scatterplot(data=df, x=\"a\", y=\"b\", hue=\"g\")` |\n\n**Websites from this lecture:** [plotnine.org](https://plotnine.org/), [plotnine guide](https://jeroenjanssens.com/plotnine/), [seaborn tutorial](https://seaborn.pydata.org/tutorial.html) (read \"Data structures accepted by seaborn\" first), [seaborn function overview](https://seaborn.pydata.org/tutorial/function_overview.html).\n\nEvery output and plot below came from running the code. The drunk-driving data is on Canvas, so that example is shown without output.",
-  "takeaways": [
-   "plotnine = ggplot2 in Python: p9.ggplot(df) + p9.geom_point(p9.aes(x=\"a\", y=\"b\")). Column names go in QUOTES.",
-   "facet_wrap(\"var\", nrow=2) = one panel per group; fill=\"col\" colors bars by a column.",
-   "seaborn: sns.scatterplot / sns.histplot(data=df, x=..., hue=...); plt.subplots(1, 2) puts plots side by side.",
-   "plt.show() displays a plot, plt.savefig(\"x.png\") saves it (overwrites!), plt.close() clears it.",
-   "pandas can plot directly: series.plot.density(), df.plot().",
-   "Recoding: col > 0 makes True/False; .replace({old: new}); pd.Categorical.from_codes(codes, categories=[...]).",
-   "Quiz: 45 min, Python only, Proctorio in Chrome; run the Proctorio Diagnostic on Canvas first."
-  ],
-  "updatedAt": "2026-11-16T22:00:00Z",
-  "chunks": [
-   {
-    "id": "p19-1",
-    "label": "plotnine: ggplot in Python (column names in quotes)",
-    "question": "How do I make a ggplot-style scatterplot in Python?",
-    "code": "import plotnine as p9\nimport pandas as pd\ntips = pd.read_csv(\"https://tinyurl.com/5206tips\")\np = p9.ggplot(tips) + p9.geom_point(mapping=p9.aes(x=\"total_bill\", y=\"tip\"))\np",
-    "comment": "Slide 4 *The plotnine Library*. plotnine implements the same grammar of graphics as ggplot2: `ggplot(data) + geom_...(aes(...))`. Two differences from R: functions need the `p9.` prefix, and **variable names go inside quotation marks**.\n\n![tips scatter](files/py19-tips-scatter.png)",
-    "key": true,
-    "lang": "python"
-   },
-   {
-    "id": "p19-2",
-    "label": "Recoding before a plot: a True/False column, .replace(), Categorical.from_codes()",
-    "question": "The practice on slides 6–8 (drunk driving and car-crash deaths): how are the variables recoded?",
-    "code": "fatalities = pd.read_csv(\"nhtsa2010fars.csv\")   # Canvas -> Files\nfatalities['DRUNK'] = fatalities.DRUNK_DR > 0\nmapping = {1: 6, 2: 0, 3: 1, 4: 2, 5: 3, 6: 4, 7: 5}   # Sunday=1 ... Saturday=7  ->  Mon=0 ... Sun=6\nfatalities['DAY_WEEK'] = fatalities.DAY_WEEK.replace(mapping)\nfatalities['DAY_WEEK'] = pd.Categorical.from_codes(fatalities.DAY_WEEK,\n    categories=['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])\nfatalities.loc[fatalities.HOUR > 24, 'HOUR'] = None\nfatalities['TIME'] = fatalities.HOUR + fatalities.MINUTE / 60",
-    "comment": "Slide 7 *Answer: Recoding*. Not run here: the data file is on Canvas → Files.\n\n- `DRUNK_DR > 0` makes a **True/False column**.\n- `.replace({old: new})` **recodes** the values.\n- `pd.Categorical.from_codes(codes, categories=[...])` turns the codes 0–6 into **day labels in that order**, like `factor()`.\n- `.loc[condition, 'HOUR'] = None` **sets the impossible hours to missing**.\n- `HOUR + MINUTE / 60` makes a **decimal time**.",
-    "key": false,
-    "lang": "python"
-   },
-   {
-    "id": "p19-3",
-    "label": "facet_wrap + geom_histogram: one panel per day",
-    "question": "How do I make histograms split into panels, with fill by a group?",
-    "code": "gg = p9.ggplot(fatalities) + p9.facet_wrap(\"DAY_WEEK\", nrow = 2)\ngg + p9.geom_histogram(mapping = p9.aes(\"TIME\", fill = \"DRUNK\"), bins = 24)",
-    "comment": "Slide 8 *Answer: Plot*. `facet_wrap(\"var\", nrow=2)` makes one panel per day in 2 rows. `fill=\"DRUNK\"` colors the bars by the True/False column. `bins=24` gives one bar per hour. You can save a ggplot in a variable (`gg`) and add layers to it later.",
-    "key": false,
-    "lang": "python"
-   },
-   {
-    "id": "p19-4",
-    "label": "seaborn + matplotlib: two plots side by side",
-    "question": "How do I put a seaborn scatterplot and histogram next to each other?",
-    "code": "import matplotlib.pyplot as plt\nimport seaborn as sns\npenguins = sns.load_dataset(\"penguins\")\nf, axs = plt.subplots(1, 2)      # 1 row, 2 columns of plots\nsns.scatterplot(data=penguins, x=\"flipper_length_mm\", y=\"bill_length_mm\",\n                hue=\"species\", ax=axs[0])\nsns.histplot(data=penguins, x=\"species\", hue=\"species\", legend=False, ax=axs[1])\nplt.savefig(\"test_seaborn.png\")\nplt.close()",
-    "comment": "Slides 9–11. `matplotlib.pyplot` (`plt`) is like base R graphics; `seaborn` (`sns`) makes nicer plots with less code. `plt.subplots(1, 2)` makes the grid and `ax=axs[0]` / `axs[1]` puts each plot in its place. `hue=` colors by a group (like `color=` in ggplot).\n\n**To see a plot:** `plt.show()`; in R Markdown it then appears in the PDF. `plt.savefig(\"name.png\")` saves it (and overwrites a file with the same name). `plt.close()` clears it so the next plot starts fresh.\n\n![seaborn side by side](files/py19-seaborn.png)",
-    "key": false,
-    "lang": "python"
-   },
-   {
-    "id": "p19-5",
-    "label": "Plots straight from pandas: .plot.density(), .plot()",
-    "question": "Can a DataFrame or Series plot itself?",
-    "code": "penguins.bill_depth_mm.plot.density()\nplt.close()\nimport numpy as np\ndf = pd.DataFrame(np.random.standard_normal((10, 4)).cumsum(0),\n                  columns=[\"A\", \"B\", \"C\", \"D\"],\n                  index=np.arange(0, 100, 10))\ndf.shape\n#> (10, 4)",
-    "comment": "Slide 12 *Plots with Pandas*. `series.plot.density()` draws a smooth density curve; `df.plot()` draws one line per column against the index. `.cumsum(0)` makes running totals down each column (random walks). These use matplotlib underneath, so `plt.show()` / `plt.savefig()` work the same way.",
-    "key": false,
-    "lang": "python"
-   },
-   {
-    "id": "p19-6",
-    "label": "HW YAML: wrap long code lines in the PDF",
-    "question": "What YAML did he say to use for the homework PDF?",
-    "code": "# R Markdown YAML (not Python), from slide 2:\n# title: \"UNSTAT2102: Homework 4\"\n# author: \"Due Tuesday November 17 by 11:59PM\"\n# output:\n#   pdf_document:\n#     number_sections: true\n#     pandoc_args: --listings\n# header-includes:\n#   - \\lstset{breaklines=true, basicstyle=\\ttfamily\\small}",
-    "comment": "Slide 2 *Homework*. `--listings` with `breaklines=true` makes long code lines wrap in the PDF instead of running off the page. Upload **the PDF only**, not the .Rmd. The quiz template on *Rev 08* uses this same YAML.",
-    "key": false,
-    "lang": "python"
-   },
-   {
-    "id": "p19-7-prac",
-    "label": "Practice · A boxplot of tips by day (plotnine)",
-    "question": "Using tips, make a boxplot of tip for each day, filled by smoker.",
-    "code": "p = (p9.ggplot(tips)\n     + p9.geom_boxplot(p9.aes(x=\"day\", y=\"tip\", fill=\"smoker\")))\np",
-    "comment": "Any ggplot2 geom works with `p9.` in front: `geom_boxplot`, `geom_bar`, `geom_line`, `geom_histogram`… See plotnine.org (from slide 4) for the full list.\n\n![boxplot](files/py19-tips-box.png)",
-    "key": false,
-    "lang": "python"
-   }
-  ]
- },
  "rev-08": {
   "type": "prac",
   "num": "08",
@@ -8987,7 +9229,7 @@ window.ENTRIES = {
    "Lists / dicts for Q1-style questions: Lecture 15 slides 15–16, Lecture 16 slide 6 (append, extend, insert, update).",
    "Plots: Lecture 19 slide 4 (plotnine), 8 (facet_wrap histogram), 11 (seaborn)."
   ],
-  "updatedAt": "2026-11-16T22:00:00Z",
+  "updatedAt": "2026-11-16T23:00:00Z",
   "chunks": [
    {
     "id": "r08-tmpl",
@@ -9042,7 +9284,7 @@ window.ENTRIES = {
    "Two conditions: df.loc[(cond1) & (cond2)], each in parentheses; never 'and' / 'or'.",
    "plotnine: p9.ggplot(df) + p9.geom_point(p9.aes(x='a', y='b')), column names in quotes."
   ],
-  "updatedAt": "2026-11-16T22:00:00Z",
+  "updatedAt": "2026-11-16T23:00:00Z",
   "chunks": [
    {
     "id": "qa-0",

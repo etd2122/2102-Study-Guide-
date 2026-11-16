@@ -98,6 +98,23 @@ window.R_ERRORS = [
   fix:"Put the labels in a list: two sets of brackets, `s[[\"c\", \"a\"]]`.",
   wrong:"obj2[\"c\", \"a\"]", right:"obj2[[\"c\", \"a\"]]", see:['py-17','A Series: values with labels, obj2["a"] and obj2[["c", "a"]]'] },
 
+{ id:'py-series-ambiguous', match:"truth value of a Series is ambiguous|truth value of a DataFrame is ambiguous", kind:'Error',
+  title:"ValueError: The truth value of a Series is ambiguous (pandas)",
+  means:"You used Python's `and`, `or`, `not` or an `if` on a whole True/False Series. Python wants ONE True/False and the Series has many.",
+  causes:["`(df[\"a\"] > 3) and (df[\"b\"] > 5)` when filtering rows.",
+          "`if df[\"x\"] > 0:` on a whole column.",
+          "Missing parentheses: `df[\"a\"] > 3 & df[\"b\"] > 5` (`&` runs first)."],
+  fix:"Combine conditions element by element with `&` (and), `|` (or), `~` (not), with **parentheses around each comparison**. For a single answer about the whole column use `.any()` or `.all()`.",
+  wrong:"df.loc[(df[\"hours\"] >= 3) and (df[\"quiz_1\"] >= 80)]", right:"df.loc[(df[\"hours\"] >= 3) & (df[\"quiz_1\"] >= 80)]", see:['rec-10','3 · Filtering rows with a Boolean mask, &, | and .isin()'] },
+
+{ id:'py-loc-int', match:"KeyError: -?\\d+\\b", kind:'Error',
+  title:"KeyError: 0 (pandas .loc with a number)",
+  means:"`.loc` looks up row **labels**, and no row has the label you typed. The number was read as a label, not a position.",
+  causes:["`df.loc[0]` on a table whose index is IDs like 101, 104, … (or dates).",
+          "`s[0]` on a Series with text or ID labels."],
+  fix:"For a position use `.iloc`: `df.iloc[0]` is the first row. For a label, check what exists with `df.index.tolist()`.",
+  wrong:"df.loc[0]", right:"df.iloc[0]          # first row by position\ndf.loc[101]         # row labeled 101", see:['rec-10','2 · .loc (labels) vs .iloc (positions), and slicing'] },
+
 { id:'py-key', match:"KeyError", kind:'Error',
   title:"KeyError: 'name' (Python)",
   means:"That key isn't in the dictionary.",

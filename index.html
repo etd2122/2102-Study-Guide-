@@ -1135,12 +1135,17 @@ const PY_LOOKUP=[
   ['df$new <- df$a / df$b','df["new"] = df["a"] / df["b"]'],['table(x)','x.value_counts()'],['sum(is.na(x))','x.isna().sum()'],
   ['mean(x, na.rm = TRUE)','x.mean()  (skips NaN by default)'],['which.max(x)','x.idxmax() (label) / x.argmax() (position)'],['cor(x, y)','x.corr(y)'],
   ['apply(df, 1, f)','df.apply(f, axis=1)'],['tapply(x, g, mean)','df.groupby("g")["x"].mean()'],['df[order(-df$a), ]','df.sort_values("a", ascending=False)'],
-  ['grepl("S", x)','x.str.contains("S")'],['recode / named vector lookup','x.map({"AM": "Morning"})']
+  ['grepl("S", x)','x.str.contains("S")'],['recode / named vector lookup','x.map({"AM": "Morning"})'],
+  ['Plots'],
+  ['library(ggplot2)','import plotnine as p9'],['ggplot(df) + geom_point(aes(a, b))','p9.ggplot(df) + p9.geom_point(p9.aes(x="a", y="b"))  (quoted names)'],
+  ['facet_wrap(~ g, nrow = 2)','p9.facet_wrap("g", nrow=2)'],['ggsave("p.png")','g.save("p.png") / plt.savefig("p.png")'],
+  ['par(mfrow = c(1, 2))','f, axs = plt.subplots(1, 2)  then ax=axs[0], ax=axs[1]'],['aes(color = g) / aes(fill = g)','sns.scatterplot(..., hue="g")'],
+  ['hist(x) · plot(density(x))','df.x.plot.hist() · df.x.plot.density()'],['factor(codes, levels = 0:6, labels = ...)','pd.Categorical.from_codes(codes, categories=[...])']
 ];
 function pyQuizIntroHTML(list){
   return `<section class="pyq">
     <div class="pyq-facts"><span><b>Wed, Nov 18</b> in class</span><span>45 minutes</span><span>Python only</span><span>~25 min review first</span><span>Open notes</span></div>
-    <p class="hint">Everything flagged for the Python quiz, in lecture order: the points to remember and the exam code from Py 14–18, Rec 10 and HW 4. Use the sidebar search during the quiz: type a function or what you need (“count missing”, “rows where”, “average by group”).</p>
+    <p class="hint">Everything flagged for the Python quiz, in lecture order: the points to remember and the exam code from Py 14–19, Rec 10 and HW 4. Use the sidebar search during the quiz: type a function or what you need (“count missing”, “rows where”, “average by group”).</p>
     <div class="pyq-actions">
       <button class="btn sm primary" type="button" data-act="pyq-test">Self-test: Python questions →</button>
       <button class="btn sm" type="button" data-act="toc" data-to="pyq-lookup">R → Python lookup table</button>

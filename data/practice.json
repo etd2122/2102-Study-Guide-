@@ -1,0 +1,756 @@
+[
+ {
+  "id": "a1",
+  "group": "A · The Q3 recipe on new data (price indexes)",
+  "title": "Read the data",
+  "prompt": "The file `prices.csv` (from FRED) has three columns: `observation_date`, `CPIAUCSL` (the Consumer Price Index) and `PCEPI` (the PCE price index), one row per month.\n\nRead it into a DataFrame called **`prices`** so that the columns are named **`month`, `cpi`, `pce`**, the dates are real dates, and **`month` is the index**.",
+  "starter": "prices = pd.read_csv(\"prices.csv\", ...)\nprices.head()",
+  "solution": "prices = pd.read_csv(\"prices.csv\", header=0, names=[\"month\", \"cpi\", \"pce\"],\n                     parse_dates=[\"month\"], index_col=\"month\")",
+  "targets": [
+   {
+    "expr": "type(prices.index).__name__",
+    "label": "the index is real dates (DatetimeIndex)"
+   },
+   {
+    "expr": "list(prices.columns)",
+    "label": "the columns are cpi and pce"
+   },
+   {
+    "expr": "prices.shape",
+    "label": "the shape"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'index_col' not in __code__",
+    "msg": "Add index_col=\"month\" so the dates become the row labels (the index)."
+   },
+   {
+    "when": "'parse_dates' not in __code__",
+    "msg": "Add parse_dates=[\"month\"] so the text dates become real dates."
+   },
+   {
+    "when": "'names' not in __code__",
+    "msg": "Use names=[\"month\", \"cpi\", \"pce\"] (with header=0) to rename the columns."
+   }
+  ],
+  "hint": "It's the exact pattern of the HW 4 Q3 setup: header=0, names=[...], parse_dates=[...], index_col=...",
+  "where": "HW 4 Q3 setup code; Lecture 18 slide 3 (read_csv)",
+  "setup": ""
+ },
+ {
+  "id": "a2",
+  "group": "A · The Q3 recipe on new data (price indexes)",
+  "title": "Observations and date range",
+  "setup": "prices = pd.read_csv(\"prices.csv\", header=0, names=[\"month\", \"cpi\", \"pce\"],\n                     parse_dates=[\"month\"], index_col=\"month\")",
+  "prompt": "How many observations are there, and what is the date range they span?\n\nStore the number of observations in **`n_obs`**, the first date in **`first`** and the last date in **`last`**.",
+  "starter": "n_obs = \nfirst = \nlast = ",
+  "solution": "n_obs = prices.shape[0]\nfirst = prices.index.min()\nlast = prices.index.max()",
+  "targets": [
+   {
+    "expr": "n_obs",
+    "label": "n_obs (number of observations)"
+   },
+   {
+    "expr": "first",
+    "label": "first date"
+   },
+   {
+    "expr": "last",
+    "label": "last date"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'count' in __code__",
+    "msg": ".count() skips missing values, so it undercounts the rows. Use prices.shape[0] or len(prices)."
+   },
+   {
+    "when": "'[\"month\"]' in __code__ or \"['month']\" in __code__",
+    "msg": "month is the INDEX now, not a column: use prices.index.min() / .max()."
+   },
+   {
+    "when": "'size' in __code__",
+    "msg": ".size is rows x columns (all cells). The number of rows is prices.shape[0]."
+   }
+  ],
+  "hint": "shape is (rows, columns). The dates are the index.",
+  "where": "Lecture 18 slide 4 (Attributes)"
+ },
+ {
+  "id": "a3",
+  "group": "A · The Q3 recipe on new data (price indexes)",
+  "title": "Missing values on each variable",
+  "setup": "prices = pd.read_csv(\"prices.csv\", header=0, names=[\"month\", \"cpi\", \"pce\"],\n                     parse_dates=[\"month\"], index_col=\"month\")",
+  "prompt": "How many values are missing on each of the variables in `prices`? Store the answer (one number per column) in **`ans`**.",
+  "starter": "ans = ",
+  "solution": "ans = prices.isna().sum()",
+  "targets": [
+   {
+    "expr": "ans",
+    "label": "missing values per column"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'count' in __code__",
+    "msg": ".count() gives the NON-missing values. You want .isna().sum()."
+   },
+   {
+    "when": "__code__.count('sum') >= 2",
+    "msg": ".sum().sum() adds everything into one number; the question asks for one number PER column."
+   }
+  ],
+  "hint": ".isna() marks each missing cell True; .sum() counts the Trues in each column.",
+  "where": "Lecture 18 slide 8; Rec 10 §6"
+ },
+ {
+  "id": "a4",
+  "group": "A · The Q3 recipe on new data (price indexes)",
+  "title": "Correlation",
+  "setup": "prices = pd.read_csv(\"prices.csv\", header=0, names=[\"month\", \"cpi\", \"pce\"],\n                     parse_dates=[\"month\"], index_col=\"month\")",
+  "prompt": "What is the correlation between the observed values of `cpi` and `pce`? Store it (one number) in **`ans`**.",
+  "starter": "ans = ",
+  "solution": "ans = prices[\"cpi\"].corr(prices[\"pce\"])",
+  "targets": [
+   {
+    "expr": "ans",
+    "label": "correlation (one number)"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "isinstance(ans, pd.DataFrame)",
+    "msg": "prices.corr() gives a whole table. For one number use prices[\"cpi\"].corr(prices[\"pce\"])."
+   }
+  ],
+  "hint": "series1.corr(series2)",
+  "where": "Lecture 18 slide 8; Rec 10 §9"
+ },
+ {
+  "id": "a5",
+  "group": "A · The Q3 recipe on new data (price indexes)",
+  "title": "A new column and its mean",
+  "setup": "prices = pd.read_csv(\"prices.csv\", header=0, names=[\"month\", \"cpi\", \"pce\"],\n                     parse_dates=[\"month\"], index_col=\"month\")",
+  "prompt": "Create a new column within `prices` called **`ratio`** equal to `cpi` divided by `pce`. Then store the mean of `ratio` in **`ans`**.",
+  "starter": "prices[\"ratio\"] = \nans = ",
+  "solution": "prices[\"ratio\"] = prices[\"cpi\"] / prices[\"pce\"]\nans = prices[\"ratio\"].mean()",
+  "targets": [
+   {
+    "expr": "prices[\"ratio\"]",
+    "label": "the ratio column"
+   },
+   {
+    "expr": "ans",
+    "label": "mean of ratio"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'pce\"] / prices[\"cpi' in __code__ or \"pce'] / prices['cpi\" in __code__",
+    "msg": "It's cpi divided by pce, not the other way round."
+   }
+  ],
+  "hint": "df[\"new\"] = df[\"a\"] / df[\"b\"] computes every row at once.",
+  "where": "Lecture 18 slide 8 (tip_pct); Rec 10 §4"
+ },
+ {
+  "id": "a6",
+  "group": "A · The Q3 recipe on new data (price indexes)",
+  "title": "Harder: the first month above 100",
+  "setup": "prices = pd.read_csv(\"prices.csv\", header=0, names=[\"month\", \"cpi\", \"pce\"],\n                     parse_dates=[\"month\"], index_col=\"month\")",
+  "prompt": "In which month was `cpi` **above 100 for the first time**? Store that date in **`ans`**.",
+  "starter": "ans = ",
+  "solution": "ans = prices.index[prices[\"cpi\"] > 100].min()",
+  "targets": [
+   {
+    "expr": "ans",
+    "label": "first month with cpi > 100"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'idxmax' in __code__ and '>' not in __code__",
+    "msg": ".idxmax() gives the month of the LARGEST cpi, not the first one above 100."
+   },
+   {
+    "when": "'argmax' in __code__",
+    "msg": ".argmax() gives a position (a number), not the date. Keep the dates with prices.index[...] or use .idxmax() on the True/False Series."
+   }
+  ],
+  "hint": "Make the condition prices[\"cpi\"] > 100, keep those dates with prices.index[condition], then take .min(). (Or: (prices[\"cpi\"] > 100).idxmax(), since idxmax returns the first True.)",
+  "where": "Lecture 18 slide 5 (conditions); slide 8 (argmax)"
+ },
+ {
+  "id": "a7",
+  "group": "A · The Q3 recipe on new data (price indexes)",
+  "title": "Harder: months with both values",
+  "setup": "prices = pd.read_csv(\"prices.csv\", header=0, names=[\"month\", \"cpi\", \"pce\"],\n                     parse_dates=[\"month\"], index_col=\"month\")",
+  "prompt": "In how many months are **both** `cpi` and `pce` observed (neither is missing)? Store the count in **`ans`**.",
+  "starter": "ans = ",
+  "solution": "ans = (prices[\"cpi\"].notna() & prices[\"pce\"].notna()).sum()",
+  "targets": [
+   {
+    "expr": "ans",
+    "label": "number of months"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "' and ' in __code__",
+    "msg": "Use & between two True/False Series, not 'and'."
+   },
+   {
+    "when": "ans == prices['pce'].count() or ans == prices['cpi'].count()",
+    "msg": "Counting one column's values isn't enough: a month can have pce but be missing cpi. Require BOTH: notna() & notna()."
+   }
+  ],
+  "hint": "Combine two True/False Series with &, then .sum() counts the Trues.",
+  "where": "Rec 10 §3 and §6"
+ },
+ {
+  "id": "b1",
+  "group": "B · Unemployment and interest rates",
+  "title": "Share of months at or above 6%",
+  "setup": "rates = pd.read_csv(\"rates.csv\", header=0, names=[\"month\", \"unemployment\", \"fed_funds\"],\n                    parse_dates=[\"month\"], index_col=\"month\")",
+  "prompt": "What **fraction** of months had an unemployment rate of **at least 6%**? Store it in **`ans`**.",
+  "starter": "ans = ",
+  "solution": "ans = (rates[\"unemployment\"] >= 6).mean()",
+  "targets": [
+   {
+    "expr": "ans",
+    "label": "fraction of months"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'> 6' in __code__ and '>=' not in __code__",
+    "msg": "\"At least 6\" includes 6 itself: use >= 6."
+   },
+   {
+    "when": "ans > 1",
+    "msg": "That's a count. A fraction is between 0 and 1: use .mean() instead of .sum()."
+   }
+  ],
+  "hint": "(condition).mean() is the share of Trues.",
+  "where": "Lecture 18 slide 5"
+ },
+ {
+  "id": "b2",
+  "group": "B · Unemployment and interest rates",
+  "title": "When were interest rates highest?",
+  "setup": "rates = pd.read_csv(\"rates.csv\", header=0, names=[\"month\", \"unemployment\", \"fed_funds\"],\n                    parse_dates=[\"month\"], index_col=\"month\")",
+  "prompt": "Which month had the highest federal funds rate, and what was the rate? Store the month in **`when`** and the rate in **`top`**.",
+  "starter": "when = \ntop = ",
+  "solution": "when = rates[\"fed_funds\"].idxmax()\ntop = rates[\"fed_funds\"].max()",
+  "targets": [
+   {
+    "expr": "when",
+    "label": "the month"
+   },
+   {
+    "expr": "top",
+    "label": "the rate"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'argmax' in __code__",
+    "msg": ".argmax() returns a POSITION (a row number). For the month (the label) use .idxmax()."
+   }
+  ],
+  "hint": ".idxmax() = label of the max, .max() = the value.",
+  "where": "Lecture 18 slide 8"
+ },
+ {
+  "id": "b3",
+  "group": "B · Unemployment and interest rates",
+  "title": "A conditional mean",
+  "setup": "rates = pd.read_csv(\"rates.csv\", header=0, names=[\"month\", \"unemployment\", \"fed_funds\"],\n                    parse_dates=[\"month\"], index_col=\"month\")",
+  "prompt": "What was the **average unemployment rate** in months when the federal funds rate was **below 1%**? Store it in **`ans`**.",
+  "starter": "ans = ",
+  "solution": "ans = rates.loc[rates[\"fed_funds\"] < 1, \"unemployment\"].mean()",
+  "targets": [
+   {
+    "expr": "ans",
+    "label": "mean unemployment"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'<' not in __code__",
+    "msg": "First keep only the months with fed_funds < 1, then take the mean of unemployment."
+   },
+   {
+    "when": "'fed_funds\"].mean' in __code__ or \"fed_funds'].mean\" in __code__",
+    "msg": "That's the mean of the federal funds rate. Keep the rows with fed_funds < 1, then take the mean of unemployment."
+   }
+  ],
+  "hint": "rates.loc[condition, \"column\"] picks the rows and the column in one step.",
+  "where": "Lecture 18 slide 5; Rec 10 §2–3"
+ },
+ {
+  "id": "b4",
+  "group": "B · Unemployment and interest rates",
+  "title": "New column, then count",
+  "setup": "rates = pd.read_csv(\"rates.csv\", header=0, names=[\"month\", \"unemployment\", \"fed_funds\"],\n                    parse_dates=[\"month\"], index_col=\"month\")",
+  "prompt": "Create a column **`gap`** = `fed_funds` minus `unemployment`. In how many months was `gap` **negative**? Store the count in **`ans`**.",
+  "starter": "rates[\"gap\"] = \nans = ",
+  "solution": "rates[\"gap\"] = rates[\"fed_funds\"] - rates[\"unemployment\"]\nans = (rates[\"gap\"] < 0).sum()",
+  "targets": [
+   {
+    "expr": "rates[\"gap\"]",
+    "label": "the gap column"
+   },
+   {
+    "expr": "ans",
+    "label": "months with a negative gap"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'unemployment\"] - rates[\"fed' in __code__",
+    "msg": "It's fed_funds minus unemployment (the order matters)."
+   },
+   {
+    "when": "'len(' in __code__ or 'shape' in __code__",
+    "msg": "Careful: NaN < 0 is False, so (condition).sum() is right; counting rows another way may include them."
+   }
+  ],
+  "hint": "(rates[\"gap\"] < 0).sum()",
+  "where": "Lecture 18 slide 8"
+ },
+ {
+  "id": "b5",
+  "group": "B · Unemployment and interest rates",
+  "title": "Harder: a mean for every decade",
+  "setup": "rates = pd.read_csv(\"rates.csv\", header=0, names=[\"month\", \"unemployment\", \"fed_funds\"],\n                    parse_dates=[\"month\"], index_col=\"month\")",
+  "prompt": "Compute the **average unemployment rate for each decade** (1940, 1950, …, 2020). Store the result (one number per decade, labeled by decade) in **`ans`**.",
+  "starter": "decade = (rates.index.year // 10) * 10\nans = ",
+  "solution": "decade = (rates.index.year // 10) * 10\nans = rates.groupby(decade)[\"unemployment\"].mean()",
+  "targets": [
+   {
+    "expr": "ans",
+    "label": "mean unemployment by decade"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'fed_funds' in __code__",
+    "msg": "The question is about unemployment."
+   },
+   {
+    "when": "len(ans) > 20",
+    "msg": "That's one mean per YEAR. Group by decade = (rates.index.year // 10) * 10."
+   }
+  ],
+  "hint": "df.groupby(groups)[\"col\"].mean(). The groups can be any array with one value per row, like decade.",
+  "where": "Not in his slides: P4DA ch. 10 (groupby)"
+ },
+ {
+  "id": "c1",
+  "group": "C · Penguins (missing values, groups)",
+  "title": "Missing values and complete rows",
+  "setup": "penguins = pd.read_csv(\"penguins.csv\")",
+  "prompt": "How many values are missing in each column of `penguins` (store in **`missing`**), and how many penguins have **no missing values at all** (store in **`complete`**)?",
+  "starter": "missing = \ncomplete = ",
+  "solution": "missing = penguins.isna().sum()\ncomplete = penguins.notna().all(axis=1).sum()",
+  "targets": [
+   {
+    "expr": "missing",
+    "label": "missing per column"
+   },
+   {
+    "expr": "complete",
+    "label": "rows with nothing missing"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'axis=0' in __code__ or ('all()' in __code__ and 'axis' not in __code__)",
+    "msg": "A complete ROW needs .all(axis=1): every value in the row is present."
+   },
+   {
+    "when": "complete == len(penguins) - int(penguins.isna().sum().sum())",
+    "msg": "Subtracting the total missing count double-counts rows with several NaNs. Check each row: penguins.notna().all(axis=1).sum()."
+   }
+  ],
+  "hint": ".notna().all(axis=1) is True for a row when every value is present.",
+  "where": "Rec 10 §6; Lecture 18 slide 10 (axis)"
+ },
+ {
+  "id": "c2",
+  "group": "C · Penguins (missing values, groups)",
+  "title": "New column, then the top species",
+  "setup": "penguins = pd.read_csv(\"penguins.csv\")",
+  "prompt": "Create **`bill_ratio`** = `bill_length_mm` / `bill_depth_mm` as a new column. Which species has the **highest average** `bill_ratio`? Store the species name in **`ans`**.",
+  "starter": "penguins[\"bill_ratio\"] = \nans = ",
+  "solution": "penguins[\"bill_ratio\"] = penguins[\"bill_length_mm\"] / penguins[\"bill_depth_mm\"]\nans = penguins.groupby(\"species\")[\"bill_ratio\"].mean().idxmax()",
+  "targets": [
+   {
+    "expr": "penguins[\"bill_ratio\"]",
+    "label": "the bill_ratio column"
+   },
+   {
+    "expr": "ans",
+    "label": "species with the highest mean ratio"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'max()' in __code__ and 'idxmax' not in __code__",
+    "msg": ".max() gives the largest VALUE; .idxmax() gives its label (the species name)."
+   }
+  ],
+  "hint": "groupby(\"species\")[\"bill_ratio\"].mean() gives one mean per species; .idxmax() names the biggest.",
+  "where": "P4DA ch. 10; Lecture 18 slide 8"
+ },
+ {
+  "id": "c3",
+  "group": "C · Penguins (missing values, groups)",
+  "title": "Two conditions",
+  "setup": "penguins = pd.read_csv(\"penguins.csv\")",
+  "prompt": "Among **Gentoo** penguins with a **flipper length over 220 mm**, what is the mean `body_mass_g`? Store it in **`ans`**.",
+  "starter": "ans = ",
+  "solution": "ans = penguins.loc[(penguins[\"species\"] == \"Gentoo\") & (penguins[\"flipper_length_mm\"] > 220), \"body_mass_g\"].mean()",
+  "targets": [
+   {
+    "expr": "ans",
+    "label": "mean body mass"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "' and ' in __code__",
+    "msg": "Use & (with each condition in parentheses), not 'and'."
+   },
+   {
+    "when": "'>=' in __code__",
+    "msg": "\"Over 220\" means > 220, not >= 220."
+   },
+   {
+    "when": "'flipper' not in __code__",
+    "msg": "Two conditions: Gentoo AND flipper_length_mm > 220."
+   }
+  ],
+  "hint": "df.loc[(cond1) & (cond2), \"column\"].mean()",
+  "where": "Lecture 18 slide 5; Rec 10 §3"
+ },
+ {
+  "id": "c4",
+  "group": "C · Penguins (missing values, groups)",
+  "title": "Counts per island",
+  "setup": "penguins = pd.read_csv(\"penguins.csv\")",
+  "prompt": "How many penguins are there on **each island**? Store the counts (labeled by island) in **`ans`**.",
+  "starter": "ans = ",
+  "solution": "ans = penguins[\"island\"].value_counts()",
+  "targets": [
+   {
+    "expr": "ans",
+    "label": "count per island"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'unique' in __code__",
+    "msg": ".unique() lists the islands; .value_counts() counts them."
+   }
+  ],
+  "hint": "R's table(x) is x.value_counts().",
+  "where": "Lecture 17 slide 13; Rec 10 §7"
+ },
+ {
+  "id": "c5",
+  "group": "C · Penguins (missing values, groups)",
+  "title": "Correlation within one group",
+  "setup": "penguins = pd.read_csv(\"penguins.csv\")",
+  "prompt": "For **Adelie** penguins only, what is the correlation between `bill_length_mm` and `body_mass_g`? Store it in **`ans`**.",
+  "starter": "ans = ",
+  "solution": "adelie = penguins.loc[penguins[\"species\"] == \"Adelie\"]\nans = adelie[\"bill_length_mm\"].corr(adelie[\"body_mass_g\"])",
+  "targets": [
+   {
+    "expr": "ans",
+    "label": "correlation for Adelie"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'Adelie' not in __code__",
+    "msg": "Keep only the Adelie rows first (penguins.loc[penguins[\"species\"] == \"Adelie\"])."
+   }
+  ],
+  "hint": "Subset the rows, then use .corr() on the two columns of the subset.",
+  "where": "Lecture 18 slides 5 and 8"
+ },
+ {
+  "id": "d1",
+  "group": "D · Tips and cars",
+  "title": "Share of generous tips",
+  "setup": "tips = pd.read_csv(\"tips.csv\")",
+  "prompt": "What **fraction** of bills had a tip of **more than 20%** of the total bill? Store it in **`ans`**.",
+  "starter": "ans = ",
+  "solution": "ans = (tips[\"tip\"] / tips[\"total_bill\"] > 0.20).mean()",
+  "targets": [
+   {
+    "expr": "ans",
+    "label": "fraction of bills"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'> 20' in __code__",
+    "msg": "tip / total_bill is a proportion (0.20), not a percent (20). Compare with 0.20, or multiply by 100 first."
+   },
+   {
+    "when": "ans > 1",
+    "msg": "That's a count: use .mean() for the fraction."
+   }
+  ],
+  "hint": "(condition).mean()",
+  "where": "Lecture 18 slide 8 (tip_pct)"
+ },
+ {
+  "id": "d2",
+  "group": "D · Tips and cars",
+  "title": "Largest average party",
+  "setup": "tips = pd.read_csv(\"tips.csv\")",
+  "prompt": "On which **day** was the average party `size` the largest? Store the day in **`ans`**.",
+  "starter": "ans = ",
+  "solution": "ans = tips.groupby(\"day\")[\"size\"].mean().idxmax()",
+  "targets": [
+   {
+    "expr": "ans",
+    "label": "the day"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'tips.size' in __code__",
+    "msg": "tips.size is the DataFrame attribute (rows x columns). Use tips[\"size\"] for the column."
+   },
+   {
+    "when": "'max()' in __code__ and 'idxmax' not in __code__",
+    "msg": ".max() gives the value; .idxmax() gives the day."
+   },
+   {
+    "when": "'groupby' not in __code__",
+    "msg": "That finds the day of the single biggest party. The question asks for the largest AVERAGE size: group by day, then .mean()."
+   }
+  ],
+  "hint": "tips.groupby(\"day\")[\"size\"].mean() then .idxmax()",
+  "where": "Lecture 18 slide 4 (size trap); P4DA ch. 10"
+ },
+ {
+  "id": "d3",
+  "group": "D · Tips and cars",
+  "title": "Row labels that meet a condition",
+  "setup": "cars = pd.read_csv(\"mtcars.csv\", index_col=\"model\")",
+  "prompt": "`cars` is the mtcars data with the car model as the index. Which models get **more than 25 mpg**? Store their names as a **list, sorted alphabetically**, in **`ans`**.",
+  "starter": "ans = ",
+  "solution": "ans = sorted(cars.index[cars[\"mpg\"] > 25])",
+  "targets": [
+   {
+    "expr": "ans",
+    "label": "sorted list of models"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "isinstance(ans, list) and ans != sorted(ans)",
+    "msg": "Sort the names: sorted(...) or .sort_values()."
+   },
+   {
+    "when": "isinstance(ans, (pd.DataFrame, pd.Series))",
+    "msg": "The question asks for a list of the NAMES (the index): cars.index[condition]."
+   }
+  ],
+  "hint": "cars.index[condition] gives the labels; sorted() makes a sorted list.",
+  "where": "Lecture 17 slides 17–18 (mtcars, index)"
+ },
+ {
+  "id": "d4",
+  "group": "D · Tips and cars",
+  "title": "Harder: power per ton",
+  "setup": "cars = pd.read_csv(\"mtcars.csv\", index_col=\"model\")",
+  "prompt": "Create a column **`hp_per_ton`** = `hp` / `wt` (wt is in 1000s of pounds). Which model has the **largest** `hp_per_ton`? Store the model name in **`ans`**.",
+  "starter": "cars[\"hp_per_ton\"] = \nans = ",
+  "solution": "cars[\"hp_per_ton\"] = cars[\"hp\"] / cars[\"wt\"]\nans = cars[\"hp_per_ton\"].idxmax()",
+  "targets": [
+   {
+    "expr": "cars[\"hp_per_ton\"]",
+    "label": "the hp_per_ton column"
+   },
+   {
+    "expr": "ans",
+    "label": "the model"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'argmax' in __code__",
+    "msg": ".argmax() returns a position number; .idxmax() returns the model name (the index label)."
+   },
+   {
+    "when": "not isinstance(ans, str)",
+    "msg": "The answer is a model NAME (text): .idxmax() gives the label of the largest value; .max() gives the value."
+   }
+  ],
+  "hint": "New column, then .idxmax().",
+  "where": "Lecture 18 slide 8"
+ },
+ {
+  "id": "e1",
+  "group": "E · Lists, dictionaries, NumPy",
+  "title": "Change a list in place",
+  "prompt": "Start with `scores = [88, 92, 79]`. **In place** (without making a new list): add `85` to the end, then add `90` and `70` in one step, then sort the list from smallest to largest.",
+  "starter": "scores = [88, 92, 79]\n",
+  "solution": "scores = [88, 92, 79]\nscores.append(85)\nscores.extend([90, 70])\nscores.sort()",
+  "targets": [
+   {
+    "expr": "scores",
+    "label": "the final list"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "scores is None",
+    "msg": "scores became None: .append(), .extend() and .sort() change the list and return None, so don't write scores = scores.append(...)."
+   },
+   {
+    "when": "'append([' in __code__",
+    "msg": ".append([90, 70]) adds ONE item (a list inside the list). Use .extend([90, 70]) to add each number."
+   }
+  ],
+  "hint": ".append(x) adds one item; .extend([..]) adds each item; .sort() sorts in place.",
+  "where": "Lecture 15 slide 15; Lecture 16 slide 6",
+  "setup": ""
+ },
+ {
+  "id": "e2",
+  "group": "E · Lists, dictionaries, NumPy",
+  "title": "Build and change a dictionary",
+  "prompt": "Create a dictionary **`course_credits`** with keys `\"STAT2102\"`, `\"ECON3412\"`, `\"DTCH2102\"` and values `3`, `3`, `4`. Then change `DTCH2102` to `3`, add `\"HUMA1123\"` with `4` credits, and store the **total** number of credits in **`total`**.",
+  "starter": "course_credits = \n",
+  "solution": "course_credits = {\"STAT2102\": 3, \"ECON3412\": 3, \"DTCH2102\": 4}\ncourse_credits[\"DTCH2102\"] = 3\ncourse_credits[\"HUMA1123\"] = 4\ntotal = sum(course_credits.values())",
+  "targets": [
+   {
+    "expr": "course_credits",
+    "label": "the dictionary"
+   },
+   {
+    "expr": "total",
+    "label": "total credits"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'sum(course_credits)' in __code__",
+    "msg": "sum(course_credits) tries to add the KEYS (text). Use sum(course_credits.values())."
+   },
+   {
+    "when": "total == 10",
+    "msg": "That total was computed BEFORE the changes (3 + 3 + 4). Change DTCH2102 and add HUMA1123 first, then sum."
+   }
+  ],
+  "hint": "d[\"key\"] = value changes or adds a key; sum(d.values()) adds the values.",
+  "where": "Lecture 15 slide 16; Lecture 16 slides 5–6",
+  "setup": ""
+ },
+ {
+  "id": "e3",
+  "group": "E · Lists, dictionaries, NumPy",
+  "title": "Random matrix, keep rows, row means",
+  "prompt": "Run `np.random.seed(2102)`, then create **`m`**: a 8 × 3 matrix drawn from a normal distribution with **mean 50 and standard deviation 10**. Make **`high`**: a **copy** of the rows of `m` whose **second** column is above 50. Then store the **mean of each row** of `high` in **`row_means`**.",
+  "starter": "np.random.seed(2102)\nm = \nhigh = \nrow_means = ",
+  "solution": "np.random.seed(2102)\nm = np.random.normal(loc=50, scale=10, size=(8, 3))\nhigh = m[m[:, 1] > 50, :].copy()\nrow_means = high.mean(axis=1)",
+  "targets": [
+   {
+    "expr": "m",
+    "label": "m (8 x 3, mean 50, sd 10)"
+   },
+   {
+    "expr": "high",
+    "label": "high (rows where column 2 > 50)"
+   },
+   {
+    "expr": "row_means",
+    "label": "mean of each row"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'[:, 2]' in __code__",
+    "msg": "The SECOND column is position 1 (Python counts from 0): m[:, 1]."
+   },
+   {
+    "when": "'axis=0' in __code__",
+    "msg": "axis=0 gives one mean per COLUMN; one per ROW is axis=1."
+   },
+   {
+    "when": "'scale=100' in __code__",
+    "msg": "scale is the standard deviation (10), not the variance (100)."
+   }
+  ],
+  "hint": "np.random.normal(loc=, scale=, size=(rows, cols)); m[condition, :] keeps rows; .mean(axis=1) per row.",
+  "where": "Lecture 16 slides 13, 16, 20, 22",
+  "setup": ""
+ },
+ {
+  "id": "e4",
+  "group": "E · Lists, dictionaries, NumPy",
+  "title": "Count entries in a matrix",
+  "prompt": "With the same seed, `np.random.seed(2102)` and `m = np.random.normal(loc=50, scale=10, size=(8, 3))`: how many entries of `m` are **below 40** (store in **`n_low`**) and what **proportion** of all entries is that (store in **`p_low`**)?",
+  "starter": "np.random.seed(2102)\nm = np.random.normal(loc=50, scale=10, size=(8, 3))\nn_low = \np_low = ",
+  "solution": "np.random.seed(2102)\nm = np.random.normal(loc=50, scale=10, size=(8, 3))\nn_low = (m < 40).sum()\np_low = (m < 40).mean()",
+  "targets": [
+   {
+    "expr": "n_low",
+    "label": "number below 40"
+   },
+   {
+    "expr": "p_low",
+    "label": "proportion below 40"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'/ 8' in __code__ or '/8' in __code__",
+    "msg": "There are 8 x 3 = 24 entries, not 8. (m < 40).mean() does it for you."
+   }
+  ],
+  "hint": "A True/False array: .sum() counts Trues, .mean() gives the share.",
+  "where": "Lecture 16 slides 16 and 18",
+  "setup": ""
+ },
+ {
+  "id": "e5",
+  "group": "E · Lists, dictionaries, NumPy",
+  "title": "dtypes",
+  "prompt": "`x = np.array([1, 2, 3])` and `y = np.array([1, 2.5, 3])`. Store the dtype of `x` in **`dx`** and of `y` in **`dy`**, and store the dtype of `x + y` in **`dsum`**.",
+  "starter": "x = np.array([1, 2, 3])\ny = np.array([1, 2.5, 3])\ndx = \ndy = \ndsum = ",
+  "solution": "x = np.array([1, 2, 3])\ny = np.array([1, 2.5, 3])\ndx = x.dtype\ndy = y.dtype\ndsum = (x + y).dtype",
+  "targets": [
+   {
+    "expr": "dx",
+    "label": "dtype of x"
+   },
+   {
+    "expr": "dy",
+    "label": "dtype of y"
+   },
+   {
+    "expr": "dsum",
+    "label": "dtype of x + y"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'type(' in __code__",
+    "msg": "type(x) is numpy.ndarray for both; the element type is x.dtype."
+   }
+  ],
+  "hint": "arr.dtype. Arrays hold one type; mixing int and float gives float.",
+  "where": "Lecture 16 slide 14 (homogeneous)",
+  "setup": ""
+ }
+]

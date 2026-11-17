@@ -115,6 +115,27 @@ window.R_ERRORS = [
   fix:"For a position use `.iloc`: `df.iloc[0]` is the first row. For a label, check what exists with `df.index.tolist()`.",
   wrong:"df.loc[0]", right:"df.iloc[0]          # first row by position\ndf.loc[101]         # row labeled 101", see:['rec-10','2 · .loc (labels) vs .iloc (positions), and slicing'] },
 
+{ id:'py-rand-paren', match:"Cannot perform 'r?and_'|Cannot perform 'r?or_'|unsupported operand type\\(s\\) for &|unsupported operand type\\(s\\) for \\|", kind:'Error',
+  title:"TypeError: Cannot perform 'rand_' with a dtyped [float64] array and scalar of type [bool] (pandas)",
+  means:"`&` or `|` ran before `==` / `>`, because the conditions aren't in parentheses.",
+  causes:["`tips.day == \"Sat\" & tips.tip > 7`: Python does `\"Sat\" & tips.tip` first (`&` binds tighter than `==` and `>`)."],
+  fix:"Wrap every condition in its own parentheses.",
+  wrong:"tips.loc[tips.day == \"Sat\" & tips.tip > 7]", right:"tips.loc[(tips.day == \"Sat\") & (tips.tip > 7)]", see:['py-18','.head() and .loc[condition]: rows that meet a condition'] },
+
+{ id:'py-loc-comma', match:"zip\\(\\) argument 2 is longer than argument 1", kind:'Error',
+  title:"ValueError: zip() argument 2 is longer than argument 1 (pandas .loc)",
+  means:"You wrote `.loc[label, ]` with an R-style trailing comma and only one label.",
+  causes:["Copying the slide habit `tips.loc[cond, ]` to a single row: `tips.loc[170, ]`. (With a True/False condition the comma happens to work.)"],
+  fix:"Drop the comma: `tips.loc[170]`. To pick columns, fill the second slot: `tips.loc[170, \"tip\"]`.",
+  wrong:"tips.loc[170, ]", right:"tips.loc[170]", see:['py-18','.head() and .loc[condition]: rows that meet a condition'] },
+
+{ id:'py-loc-int-slice', match:"cannot do slice indexing on .*Index with these indexers", kind:'Error',
+  title:"TypeError: cannot do slice indexing on Index with these indexers [3] of type int (pandas)",
+  means:"You sliced columns by number with `.loc`, but `.loc` uses column **names**.",
+  causes:["`tips.loc[:3, :3]` when you meant positions."],
+  fix:"Use `.iloc` for positions (`tips.iloc[:3, :3]`) or names with `.loc` (`tips.loc[:3, \"total_bill\":\"smoker\"]`).",
+  wrong:"tips.loc[:3, :3]", right:"tips.iloc[:3, :3]", see:['py-18','.iloc[rows, cols]: subset by position'] },
+
 { id:'py-key', match:"KeyError", kind:'Error',
   title:"KeyError: 'name' (Python)",
   means:"That key isn't in the dictionary.",

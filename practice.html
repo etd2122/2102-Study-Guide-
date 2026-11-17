@@ -71,6 +71,7 @@ textarea:focus{outline:none;box-shadow:inset 0 0 0 2px var(--accent)}
 .feedback .tip{margin-top:8px;padding-top:8px;border-top:1px dashed rgba(0,0,0,.15)}
 .out pre{margin:0;padding:10px 12px;font-family:var(--mono);font-size:13px;white-space:pre-wrap;max-height:340px;overflow:auto}
 .out .err{color:var(--bad)}
+.pic img{display:block;max-width:100%;height:auto;margin:0 auto;padding:8px}
 .solution pre{margin:0;padding:10px 12px;font-family:var(--mono);font-size:13px;white-space:pre-wrap}
 .nav{display:flex;justify-content:space-between;margin-top:22px}
 @media (max-width:820px){
@@ -108,7 +109,7 @@ textarea:focus{outline:none;box-shadow:inset 0 0 0 2px var(--accent)}
     <div class="where" id="where"></div>
     <div class="box setup" id="setupBox" hidden><div class="hd"><span>Already run for you before your code</span></div><pre id="setup"></pre></div>
     <div class="box">
-      <div class="hd"><label for="code">Your code (Python)</label><span>pandas as <code>pd</code>, NumPy as <code>np</code></span></div>
+      <div class="hd"><label for="code">Your code (Python)</label><span id="libs">pandas as <code>pd</code>, NumPy as <code>np</code></span></div>
       <textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
     </div>
     <div class="actions">
@@ -120,7 +121,7 @@ textarea:focus{outline:none;box-shadow:inset 0 0 0 2px var(--accent)}
       <span class="keys">⌘/Ctrl + Enter = Check · Tab = indent</span>
     </div>
     <div id="feedback"></div>
-    <div class="box out" id="outBox" hidden><div class="hd"><span>Output</span></div><pre id="out"></pre></div>
+    <div class="box out" id="outBox" hidden><div class="hd"><span>Output</span></div><pre id="out"></pre><div id="pic" class="pic"></div></div>
     <div class="box solution" id="solBox" hidden><div class="hd"><span>One correct solution</span></div><pre id="sol"></pre></div>
     <div class="nav"><button class="btn" id="btnPrev" type="button">← Previous</button><button class="btn" id="btnNext" type="button">Next →</button></div>
   </main>
@@ -136,7 +137,7 @@ const store = {
   set(k, v){ try{ localStorage.setItem('s2102.prac.' + k, JSON.stringify(v)); }catch(e){} }
 };
 const DATA = ['prices.csv', 'rates.csv', 'penguins.csv', 'tips.csv', 'mtcars.csv', 'checker.py'];
-let P = [], cur = 0, py = null, busy = false;
+let P = [], cur = 0, py = null, busy = false, plotReady = null;
 let solved = store.get('solved', {});
 
 function renderList(){
@@ -159,6 +160,8 @@ function show(i){
   $('#prompt').innerHTML = md(p.prompt);
   $('#where').innerHTML = p.where ? 'Where in his files: ' + esc(p.where) : '';
   $('#setupBox').hidden = !p.setup; $('#setup').textContent = p.setup;
+  $('#libs').innerHTML = p.plot ? 'loaded: <code>pd</code>, <code>np</code>, <code>p9</code> (plotnine), <code>sns</code>, <code>plt</code>' : 'pandas as <code>pd</code>, NumPy as <code>np</code>';
+  if (p.plot && py) ensurePlot();
   $('#code').value = store.get('draft.' + p.id, p.starter);
   $('#feedback').innerHTML = ''; $('#outBox').hidden = true; $('#solBox').hidden = true; $('#sol').textContent = p.solution;
   $('#btnPrev').disabled = cur === 0; $('#btnNext').disabled = cur === P.length - 1;
@@ -185,10 +188,22 @@ async function boot(){
     $('#status').className = 'status ready';
     $('#statusTxt').textContent = 'Python is ready (pandas ' + py.runPython('import pandas; pandas.__version__') + '). Your code runs on this page; nothing is sent anywhere.';
     $('#btnCheck').disabled = $('#btnRun').disabled = false;
+    if (P[cur].plot) ensurePlot();
   }catch(e){
     $('#status').className = 'status fail';
     $('#statusTxt').textContent = 'Python could not load (' + e.message + '). It needs internet the first time; try reloading.';
   }
+}
+function ensurePlot(){
+  if (!plotReady){
+    plotReady = (async () => {
+      $('#status').className = 'status'; $('#statusTxt').textContent = 'Loading the plotting libraries (plotnine, seaborn): about 10 seconds, once…';
+      await py.loadPackage(['micropip', 'matplotlib', 'scipy', 'statsmodels']);
+      await py.runPythonAsync('import micropip\nawait micropip.install(["plotnine", "seaborn"])\ncheckerplot = checker.plot_ns()');
+      $('#status').className = 'status ready'; $('#statusTxt').textContent = 'Python and the plotting libraries are ready. Your code runs on this page; nothing is sent anywhere.';
+    })().catch(e => { plotReady = null; $('#status').className = 'status fail'; $('#statusTxt').textContent = 'The plotting libraries could not load (' + e.message.slice(0, 120) + '). Check the internet and reload.'; throw e; });
+  }
+  return plotReady;
 }
 async function pyCall(expr){
   py.globals.set('PROB', JSON.stringify(P[cur])); py.globals.set('CODE', $('#code').value);
@@ -197,18 +212,17 @@ async function pyCall(expr){
 async function run(){
   if (busy || !py) return; busy = true; saveDraft();
   try{
-    const r = await pyCall(`
-_p = json.loads(PROB); _ns = {"np": checker.np, "pd": checker.pd}
-checker.run_code(_p.get("setup", ""), _ns)
-_o, _e = checker.run_code(CODE, _ns)
-json.dumps({"output": _o, "error": _e, "hint": checker.error_hint(_e) if _e else ""})`);
+    if (P[cur].plot){ $('#btnRun').textContent = 'Running…'; await ensurePlot(); }
+    const r = await pyCall('json.dumps(checker.run_only(json.loads(PROB), CODE), default=str)');
     showOut(r); $('#feedback').innerHTML = r.error ? fbError(r) : '';
-  } finally { busy = false; }
+  } catch(e){ $('#feedback').innerHTML = `<div class="feedback bad"><h3>Something went wrong</h3>${esc(e.message.slice(-300))}</div>`; }
+  finally { busy = false; $('#btnRun').textContent = 'Run (see output)'; }
 }
 async function check(){
   if (busy || !py) return; busy = true; saveDraft();
   $('#btnCheck').textContent = 'Checking…';
   try{
+    if (P[cur].plot) await ensurePlot();
     const r = await pyCall('json.dumps(checker.check(json.loads(PROB), CODE), default=str)');
     showOut(r);
     const p = P[cur];
@@ -229,8 +243,10 @@ function fbError(r){
 }
 function showOut(r){
   const t = (r.output || '').trimEnd();
-  $('#outBox').hidden = !t && !r.error;
+  $('#outBox').hidden = !t && !r.error && !r.image;
+  $('#out').hidden = !t && !r.error;
   $('#out').innerHTML = esc(t) + (r.error ? (t ? '\n' : '') + '<span class="err">' + esc(r.error) + '</span>' : '');
+  $('#pic').innerHTML = r.image ? `<img alt="Your plot" src="data:image/png;base64,${r.image}">` : '';
 }
 
 $('#plist').addEventListener('click', e => { const b = e.target.closest('button[data-i]'); if (b) show(+b.dataset.i); });

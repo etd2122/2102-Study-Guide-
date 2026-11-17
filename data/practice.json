@@ -36,6 +36,7 @@
   ],
   "hint": "It's the exact pattern of the HW 4 Q3 setup: header=0, names=[...], parse_dates=[...], index_col=...",
   "where": "HW 4 Q3 setup code; Lecture 18 slide 3 (read_csv)",
+  "plot": false,
   "setup": ""
  },
  {
@@ -75,7 +76,8 @@
    }
   ],
   "hint": "shape is (rows, columns). The dates are the index.",
-  "where": "Lecture 18 slide 4 (Attributes)"
+  "where": "Lecture 18 slide 4 (Attributes)",
+  "plot": false
  },
  {
   "id": "a3",
@@ -102,7 +104,8 @@
    }
   ],
   "hint": ".isna() marks each missing cell True; .sum() counts the Trues in each column.",
-  "where": "Lecture 18 slide 8; Rec 10 §6"
+  "where": "Lecture 18 slide 8; Rec 10 §6",
+  "plot": false
  },
  {
   "id": "a4",
@@ -125,7 +128,8 @@
    }
   ],
   "hint": "series1.corr(series2)",
-  "where": "Lecture 18 slide 8; Rec 10 §9"
+  "where": "Lecture 18 slide 8; Rec 10 §9",
+  "plot": false
  },
  {
   "id": "a5",
@@ -152,7 +156,8 @@
    }
   ],
   "hint": "df[\"new\"] = df[\"a\"] / df[\"b\"] computes every row at once.",
-  "where": "Lecture 18 slide 8 (tip_pct); Rec 10 §4"
+  "where": "Lecture 18 slide 8 (tip_pct); Rec 10 §4",
+  "plot": false
  },
  {
   "id": "a6",
@@ -179,7 +184,8 @@
    }
   ],
   "hint": "Make the condition prices[\"cpi\"] > 100, keep those dates with prices.index[condition], then take .min(). (Or: (prices[\"cpi\"] > 100).idxmax(), since idxmax returns the first True.)",
-  "where": "Lecture 18 slide 5 (conditions); slide 8 (argmax)"
+  "where": "Lecture 18 slide 5 (conditions); slide 8 (argmax)",
+  "plot": false
  },
  {
   "id": "a7",
@@ -206,7 +212,8 @@
    }
   ],
   "hint": "Combine two True/False Series with &, then .sum() counts the Trues.",
-  "where": "Rec 10 §3 and §6"
+  "where": "Rec 10 §3 and §6",
+  "plot": false
  },
  {
   "id": "b1",
@@ -233,7 +240,8 @@
    }
   ],
   "hint": "(condition).mean() is the share of Trues.",
-  "where": "Lecture 18 slide 5"
+  "where": "Lecture 18 slide 5",
+  "plot": false
  },
  {
   "id": "b2",
@@ -260,7 +268,8 @@
    }
   ],
   "hint": ".idxmax() = label of the max, .max() = the value.",
-  "where": "Lecture 18 slide 8"
+  "where": "Lecture 18 slide 8",
+  "plot": false
  },
  {
   "id": "b3",
@@ -287,7 +296,8 @@
    }
   ],
   "hint": "rates.loc[condition, \"column\"] picks the rows and the column in one step.",
-  "where": "Lecture 18 slide 5; Rec 10 §2–3"
+  "where": "Lecture 18 slide 5; Rec 10 §2–3",
+  "plot": false
  },
  {
   "id": "b4",
@@ -318,7 +328,8 @@
    }
   ],
   "hint": "(rates[\"gap\"] < 0).sum()",
-  "where": "Lecture 18 slide 8"
+  "where": "Lecture 18 slide 8",
+  "plot": false
  },
  {
   "id": "b5",
@@ -345,7 +356,8 @@
    }
   ],
   "hint": "df.groupby(groups)[\"col\"].mean(). The groups can be any array with one value per row, like decade.",
-  "where": "Not in his slides: P4DA ch. 10 (groupby)"
+  "where": "Not in his slides: P4DA ch. 10 (groupby)",
+  "plot": false
  },
  {
   "id": "c1",
@@ -376,7 +388,8 @@
    }
   ],
   "hint": ".notna().all(axis=1) is True for a row when every value is present.",
-  "where": "Rec 10 §6; Lecture 18 slide 10 (axis)"
+  "where": "Rec 10 §6; Lecture 18 slide 10 (axis)",
+  "plot": false
  },
  {
   "id": "c2",
@@ -403,7 +416,8 @@
    }
   ],
   "hint": "groupby(\"species\")[\"bill_ratio\"].mean() gives one mean per species; .idxmax() names the biggest.",
-  "where": "P4DA ch. 10; Lecture 18 slide 8"
+  "where": "P4DA ch. 10; Lecture 18 slide 8",
+  "plot": false
  },
  {
   "id": "c3",
@@ -434,7 +448,8 @@
    }
   ],
   "hint": "df.loc[(cond1) & (cond2), \"column\"].mean()",
-  "where": "Lecture 18 slide 5; Rec 10 §3"
+  "where": "Lecture 18 slide 5; Rec 10 §3",
+  "plot": false
  },
  {
   "id": "c4",
@@ -457,7 +472,8 @@
    }
   ],
   "hint": "R's table(x) is x.value_counts().",
-  "where": "Lecture 17 slide 13; Rec 10 §7"
+  "where": "Lecture 17 slide 13; Rec 10 §7",
+  "plot": false
  },
  {
   "id": "c5",
@@ -480,7 +496,8 @@
    }
   ],
   "hint": "Subset the rows, then use .corr() on the two columns of the subset.",
-  "where": "Lecture 18 slides 5 and 8"
+  "where": "Lecture 18 slides 5 and 8",
+  "plot": false
  },
  {
   "id": "d1",
@@ -507,7 +524,8 @@
    }
   ],
   "hint": "(condition).mean()",
-  "where": "Lecture 18 slide 8 (tip_pct)"
+  "where": "Lecture 18 slide 8 (tip_pct)",
+  "plot": false
  },
  {
   "id": "d2",
@@ -538,7 +556,8 @@
    }
   ],
   "hint": "tips.groupby(\"day\")[\"size\"].mean() then .idxmax()",
-  "where": "Lecture 18 slide 4 (size trap); P4DA ch. 10"
+  "where": "Lecture 18 slide 4 (size trap); P4DA ch. 10",
+  "plot": false
  },
  {
   "id": "d3",
@@ -565,7 +584,8 @@
    }
   ],
   "hint": "cars.index[condition] gives the labels; sorted() makes a sorted list.",
-  "where": "Lecture 17 slides 17–18 (mtcars, index)"
+  "where": "Lecture 17 slides 17–18 (mtcars, index)",
+  "plot": false
  },
  {
   "id": "d4",
@@ -596,7 +616,8 @@
    }
   ],
   "hint": "New column, then .idxmax().",
-  "where": "Lecture 18 slide 8"
+  "where": "Lecture 18 slide 8",
+  "plot": false
  },
  {
   "id": "e1",
@@ -623,6 +644,7 @@
   ],
   "hint": ".append(x) adds one item; .extend([..]) adds each item; .sort() sorts in place.",
   "where": "Lecture 15 slide 15; Lecture 16 slide 6",
+  "plot": false,
   "setup": ""
  },
  {
@@ -654,6 +676,7 @@
   ],
   "hint": "d[\"key\"] = value changes or adds a key; sum(d.values()) adds the values.",
   "where": "Lecture 15 slide 16; Lecture 16 slides 5–6",
+  "plot": false,
   "setup": ""
  },
  {
@@ -693,6 +716,7 @@
   ],
   "hint": "np.random.normal(loc=, scale=, size=(rows, cols)); m[condition, :] keeps rows; .mean(axis=1) per row.",
   "where": "Lecture 16 slides 13, 16, 20, 22",
+  "plot": false,
   "setup": ""
  },
  {
@@ -720,6 +744,7 @@
   ],
   "hint": "A True/False array: .sum() counts Trues, .mean() gives the share.",
   "where": "Lecture 16 slides 16 and 18",
+  "plot": false,
   "setup": ""
  },
  {
@@ -751,6 +776,383 @@
   ],
   "hint": "arr.dtype. Arrays hold one type; mixing int and float gives float.",
   "where": "Lecture 16 slide 14 (homogeneous)",
+  "plot": false,
   "setup": ""
+ },
+ {
+  "id": "f1",
+  "group": "F · Data visualization (plotnine, seaborn, pandas)",
+  "plot": true,
+  "title": "Scatterplot with color",
+  "setup": "tips = pd.read_csv(\"tips.csv\")",
+  "prompt": "Make a **scatterplot** of `tip` (y-axis) against `total_bill` (x-axis), with the points **colored by `time`** (Lunch / Dinner). Store the plot in **`p`**.",
+  "starter": "p = (p9.ggplot(tips)\n     + p9.geom_point(p9.aes(...)))\np",
+  "solution": "p = (p9.ggplot(tips)\n     + p9.geom_point(p9.aes(x=\"total_bill\", y=\"tip\", color=\"time\")))",
+  "targets": [
+   {
+    "expr": "geoms(p)",
+    "label": "the geom (points)"
+   },
+   {
+    "expr": "aes(p)",
+    "label": "x, y and color mappings"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'geom_line' in __code__",
+    "msg": "A scatterplot uses geom_point, not geom_line."
+   },
+   {
+    "when": "'color' not in __code__ and 'colour' not in __code__",
+    "msg": "Color the points by time: color=\"time\" goes INSIDE p9.aes()."
+   },
+   {
+    "when": "aes(p).get('x') == 'tip'",
+    "msg": "x and y are swapped: total_bill on x, tip on y."
+   }
+  ],
+  "hint": "p9.ggplot(data) + p9.geom_point(p9.aes(x=\"col\", y=\"col\", color=\"col\")). Column names in quotes.",
+  "where": "Lecture 19 slide 4 (The plotnine Library); plotnine.org → Reference → geom_point"
+ },
+ {
+  "id": "f2",
+  "group": "F · Data visualization (plotnine, seaborn, pandas)",
+  "plot": true,
+  "title": "Histogram with one panel per group",
+  "setup": "penguins = pd.read_csv(\"penguins.csv\")",
+  "prompt": "Make a **histogram** of `flipper_length_mm` with **20 bins** and a **separate panel for each species**. Store it in **`p`**.",
+  "starter": "p = (p9.ggplot(penguins)\n     + ...)\np",
+  "solution": "p = (p9.ggplot(penguins)\n     + p9.geom_histogram(p9.aes(x=\"flipper_length_mm\"), bins=20)\n     + p9.facet_wrap(\"species\"))",
+  "targets": [
+   {
+    "expr": "geoms(p)",
+    "label": "the geom (histogram)"
+   },
+   {
+    "expr": "aes(p)",
+    "label": "x mapping"
+   },
+   {
+    "expr": "layer_param(p, 'geom_histogram', 'bins')",
+    "label": "bins = 20"
+   },
+   {
+    "expr": "facet(p)",
+    "label": "one panel per species"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'facet' not in __code__",
+    "msg": "Panels per group: add + p9.facet_wrap(\"species\")."
+   },
+   {
+    "when": "'bins' not in __code__",
+    "msg": "Set the number of bars with bins=20 inside geom_histogram()."
+   },
+   {
+    "when": "'color=\"species\"' in __code__ or 'fill=\"species\"' in __code__",
+    "msg": "Coloring by species puts them in ONE panel; the question asks for separate panels (facet_wrap)."
+   }
+  ],
+  "hint": "+ p9.geom_histogram(p9.aes(x=\"...\"), bins=20) + p9.facet_wrap(\"species\")",
+  "where": "Lecture 19 slide 8 (Answer: Plot uses facet_wrap + geom_histogram)"
+ },
+ {
+  "id": "f3",
+  "group": "F · Data visualization (plotnine, seaborn, pandas)",
+  "plot": true,
+  "title": "Boxplots by group",
+  "setup": "tips = pd.read_csv(\"tips.csv\")",
+  "prompt": "Make **boxplots** of `tip` for each `day` (day on the x-axis), with the boxes **filled by `smoker`**. Store it in **`p`**.",
+  "starter": "p = ",
+  "solution": "p = (p9.ggplot(tips)\n     + p9.geom_boxplot(p9.aes(x=\"day\", y=\"tip\", fill=\"smoker\")))",
+  "targets": [
+   {
+    "expr": "geoms(p)",
+    "label": "the geom (boxplot)"
+   },
+   {
+    "expr": "aes(p)",
+    "label": "x, y and fill mappings"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "aes(p).get('x') == 'tip'",
+    "msg": "Swapped: day goes on x (the groups), tip on y (the numbers)."
+   },
+   {
+    "when": "'color=\"smoker\"' in __code__",
+    "msg": "For boxes and bars, color= is only the outline; fill= colors the inside."
+   },
+   {
+    "when": "'fill' not in __code__",
+    "msg": "Fill the boxes by smoker: fill=\"smoker\" inside p9.aes()."
+   }
+  ],
+  "hint": "geom_boxplot(p9.aes(x=group, y=number, fill=other_group))",
+  "where": "plotnine.org → Reference → geom_boxplot"
+ },
+ {
+  "id": "f4",
+  "group": "F · Data visualization (plotnine, seaborn, pandas)",
+  "plot": true,
+  "title": "Bar chart of counts",
+  "setup": "penguins = pd.read_csv(\"penguins.csv\")",
+  "prompt": "Make a **bar chart** showing **how many penguins** were measured on each `island`. Store it in **`p`**.",
+  "starter": "p = ",
+  "solution": "p = p9.ggplot(penguins) + p9.geom_bar(p9.aes(x=\"island\"))",
+  "targets": [
+   {
+    "expr": "geoms(p)",
+    "label": "the geom (bar)"
+   },
+   {
+    "expr": "aes(p)",
+    "label": "x mapping (island)"
+   },
+   {
+    "expr": "drawable(p)",
+    "label": "the plot draws"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'geom_col' in __code__",
+    "msg": "geom_col needs a y (bar heights you already computed). For COUNTS use geom_bar(aes(x=...)): it counts for you."
+   },
+   {
+    "when": "'geom_histogram' in __code__",
+    "msg": "Histograms are for numbers; for counts of a category use geom_bar."
+   }
+  ],
+  "hint": "geom_bar(aes(x=category)) counts the rows in each category.",
+  "where": "plotnine.org → Reference → geom_bar; P4DA ch. 9"
+ },
+ {
+  "id": "f5",
+  "group": "F · Data visualization (plotnine, seaborn, pandas)",
+  "plot": true,
+  "title": "Harder: a line plot over time (dates in the index)",
+  "setup": "rates = pd.read_csv(\"rates.csv\", header=0, names=[\"month\", \"unemployment\", \"fed_funds\"],\n                    parse_dates=[\"month\"], index_col=\"month\")",
+  "prompt": "Using only months from **2000 on**, make a **line plot** of `unemployment` over time (month on the x-axis). Store it in **`p`**.\n\nCareful: in `rates` the dates are the **index**, and plotnine can only use **columns**.",
+  "starter": "recent = rates.loc[rates.index >= \"2000-01-01\"]\np = ",
+  "solution": "recent = rates.loc[rates.index >= \"2000-01-01\"].reset_index()\np = p9.ggplot(recent) + p9.geom_line(p9.aes(x=\"month\", y=\"unemployment\"))",
+  "targets": [
+   {
+    "expr": "geoms(p)",
+    "label": "the geom (line)"
+   },
+   {
+    "expr": "aes(p)",
+    "label": "x = month, y = unemployment"
+   },
+   {
+    "expr": "nrows(p)",
+    "label": "only months from 2000 on"
+   },
+   {
+    "expr": "drawable(p)",
+    "label": "the plot draws"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'reset_index' not in __code__",
+    "msg": "month is the INDEX, so plotnine can't find it. Use .reset_index() to turn the index into a column first."
+   },
+   {
+    "when": "'geom_point' in __code__ and 'geom_line' not in __code__",
+    "msg": "Over time = a line: geom_line."
+   },
+   {
+    "when": "nrows(p) == len(rates)",
+    "msg": "Keep only the months from 2000 on (rates.index >= \"2000-01-01\")."
+   }
+  ],
+  "hint": "df.reset_index() moves the index (month) back into a column; then aes(x=\"month\", y=\"unemployment\").",
+  "where": "Not on his slides: plotnine.org → geom_line; P4DA ch. 11 (time series)"
+ },
+ {
+  "id": "f6",
+  "group": "F · Data visualization (plotnine, seaborn, pandas)",
+  "plot": true,
+  "title": "Titles and axis labels",
+  "setup": "penguins = pd.read_csv(\"penguins.csv\")",
+  "prompt": "Make a scatterplot of `body_mass_g` (y) against `flipper_length_mm` (x) with the title **Bigger flippers, heavier penguins**, the x-axis label **Flipper length (mm)** and the y-axis label **Body mass (g)**. Store it in **`p`**.",
+  "starter": "p = ",
+  "solution": "p = (p9.ggplot(penguins)\n     + p9.geom_point(p9.aes(x=\"flipper_length_mm\", y=\"body_mass_g\"))\n     + p9.labs(title=\"Bigger flippers, heavier penguins\", x=\"Flipper length (mm)\", y=\"Body mass (g)\"))",
+  "targets": [
+   {
+    "expr": "geoms(p)",
+    "label": "the geom (points)"
+   },
+   {
+    "expr": "aes(p)",
+    "label": "x and y mappings"
+   },
+   {
+    "expr": "labels(p)",
+    "label": "title and axis labels (exact text)"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'labs' not in __code__ and 'ggtitle' not in __code__",
+    "msg": "Add + p9.labs(title=\"...\", x=\"...\", y=\"...\")."
+   },
+   {
+    "when": "'xlab' in __code__ and 'labs(' not in __code__",
+    "msg": "p9.xlab()/p9.ylab()/p9.ggtitle() work too; check the exact text of each label."
+   }
+  ],
+  "hint": "p9.labs(title=..., x=..., y=...) like labs() in ggplot2.",
+  "where": "plotnine.org → Reference → labs"
+ },
+ {
+  "id": "f7",
+  "group": "F · Data visualization (plotnine, seaborn, pandas)",
+  "plot": true,
+  "title": "Harder: points plus a fitted line per group",
+  "setup": "penguins = pd.read_csv(\"penguins.csv\")",
+  "prompt": "Make a scatterplot of `bill_depth_mm` (y) against `bill_length_mm` (x), **colored by species**, and add a **straight-line fit** (linear regression) for each species. Store it in **`p`**.",
+  "starter": "p = ",
+  "solution": "p = (p9.ggplot(penguins, p9.aes(x=\"bill_length_mm\", y=\"bill_depth_mm\", color=\"species\"))\n     + p9.geom_point()\n     + p9.geom_smooth(method=\"lm\"))",
+  "targets": [
+   {
+    "expr": "geoms(p)",
+    "label": "the geoms (points + smooth)"
+   },
+   {
+    "expr": "aes(p)",
+    "label": "x, y and color"
+   },
+   {
+    "expr": "layer_param(p, 'geom_smooth', 'method')",
+    "label": "a straight-line (lm) fit"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'geom_smooth' not in __code__",
+    "msg": "Add a fitted line with + p9.geom_smooth(method=\"lm\")."
+   },
+   {
+    "when": "'method' not in __code__",
+    "msg": "The default smoother is curvy; for a straight line use method=\"lm\"."
+   },
+   {
+    "when": "'color' not in __code__",
+    "msg": "Color by species (inside aes) so each species gets its own line."
+   }
+  ],
+  "hint": "Put the shared aes in p9.ggplot(data, p9.aes(...)) so both layers use it.",
+  "where": "plotnine.org → Reference → geom_smooth"
+ },
+ {
+  "id": "f8",
+  "group": "F · Data visualization (plotnine, seaborn, pandas)",
+  "plot": true,
+  "title": "seaborn histogram with groups",
+  "setup": "tips = pd.read_csv(\"tips.csv\")",
+  "prompt": "With **seaborn**, make a histogram of `tip` with **separate colors for each `time`** (Lunch / Dinner). Store what the function returns in **`ax`**.",
+  "starter": "ax = sns.histplot(...)",
+  "solution": "ax = sns.histplot(data=tips, x=\"tip\", hue=\"time\")",
+  "targets": [
+   {
+    "expr": "ax_info(ax)['xlabel']",
+    "label": "x is tip"
+   },
+   {
+    "expr": "ax_info(ax)['legend']",
+    "label": "colored by time (legend)"
+   },
+   {
+    "expr": "ax_info(ax)['has_bars']",
+    "label": "it's a histogram (bars)"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'hue' not in __code__",
+    "msg": "In seaborn, color by a column with hue=\"time\" (not color=)."
+   },
+   {
+    "when": "'scatterplot' in __code__",
+    "msg": "A histogram is sns.histplot."
+   }
+  ],
+  "hint": "sns.histplot(data=df, x=\"col\", hue=\"group\")",
+  "where": "Lecture 19 slide 11 (Example Code); seaborn → API reference → histplot"
+ },
+ {
+  "id": "f9",
+  "group": "F · Data visualization (plotnine, seaborn, pandas)",
+  "plot": true,
+  "title": "pandas: density in one line",
+  "setup": "penguins = pd.read_csv(\"penguins.csv\")",
+  "prompt": "Using the **pandas** `.plot` methods (no plotnine or seaborn), draw a **density curve** of `body_mass_g`. Store what it returns in **`ax`**.",
+  "starter": "ax = ",
+  "solution": "ax = penguins[\"body_mass_g\"].plot.density()",
+  "targets": [
+   {
+    "expr": "ax_info(ax)['ylabel']",
+    "label": "a density plot"
+   },
+   {
+    "expr": "ax_info(ax)['lines']",
+    "label": "one curve"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'hist' in __code__",
+    "msg": ".plot.hist() is a histogram; a smooth curve is .plot.density() (or .plot.kde())."
+   },
+   {
+    "when": "'penguins.plot.density' in __code__",
+    "msg": "Pick the column first: penguins[\"body_mass_g\"].plot.density(); the whole DataFrame draws one curve per numeric column."
+   }
+  ],
+  "hint": "series.plot.density()",
+  "where": "Lecture 19 slide 12 (Plots with Pandas)"
+ },
+ {
+  "id": "f10",
+  "group": "F · Data visualization (plotnine, seaborn, pandas)",
+  "plot": true,
+  "title": "Plot + answer: which day tips best?",
+  "setup": "tips = pd.read_csv(\"tips.csv\")",
+  "prompt": "Create a column **`tip_pct`** = 100 × `tip` / `total_bill`. Make **boxplots of `tip_pct` by `day`** and store the plot in **`p`**. Then answer: which day has the **highest median** tip percentage? Store the day in **`ans`** (compute it, don't just read it off the plot).",
+  "starter": "tips[\"tip_pct\"] = \np = \nans = ",
+  "solution": "tips[\"tip_pct\"] = 100 * tips[\"tip\"] / tips[\"total_bill\"]\np = p9.ggplot(tips) + p9.geom_boxplot(p9.aes(x=\"day\", y=\"tip_pct\"))\nans = tips.groupby(\"day\")[\"tip_pct\"].median().idxmax()",
+  "targets": [
+   {
+    "expr": "geoms(p)",
+    "label": "the geom (boxplot)"
+   },
+   {
+    "expr": "aes(p)",
+    "label": "x = day, y = tip_pct"
+   },
+   {
+    "expr": "ans",
+    "label": "day with the highest median tip %"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'mean()' in __code__ and 'median' not in __code__",
+    "msg": "The question asks for the MEDIAN (the line in the middle of each box), not the mean. Here they disagree: the mean is highest on Friday."
+   },
+   {
+    "when": "'max()' in __code__ and 'idxmax' not in __code__",
+    "msg": ".max() gives the value; .idxmax() gives the day."
+   }
+  ],
+  "hint": "tips.groupby(\"day\")[\"tip_pct\"].median().idxmax()",
+  "where": "P4DA ch. 10; plotnine geom_boxplot"
  }
 ]

@@ -35,7 +35,8 @@ def run_code(code, ns):
 
 ERROR_HINTS = [
     ("KeyError", "A KeyError means that column or label doesn't exist. Check the spelling, and remember: after index_col=..., the date is the INDEX, not a column."),
-    ("NameError", "A NameError means a name isn't defined yet: a typo, or a variable from an earlier step you haven't created (run the setup code first)."),
+    ("Could not evaluate", "plotnine couldn't find that column. Column names go in quotes and must match exactly; a date INDEX is not a column: use df.reset_index() first."),
+    ("NameError", "A NameError means a name isn't defined yet: a typo, a variable you haven't created, or (in plotnine) a column name without quotes: p9.aes(x=\"total_bill\")."),
     ("ambiguous", "'The truth value of a Series is ambiguous': use & and | (not and / or) and put each condition in parentheses."),
     ("AttributeError", "An AttributeError means that method doesn't exist for this object: check the spelling and whether you need a column (df['col']) first."),
     ("TypeError", "A TypeError means the types don't fit, e.g. adding text to a number, or calling something that isn't a function."),
@@ -161,10 +162,145 @@ def _eval(expr, ns):
     return eval(expr, ns)
 
 
+# ---------------- plots: describe a plotnine ggplot or a matplotlib Axes so it can be compared
+def _is_gg(p):
+    return type(p).__name__ == "ggplot"
+
+
+def _need_gg(p):
+    if not _is_gg(p):
+        raise TypeError(f"`p` should be a plotnine ggplot (p9.ggplot(...) + p9.geom_...), not a {type(p).__name__}")
+
+
+def geoms(p):
+    """Sorted geom names, e.g. ['geom_point', 'geom_smooth']."""
+    _need_gg(p)
+    return sorted(type(l.geom).__name__ for l in p.layers)
+
+
+def aes(p):
+    """All mapped aesthetics (plot-level + layer-level): {'x': 'total_bill', 'y': 'tip', 'color': 'time'}."""
+    _need_gg(p)
+    m = {k: str(v) for k, v in dict(p.mapping).items()}
+    for l in p.layers:
+        m.update({k: str(v) for k, v in dict(l.mapping).items()})
+    m.pop("group", None)
+    return {("color" if k == "colour" else k): v for k, v in m.items()}
+
+
+def facet(p):
+    _need_gg(p)
+    f = p.facet
+    name = type(f).__name__
+    if name == "facet_null":
+        return "none"
+    vars_ = list(getattr(f, "vars", ()) or ())
+    if not vars_:
+        vars_ = [v for v in list(getattr(f, "rows", ()) or ()) + list(getattr(f, "cols", ()) or ())]
+    return f"{name}: " + ", ".join(map(str, vars_))
+
+
+def layer_param(p, geom, name):
+    _need_gg(p)
+    for l in p.layers:
+        if type(l.geom).__name__ == geom:
+            for src in (l.stat.params, l.geom.params):
+                if name in src:
+                    return src[name]
+    return None
+
+
+def drawable(p):
+    """True if the plot draws; otherwise raises the plotting error."""
+    _need_gg(p)
+    import matplotlib.pyplot as plt
+    p.draw()
+    plt.close("all")
+    return True
+
+
+def nrows(p):
+    _need_gg(p)
+    return len(p.data)
+
+
+def _fig(p):
+    import matplotlib.pyplot as plt
+    if _is_gg(p):
+        return p.draw()
+    return p.figure
+
+
+def labels(p):
+    """x label, y label and title as they appear on the drawn plot."""
+    if _is_gg(p):
+        import matplotlib.pyplot as plt
+        p.draw()
+        plt.close("all")
+        L = p.labels
+        return {"x": str(L.x or ""), "y": str(L.y or ""), "title": str(L.title or "")}
+    ax = p if hasattr(p, "get_xlabel") else p.figure.axes[0]
+    return {"x": ax.get_xlabel(), "y": ax.get_ylabel(), "title": ax.get_title()}
+
+
+def ax_info(ax):
+    """For seaborn / pandas plots (a matplotlib Axes)."""
+    if type(ax).__name__ not in ("Axes", "AxesSubplot"):
+        raise TypeError(f"`ax` should be the plot (a matplotlib Axes, what sns.histplot(...) returns), not a {type(ax).__name__}")
+    leg = ax.get_legend()
+    return {"xlabel": ax.get_xlabel(), "ylabel": ax.get_ylabel(),
+            "legend": leg.get_title().get_text() if leg else "", "lines": len(ax.get_lines()),
+            "has_bars": len(ax.patches) > 0}
+
+
+def picture(ns):
+    """PNG (base64) of the student's plot: `p` if it is a ggplot, else the current matplotlib figure."""
+    import base64
+    try:
+        import matplotlib.pyplot as plt
+    except Exception:
+        return ""
+    fig = None
+    try:
+        if _is_gg(ns.get("p")):
+            fig = ns["p"].draw()
+        elif plt.get_fignums():
+            fig = plt.gcf()
+        if fig is None or not fig.axes:
+            return ""
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", dpi=80, bbox_inches="tight")
+        return base64.b64encode(buf.getvalue()).decode()
+    except Exception:
+        return ""
+    finally:
+        plt.close("all")
+
+
+PLOT_NS = {}
+
+
+def plot_ns():
+    """p9, sns, plt and the plot helpers, loaded only for plot problems."""
+    if not PLOT_NS:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        import plotnine as p9
+        import seaborn as sns
+        PLOT_NS.update(p9=p9, sns=sns, plt=plt, geoms=geoms, aes=aes, facet=facet, layer_param=layer_param,
+                       nrows=nrows, drawable=drawable, labels=labels, ax_info=ax_info)
+    return PLOT_NS
+
+
 def check(problem, user_code, base_ns=None):
     """problem: dict with setup, solution, targets [{expr,label}], mistakes [{when,msg}]."""
+    is_plot = bool(problem.get("plot"))
     def fresh():
         ns = {"np": np, "pd": pd}
+        if is_plot:
+            ns.update(plot_ns())
+            ns["plt"].close("all")
         if base_ns:
             ns.update(base_ns)
         return ns
@@ -174,8 +310,11 @@ def check(problem, user_code, base_ns=None):
     _, rerr = run_code(problem["solution"], R)
     if rerr:
         return dict(ok=False, output="", error="(reference solution failed: " + rerr + ")", hint="", results=[], mistakes=[])
+    if is_plot:
+        plot_ns()["plt"].close("all")
     run_code(setup, U)
     out, err = run_code(user_code, U)
+    image = picture(U) if is_plot and not err else ""
     results, all_ok = [], True
     for t in problem["targets"]:
         exp = _eval(t["expr"], R)
@@ -202,4 +341,17 @@ def check(problem, user_code, base_ns=None):
             except Exception:
                 pass
     return dict(ok=all_ok and not err, output=out, error=err, hint=error_hint(err) if err else "",
-                results=results, mistakes=mistakes)
+                results=results, mistakes=mistakes, image=image)
+
+
+def run_only(problem, user_code):
+    """The Run button: run setup + code, return output, error and the plot picture."""
+    is_plot = bool(problem.get("plot"))
+    ns = {"np": np, "pd": pd}
+    if is_plot:
+        ns.update(plot_ns())
+        ns["plt"].close("all")
+    run_code(problem.get("setup", ""), ns)
+    out, err = run_code(user_code, ns)
+    return dict(output=out, error=err, hint=error_hint(err) if err else "",
+                image=picture(ns) if is_plot and not err else "")

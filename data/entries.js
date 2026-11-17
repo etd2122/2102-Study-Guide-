@@ -1,5 +1,5 @@
 // STAT 2102 study guide data. Replace this file with the one you download from the site.
-window.ENTRIES_SAVED = "2026-11-17T01:30:00Z";
+window.ENTRIES_SAVED = "2026-11-17T03:00:00Z";
 window.ENTRIES = {
  "py-14": {
   "type": "py",
@@ -9527,6 +9527,267 @@ window.ENTRIES = {
     "question": "Draw a 6 × 4 matrix from a normal distribution with mean 10 and standard deviation 2 (use seed 42). Keep the rows whose **last** column is below 10 (as a copy), compute each kept row's mean, and give the dtype.",
     "code": "np.random.seed(42)\nm = np.random.normal(loc=10, scale=2, size=(6, 4))\nkeep = m[:, -1] < 10\nsmall = m[keep, :].copy()\nsmall.shape\n#> (4, 4)\nrow_means = small.mean(axis=1)\nrow_means.round(2)\n#> array([9.57, 8.02, 8.49, 9.94])\nrow_means.dtype\n#> dtype('float64')",
     "comment": "`size=(rows, cols)` makes a matrix. `m[:, -1]` is the last column (`-1` counts from the end; the first column would be `m[:, 0]`). A True/False array in the **row** position keeps those rows. `.copy()` makes it independent of `m`. `axis=1` = one value per row.\n\n**In his files:** Lecture 16 slide 13 (random normal), slide 16 (*Subsetting Numpy Arrays by Bool*), slide 20 (axis), slide 22 (copy); Lecture 17 slides 4, 8, 10.",
+    "key": false,
+    "lang": "python"
+   }
+  ]
+ },
+ "rev-10": {
+  "type": "prac",
+  "num": "10",
+  "title": "Python Quiz: data visualization (what you saw, what's fair game, traps)",
+  "date": "",
+  "exams": [
+   "Python Quiz"
+  ],
+  "topics": [
+   "plot",
+   "plots",
+   "visualization",
+   "graph",
+   "chart",
+   "plotnine",
+   "ggplot",
+   "geom_point",
+   "geom_line",
+   "geom_histogram",
+   "geom_density",
+   "geom_boxplot",
+   "geom_bar",
+   "geom_col",
+   "geom_smooth",
+   "facet_wrap",
+   "labs",
+   "seaborn",
+   "matplotlib",
+   "scatterplot",
+   "histogram",
+   "boxplot",
+   "bar chart",
+   "line plot",
+   "color",
+   "fill",
+   "hue",
+   "reset_index"
+  ],
+  "pdfs": [],
+  "notes": "**Plots will probably be part of the quiz.** Lecture 19 (Monday) was all about them, and it was the last lecture before the quiz. This page shows the plots from the lecture, the other common plots that use the same grammar (fair game), how to choose a plot, and the traps. Every plot below was drawn from the code shown (plotnine 0.15, seaborn 0.13).\n\n### What you saw in Lecture 19\n\n| Slide | Plot | Code |\n|---|---|---|\n| 4 | scatterplot (plotnine) | `p9.ggplot(tips) + p9.geom_point(mapping=p9.aes(x=\"total_bill\", y=\"tip\"))` |\n| 8 | histograms, one panel per day, bars filled by a group | `+ p9.facet_wrap(\"DAY_WEEK\", nrow = 2)` · `p9.geom_histogram(p9.aes(\"TIME\", fill = \"DRUNK\"), bins = 24)` |\n| 11 | seaborn scatter + histogram side by side | `f, axs = plt.subplots(1, 2)` · `sns.scatterplot(..., hue=\"species\", ax=axs[0])` · `sns.histplot(..., ax=axs[1])` |\n| 12 | pandas plots | `penguins.bill_depth_mm.plot.density()` · `df.plot()` |\n| 10 | show / save | `plt.show()` · `plt.savefig(\"name.png\")` · `plt.close()` |\n\n### Fair game: the same grammar, other geoms\n\n| Question the plot answers | plotnine | seaborn | pandas |\n|---|---|---|---|\n| two numbers related? | `geom_point` | `sns.scatterplot` | `df.plot.scatter(x=, y=)` |\n| …with a trend line | `+ geom_smooth(method=\"lm\")` | `sns.regplot` | |\n| change over time | `geom_line` (reset_index first) | `sns.lineplot` | `df.plot()` |\n| distribution of one number | `geom_histogram(bins=)`, `geom_density` | `sns.histplot`, `sns.kdeplot` | `.plot.hist()`, `.plot.density()` |\n| number across groups | `geom_boxplot`, `geom_violin` | `sns.boxplot`, `sns.violinplot` | `.plot.box()` |\n| counts per category | `geom_bar(aes(x=))` | `sns.countplot` | `.value_counts().plot.bar()` |\n| numbers you computed per category | `geom_col(aes(x=, y=))` | `sns.barplot` | `.plot.bar()` |\n| a panel per group | `facet_wrap(\"g\")`, `facet_grid(\"r ~ c\")` | `col=` in `sns.relplot` / `displot` | |\n| color by group | `color=` / `fill=` in `aes` | `hue=` | |\n| labels | `labs(title=, x=, y=)` | `ax.set_title()`, `ax.set_xlabel()` | `title=` argument |\n\n### Traps\n\n- **Column names go in quotes:** `p9.aes(x=\"tip\")`. Without them you get *NameError*.\n- **Dates in the index:** plotnine can't see the index. Use `df.reset_index()` first. seaborn and pandas can use the index directly.\n- **`p9.` in front of everything:** `p9.geom_point`, `p9.aes`, `p9.facet_wrap`, `p9.labs`.\n- **Mapped vs set:** `color=\"time\"` *inside* `aes` maps a column and makes a legend. `color=\"red\"` *outside* sets one color.\n- **`color` vs `fill`:** bars, boxes and histograms need `fill=`. `color=` only changes the outline.\n- **`geom_bar` vs `geom_col`:** `geom_bar` counts the rows; `geom_col` plots a y you give it.\n- **`facet_wrap(\"species\")`** takes a string, not R's `~ species`.\n- **Long expressions:** wrap the whole plot in `( ... )` to split it over lines, with `+` at the start of each line.\n- **Showing a plot:** in R Markdown, plotnine shows when `p` is the last line of the chunk. For seaborn, matplotlib and pandas use `plt.show()`, then `plt.close()`.\n\n**Practice with automatic checking:** the [Code Practice page](practice.html), section **F · Data visualization**: 10 plot problems. It draws your plot and checks the geom, the x / y / color mappings, facets, bins and labels.\n\n**Where to look during the quiz (allowed sites):** plotnine.org → *Reference* (every geom, with examples) · seaborn → *API reference* / *Gallery* · P4DA **ch. 9** *Plotting and Visualization* · Lecture 19 slides 4, 8, 11, 12.",
+  "takeaways": [
+   "plotnine = ggplot2 in Python: p9.ggplot(df) + p9.geom_xxx(p9.aes(x=\"col\", y=\"col\")). Column names in QUOTES, p9. in front of everything.",
+   "Pick the plot from the question: 2 numbers → geom_point; over time → geom_line; 1 number → geom_histogram/geom_density; number by group → geom_boxplot; counts → geom_bar.",
+   "Dates in the index? plotnine needs df.reset_index() first; pandas df.plot() and seaborn can use the index.",
+   "color= is points/lines/outlines, fill= is the inside of bars/boxes. Inside aes = mapped to a column (legend); outside = one fixed value.",
+   "geom_bar(aes(x=)) counts rows; geom_col(aes(x=, y=)) uses numbers you computed.",
+   "facet_wrap(\"g\") = one panel per group; geom_smooth(method=\"lm\") = straight trend line; labs(title=, x=, y=) = labels.",
+   "seaborn: data=df, x=\"col\", hue=\"group\"; plt.subplots(1, 2) + ax=axs[0] for side-by-side; plt.show() / plt.savefig() / plt.close().",
+   "Simpson's paradox: penguins' bill length vs depth is negative overall but positive within each species: color by group!"
+  ],
+  "updatedAt": "2026-11-17T03:00:00Z",
+  "chunks": [
+   {
+    "id": "v0",
+    "label": "Setup for every plot below",
+    "question": "What do I import and load before plotting?",
+    "code": "import numpy as np\nimport pandas as pd\nimport plotnine as p9\nimport matplotlib.pyplot as plt\nimport seaborn as sns\ntips = pd.read_csv(\"https://tinyurl.com/5206tips\")\npenguins = sns.load_dataset(\"penguins\")\nrates = pd.read_csv(\"rates.csv\", header=0, names=[\"month\", \"unemployment\", \"fed_funds\"],\n                    parse_dates=[\"month\"], index_col=\"month\")",
+    "comment": "`rates` is the FRED unemployment and federal funds data, read exactly like HW 4 Q3, so the dates are the **index**. That matters for plotnine (see the line plot).",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "v1",
+    "label": "Scatterplot: two numeric variables (+ color by a group)",
+    "question": "How are two numeric variables related?",
+    "code": "p = (p9.ggplot(tips)\n     + p9.geom_point(p9.aes(x=\"total_bill\", y=\"tip\", color=\"time\")))\np",
+    "comment": "**Seen in Lecture 19 slide 4** (without color). `color=` *inside* `aes()` maps a column to colors and makes a legend. Each point = one row.\n\n![viz-scatter](files/plots/viz-scatter.png)",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "v2",
+    "label": "Line plot over time: dates in the index need reset_index()",
+    "question": "How does a variable change over time (FRED-style data)?",
+    "code": "recent = rates.loc[rates.index >= \"2000-01-01\"].reset_index()\np = (p9.ggplot(recent)\n     + p9.geom_line(p9.aes(x=\"month\", y=\"unemployment\")))\np",
+    "comment": "**Not in his slides, but very likely with HW 4 Q3-style data.** plotnine (like ggplot2) only uses **columns**, and after `index_col=\"month\"` the dates are the index. `.reset_index()` turns the index back into a column. Forget it and you get *PlotnineError: Could not evaluate the 'x' mapping: 'month'*.\n\nTwo series on one plot: `p9.geom_line(p9.aes(x=\"month\", y=\"unemployment\")) + p9.geom_line(p9.aes(x=\"month\", y=\"fed_funds\"), color=\"red\")`.\n\n![viz-line](files/plots/viz-line.png)",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "v3",
+    "label": "Histogram: one numeric variable (bins) + facet_wrap",
+    "question": "What is the distribution of one numeric variable? Does it differ by group?",
+    "code": "p = (p9.ggplot(penguins)\n     + p9.geom_histogram(p9.aes(x=\"flipper_length_mm\"), bins=20)\n     + p9.facet_wrap(\"species\"))\np",
+    "comment": "**Seen in Lecture 19 slide 8** (`facet_wrap(\"DAY_WEEK\", nrow = 2)` with `bins = 24`). `bins=` sets the number of bars; `facet_wrap(\"col\")` makes one panel per group (the column name is a string, unlike R's `~ col`).\n\n![viz-hist-facet](files/plots/viz-hist-facet.png)",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "v4",
+    "label": "Density curves, overlapping by group (fill + alpha)",
+    "question": "How do I compare distributions of several groups on one plot?",
+    "code": "p = (p9.ggplot(penguins)\n     + p9.geom_density(p9.aes(x=\"body_mass_g\", fill=\"species\"), alpha=0.5))\np",
+    "comment": "A smooth version of the histogram. `fill=` (mapped, inside aes) colors each group; `alpha=0.5` (set, outside aes) makes them see-through so they overlap visibly.\n\n![viz-density](files/plots/viz-density.png)",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "v5",
+    "label": "Boxplots: a numeric variable by group (+ fill)",
+    "question": "How does a numeric variable compare across groups (medians, spread, outliers)?",
+    "code": "p = (p9.ggplot(tips)\n     + p9.geom_boxplot(p9.aes(x=\"day\", y=\"tip\", fill=\"smoker\")))\np",
+    "comment": "Group on **x**, number on **y**. The line in each box is the **median**, the box is the middle 50% (IQR), dots are outliers. For boxes and bars use `fill=` (inside); `color=` only colors the outline.\n\n![viz-box](files/plots/viz-box.png)",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "v6",
+    "label": "Bar charts: geom_bar counts for you, geom_col uses your numbers",
+    "question": "How many rows in each category? Or: plot numbers I already computed?",
+    "code": "p = p9.ggplot(penguins) + p9.geom_bar(p9.aes(x=\"island\"))\np",
+    "comment": "**geom_bar(aes(x=category))** counts the rows itself (like `table()` then a barplot). If you already have the numbers, use **geom_col** with both x and y:\n\n```\ncounts = penguins[\"island\"].value_counts().reset_index()\np9.ggplot(counts) + p9.geom_col(p9.aes(x=\"island\", y=\"count\"))\n```\n\n![viz-bar](files/plots/viz-bar.png)",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "v7",
+    "label": "Points + a straight-line fit per group (geom_smooth(method=\"lm\"))",
+    "question": "Is there a linear relationship, and is it the same in each group?",
+    "code": "p = (p9.ggplot(penguins, p9.aes(x=\"bill_length_mm\", y=\"bill_depth_mm\", color=\"species\"))\n     + p9.geom_point()\n     + p9.geom_smooth(method=\"lm\"))\np",
+    "comment": "Putting `aes()` inside `p9.ggplot(data, aes)` shares it with every layer. `method=\"lm\"` fits a straight line (the default is a curvy smoother).\n\n**Interpretation worth knowing (Simpson's paradox):** across all penguins, the correlation of bill length and depth is **negative** (about −0.24), but **within each species it is positive**. A plot colored by group shows it; a single correlation hides it.\n\n![viz-smooth](files/plots/viz-smooth.png)",
+    "key": true,
+    "lang": "python"
+   },
+   {
+    "id": "v8",
+    "label": "Titles, axis labels, theme, flipped axes",
+    "question": "How do I label a plot properly?",
+    "code": "p = (p9.ggplot(penguins)\n     + p9.geom_point(p9.aes(x=\"flipper_length_mm\", y=\"body_mass_g\"))\n     + p9.labs(title=\"Bigger flippers, heavier penguins\",\n               x=\"Flipper length (mm)\", y=\"Body mass (g)\")\n     + p9.theme_bw())\np",
+    "comment": "`p9.labs(title=, x=, y=, color=)` like ggplot2. `p9.theme_bw()` / `theme_minimal()` change the look. `+ p9.coord_flip()` swaps the axes (handy for long category names on bar charts).\n\n![viz-labels](files/plots/viz-labels.png)",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "v9",
+    "label": "Mapped vs. set: color=\"time\" inside aes vs color=\"red\" outside",
+    "question": "Why are my points not the color I asked for?",
+    "code": "p = (p9.ggplot(tips)\n     + p9.geom_point(p9.aes(x=\"total_bill\", y=\"tip\"), color=\"red\", size=1, alpha=0.6))\np",
+    "comment": "**Inside `aes()`** = *mapped*: the value is a COLUMN name, colors come from the data, a legend appears. **Outside `aes()`** = *set*: one fixed color for everything, no legend. Classic mistakes: `p9.aes(color=\"red\")` (makes a legend called \"red\"), or `color=\"time\"` outside aes (error: \"time\" isn't a color).\n\n![viz-set](files/plots/viz-set.png)",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "v10",
+    "label": "seaborn: scatter, box, count and line plots",
+    "question": "What are the seaborn versions of the common plots?",
+    "code": "f, axs = plt.subplots(2, 2, figsize=(9, 6))\nsns.scatterplot(data=tips, x=\"total_bill\", y=\"tip\", hue=\"time\", ax=axs[0, 0])\nsns.boxplot(data=tips, x=\"day\", y=\"tip\", ax=axs[0, 1])\nsns.countplot(data=penguins, x=\"island\", ax=axs[1, 0])\nsns.lineplot(data=rates.loc[\"2000\":], x=\"month\", y=\"unemployment\", ax=axs[1, 1])",
+    "comment": "**Seen in Lecture 19 slide 11** (`plt.subplots(1, 2)` with `scatterplot` and `histplot`). In seaborn, `hue=` is the group color (plotnine's `color=`/`fill=`), and `data=` + column names as strings. Unlike plotnine, **seaborn can use the index** by name (`x=\"month\"`), so no `reset_index()` needed. Others: `sns.histplot`, `sns.kdeplot`, `sns.barplot` (means with error bars), `sns.regplot` (scatter + line), `sns.violinplot`. Show with `plt.show()`, save with `plt.savefig(\"x.png\")`, then `plt.close()`.\n\n![viz-seaborn](files/plots/viz-seaborn.png)",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "v11",
+    "label": "pandas: plot straight from a Series or DataFrame",
+    "question": "What's the quickest plot without plotnine or seaborn?",
+    "code": "f, axs = plt.subplots(2, 2, figsize=(9, 6))\nrates.loc[\"2000\":].plot(ax=axs[0, 0])\npenguins[\"island\"].value_counts().plot.bar(ax=axs[0, 1])\ntips[\"tip\"].plot.hist(bins=20, ax=axs[1, 0])\ntips.plot.scatter(x=\"total_bill\", y=\"tip\", ax=axs[1, 1])",
+    "comment": "**Seen in Lecture 19 slide 12** (`.plot.density()` and `df.plot()`). `df.plot()` draws **one line per column against the index**, so FRED data with dates in the index plots over time immediately. `value_counts().plot.bar()` is a bar chart of counts. Also `.plot.box()`, `.plot.density()`, `.plot.line()`.\n\n![viz-pandas](files/plots/viz-pandas.png)",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "v12",
+    "label": "Show and save plots in R Markdown and the REPL",
+    "question": "My plot doesn't appear / how do I save it?",
+    "code": "# plotnine: the plot shows when it's the LAST line of the chunk\np = p9.ggplot(tips) + p9.geom_point(p9.aes(x=\"total_bill\", y=\"tip\"))\np\n# p.save(\"tips.png\")            # save a plotnine plot to a file\n\n# seaborn / matplotlib / pandas\nsns.histplot(data=tips, x=\"tip\")\n# plt.show()                    # show it (needed in a script / the REPL)\n# plt.savefig(\"hist.png\")       # save it (overwrites a file with the same name)\nplt.close()                     # clear it so the next plot starts fresh",
+    "comment": "Lecture 19 slide 10 (*Tutorials*): `plt.show()` in the REPL opens a window that blocks the console until you close it. In R Markdown both kinds of plot appear in the PDF (tested with the quiz template).",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "f1-prac",
+    "label": "Practice · Which plot for: the relationship between two numeric variables?",
+    "question": "Which plot for: the relationship between two numeric variables?",
+    "code": "p9.ggplot(df) + p9.geom_point(p9.aes(x=\"a\", y=\"b\"))",
+    "comment": "**Scatterplot.** Add `color=\"group\"` to compare groups, `+ p9.geom_smooth(method=\"lm\")` for a trend line. seaborn: `sns.scatterplot`.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "f2-prac",
+    "label": "Practice · Which plot for: the distribution of one numeric variable?",
+    "question": "Which plot for: the distribution of one numeric variable?",
+    "code": "p9.ggplot(df) + p9.geom_histogram(p9.aes(x=\"a\"), bins=20)",
+    "comment": "**Histogram (or density).** `geom_density` for a smooth curve; `facet_wrap(\"group\")` or `fill=\"group\"` to compare groups. pandas: `df[\"a\"].plot.hist()`.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "f3-prac",
+    "label": "Practice · Which plot for: a numeric variable compared across categories?",
+    "question": "Which plot for: a numeric variable compared across categories?",
+    "code": "p9.ggplot(df) + p9.geom_boxplot(p9.aes(x=\"group\", y=\"a\"))",
+    "comment": "**Side-by-side boxplots.** Category on x, number on y. The middle line is the median.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "f4-prac",
+    "label": "Practice · Which plot for: how many observations in each category?",
+    "question": "Which plot for: how many observations in each category?",
+    "code": "p9.ggplot(df) + p9.geom_bar(p9.aes(x=\"group\"))",
+    "comment": "**Bar chart of counts.** geom_bar counts the rows. geom_col needs a y you computed. pandas: `df[\"group\"].value_counts().plot.bar()`.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "f5-prac",
+    "label": "Practice · Which plot for: how something changes over time?",
+    "question": "Which plot for: how something changes over time?",
+    "code": "p9.ggplot(df.reset_index()) + p9.geom_line(p9.aes(x=\"month\", y=\"a\"))",
+    "comment": "**Line plot (time on x).** With dates in the index, reset_index() first for plotnine; pandas `df.plot()` uses the index directly.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "f6-prac",
+    "label": "Practice · Why does p9.aes(x=total_bill) give a NameError?",
+    "question": "Why does p9.aes(x=total_bill) give a NameError?",
+    "code": "p9.aes(x=\"total_bill\")",
+    "comment": "**Column names must be strings in plotnine.** In R's ggplot2 you write bare names; in Python they go in quotes.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "f7-prac",
+    "label": "Practice · What's the difference between color and fill?",
+    "question": "What's the difference between color and fill?",
+    "code": "p9.geom_boxplot(p9.aes(x=\"day\", y=\"tip\", fill=\"smoker\"))",
+    "comment": "**color = points, lines and outlines; fill = the inside of bars, boxes, areas.** For a boxplot or histogram, color= only changes the outline.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "f8-prac",
+    "label": "Practice · What's the difference between putting color inside aes() and outside?",
+    "question": "What's the difference between putting color inside aes() and outside?",
+    "code": "p9.geom_point(p9.aes(x=\"a\", y=\"b\", color=\"group\"))   # mapped\np9.geom_point(p9.aes(x=\"a\", y=\"b\"), color=\"red\")      # set",
+    "comment": "**Inside = mapped to a column (legend); outside = one fixed color.** aes(color=\"red\") is a classic mistake: it makes a legend entry called red.",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "f9-prac",
+    "label": "Practice · facet_wrap vs facet_grid?",
+    "question": "facet_wrap vs facet_grid?",
+    "code": "p9.facet_wrap(\"species\")\np9.facet_grid(\"sex ~ species\")",
+    "comment": "**facet_wrap: one variable, panels wrap into rows; facet_grid: rows by one variable, columns by another.** Lecture 19 used facet_wrap(\"DAY_WEEK\", nrow = 2).",
+    "key": false,
+    "lang": "python"
+   },
+   {
+    "id": "f10-prac",
+    "label": "Practice · Interpret: overall corr(bill_length, bill_depth) is negative, but within each species it's positive. What is this called?",
+    "question": "Interpret: overall corr(bill_length, bill_depth) is negative, but within each species it's positive. What is this called?",
+    "code": "penguins[\"bill_length_mm\"].corr(penguins[\"bill_depth_mm\"])\n#> np.float64(-0.23505287035553277)\npenguins.groupby(\"species\")[[\"bill_length_mm\", \"bill_depth_mm\"]].corr()\n#>                           bill_length_mm  bill_depth_mm\n#> species\n#> Adelie    bill_length_mm        1.000000       0.391492\n#>           bill_depth_mm         0.391492       1.000000\n#> Chinstrap bill_length_mm        1.000000       0.653536\n#>           bill_depth_mm         0.653536       1.000000\n#> Gentoo    bill_length_mm        1.000000       0.643384\n#>           bill_depth_mm         0.643384       1.000000",
+    "comment": "**Simpson's paradox: a lurking group variable (species) reverses the trend.** A scatterplot colored by species (with geom_smooth per species) shows it.",
     "key": false,
     "lang": "python"
    }

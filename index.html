@@ -419,7 +419,7 @@ details.alt{border-left-width:1px;border-left-color:color-mix(in srgb,var(--acce
       <button class="btn" id="btnGuide" type="button" aria-pressed="false">Study guide</button>
       <button class="btn ghost menu-btn" id="btnMenu" type="button" aria-expanded="true">List</button>
     </div>
-    <button class="btn quiz-cta" id="btnPyQuiz" type="button" aria-pressed="false"><span>Python Quiz study page</span><span class="quiz-when">Wed, Nov 18</span></button>
+    <button class="btn quiz-cta" id="btnPyQuiz" type="button" aria-pressed="false"><span>Python Quiz study page</span><span class="quiz-when">new date TBA</span></button>
     <a class="btn" href="practice.html" style="justify-content:center;text-decoration:none;color:inherit">Code practice: instant feedback →</a>
     <button class="btn match-btn" id="btnMatch" type="button" aria-pressed="false">Find code for a question</button>
     <div class="side-actions tool-row">
@@ -1134,7 +1134,8 @@ const PY_LOOKUP=[
   ['df$col','df["col"]  (or df.col)'],['df[, c("a", "b")]','df[["a", "b"]]'],['df[df$a > 1, ]','df.loc[df["a"] > 1]'],['df[1:3, 1:2]','df.iloc[0:3, 0:2]'],
   ['df[(a > 1) & (b == "x"), ]','df.loc[(df.a > 1) & (df.b == "x")]'],['x %in% c("a", "b")','x.isin(["a", "b"])'],
   ['df$new <- df$a / df$b','df["new"] = df["a"] / df["b"]'],['table(x)','x.value_counts()'],['sum(is.na(x))','x.isna().sum()'],
-  ['mean(x, na.rm = TRUE)','x.mean()  (skips NaN by default)'],['which.max(x)','x.idxmax() (label) / x.argmax() (position)'],['cor(x, y)','x.corr(y)'],
+  ['mean(x, na.rm = TRUE)','x.mean()  (skips NaN by default)'],['median(x), quantile(x, 0.25)','x.median(), x.quantile(0.25)'],['ncol(df), str(df)','df.shape[1], df.dtypes'],
+  ['x[is.na(x)] <- mean(x, na.rm = TRUE)','x.fillna(x.mean())'],['df$name[is.na(df$x)]','df.loc[df["x"].isna(), "name"]'],['geom_boxplot(aes(y = x))','p9.geom_boxplot(p9.aes(y="x"))'],['which.max(x)','x.idxmax() (label) / x.argmax() (position)'],['cor(x, y)','x.corr(y)'],
   ['apply(df, 1, f)','df.apply(f, axis=1)'],['tapply(x, g, mean)','df.groupby("g")["x"].mean()'],['df[order(-df$a), ]','df.sort_values("a", ascending=False)'],
   ['grepl("S", x)','x.str.contains("S")'],['recode / named vector lookup','x.map({"AM": "Morning"})'],
   ['Plots'],
@@ -1145,9 +1146,11 @@ const PY_LOOKUP=[
 ];
 function pyQuizIntroHTML(list){
   return `<section class="pyq">
-    <div class="pyq-facts"><span><b>Wed, Nov 18</b> in class</span><span>45 minutes</span><span>Python only</span><span>30 min review first</span><span>Proctorio (Chrome)</span></div>
+    <div class="pyq-facts"><span><b>Nov 18 sitting stopped halfway</b> · new date TBA</span><span>45 minutes</span><span>Python only</span><span>30 min review first</span><span>Proctorio (Chrome)</span></div>
+    <p class="hint"><b>Start with Rev 11:</b> the Nov 18 quiz was stopped halfway; Rev 11 shows what was actually on it, what this page missed (outliers, median, fillna, a Categorical from counts) and fixes the code you wrote.</p>
     <p class="hint"><b>During the quiz you can only use his files and the websites he gave, not this site.</b> Use it now to learn <i>where</i> things are (the map) and to practice: much of the quiz will look like HW 4 Q3. Below: every point and exam chunk from Py 14–19, Rec 10, HW 4 and the two Q3-style practice sets (Rev 09, Test 03), in lecture order.</p>
     <div class="pyq-actions">
+      <button class="btn sm primary" type="button" data-act="goto" data-eid="rev-11">What was on the Nov 18 quiz →</button>
       <button class="btn sm primary" type="button" data-act="goto" data-eid="rev-08">Where everything is in his slides →</button>
       <button class="btn sm primary" type="button" data-act="goto" data-eid="rev-09">Practice: HW 4 Q3 style →</button>
       <button class="btn sm primary" type="button" data-act="goto" data-eid="test-03">More practice: Test 03 drill →</button>

@@ -1154,5 +1154,193 @@
   ],
   "hint": "tips.groupby(\"day\")[\"tip_pct\"].median().idxmax()",
   "where": "P4DA ch. 10; plotnine geom_boxplot"
+ },
+ {
+  "id": "g1",
+  "group": "G · From the Nov 18 quiz: what the guide missed",
+  "title": "Variables and string columns",
+  "setup": "cars = pd.read_csv(\"mtcars.csv\")",
+  "prompt": "Store the number of **variables** in `cars` in **`n_vars`**, and a list of the names of the **string** columns in **`text_cols`**.",
+  "starter": "n_vars = \ntext_cols = ",
+  "solution": "n_vars = cars.shape[1]\ntext_cols = list(cars.select_dtypes(exclude=\"number\").columns)",
+  "targets": [
+   {
+    "expr": "n_vars",
+    "label": "number of variables"
+   },
+   {
+    "expr": "text_cols",
+    "label": "string columns"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'.count()' in __code__",
+    "msg": ".count() gives non-missing values per column, not the number of variables. Use .shape[1]."
+   },
+   {
+    "when": "'.type(' in __code__",
+    "msg": "DataFrames have no .type(). The column types are the attribute .dtypes (no parentheses)."
+   }
+  ],
+  "hint": ".shape[1] = columns. .dtypes shows each column's type; select_dtypes(exclude=\"number\") keeps the non-numbers.",
+  "where": "L18 s4 / L17 s18 (Attributes); dtypes in L17, L18, Rec 10",
+  "plot": false
+ },
+ {
+  "id": "g2",
+  "group": "G · From the Nov 18 quiz: what the guide missed",
+  "title": "Box plot of one variable",
+  "setup": "cars = pd.read_csv(\"mtcars.csv\")",
+  "prompt": "Make a plotnine **box plot** of `mpg` from `cars`, stored in **`p`**.",
+  "starter": "p = ",
+  "solution": "p = p9.ggplot(cars) + p9.geom_boxplot(p9.aes(y=\"mpg\"))",
+  "targets": [
+   {
+    "expr": "geoms(p)",
+    "label": "the layer"
+   },
+   {
+    "expr": "aes(p)",
+    "label": "the mapping"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'ggplot(cars[' in __code__ or 'ggplot(cars.loc' in __code__",
+    "msg": "Give p9.ggplot() the whole DataFrame; pick the column inside p9.aes(y=\"mpg\")."
+   },
+   {
+    "when": "'aes()' in __code__",
+    "msg": "A box plot needs y=: p9.aes(y=\"mpg\")."
+   }
+  ],
+  "hint": "p9.ggplot(df) + p9.geom_boxplot(p9.aes(y=\"col\"))",
+  "where": "L19 s4 (plotnine grammar); Rev 10 v5",
+  "plot": true
+ },
+ {
+  "id": "g3",
+  "group": "G · From the Nov 18 quiz: what the guide missed",
+  "title": "Outlier rows (1.5 × IQR)",
+  "setup": "cars = pd.read_csv(\"mtcars.csv\")",
+  "prompt": "Using the 1.5 × IQR rule on **`mpg`**, store the **model names** of the outliers as a list in **`outliers`**.",
+  "starter": "q1 = \nq3 = \n\noutliers = ",
+  "solution": "q1 = cars[\"mpg\"].quantile(0.25)\nq3 = cars[\"mpg\"].quantile(0.75)\niqr = q3 - q1\noutliers = list(cars.loc[(cars[\"mpg\"] < q1 - 1.5 * iqr) | (cars[\"mpg\"] > q3 + 1.5 * iqr), \"model\"])",
+  "targets": [
+   {
+    "expr": "outliers",
+    "label": "outlier models"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "' and ' in __code__ or ' or ' in __code__",
+    "msg": "Use | (or) and & (and) with each condition in parentheses, never 'and' / 'or'."
+   }
+  ],
+  "hint": "Fences: Q1 − 1.5·IQR and Q3 + 1.5·IQR. Keep rows outside them with .loc[cond, \"model\"].",
+  "where": "Not on his slides: pandas docs Series.quantile; .loc L18 s5",
+  "plot": false
+ },
+ {
+  "id": "g4",
+  "group": "G · From the Nov 18 quiz: what the guide missed",
+  "title": "Find and fill missing values",
+  "setup": "penguins = pd.read_csv(\"penguins.csv\")",
+  "prompt": "Store the **species** of the penguins missing `flipper_length_mm` (as a list) in **`who`**. Then replace the missing `flipper_length_mm` values in `penguins` with the mean of the non-missing values.",
+  "starter": "who = \n",
+  "solution": "who = list(penguins.loc[penguins[\"flipper_length_mm\"].isna(), \"species\"])\npenguins[\"flipper_length_mm\"] = penguins[\"flipper_length_mm\"].fillna(penguins[\"flipper_length_mm\"].mean())",
+  "targets": [
+   {
+    "expr": "who",
+    "label": "species with a missing flipper length"
+   },
+   {
+    "expr": "int(penguins[\"flipper_length_mm\"].isna().sum())",
+    "label": "missing values left"
+   },
+   {
+    "expr": "round(float(penguins[\"flipper_length_mm\"].mean()), 4)",
+    "label": "mean after filling"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'fillna' in __code__ and 'penguins[\"flipper_length_mm\"] =' not in __code__ and \"penguins['flipper_length_mm'] =\" not in __code__",
+    "msg": ".fillna() returns a new Series. Assign it back: penguins[\"flipper_length_mm\"] = ...fillna(...)."
+   }
+  ],
+  "hint": "Find them BEFORE you fill them. .loc[mask, \"species\"]; then .fillna(column.mean()).",
+  "where": "Rec 10 §6 (fillna); L18 s5 (.loc), s8 (.isna)",
+  "plot": false
+ },
+ {
+  "id": "g5",
+  "group": "G · From the Nov 18 quiz: what the guide missed",
+  "title": "Categorical from a table of counts",
+  "setup": "",
+  "prompt": "Ratings: **High 4, Medium 9, Low 7**, and **Not sure 5** (not a rating). Make an **ordered** Categorical **`level`** of size 20 with categories `High`, `Medium`, `Low` in that order (the 4 Highs first).",
+  "starter": "level = ",
+  "solution": "level = pd.Categorical.from_codes([0] * 4 + [1] * 9 + [2] * 7, categories=[\"High\", \"Medium\", \"Low\"], ordered=True)",
+  "targets": [
+   {
+    "expr": "len(level)",
+    "label": "size"
+   },
+   {
+    "expr": "list(level.categories)",
+    "label": "categories"
+   },
+   {
+    "expr": "bool(level.ordered)",
+    "label": "ordered"
+   },
+   {
+    "expr": "list(level.codes)",
+    "label": "the values in order"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "len(level) == 25",
+    "msg": "\"Not sure\" isn't a rating: the size should be 4 + 9 + 7 = 20."
+   }
+  ],
+  "hint": "[0] * 4 is four 0s; + joins lists. pd.Categorical.from_codes(codes, categories=[...], ordered=True).",
+  "where": "L17 s14–15 (Categorical.from_codes); L15 (list * and +)",
+  "plot": false
+ },
+ {
+  "id": "g6",
+  "group": "G · From the Nov 18 quiz: what the guide missed",
+  "title": "A date window vs. the overall mean",
+  "setup": "rates = pd.read_csv(\"rates.csv\", header=0, names=[\"month\", \"unemployment\", \"fed_funds\"], parse_dates=[\"month\"], index_col=\"month\")",
+  "prompt": "Store the mean **fed_funds** rate over the whole series in **`overall`**, its mean from **January 2020 to December 2021** in **`recent`**, and whether `recent` is higher in **`higher`** (True/False).",
+  "starter": "overall = \nrecent = \nhigher = ",
+  "solution": "overall = rates[\"fed_funds\"].mean()\nrecent = rates.loc[\"2020-01\":\"2021-12\", \"fed_funds\"].mean()\nhigher = recent > overall",
+  "targets": [
+   {
+    "expr": "round(float(overall), 4)",
+    "label": "overall mean"
+   },
+   {
+    "expr": "round(float(recent), 4)",
+    "label": "2020–2021 mean"
+   },
+   {
+    "expr": "bool(higher)",
+    "label": "higher?"
+   }
+  ],
+  "mistakes": [
+   {
+    "when": "'rates[\"month\"]' in __code__ or \"rates['month']\" in __code__",
+    "msg": "month is the INDEX (index_col), not a column. Slice dates with rates.loc[\"2020-01\":\"2021-12\"]."
+   }
+  ],
+  "hint": "With a date index: rates.loc[\"start\":\"end\", \"col\"] (both ends included).",
+  "where": "HW 4 Q3 setup; L18 s5 (.loc)",
+  "plot": false
  }
 ]
